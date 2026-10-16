@@ -384,9 +384,12 @@
       }
     },
     "disable-autoplay": {
-      "description": "Makes song start in \"paused\" mode",
+      "description": "Keep a video from starting by itself, and the site's autoplay toggle off",
       "menu": {
-        "apply-once": "Applies only on startup"
+        "apply-once": "Only once per session",
+        "block-on-load": "Pause a video that starts when the app opens",
+        "block-on-navigation": "Pause a video that starts by itself after navigating",
+        "enforce-autonav": "Keep the site's autoplay toggle off"
       },
       "name": "Disable Autoplay"
     },

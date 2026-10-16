@@ -9,7 +9,6 @@ import type { VideoInfo } from "@/types/video-info";
  * and a read that returns the same video as last time is dropped. Binding is driven by
  * the site's own SPA events (docs/PRD.md §3.4) and by the media element's `loadstart`.
  */
-import { PlayerState } from "@/types/youtube-player";
 import type { YouTubePlayer } from "@/types/youtube-player";
 
 import { getPlayer, getVideo } from "./youtube-dom";
@@ -58,7 +57,11 @@ const readVideoInfo = (player: Player): VideoInfo | null => {
     imageSrc: details.thumbnail?.thumbnails?.at(-1)?.url,
     isLive: details.isLiveContent,
     isMuted: player.isMuted?.() ?? false,
-    isPaused: player.getPlayerState?.() !== PlayerState.Playing,
+    // Asked of the media element, not of the player state: the state numbers
+    // buffering (3) and cued (5) alongside paused, and a video that is buffering is
+    // not a video the user paused - reading it as one put a stale "paused" into the
+    // mirror on every transition, and it outranked the play/pause reports.
+    isPaused: video?.paused ?? true,
     playlistId: player.getVideoData?.().list || listFromUrl || undefined,
     title: details.title,
     uploadDate: microformat?.uploadDate,

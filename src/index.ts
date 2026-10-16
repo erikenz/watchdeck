@@ -107,7 +107,7 @@ if (remoteDebugPort) {
   // Chrome 111+ refuses cross-origin CDP websockets without this.
   app.commandLine.appendSwitch("remote-allow-origins", "*");
   console.log(
-    `${LoggerPrefix} remote debugging on http://127.0.0.1:${remoteDebugPort}`
+    `${LoggerPrefix} requesting remote debugging on http://127.0.0.1:${remoteDebugPort}`
   );
 }
 
@@ -651,6 +651,33 @@ app.on("activate", async () => {
 const getDefaultLocale = async (locale: string) =>
   Object.keys(await languageResources()).includes(locale) ? locale : null;
 
+/**
+ * `--remote-debugging-port` does not report a bind failure: with the port already taken by
+ * another browser, the app starts without an endpoint and whoever owns the port answers on it -
+ * which looks exactly like a working debugging setup until the tools drive the wrong browser.
+ * The endpoint names its client, so ask it once the app is up and say which case this is.
+ */
+const reportRemoteDebugEndpoint = async (port: string) => {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/json/version`);
+    const version = (await response.json()) as { "User-Agent"?: string };
+    const agent = version["User-Agent"] ?? "";
+    if (agent.includes(app.getName())) {
+      console.log(
+        `${LoggerPrefix} remote debugging ready on http://127.0.0.1:${port}`
+      );
+      return;
+    }
+    console.warn(
+      `${LoggerPrefix} port ${port} answers, but not for this app (${agent || "unknown"}) - another browser owns it, so the app has no CDP endpoint; pass WATCHDECK_REMOTE_DEBUG=<free port>`
+    );
+  } catch {
+    console.warn(
+      `${LoggerPrefix} nothing answers on http://127.0.0.1:${port}: the port was taken before the app could bind it, or debugging is off`
+    );
+  }
+};
+
 app.whenReady().then(async () => {
   if (!config.get("options.language")) {
     const locale = await getDefaultLocale(app.getLocale());
@@ -663,6 +690,10 @@ app.whenReady().then(async () => {
     await setLanguage(config.get("options.language") ?? "en");
     console.log(LoggerPrefix, t("main.console.i18n.loaded"));
   });
+
+  if (remoteDebugPort) {
+    await reportRemoteDebugEndpoint(remoteDebugPort);
+  }
 
   if (config.get("options.autoResetAppCache")) {
     // Clear cache after 20s

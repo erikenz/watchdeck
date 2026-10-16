@@ -308,8 +308,9 @@ function initTheme(win: BrowserWindow) {
 
   win.webContents.once("did-finish-load", () => {
     if (is.dev()) {
-      console.debug(LoggerPrefix, t("main.console.did-finish-load.dev-tools"));
-      win.webContents.openDevTools();
+      // DevTools used to open here on every dev run, covering the window that is the
+      // thing under development. It stays one keystroke (F12) or one menu click away.
+      console.debug(LoggerPrefix, t("main.console.did-finish-load.ready"));
     }
   });
 }

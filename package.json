@@ -134,6 +134,6 @@
     "node": ">=24",
     "pnpm": ">=12"
   },
-  "desktopName": "com.github.erikenz.watchdeck",
+  "desktopName": "watchdeck",
   "productName": "Watchdeck"
 }

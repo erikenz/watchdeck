@@ -663,7 +663,10 @@ identity is the lowercase `watchdeck` — `~/.config/watchdeck` on Linux, `WM_CL
 `StartupWMClass: watchdeck` in the desktop entry. Case-sensitive filesystems treat `Watchdeck` and `watchdeck` as two
 different applications, so a capitalised directory splits `$XDG_CONFIG_HOME/*` globs, scripts and window-manager rules
 (and a later rename orphans the user's config and session). The reverse-DNS `com.github.erikenz.watchdeck` stays where
-reverse-DNS belongs: the Windows AppUserModelID and the electron-builder `appId`. See `src/app-identity.ts`.
+reverse-DNS belongs: the Windows AppUserModelID and the electron-builder `appId`. See `src/app-identity.ts`. Two more places carry that identity and must stay in step: `desktopName` in
+package.json (Electron uses it for the **Wayland app_id**, which is what Hyprland and friends match on — leaving
+the reverse-DNS id there is why window rules stopped matching) and `linux.desktop.entry.StartupWMClass` in
+electron-builder.yml.
 
 **On the escapes (rev 5, owner's call).** Revision 1 proposed replacing the `\u0079\u006f\u0075\u0074\u0075\u0062\u0065`
 escapes with plain strings. They stay instead, and for a reason worth recording: the upstream fork introduced them in the

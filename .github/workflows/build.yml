@@ -94,13 +94,17 @@ jobs:
         run: |
           pnpm release:win
 
+      # The plugin's renderer fixtures drive a plain browser (the app's own test drives Electron),
+      # so the runner needs one: this was skipped while the download was the only thing that used it.
+      - name: Install the test browser
+        if: runner.os == 'Linux'
+        run: pnpm exec playwright install --with-deps chromium
+
       # The launch test drives Electron through Playwright, which needs a display: xvfb exists
       # on the Linux runner only.
       - name: Test
         if: runner.os == 'Linux'
         uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
         with:
           run: pnpm test:debug
 

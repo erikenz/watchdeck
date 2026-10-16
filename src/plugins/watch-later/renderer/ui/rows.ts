@@ -163,3 +163,23 @@ export const toolbarInsertionPoint = ():
     ? { before: list.firstElementChild, parent: list }
     : { before: list, parent: list.parentElement ?? list };
 };
+
+/**
+ * Whether the toolbar has to be moved to sit where the insertion point says it belongs.
+ *
+ * Moving an element that is already in place is not a no-op: it is a DOM mutation, which feeds
+ * this plugin's own observer, and it takes the element out from under a click whose press is
+ * already down on one of its buttons - a click that then never arrives. So the decision is a
+ * question about the anchor, and it is a function here rather than a line inside the mount.
+ */
+export const toolbarNeedsMoving = (
+  host: Element,
+  point: { before: Element | null; parent: Element }
+): boolean => {
+  if (host.parentElement !== point.parent) {
+    return true;
+  }
+  return point.before
+    ? host.nextElementSibling !== point.before
+    : host !== point.parent.lastElementChild;
+};

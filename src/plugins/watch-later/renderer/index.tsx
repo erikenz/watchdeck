@@ -37,6 +37,7 @@ import {
   rowVideoId,
   TOOLBAR_HOST_CLASS,
   toolbarInsertionPoint,
+  toolbarNeedsMoving,
 } from "./ui/rows";
 import Toolbar from "./ui/toolbar";
 
@@ -138,13 +139,8 @@ export const renderer = {
     const placed = this.toolbarHost;
     if (placed?.isConnected) {
       // The site renders its parts in whatever order it likes, so a toolbar that is no longer
-      // against its anchor is put back - and only then. Moving an element that is already in
-      // place is a DOM mutation, not a no-op: it feeds this plugin's own observer, and it takes
-      // the element out from under a click whose press is already down on one of its buttons.
-      const anchored = point.before
-        ? placed.nextElementSibling === point.before
-        : placed === point.parent.lastElementChild;
-      if (placed.parentElement === point.parent && anchored) {
+      // against its anchor is put back - and only then; `toolbarNeedsMoving` carries the reason.
+      if (!toolbarNeedsMoving(placed, point)) {
         return;
       }
       point.parent.insertBefore(placed, point.before);

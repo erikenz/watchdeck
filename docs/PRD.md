@@ -658,6 +658,13 @@ MIT attribution text, `changelog.md` (delete), `renovate.json` (rewrite), `.gith
 `web/screenshot.png`, `assets/icon.svg` + `assets/generated/**` (new icon set), `assets/error.html` text,
 `tests/index.test.js` (assert `https://www.youtube.com`). `.devcontainer/` is fine as-is.
 
+**Identity, on-disk vs display (rev 9).** The window title, tray and dialogs say `Watchdeck`; the *on-disk*
+identity is the lowercase `watchdeck` — `~/.config/watchdeck` on Linux, `WM_CLASS`/Wayland app_id `watchdeck`, and
+`StartupWMClass: watchdeck` in the desktop entry. Case-sensitive filesystems treat `Watchdeck` and `watchdeck` as two
+different applications, so a capitalised directory splits `$XDG_CONFIG_HOME/*` globs, scripts and window-manager rules
+(and a later rename orphans the user's config and session). The reverse-DNS `com.github.erikenz.watchdeck` stays where
+reverse-DNS belongs: the Windows AppUserModelID and the electron-builder `appId`. See `src/app-identity.ts`.
+
 **On the escapes (rev 5, owner's call).** Revision 1 proposed replacing the `\u0079\u006f\u0075\u0074\u0075\u0062\u0065`
 escapes with plain strings. They stay instead, and for a reason worth recording: the upstream fork introduced them in the
 same commit that renamed the app (upstream `ffa61687` "chore: improve readability", which turned `youtube-music` /

@@ -246,7 +246,9 @@ const parseLegacyItem = (
     return undefined;
   }
 
-  const byline = children(renderer, "shortBylineText")[0];
+  // The byline is `shortBylineText.runs[0]`: the run carries the channel name, and its
+  // navigationEndpoint the channel id. (`children()` only walks arrays, so it cannot be
+  // used for the byline object itself - reaching for it is what dropped every channel.)
   const bylineRun = children(child(renderer, "shortBylineText"), "runs")[0];
   const badgedLive = children(renderer, "badges").some((badge) => {
     const label = textOf(child(badge, "metadataBadgeRenderer")) ?? "";
@@ -260,17 +262,13 @@ const parseLegacyItem = (
     );
 
   return {
-    channelId:
-      typeof child(child(bylineRun, "navigationEndpoint"), "browseEndpoint") ===
-      "object"
-        ? textOf(
-            child(
-              child(child(bylineRun, "navigationEndpoint"), "browseEndpoint"),
-              "browseId"
-            )
-          )
-        : undefined,
-    channelTitle: textOf(child(byline, "runs")) ?? textOf(byline),
+    channelId: textOf(
+      child(
+        child(child(bylineRun, "navigationEndpoint"), "browseEndpoint"),
+        "browseId"
+      )
+    ),
+    channelTitle: textOf(bylineRun),
     durationSeconds: secondsFromText(lengthText),
     isLive: badgedLive || undefined,
     setVideoId:

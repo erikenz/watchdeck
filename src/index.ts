@@ -1,3 +1,5 @@
+// Must come first: it sets the app's on-disk identity before any path is read.
+import "./app-identity";
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
@@ -118,10 +120,7 @@ if (is.linux()) {
     disabledFeatures.push("MediaSessionService");
   }
 
-  // Overrides WM_CLASS for X11 to correspond to icon filename
-  app.setName("com.github.erikenz.watchdeck");
-  // for wayland
-  app.commandLine.appendSwitch("class", "com.github.erikenz.watchdeck");
+  // WM_CLASS/app_id and the on-disk identity are set in src/app-identity.ts.
 }
 
 if (disableHardwareAcceleration) {

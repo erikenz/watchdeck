@@ -105,6 +105,91 @@ test("parses a page into items, resume percent, badge and continuation", () => {
   expect(parsed.totalItems).toBe(2);
 });
 
+/** Taken from a real `VLWL` response, trimmed to the fields the parser reads. */
+const realPageFixture = {
+  contents: {
+    itemSectionRenderer: {
+      contents: [
+        {
+          playlistVideoListRenderer: {
+            contents: [
+              {
+                playlistVideoRenderer: {
+                  index: { simpleText: "1" },
+                  isPlayable: true,
+                  navigationEndpoint: {
+                    commandMetadata: {
+                      webCommandMetadata: { url: "/watch?v=aaaa" },
+                    },
+                  },
+                  setVideoId: "289F4A46CA11",
+                  shortBylineText: {
+                    runs: [
+                      {
+                        navigationEndpoint: {
+                          browseEndpoint: {
+                            browseId: "UCYEK6xds6eo-3tr4xRdflmQ",
+                            canonicalBaseUrl:
+                              "/channel/UCYEK6xds6eo-3tr4xRdflmQ",
+                          },
+                        },
+                        text: "deadmau5",
+                      },
+                    ],
+                  },
+                  thumbnail: {
+                    thumbnails: [
+                      {
+                        height: 94,
+                        url: "https://i.ytimg.com/vi/aaaa/default.jpg",
+                        width: 168,
+                      },
+                      {
+                        height: 188,
+                        url: "https://i.ytimg.com/vi/aaaa/mqdefault.jpg",
+                        width: 336,
+                      },
+                    ],
+                  },
+                  thumbnailOverlays: [
+                    {
+                      thumbnailOverlayResumePlaybackRenderer: {
+                        percentDurationWatched: 25,
+                      },
+                    },
+                    {
+                      thumbnailOverlayTimeStatusRenderer: {
+                        text: { simpleText: "1:01:00" },
+                        style: "DEFAULT",
+                      },
+                    },
+                  ],
+                  title: { runs: [{ text: "deadmau5 Live Stream" }] },
+                  videoId: "aaaaaaaaaaa",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+};
+
+test("parses a real page: channel, duration from the overlay, resume percent", () => {
+  const [item] = parseWatchLaterPage(realPageFixture).items;
+
+  expect(item.videoId).toBe("aaaaaaaaaaa");
+  expect(item.title).toBe("deadmau5 Live Stream");
+  expect(item.channelTitle).toBe("deadmau5");
+  expect(item.channelId).toBe("UCYEK6xds6eo-3tr4xRdflmQ");
+  expect(item.setVideoId).toBe("289F4A46CA11");
+  // No lengthText in this response shape: the duration comes from the time-status overlay.
+  expect(item.durationSeconds).toBe(3660);
+  expect(item.ytPercentWatched).toBe(25);
+  expect(item.thumbnailUrl).toContain("mqdefault.jpg");
+});
+
 test("paging walks to the end, captures progress and soft-deletes what is gone", async () => {
   const db = new WatchLaterStore(openNodeSqlite(":memory:"));
   db.upsertEntry({ accountId: "alpha", videoId: "stale000001" });

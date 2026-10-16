@@ -44,7 +44,9 @@ linux:
   syncDesktopName: true
   desktop:
     entry:
-      StartupWMClass: "com.github.erikenz.watchdeck"
+      # Matches the WM_CLASS/app_id the app sets (lowercase, like the icon and the
+      # config directory), so window managers and launchers can associate the window.
+      StartupWMClass: "watchdeck"
   target:
     - target: AppImage
       arch:

@@ -20,6 +20,9 @@ These four are held at the version the current code is written against. Each one
 
 ## Environment notes (this workspace, not the code)
 
-- [ ] **`pnpm dev` warns about a tsconfig base file** (`Cannot find base config file "./node_modules/@electron-toolkit/tsconfig/tsconfig.node.json"` pointing at `../../../../tsconfig.json:2:13`): esbuild resolves that path four levels above the repo, which is the _primary checkout_ at `~/Projects/watchdeck`. It still carries the old tsconfig from before the inlining. Update that checkout (`git -C ~/Projects/watchdeck pull`) or run dev from a normal clone; a clean copy of the pushed code prints no such warning.
 - [ ] **`pnpm test` cannot attach to the page without a window manager** (this sandbox): `firstWindow()` never resolves — for this app _and_ for the commit before it. The window is created and titled correctly, which the launch test asserts. The page load assertion is `test.fixme` in `tests/index.test.js`; drop the `.fixme` where `pnpm dev` shows the site (a real desktop, or xvfb in CI).
-- [ ] **userData directory naming**: the app keeps its data in `~/.config/Watchdeck` (Electron uses `productName`), while the prototype used `~/.config/watchdeck`. Separate directories: the lowercase one holds the prototype's config, its `watchdeck.db` and its Chromium profile.
+
+Resolved, and worth remembering:
+
+- A `pnpm dev` warning about a missing tsconfig base file came from the **primary checkout** above this worktree (esbuild resolved `../../../../tsconfig.json`), not from this tree; updating that checkout removed it.
+- The app's userData directory is the lowercase `watchdeck` on Linux now (see `src/app-identity.ts`), matching the app id, the icon and the window class instead of a separate capitalised directory.

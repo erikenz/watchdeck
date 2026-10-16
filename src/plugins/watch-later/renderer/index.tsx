@@ -18,7 +18,7 @@ import {
   createSaveButton,
   HOST_CLASS,
   isThumbnailHost,
-  mediaOf,
+  mediaBoxOf,
   paintButton,
   PREVIEW_OPEN_CLASS,
   PREVIEW_SELECTOR,
@@ -380,11 +380,12 @@ export const renderer = {
   },
 
   /**
-   * The site plays its inline preview in one overlay it moves over the hovered card. While that
-   * overlay is up it takes the pointer (`ytd-video-preview[active]` is `pointer-events: auto`),
-   * so the card is no longer `:hover`ed and a button that follows `:hover` fades out exactly
-   * while the user is looking at it. Marking the covered card keeps its button up, and clear of
-   * the player's control bar, for as long as the overlay is there.
+   * The site plays its inline preview in one overlay it moves over the hovered card, and while it
+   * plays that overlay takes the pointer (`ytd-video-preview[active]` is `pointer-events: auto`),
+   * so the card stops being `:hover`ed and a button that follows `:hover` fades out exactly while
+   * the user is looking at it. Marking the covered card keeps its button up for as long as the
+   * overlay is there. The mark only decides visibility - the button sits at the same offset in
+   * every state.
    */
   markPreview() {
     const preview = shownPreview();
@@ -393,23 +394,9 @@ export const renderer = {
     if (card === this.previewCard) {
       return;
     }
-    this.markCard(this.previewCard, false);
+    this.previewCard?.classList.remove(PREVIEW_OPEN_CLASS);
     this.previewCard = card;
-    this.markCard(card, true);
-  },
-
-  /** The mark decides how high the button sits, so the button is put back in place with it. */
-  markCard(card: Element | null, covered: boolean) {
-    if (!card) {
-      return;
-    }
-    card.classList.toggle(PREVIEW_OPEN_CLASS, covered);
-    const button = card.querySelector<HTMLButtonElement>(
-      `:scope > .${BUTTON_CLASS}`
-    );
-    if (button) {
-      alignButton(button, card);
-    }
+    card?.classList.add(PREVIEW_OPEN_CLASS);
   },
 
   /**
@@ -444,8 +431,8 @@ export const renderer = {
     const box = preview.getBoundingClientRect();
     const hovered = this.hoveredCard;
     if (hovered?.isConnected) {
-      const media = mediaOf(hovered);
-      if (media && overlapArea(media.getBoundingClientRect(), box) > 0) {
+      const media = mediaBoxOf(hovered);
+      if (media && overlapArea(media.box, box) > 0) {
         return hovered;
       }
     }
@@ -454,8 +441,8 @@ export const renderer = {
     let found: Element | null = null;
     let foundArea = 0;
     for (const card of document.querySelectorAll(`.${HOST_CLASS}`)) {
-      const media = mediaOf(card);
-      const area = media ? overlapArea(media.getBoundingClientRect(), box) : 0;
+      const media = mediaBoxOf(card);
+      const area = media ? overlapArea(media.box, box) : 0;
       if (area > foundArea) {
         found = card;
         foundArea = area;

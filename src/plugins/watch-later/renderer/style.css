@@ -26,7 +26,8 @@
 }
 
 /* Hovering the card shows the button; so does the site's preview playing over it, because that
-   overlay takes the pointer and the card stops being hovered while it is up. */
+   overlay takes the pointer and the card stops being hovered while it is up. The button itself
+   keeps one position in both states. */
 .wd-wl-anchor:hover .wd-wl-save,
 .wd-wl-anchor.wd-wl-preview-open .wd-wl-save,
 .wd-wl-save:focus-visible {
@@ -47,7 +48,6 @@
 .wd-wl-save svg {
   width: 22px;
   height: 22px;
-  fill: currentColor;
 }
 
 .wd-wl-save[data-state="saved"] {

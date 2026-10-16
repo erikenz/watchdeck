@@ -37,6 +37,28 @@ export const cardOf = (element: Element): Element | null =>
 export const BUTTON_CLASS = "wd-wl-save";
 export const HOST_CLASS = "wd-wl-anchor";
 
+/**
+ * The thumbnail-ish parts a card is built from, in the order worth measuring: the box the site
+ * sizes to the video first, then the pieces inside it. The `<img>` is last on purpose - the site
+ * swaps it around (and hides it behind its preview), while the box it lives in keeps the video's
+ * footprint.
+ */
+const MEDIA_SELECTOR = [
+  "ytd-thumbnail",
+  "yt-thumbnail-view-model",
+  "a#thumbnail",
+  "#thumbnail",
+  "#mouseover-overlay",
+  "img",
+].join(",");
+
+/** Anything smaller is an avatar, a badge, or a box the site has not laid out yet. */
+const MIN_MEDIA_WIDTH = 80;
+const MIN_MEDIA_HEIGHT = 45;
+
+/** How far above the video's bottom edge the button sits: clear of the duration badge. */
+const BUTTON_LIFT = 36;
+
 const VIDEO_PATH = "/watch";
 const VIDEO_ID_PATTERN = /(?:^|\/)(?:shorts|embed|live)\/([\w-]{11})/;
 
@@ -77,18 +99,22 @@ export const videoIdFromHost = (host: Element): string | undefined => {
 };
 
 /**
- * The element that actually paints the video for a card. Cards wrap their thumbnail in boxes
- * with their own padding, so anchoring the button to the card's corner puts it in the gap
- * beside the video instead of on it. The thumbnail box is preferred over the `<img>` inside it:
- * the site swaps that image around (and hides it behind its preview), while the box it lives in
- * keeps the video's footprint.
+ * The box that paints the video inside a card, with the element it was measured on. Candidates
+ * are measured rather than assumed: a card also carries avatars and, on some surfaces, thumbnail
+ * markup the site has not laid out yet, and aligning the button to one of those parks it in the
+ * metadata row instead of on the video.
  */
-export const mediaOf = (host: Element): Element | undefined =>
-  host.querySelector("ytd-thumbnail, yt-thumbnail-view-model, #thumbnail") ??
-  host.querySelector(
-    "#video-preview, ytd-video-preview, #inline-preview-player, #mouseover-overlay, img"
-  ) ??
-  undefined;
+export const mediaBoxOf = (
+  card: Element
+): { box: DOMRect; element: Element } | undefined => {
+  for (const candidate of card.querySelectorAll(MEDIA_SELECTOR)) {
+    const box = candidate.getBoundingClientRect();
+    if (box.width >= MIN_MEDIA_WIDTH && box.height >= MIN_MEDIA_HEIGHT) {
+      return { box, element: candidate };
+    }
+  }
+  return undefined;
+};
 
 /**
  * The site's inline preview. Hidden, it is still in the document, keeps the geometry it last had
@@ -120,28 +146,31 @@ export const shownPreview = (): Element | undefined => {
 };
 
 /**
- * Puts the button in the bottom-right corner of the video itself, clear of what sits there:
- * the duration badge on a thumbnail, the control bar of the preview playing over the card.
+ * Puts the button in the bottom-right corner of the video itself, above what the site puts there
+ * (the duration badge on a thumbnail, the timestamp on its inline preview). The offset does not
+ * change with what is playing: a control that moves when the preview starts is worse than one
+ * that sits a little closer to the site's own chrome.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
-  const media = mediaOf(host) ?? host;
-  const hostRect = host.getBoundingClientRect();
-  const mediaRect = media.getBoundingClientRect();
-  if (mediaRect.width < 40 || mediaRect.height < 30) {
+  const media = mediaBoxOf(host);
+  if (!media) {
     return;
   }
-  const clearance = (host.classList.contains(PREVIEW_OPEN_CLASS) ? 56 : 28) + 8;
-  button.style.right = `${Math.max(4, Math.round(hostRect.right - mediaRect.right) + 8)}px`;
-  button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - mediaRect.bottom) + clearance)}px`;
+  const hostRect = host.getBoundingClientRect();
+  button.style.right = `${Math.max(4, Math.round(hostRect.right - media.box.right) + 8)}px`;
+  button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - media.box.bottom) + BUTTON_LIFT)}px`;
 };
 
 const ICONS: Record<string, string> = {
+  // The site's own Watch Later glyph: a clock. Filled means it is in the list, outline means it
+  // is not - the same on/off language the site uses for its like button - so the button says
+  // *what* it does. A bare plus or check would have to be learned first.
   saved:
-    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Zm-.9 4.2v5.4l4.4 2.5.9-1.5-3.5-2V7.2Z"/></svg>',
   unsaved:
-    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3h-2v8H3v2h8v8h2v-8h8v-2h-8z"/></svg>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.3v4.9l3.4 2"/></svg>',
   pending:
-    '<svg viewBox="0 0 24 24" aria-hidden="true" class="wd-wl-spin"><path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/></svg>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true" class="wd-wl-spin"><path fill="currentColor" d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/></svg>',
 };
 
 export type ButtonState = "saved" | "unsaved" | "pending" | "error";

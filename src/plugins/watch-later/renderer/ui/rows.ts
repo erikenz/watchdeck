@@ -106,27 +106,53 @@ export const applyRowVisibility = (
 export const rowVideoId = videoIdFromRow;
 
 /**
- * The toolbar goes above the site's own "Date added (newest)" select: before the sort
- * header when there is one, and above the first row otherwise.
+ * The site's own sort control: a chip in the section header on the current markup, a chip inside
+ * the list renderer on older ones. The list renderer keeps a `#sort-filter-menu` that stays
+ * `display: none` whenever the visible control lives in the header, so candidates are measured:
+ * anchoring the toolbar to a hidden copy mounts it where it can never be seen.
  */
+const SORT_CONTROL_SELECTOR = [
+  "yt-sort-filter-sub-menu-renderer",
+  "ytd-sort-filter-sub-menu-renderer",
+  "#sort-filter-menu",
+  "chip-view-model",
+].join(",");
+
+const visibleSortControl = (): Element | undefined => {
+  for (const candidate of document.querySelectorAll(SORT_CONTROL_SELECTOR)) {
+    const box = candidate.getBoundingClientRect();
+    if (box.width > 0 && box.height > 0) {
+      return candidate;
+    }
+  }
+  return undefined;
+};
+
 /**
- * Where the toolbar goes: inside the page's main column, immediately before the site's own
- * "Date added (newest)" chip. The chip sits in a container the site has already laid out, so
- * the toolbar inherits that layout; the playlist header is *not* a usable anchor (it is a
- * child of `ytd-browse`, outside the column, where a sibling renders out of the flow).
+ * Where the toolbar goes: above the site's own sort control, in the container that already holds
+ * it, so the page keeps deciding the column's layout. The section header is preferred over the
+ * chip itself - the chip shares its row with whatever else the header carries, while the header
+ * is a block container in the primary column, where a sibling lands above the whole row.
  */
 export const toolbarInsertionPoint = ():
   | { before: Element | null; parent: Element }
   | undefined => {
-  const chip =
-    document.querySelector("yt-sort-filter-sub-menu-renderer") ??
-    document.querySelector("#sort-filter-menu");
+  const chip = visibleSortControl();
+  const header = chip?.closest("#header");
+  if (header?.parentElement) {
+    return { before: header, parent: header.parentElement };
+  }
   if (chip?.parentElement) {
     return { before: chip, parent: chip.parentElement };
   }
   const list = document.querySelector("ytd-playlist-video-list-renderer");
-  if (list) {
-    return { before: list.firstElementChild, parent: list };
+  if (!list) {
+    return undefined;
   }
-  return undefined;
+  // No sort control at all: the toolbar sits above the rows. That only works inside the list
+  // renderer while it stacks its children; a list that lays them in a row would put the toolbar
+  // beside the rows instead of above them.
+  return getComputedStyle(list).flexDirection.startsWith("column")
+    ? { before: list.firstElementChild, parent: list }
+    : { before: list, parent: list.parentElement ?? list };
 };

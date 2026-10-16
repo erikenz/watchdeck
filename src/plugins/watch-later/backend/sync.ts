@@ -217,6 +217,23 @@ export class WatchLaterSync {
         }
       }
 
+      // The site's own count is the tie-breaker for an empty walk. A walk that starts at the first
+      // page, sees nothing and is told the list still holds something read a failed page - an expired
+      // session, a rate-limited response, a reply that raced an account switch - and sweeping on that
+      // reading throws the whole mirror away. Seen for real: one 0-item walk marked 3369 entries
+      // removed, and the next walk's upserts put them back.
+      if (coversWholeList && seen.size === 0 && totalItems !== 0) {
+        this.#finish(runId, pages, items, "error", "empty page");
+        return {
+          completed: false,
+          error: "empty page",
+          items,
+          pages,
+          status: "error",
+          totalItems,
+        };
+      }
+
       // A full walk is the only moment we know what is *still* in the list - minus the ids
       // the user touched while we were walking (see `protectVideoIds`).
       if (coversWholeList) {

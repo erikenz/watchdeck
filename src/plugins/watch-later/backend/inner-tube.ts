@@ -343,14 +343,18 @@ export const parseWatchLaterPage = (data: unknown): WatchLaterPage => {
 
   const command = firstOfType(data, "continuationCommand");
   const token = child(command, "token");
+  const countText =
+    textOf(firstOfType(data, "numVideosText")) ??
+    textOf(firstOfType(data, "stats"));
 
   return {
     continuation: typeof token === "string" ? token : undefined,
     items,
-    totalItems: countFromText(
-      textOf(firstOfType(data, "numVideosText")) ??
-        textOf(firstOfType(data, "stats"))
-    ),
+    // A header that carries no number is not a header that could not be read: an empty list says
+    // "No videos", which is the site stating a count of zero - and the sync needs to tell that
+    // apart from a page whose count it never got.
+    totalItems:
+      countText === undefined ? undefined : (countFromText(countText) ?? 0),
   };
 };
 

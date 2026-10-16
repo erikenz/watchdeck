@@ -413,6 +413,86 @@ test("a one-page top-up leaves the interrupted walk's cursor alone", async () =>
   db.close();
 });
 
+test("an empty page while the site still counts items is a failed read, not an empty list", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000000" });
+
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    // What a hiccup looks like: no items, no continuation, and a header that still counts the
+    // list. Sweeping on this reading is what marked 3369 real entries removed once.
+    fetchPage: () =>
+      Promise.resolve(
+        parseWatchLaterPage({
+          contents: {
+            itemSectionRenderer: {
+              contents: [
+                {
+                  playlistVideoListRenderer: {
+                    contents: [],
+                    numVideosText: { simpleText: "3,477 videos" },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      ),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  const result = await sync.pull(transport, {
+    accountId: "alpha",
+    resume: false,
+  });
+
+  expect(result.status).toBe("error");
+  expect(result.error).toBe("empty page");
+  expect(db.membershipIds("alpha")).toEqual(["vid00000000"]);
+  db.close();
+});
+
+test("a list the site itself calls empty does clear the mirror", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000000" });
+
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: () =>
+      Promise.resolve(
+        parseWatchLaterPage({
+          contents: {
+            itemSectionRenderer: {
+              contents: [
+                {
+                  playlistVideoListRenderer: {
+                    contents: [],
+                    numVideosText: { simpleText: "No videos" },
+                  },
+                },
+              ],
+            },
+          },
+        })
+      ),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  const result = await sync.pull(transport, {
+    accountId: "alpha",
+    resume: false,
+  });
+
+  expect(result.status).toBe("ok");
+  expect(db.membershipIds("alpha")).toEqual([]);
+  expect(db.entryFor("alpha", "vid00000000")?.removed_at).not.toBeNull();
+  db.close();
+});
+
 test("remove resolves the entry id the list carries, and queues when it cannot", async () => {
   const db = new WatchLaterStore(openNodeSqlite(":memory:"));
   const removed: string[] = [];

@@ -41,16 +41,6 @@ export interface DefaultConfig {
 }
 
 export const defaultConfig: DefaultConfig = {
-  'window-size': {
-    width: 1100,
-    height: 550,
-  },
-  'window-maximized': false,
-  'window-position': {
-    x: -1,
-    y: -1,
-  },
-  'url': 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
   'options': {
     tray: false,
     appVisible: true,
@@ -76,4 +66,14 @@ export const defaultConfig: DefaultConfig = {
     themes: [],
   },
   'plugins': {},
+  'url': 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+  'window-maximized': false,
+  'window-position': {
+    x: -1,
+    y: -1,
+  },
+  'window-size': {
+    height: 550,
+    width: 1100,
+  },
 };

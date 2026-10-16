@@ -1,4 +1,5 @@
-import { app, type BrowserWindow } from 'electron';
+import { app } from 'electron';
+import type { BrowserWindow } from 'electron';
 import is from 'electron-is';
 
 export const getFolder = (customFolder?: string) =>
@@ -13,10 +14,10 @@ export const cropMaxWidth = (image: Electron.NativeImage) => {
   // Standard artwork width with margins from both sides is 280 + 720 + 280
   if (imageSize.width === 1280 && imageSize.height === 720) {
     return image.crop({
+      height: 720,
+      width: 720,
       x: 280,
       y: 0,
-      width: 720,
-      height: 720,
     });
   }
 

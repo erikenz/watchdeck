@@ -6,27 +6,17 @@ import nextIconWhite from '@assets/media-icons-white/next.png?asset&asarUnpack';
 import pauseIconWhite from '@assets/media-icons-white/pause.png?asset&asarUnpack';
 import playIconWhite from '@assets/media-icons-white/play.png?asset&asarUnpack';
 import previousIconWhite from '@assets/media-icons-white/previous.png?asset&asarUnpack';
-import { nativeImage, nativeTheme, type NativeImage } from 'electron';
+import { nativeImage, nativeTheme } from 'electron';
+import type { NativeImage } from 'electron';
 
 import { t } from '@/i18n';
 import { getSongControls } from '@/providers/song-controls';
-import {
-  registerCallback,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+import { registerCallback, SongInfoEvent } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
 import { Platform } from '@/types/plugins';
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
-  name: () => t('plugins.taskbar-mediacontrol.name'),
-  description: () => t('plugins.taskbar-mediacontrol.description'),
-  restartNeeded: true,
-  platform: Platform.Windows,
-  config: {
-    enabled: false,
-  },
-
   backend({ window }) {
     let currentSongInfo: SongInfo;
 
@@ -102,6 +92,15 @@ export default createPlugin({
     });
 
     // Need to set thumbar again after win.show
-    window.on('show', () => setThumbar(currentSongInfo));
+    window.on('show', () => {
+      setThumbar(currentSongInfo);
+    });
   },
+  config: {
+    enabled: false,
+  },
+  description: () => t('plugins.taskbar-mediacontrol.description'),
+  name: () => t('plugins.taskbar-mediacontrol.name'),
+  platform: Platform.Windows,
+  restartNeeded: true,
 });

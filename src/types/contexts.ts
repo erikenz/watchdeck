@@ -1,10 +1,11 @@
-import type { PluginConfig } from '@/types/plugins';
 import type {
   IpcMain,
   IpcRenderer,
   WebContents,
   BrowserWindow,
 } from 'electron';
+
+import type { PluginConfig } from '@/types/plugins';
 
 export interface BaseContext<Config extends PluginConfig> {
   getConfig: () => Promise<Config> | Config;

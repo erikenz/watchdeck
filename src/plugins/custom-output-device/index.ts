@@ -13,14 +13,12 @@ export interface CustomOutputPluginConfig {
 }
 
 export default createPlugin({
-  name: () => t('plugins.custom-output-device.name'),
-  description: () => t('plugins.custom-output-device.description'),
-  restartNeeded: true,
   config: {
     enabled: false,
     output: 'default',
     devices: {},
-  } as CustomOutputPluginConfig,
+  },
+  description: () => t('plugins.custom-output-device.description'),
   menu: ({ setConfig, getConfig, window }) => {
     const promptDeviceSelector = async () => {
       const options = await getConfig();
@@ -50,6 +48,7 @@ export default createPlugin({
       },
     ];
   },
-
+  name: () => t('plugins.custom-output-device.name'),
   renderer,
+  restartNeeded: true,
 });

@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import musicPlayerIcon from '@assets/icon.png?asset&asarUnpack';
-import { app, type NativeImage } from 'electron';
+import { app } from 'electron';
+import type { NativeImage } from 'electron';
 
-import { type SongInfo } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
 
 import type { NotificationsPluginConfig } from './index';
 
@@ -13,13 +14,13 @@ const temporaryIcon = path.join(userData, 'tempIcon.png');
 const temporaryBanner = path.join(userData, 'tempBanner.png');
 
 export const ToastStyles = {
-  logo: 1,
-  banner_centered_top: 2,
-  hero: 3,
-  banner_top_custom: 4,
-  banner_centered_bottom: 5,
   banner_bottom: 6,
+  banner_centered_bottom: 5,
+  banner_centered_top: 2,
+  banner_top_custom: 4,
+  hero: 3,
   legacy: 7,
+  logo: 1,
 };
 
 export const urgencyLevels = [
@@ -33,10 +34,10 @@ const nativeImageToLogo = (nativeImage: NativeImage) => {
   const margin = Math.max(temporaryImage.getSize().width - 256, 0);
 
   return temporaryImage.crop({
+    height: 256,
+    width: 256,
     x: Math.round(margin / 2),
     y: 0,
-    width: 256,
-    height: 256,
   });
 };
 

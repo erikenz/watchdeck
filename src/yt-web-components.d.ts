@@ -1,4 +1,4 @@
-import { type IntrinsicElements as MDUIElements } from 'mdui/jsx.en';
+import type { IntrinsicElements as MDUIElements } from 'mdui/jsx.en';
 
 import type { Icons } from '@/types/icons';
 import type { ComponentProps } from 'solid-js';

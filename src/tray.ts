@@ -8,11 +8,10 @@ import is from 'electron-is';
 import { APPLICATION_NAME, t } from '@/i18n';
 
 import * as config from './config';
+import type { MenuTemplate } from './menu';
 import { restart } from './providers/app-controls';
 import { getSongControls } from './providers/song-controls';
 import { registerCallback, SongInfoEvent } from './providers/song-info';
-
-import type { MenuTemplate } from './menu';
 
 // Prevent tray being garbage collected
 let tray: Electron.Tray | undefined;
@@ -56,14 +55,14 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
   const defaultTrayIcon = nativeImage
     .createFromPath(is.macOS() ? TrayIconWhite : TrayIcon)
     .resize({
-      width: 16 * pixelRatio,
       height: 16 * pixelRatio,
+      width: 16 * pixelRatio,
     });
   const pausedTrayIcon = nativeImage
     .createFromPath(is.macOS() ? PausedTrayIconWhite : PausedTrayIcon)
     .resize({
-      width: 16 * pixelRatio,
       height: 16 * pixelRatio,
+      width: 16 * pixelRatio,
     });
 
   tray = new Tray(defaultTrayIcon);
@@ -91,34 +90,34 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
 
   const template: MenuTemplate = [
     {
-      label: t('main.tray.play-pause'),
       click() {
         playPause();
       },
+      label: t('main.tray.play-pause'),
     },
     {
-      label: t('main.tray.next'),
       click() {
         next();
       },
+      label: t('main.tray.next'),
     },
     {
-      label: t('main.tray.previous'),
       click() {
         previous();
       },
+      label: t('main.tray.previous'),
     },
     {
-      label: t('main.tray.show'),
       click() {
         win.show();
         app.dock?.show();
       },
+      label: t('main.tray.show'),
     },
     { type: 'separator' },
     {
-      label: t('main.tray.restart'),
       click: restart,
+      label: t('main.tray.restart'),
     },
     { type: 'separator' },
     {
@@ -131,19 +130,21 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
   tray.setContextMenu(trayMenu);
 
   registerCallback((songInfo, event) => {
-    if (event === SongInfoEvent.TimeChanged) return;
+    if (event === SongInfoEvent.TimeChanged) {
+      return;
+    }
 
     if (tray) {
-      if (typeof songInfo.isPaused === 'undefined') {
+      if (songInfo.isPaused === undefined) {
         tray.setImage(defaultTrayIcon);
         return;
       }
 
       tray.setToolTip(
         t('main.tray.tooltip.with-song-info', {
+          applicationName: APPLICATION_NAME,
           artist: songInfo.artist,
           title: songInfo.title,
-          applicationName: APPLICATION_NAME,
         }),
       );
 

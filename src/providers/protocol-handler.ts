@@ -1,6 +1,7 @@
 import path from 'node:path';
 
-import { app, type BrowserWindow } from 'electron';
+import { app } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import { getSongControls } from './song-controls';
 

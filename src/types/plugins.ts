@@ -1,16 +1,17 @@
+import type { MusicPlayer } from '@/types/music-player';
+
 import type {
   BackendContext,
   MenuContext,
   PreloadContext,
   RendererContext,
 } from './contexts';
-import type { MusicPlayer } from '@/types/music-player';
 
 type Author = string;
 
-export type PluginConfig = {
+export interface PluginConfig {
   enabled: boolean;
-};
+}
 
 export type PluginLifecycleSimple<Context, This> = (
   this: This,

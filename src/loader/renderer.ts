@@ -2,10 +2,9 @@ import { deepmerge } from 'deepmerge-ts';
 import { rendererPlugins } from 'virtual:plugins';
 
 import { t } from '@/i18n';
-import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
-
 import type { RendererContext } from '@/types/contexts';
 import type { PluginConfig, PluginDef } from '@/types/plugins';
+import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
 
 const unregisterStyleMap: Record<string, (() => void)[]> = {};
 const loadedPluginMap: Record<
@@ -16,16 +15,10 @@ const loadedPluginMap: Record<
 export const createContext = <Config extends PluginConfig>(
   id: string,
 ): RendererContext<Config> => ({
-  getConfig: () =>
+  getConfig: async () =>
     window.ipcRenderer.invoke('watchdeck:get-config', id) as Promise<Config>,
-  setConfig: async (newConfig) => {
-    await window.ipcRenderer.invoke('watchdeck:set-config', id, newConfig);
-  },
   ipc: {
-    send: (event: string, ...args: unknown[]) => {
-      window.ipcRenderer.send(event, ...args);
-    },
-    invoke: (event: string, ...args: unknown[]) =>
+    invoke: async (event: string, ...args: unknown[]) =>
       window.ipcRenderer.invoke(event, ...args),
     on: (event: string, listener: CallableFunction) => {
       window.ipcRenderer.on(event, (_, ...args: unknown[]) => {
@@ -36,21 +29,31 @@ export const createContext = <Config extends PluginConfig>(
     removeAllListeners: (event: string) => {
       window.ipcRenderer.removeAllListeners(event);
     },
+    send: (event: string, ...args: unknown[]) => {
+      window.ipcRenderer.send(event, ...args);
+    },
+  },
+  setConfig: async (newConfig) => {
+    await window.ipcRenderer.invoke('watchdeck:set-config', id, newConfig);
   },
 });
 
 export const forceUnloadRendererPlugin = async (id: string) => {
-  unregisterStyleMap[id]?.forEach((unregister) => unregister());
+  unregisterStyleMap[id]?.forEach((unregister) => {
+    unregister();
+  });
 
   delete unregisterStyleMap[id];
   delete loadedPluginMap[id];
 
   const plugin = (await rendererPlugins())[id];
-  if (!plugin) return;
+  if (!plugin) {
+    return;
+  }
 
   const hasStopped = await stopPlugin(id, plugin, {
-    ctx: 'renderer',
     context: createContext(id),
+    ctx: 'renderer',
   });
   if (plugin?.stylesheets) {
     document.querySelector(`style#plugin-${id}`)?.remove();
@@ -70,11 +73,13 @@ export const forceUnloadRendererPlugin = async (id: string) => {
 
 export const forceLoadRendererPlugin = async (id: string) => {
   const plugin = (await rendererPlugins())[id];
-  if (!plugin) return;
+  if (!plugin) {
+    return;
+  }
 
   const hasEvaled = await startPlugin(id, plugin, {
-    ctx: 'renderer',
     context: createContext(id),
+    ctx: 'renderer',
   });
 
   if (
@@ -136,10 +141,6 @@ export const unloadAllRendererPlugins = async () => {
 
 export const getLoadedRendererPlugin = (
   id: string,
-): PluginDef<unknown, unknown, unknown> | undefined => {
-  return loadedPluginMap[id];
-};
+): PluginDef<unknown, unknown, unknown> | undefined => loadedPluginMap[id];
 
-export const getAllLoadedRendererPlugins = () => {
-  return loadedPluginMap;
-};
+export const getAllLoadedRendererPlugins = () => loadedPluginMap;

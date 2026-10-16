@@ -1,11 +1,14 @@
 import { Client as DiscordClient } from '@xhayper/discord-rpc';
+import type { SetActivity } from '@xhayper/discord-rpc/dist/structures/ClientUser';
 import { ActivityType } from 'discord-api-types/v10';
 import is from 'electron-is';
 
 import { t } from '@/i18n';
+import type { SongInfo } from '@/providers/song-info';
 import { LoggerPrefix } from '@/utils';
 
 import { clientId, PROGRESS_THROTTLE_MS, TimerKey } from './constants';
+import type { DiscordPluginConfig } from './index';
 import { TimerManager } from './timer-manager';
 import {
   buildDiscordButtons,
@@ -13,10 +16,6 @@ import {
   sanitizeActivityText,
   isSeek,
 } from './utils';
-
-import type { DiscordPluginConfig } from './index';
-import type { SongInfo } from '@/providers/song-info';
-import type { SetActivity } from '@xhayper/discord-rpc/dist/structures/ClientUser';
 
 // Public API definition for the Discord Service
 export class DiscordService {
@@ -82,7 +81,9 @@ export class DiscordService {
       if (is.dev()) {
         console.log(LoggerPrefix, t('plugins.discord.backend.connected'));
       }
-      this.refreshCallbacks.forEach((cb) => cb());
+      this.refreshCallbacks.forEach((cb) => {
+        cb();
+      });
     });
 
     this.rpc.on('ready', () => {
@@ -113,19 +114,19 @@ export class DiscordService {
     padHangulFields(songInfo);
 
     const activityInfo: SetActivity = {
-      type: ActivityType.Listening,
-      statusDisplayType: config.statusDisplayType,
+      buttons: buildDiscordButtons(config, songInfo),
       details: sanitizeActivityText(
         songInfo.alternativeTitle ?? songInfo.title,
       ), // Song title
       detailsUrl: songInfo.url ?? undefined,
-      state: sanitizeActivityText(songInfo.tags?.at(0) ?? songInfo.artist), // Artist name
-      stateUrl: songInfo.artistUrl,
       largeImageKey: songInfo.imageSrc ?? undefined,
       largeImageText: songInfo.album
         ? sanitizeActivityText(songInfo.album)
         : undefined,
-      buttons: buildDiscordButtons(config, songInfo),
+      state: sanitizeActivityText(songInfo.tags?.at(0) ?? songInfo.artist), // Artist name
+      stateUrl: songInfo.artistUrl,
+      statusDisplayType: config.statusDisplayType,
+      type: ActivityType.Listening,
     };
 
     // Handle paused state display
@@ -136,10 +137,10 @@ export class DiscordService {
       songInfo.songDuration > 0 &&
       typeof songInfo.elapsedSeconds === 'number'
     ) {
-      const songStartTime = Date.now() - (songInfo.elapsedSeconds * 1000);
+      const songStartTime = Date.now() - songInfo.elapsedSeconds * 1000;
       activityInfo.startTimestamp = Math.floor(songStartTime / 1000);
       activityInfo.endTimestamp = Math.floor(
-        (songStartTime + (songInfo.songDuration * 1000)) / 1000,
+        (songStartTime + songInfo.songDuration * 1000) / 1000,
       );
     }
 
@@ -186,7 +187,7 @@ export class DiscordService {
    * Attempts to connect to Discord RPC after a delay, used for retries.
    * @returns Promise that resolves on successful login or rejects on failure/cancellation.
    */
-  private connectWithRetry(): Promise<void> {
+  private async connectWithRetry(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.timerManager.set(
         TimerKey.DiscordConnectRetry,
@@ -194,11 +195,13 @@ export class DiscordService {
           // Stop retrying if auto-reconnect is disabled or already connected
           if (!this.autoReconnect || this.rpc.isConnected) {
             this.timerManager.clear(TimerKey.DiscordConnectRetry);
-            if (this.rpc.isConnected) resolve();
-            else
+            if (this.rpc.isConnected) {
+              resolve();
+            } else {
               reject(
                 new Error('Auto-reconnect disabled or already connected.'),
               );
+            }
             return;
           }
 
@@ -222,7 +225,7 @@ export class DiscordService {
   /**
    * Recursively attempts to connect to Discord RPC if auto-reconnect is enabled and not connected.
    */
-  private connectRecursive = () => {
+  private readonly connectRecursive = () => {
     if (!this.autoReconnect || this.rpc.isConnected) {
       this.timerManager.clear(TimerKey.DiscordConnectRetry);
       return;
@@ -288,7 +291,9 @@ export class DiscordService {
    * @param songInfo - The current song information.
    */
   updateActivity(songInfo: SongInfo): void {
-    if (!this.config) return;
+    if (!this.config) {
+      return;
+    }
 
     if (!songInfo.title && !songInfo.artist) {
       if (this.lastSongInfo?.videoId) {
@@ -322,11 +327,9 @@ export class DiscordService {
       this.timerManager.clear(TimerKey.UpdateTimeout);
 
       const activityInfo = this.buildActivityInfo(songInfo, this.config);
-      this.rpc.user
-        ?.setActivity(activityInfo)
-        .catch((err) =>
-          console.error(LoggerPrefix, 'Failed to set activity:', err),
-        );
+      this.rpc.user?.setActivity(activityInfo).catch((error) => {
+        console.error(LoggerPrefix, 'Failed to set activity:', error);
+      });
 
       this.lastSongInfo.videoId = songInfo.videoId;
       this.lastSongInfo.isPaused = songInfo.isPaused ?? false;
@@ -338,11 +341,9 @@ export class DiscordService {
       this.timerManager.clear(TimerKey.UpdateTimeout);
 
       const activityInfo = this.buildActivityInfo(songInfo, this.config);
-      this.rpc.user
-        ?.setActivity(activityInfo)
-        .catch((err) =>
-          console.error(LoggerPrefix, 'Failed to set throttled activity:', err),
-        );
+      this.rpc.user?.setActivity(activityInfo).catch((error) => {
+        console.error(LoggerPrefix, 'Failed to set throttled activity:', error);
+      });
 
       this.lastProgressUpdate = now;
       this.setActivityTimeout();

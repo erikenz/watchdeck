@@ -13,8 +13,8 @@ export const registerWindowDefaultTrustedTypePolicy = () => {
   if (window.trustedTypes && window.trustedTypes.createPolicy) {
     defaultTrustedTypePolicy = window.trustedTypes.createPolicy('default', {
       createHTML: (input) => input,
-      createScriptURL: (input) => input,
       createScript: (input) => input,
+      createScriptURL: (input) => input,
     });
   }
 };

@@ -5,7 +5,6 @@ import { createBackend } from '@/utils';
 
 import { TIME_UPDATE_DEBOUNCE_MS } from './constants';
 import { DiscordService } from './discord-service';
-
 import type { DiscordPluginConfig } from './index';
 
 export let discordService = null as DiscordService | null;
@@ -18,6 +17,17 @@ export const backend = createBackend<
   DiscordPluginConfig
 >({
   lastTimeUpdateSent: 0,
+
+  onConfigChange(newConfig) {
+    discordService?.onConfigChange(newConfig);
+
+    const currentlyConnected = discordService?.isConnected() ?? false;
+    if (newConfig.enabled && !currentlyConnected) {
+      discordService?.connect(!newConfig.autoReconnect);
+    } else if (!newConfig.enabled && currentlyConnected) {
+      discordService?.disconnect();
+    }
+  },
 
   async start(ctx) {
     // Get initial configuration from the context
@@ -56,16 +66,5 @@ export const backend = createBackend<
 
   stop() {
     discordService?.cleanup();
-  },
-
-  onConfigChange(newConfig) {
-    discordService?.onConfigChange(newConfig);
-
-    const currentlyConnected = discordService?.isConnected() ?? false;
-    if (newConfig.enabled && !currentlyConnected) {
-      discordService?.connect(!newConfig.autoReconnect);
-    } else if (!newConfig.enabled && currentlyConnected) {
-      discordService?.disconnect();
-    }
   },
 });

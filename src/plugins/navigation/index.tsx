@@ -7,12 +7,11 @@ import { LitElementWrapper } from '@/solit';
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
-  name: () => t('plugins.navigation.name'),
-  description: () => t('plugins.navigation.description'),
-  restartNeeded: false,
   config: {
     enabled: true,
   },
+  description: () => t('plugins.navigation.description'),
+  name: () => t('plugins.navigation.name'),
   renderer: {
     buttonContainer: document.createElement('div'),
     start() {
@@ -27,7 +26,9 @@ export default createPlugin({
               content={t('plugins.navigation.templates.back.title')}
             >
               <mdui-button-icon
-                onClick={() => history.back()}
+                onClick={() => {
+                  history.back();
+                }}
                 style={{ width: '40px', height: '40px' }}
               >
                 <LitElementWrapper
@@ -46,7 +47,9 @@ export default createPlugin({
               content={t('plugins.navigation.templates.forward.title')}
             >
               <mdui-button-icon
-                onClick={() => history.forward()}
+                onClick={() => {
+                  history.forward();
+                }}
                 style={{ width: '40px', height: '40px' }}
               >
                 <LitElementWrapper
@@ -72,4 +75,5 @@ export default createPlugin({
       this.buttonContainer.remove();
     },
   },
+  restartNeeded: false,
 });

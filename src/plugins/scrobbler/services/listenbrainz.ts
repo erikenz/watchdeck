@@ -1,12 +1,11 @@
 import { net } from 'electron';
 
 import { APPLICATION_NAME } from '@/i18n';
-
-import { ScrobblerBase } from './base';
+import type { SongInfo } from '@/providers/song-info';
 
 import type { ScrobblerPluginConfig } from '../index';
 import type { SetConfType } from '../main';
-import type { SongInfo } from '@/providers/song-info';
+import { ScrobblerBase } from './base';
 
 interface ListenbrainzRequestBody {
   listen_type?: string;
@@ -31,7 +30,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
     return true;
   }
 
-  override createSession(
+  override async createSession(
     config: ScrobblerPluginConfig,
     _setConfig: SetConfType,
   ): Promise<ScrobblerPluginConfig> {
@@ -89,15 +88,15 @@ function createRequestBody(
       : songInfo.artist;
 
   const trackMetadata = {
-    artist_name: artist,
-    track_name: title,
-    release_name: songInfo.album ?? undefined,
     additional_info: {
-      media_player: `${APPLICATION_NAME} Desktop App`,
-      submission_client: `${APPLICATION_NAME} Desktop App - Scrobbler Plugin`,
-      origin_url: songInfo.url,
       duration: songInfo.songDuration,
+      media_player: `${APPLICATION_NAME} Desktop App`,
+      origin_url: songInfo.url,
+      submission_client: `${APPLICATION_NAME} Desktop App - Scrobbler Plugin`,
     },
+    artist_name: artist,
+    release_name: songInfo.album ?? undefined,
+    track_name: title,
   };
 
   return {
@@ -115,13 +114,13 @@ function submitListen(
   config: ScrobblerPluginConfig,
 ) {
   net
-    .fetch(config.scrobblers.listenbrainz.apiRoot + 'submit-listens', {
-      method: 'POST',
+    .fetch(`${config.scrobblers.listenbrainz.apiRoot}submit-listens`, {
       body: JSON.stringify(body),
       headers: {
         'Authorization': 'Token ' + config.scrobblers.listenbrainz.token,
         'Content-Type': 'application/json',
       },
+      method: 'POST',
     })
     .catch(console.error);
 }

@@ -1,4 +1,4 @@
-export type AmbientModePluginConfig = {
+export interface AmbientModePluginConfig {
   enabled: boolean;
   quality: number;
   buffer: number;
@@ -7,4 +7,4 @@ export type AmbientModePluginConfig = {
   size: number;
   opacity: number;
   fullscreen: boolean;
-};
+}

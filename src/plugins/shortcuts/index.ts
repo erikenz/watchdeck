@@ -4,22 +4,20 @@ import { createPlugin } from '@/utils';
 import { onMainLoad } from './main';
 import { onMenu } from './menu';
 
-export type ShortcutMappingType = {
+export interface ShortcutMappingType {
   previous: string;
   playPause: string;
   next: string;
-};
-export type ShortcutsPluginConfig = {
+}
+export interface ShortcutsPluginConfig {
   enabled: boolean;
   overrideMediaKeys: boolean;
   global: ShortcutMappingType;
   local: ShortcutMappingType;
-};
+}
 
 export default createPlugin({
-  name: () => t('plugins.shortcuts.name'),
-  description: () => t('plugins.shortcuts.description'),
-  restartNeeded: true,
+  backend: onMainLoad,
   config: {
     enabled: false,
     overrideMediaKeys: false,
@@ -33,8 +31,9 @@ export default createPlugin({
       playPause: '',
       next: '',
     },
-  } as ShortcutsPluginConfig,
+  },
+  description: () => t('plugins.shortcuts.description'),
   menu: onMenu,
-
-  backend: onMainLoad,
+  name: () => t('plugins.shortcuts.name'),
+  restartNeeded: true,
 });

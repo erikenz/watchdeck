@@ -4,20 +4,18 @@ import { dialog } from 'electron';
 import { sign } from 'hono/jwt';
 
 import { t } from '@/i18n';
+import type { BackendContext } from '@/types/contexts';
 
-import { type APIServerConfig, AuthStrategy } from '../../config';
-
+import { AuthStrategy } from '../../config';
+import type { APIServerConfig } from '../../config';
 import type { JWTPayload } from '../scheme';
 import type { HonoApp } from '../types';
-import type { BackendContext } from '@/types/contexts';
 
 const routes = {
   request: createRoute({
+    description: '',
     method: 'post',
     path: '/auth/{id}',
-    summary: '',
-    description: '',
-    security: [],
     request: {
       params: z.object({
         id: z.string(),
@@ -25,7 +23,6 @@ const routes = {
     },
     responses: {
       200: {
-        description: 'Success',
         content: {
           'application/json': {
             schema: z.object({
@@ -33,11 +30,14 @@ const routes = {
             }),
           },
         },
+        description: 'Success',
       },
       403: {
         description: 'Forbidden',
       },
     },
+    security: [],
+    summary: '',
   }),
 };
 
@@ -53,17 +53,17 @@ export const register = (
       // SKIP CHECK
     } else if (config.authStrategy === AuthStrategy.AUTH_AT_FIRST) {
       const result = await dialog.showMessageBox({
-        title: t('plugins.api-server.dialog.request.title'),
-        message: t('plugins.api-server.dialog.request.message', {
-          origin: getConnInfo(ctx).remote.address,
-          ID: id,
-        }),
         buttons: [
           t('plugins.api-server.dialog.request.buttons.allow'),
           t('plugins.api-server.dialog.request.buttons.deny'),
         ],
-        defaultId: 1,
         cancelId: 1,
+        defaultId: 1,
+        message: t('plugins.api-server.dialog.request.message', {
+          origin: getConnInfo(ctx).remote.address,
+          ID: id,
+        }),
+        title: t('plugins.api-server.dialog.request.title'),
       });
 
       if (result.response === 1) {
@@ -82,8 +82,8 @@ export const register = (
 
     const token = await sign(
       {
-        id,
         iat: ~~(Date.now() / 1000),
+        id,
       } satisfies JWTPayload,
       config.secret,
     );

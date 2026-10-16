@@ -65,7 +65,7 @@ interface VolumeFade {
 export class VolumeFader {
   private readonly media: HTMLMediaElement;
   private readonly logger: VolumeLogger | null;
-  private scale: {
+  private readonly scale: {
     internalToVolume: (level: number) => number;
     volumeToInternal: (level: number) => number;
   };
@@ -152,12 +152,13 @@ export class VolumeFader {
       };
 
       // Log setting if not default
-      if (options.fadeScaling)
+      if (options.fadeScaling) {
         this.logger?.(
           'Using logarithmic fading with ' +
             String(10 * dynamicRange) +
             ' dB dynamic range.',
         );
+      }
     }
 
     // Set initial volume?
@@ -169,7 +170,7 @@ export class VolumeFader {
       this.media.volume = options.initialVolume;
 
       // Log setting
-      this.logger?.('Set initial volume to ' + String(this.media.volume) + '.');
+      this.logger?.(`Set initial volume to ${String(this.media.volume)}.`);
     }
 
     // Fade duration given?
@@ -234,7 +235,7 @@ export class VolumeFader {
       this.fadeDuration = fadeDuration;
 
       // Log setting
-      this.logger?.('Set fade duration to ' + String(fadeDuration) + ' ms.');
+      this.logger?.(`Set fade duration to ${String(fadeDuration)} ms.`);
     } else {
       // Abort and throw an exception
       throw new TypeError('Positive number expected as fade duration!');
@@ -260,13 +261,13 @@ export class VolumeFader {
     this.fade = {
       // Volume start and end point on internal fading scale
       volume: {
-        start: this.scale.volumeToInternal(this.media.volume),
         end: this.scale.volumeToInternal(targetVolume),
+        start: this.scale.volumeToInternal(this.media.volume),
       },
       // Time start and end point
       time: {
-        start: Date.now(),
         end: Date.now() + this.fadeDuration,
+        start: Date.now(),
       },
       // Optional callback function
       callback,
@@ -310,7 +311,8 @@ export class VolumeFader {
 
         // Compute current level on internal scale
         const level =
-          (progress * (this.fade.volume.end - this.fade.volume.start)) + this.fade.volume.start;
+          progress * (this.fade.volume.end - this.fade.volume.start) +
+          this.fade.volume.start;
 
         // Map fade level to volume level and apply it to media element
         this.media.volume = this.scale.internalToVolume(level);
@@ -319,7 +321,7 @@ export class VolumeFader {
         window.requestAnimationFrame(this.updateVolume.bind(this));
       } else {
         // Log end of fade
-        this.logger?.('Fade to ' + String(this.fade.volume.end) + ' complete.');
+        this.logger?.(`Fade to ${String(this.fade.volume.end)} complete.`);
 
         // Time is up, jump to target volume
         this.media.volume = this.scale.internalToVolume(this.fade.volume.end);
@@ -328,7 +330,9 @@ export class VolumeFader {
         this.active = false;
 
         // Done, call back (if callable)
-        if (typeof this.fade.callback === 'function') this.fade.callback();
+        if (typeof this.fade.callback === 'function') {
+          this.fade.callback();
+        }
 
         // Clear fade
         this.fade = undefined;
@@ -377,7 +381,7 @@ export class VolumeFader {
     input = Math.log10(input);
 
     // Scale minus something × 10 dB to 0…1 (clipping at 0)
-    return Math.max(1 + (input / dynamicRange), 0);
+    return Math.max(1 + input / dynamicRange, 0);
   }
 }
 

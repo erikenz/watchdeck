@@ -4,9 +4,10 @@ import { createPlugin } from '@/utils';
 import { onConfigChange, onMainLoad } from './main';
 import { onMenu } from './menu';
 import { onPlayerApiReady } from './renderer';
+
 import style from './style.css?inline';
 
-export type PictureInPicturePluginConfig = {
+export interface PictureInPicturePluginConfig {
   'enabled': boolean;
   'alwaysOnTop': boolean;
   'savePosition': boolean;
@@ -16,12 +17,13 @@ export type PictureInPicturePluginConfig = {
   'pip-size': [number, number];
   'isInPiP': boolean;
   'useNativePiP': boolean;
-};
+}
 
 export default createPlugin({
-  name: () => t('plugins.picture-in-picture.name'),
-  description: () => t('plugins.picture-in-picture.description'),
-  restartNeeded: true,
+  backend: {
+    onConfigChange,
+    start: onMainLoad,
+  },
   config: {
     'enabled': false,
     'alwaysOnTop': true,
@@ -32,15 +34,13 @@ export default createPlugin({
     'pip-size': [450, 275],
     'isInPiP': false,
     'useNativePiP': true,
-  } as PictureInPicturePluginConfig,
-  stylesheets: [style],
-  menu: onMenu,
-
-  backend: {
-    start: onMainLoad,
-    onConfigChange,
   },
+  description: () => t('plugins.picture-in-picture.description'),
+  menu: onMenu,
+  name: () => t('plugins.picture-in-picture.name'),
   renderer: {
     onPlayerApiReady,
   },
+  restartNeeded: true,
+  stylesheets: [style],
 });

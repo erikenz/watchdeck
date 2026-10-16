@@ -1,27 +1,23 @@
 import { Notification } from 'electron';
 import is from 'electron-is';
 
-import {
-  registerCallback,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
-
-import interactive from './interactive';
-import { notificationImage } from './utils';
+import { registerCallback, SongInfoEvent } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
+import type { BackendContext } from '@/types/contexts';
 
 import type { NotificationsPluginConfig } from './index';
-import type { BackendContext } from '@/types/contexts';
+import interactive from './interactive';
+import { notificationImage } from './utils';
 
 let config: NotificationsPluginConfig;
 
 const notify = (info: SongInfo) => {
   // Send the notification
   const currentNotification = new Notification({
-    title: info.title || 'Playing',
     body: info.artist,
     icon: notificationImage(info, config),
     silent: true,
+    title: info.title || 'Playing',
     urgency: config.urgency,
   });
   currentNotification.show();
@@ -56,9 +52,11 @@ export const onMainLoad = async (
   config = await context.getConfig();
 
   // Register the callback for new song information
-  if (is.windows() && config.interactive)
+  if (is.windows() && config.interactive) {
     interactive(context.window, () => config, context);
-  else setup();
+  } else {
+    setup();
+  }
 };
 
 export const onConfigChange = (newConfig: NotificationsPluginConfig) => {

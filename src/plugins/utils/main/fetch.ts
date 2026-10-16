@@ -18,5 +18,5 @@ export const getNetFetchAsFetch = () =>
       input instanceof Request ? input : undefined,
     );
 
-    return net.fetch(request, init);
+    return await net.fetch(request, init);
   }) as typeof fetch;

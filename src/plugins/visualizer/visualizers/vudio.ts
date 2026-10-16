@@ -1,8 +1,7 @@
 import Vudio from 'vudio/umd/vudio';
 
-import { Visualizer } from './visualizer';
-
 import type { VisualizerPluginConfig } from '../index';
+import { Visualizer } from './visualizer';
 
 class VudioVisualizer extends Visualizer {
   private readonly visualizer: Vudio;
@@ -29,8 +28,8 @@ class VudioVisualizer extends Visualizer {
 
   resize(width: number, height: number) {
     this.visualizer.setOption({
-      width,
       height,
+      width,
     });
   }
 

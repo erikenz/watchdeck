@@ -81,32 +81,32 @@ export interface ScrobblerPluginConfig {
 }
 
 export const defaultConfig: ScrobblerPluginConfig = {
+  alternativeArtist: true,
+  alternativeTitles: true,
   enabled: false,
   scrobbleOtherMedia: true,
-  alternativeTitles: true,
-  alternativeArtist: true,
   scrobblers: {
     lastfm: {
-      enabled: false,
-      token: undefined,
-      sessionKey: undefined,
-      apiRoot: 'https://ws.audioscrobbler.com/2.0/',
       apiKey: '04d76faaac8726e60988e14c105d421a',
+      apiRoot: 'https://ws.audioscrobbler.com/2.0/',
+      enabled: false,
       secret: 'a5d2a36fdf64819290f6982481eaffa2',
+      sessionKey: undefined,
+      token: undefined,
     },
     listenbrainz: {
+      apiRoot: 'https://api.listenbrainz.org/1/',
       enabled: false,
       token: undefined,
-      apiRoot: 'https://api.listenbrainz.org/1/',
     },
   },
 };
 
 export default createPlugin({
-  name: () => t('plugins.scrobbler.name'),
-  description: () => t('plugins.scrobbler.description'),
-  restartNeeded: true,
-  config: defaultConfig,
-  menu: onMenu,
   backend,
+  config: defaultConfig,
+  description: () => t('plugins.scrobbler.description'),
+  menu: onMenu,
+  name: () => t('plugins.scrobbler.name'),
+  restartNeeded: true,
 });

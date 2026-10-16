@@ -1,7 +1,7 @@
 import { autoUpdate, offset, size } from '@floating-ui/dom';
 import { useFloating } from 'solid-floating-ui';
 import { createSignal, Match, Show, Switch } from 'solid-js';
-import { type JSX } from 'solid-js/jsx-runtime';
+import type { JSX } from 'solid-js/jsx-runtime';
 import { Portal } from 'solid-js/web';
 import { css } from 'solid-styled-components';
 import { Transition } from 'solid-transition-group';
@@ -126,14 +126,14 @@ const animationStyle = cacheNoArgs(() => ({
       opacity 0.225s cubic-bezier(0.33, 1, 0.68, 1),
       transform 0.225s cubic-bezier(0.33, 1, 0.68, 1);
   `,
-  exitTo: css`
-    opacity: 0;
-    transform: scale(0.9);
-  `,
   exitActive: css`
     transition:
       opacity 0.225s cubic-bezier(0.32, 0, 0.67, 0),
       transform 0.225s cubic-bezier(0.32, 0, 0.67, 0);
+  `,
+  exitTo: css`
+    opacity: 0;
+    transform: scale(0.9);
   `,
 }));
 
@@ -149,13 +149,13 @@ const getParents = (element: Element | null): (HTMLElement | null)[] => {
   return parents;
 };
 
-type BasePanelItemProps = {
+interface BasePanelItemProps {
   name: string;
   label?: string;
   chip?: string;
   toolTip?: string;
   commandId?: number;
-};
+}
 type NormalPanelItemProps = BasePanelItemProps & {
   type: 'normal';
   onClick?: () => void;
@@ -188,9 +188,6 @@ export const PanelItem = (props: PanelItemProps) => {
   const [child, setChild] = createSignal<HTMLElement | null>(null);
 
   const position = useFloating(anchor, toolTip, {
-    whileElementsMounted: autoUpdate,
-    placement: 'bottom-start',
-    strategy: 'fixed',
     middleware: [
       offset({ mainAxis: 8 }),
       size({
@@ -202,6 +199,9 @@ export const PanelItem = (props: PanelItemProps) => {
         },
       }),
     ],
+    placement: 'bottom-start',
+    strategy: 'fixed',
+    whileElementsMounted: autoUpdate,
   });
 
   const handleHover = (event: MouseEvent) => {
@@ -235,9 +235,7 @@ export const PanelItem = (props: PanelItemProps) => {
                 document.elementFromPoint(mouseX, mouseY),
               );
 
-              if (!parents.includes(child())) {
-                setOpen(false);
-              } else {
+              if (parents.includes(child())) {
                 const onOtherHover = (event: MouseEvent) => {
                   const parents = getParents(event.target as HTMLElement);
                   const closestLevel =
@@ -260,6 +258,8 @@ export const PanelItem = (props: PanelItemProps) => {
                   }
                 };
                 document.addEventListener('mousemove', onOtherHover);
+              } else {
+                setOpen(false);
               }
             }, 225);
           },

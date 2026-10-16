@@ -1,20 +1,21 @@
 import { t } from '@/i18n';
 import { createPlugin } from '@/utils';
 
-import emptyStyle from './empty-player.css?inline';
 import {
   ButterchurnVisualizer as butterchurn,
   VudioVisualizer as vudio,
   WaveVisualizer as wave,
 } from './visualizers';
-import { type Visualizer } from './visualizers/visualizer';
+import type { Visualizer } from './visualizers/visualizer';
 
-type WaveColor = {
+import emptyStyle from './empty-player.css?inline';
+
+interface WaveColor {
   gradient: string[];
   rotate?: number;
-};
+}
 
-export type VisualizerPluginConfig = {
+export interface VisualizerPluginConfig {
   enabled: boolean;
   type: 'butterchurn' | 'vudio' | 'wave';
   butterchurn: {
@@ -55,19 +56,22 @@ export type VisualizerPluginConfig = {
       };
     }[];
   };
-};
+}
 
-type RenderProps = {
+interface RenderProps {
   visualizerInstance: Visualizer | null;
   audioContext: AudioContext | null;
   audioSource: MediaElementAudioSourceNode | null;
   observer: ResizeObserver | null;
-};
+}
 
 export default createPlugin({
   name: () => t('plugins.visualizer.name'),
   description: () => t('plugins.visualizer.description'),
   restartNeeded: false,
+  // The assertion below widens this object's literals to the plugin config
+  // type (without it TS narrows `type` to the literal).
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
     type: 'butterchurn',
@@ -132,6 +136,7 @@ export default createPlugin({
         },
       ],
     },
+    // the assertion widens the literals above to the plugin config type
   } as VisualizerPluginConfig,
   stylesheets: [emptyStyle],
   menu: async ({ getConfig, setConfig }) => {
@@ -154,11 +159,15 @@ export default createPlugin({
   },
 
   renderer: {
+    // The assertion below types the props object (the nulls are the initial
+    // values of the visualizer instance, audio context and observer).
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
     props: {
       visualizerInstance: null,
       audioContext: null,
       audioSource: null,
       observer: null,
+      // the assertion widens the null literals to the renderer prop types
     } as RenderProps,
 
     createVisualizer(

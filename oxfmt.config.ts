@@ -1,25 +1,30 @@
-import { defineConfig } from "oxfmt";
-import ultracite from "ultracite/oxfmt";
+import { defineConfig } from 'oxfmt';
+import ultracite from 'ultracite/oxfmt';
 
 export default defineConfig({
   ...ultracite,
-  singleQuote: true,
-  semi: true,
-  trailingComma: "all",
-  printWidth: 80,
-  tabWidth: 2,
-  arrowParens: "always",
+  arrowParens: 'always',
   bracketSpacing: true,
-  endOfLine: "lf",
-  quoteProps: "preserve",
+  endOfLine: 'lf',
   ignorePatterns: [
     ...ultracite.ignorePatterns,
-    "dist/",
-    "node_modules/",
-    "coverage/",
-    "pnpm-lock.yaml",
-    "changelog.md",
-    "**/*.d.ts",
-    "src/plugins/performance-improvement/scripts/**/*.js",
+    // Prose we hand-maintain: reformatting it only rewraps paragraphs (the PRD
+    // carries intentional line breaks for reviewable diffs, the README mirrors
+    // the layout of the project it forked from).
+    'README.md',
+    'docs/**',
+    'dist/',
+    'node_modules/',
+    'coverage/',
+    'pnpm-lock.yaml',
+    'changelog.md',
+    '**/*.d.ts',
+    'src/plugins/performance-improvement/scripts/**/*.js',
   ],
+  printWidth: 80,
+  quoteProps: 'preserve',
+  semi: true,
+  singleQuote: true,
+  tabWidth: 2,
+  trailingComma: 'all',
 });

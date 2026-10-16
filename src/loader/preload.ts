@@ -3,10 +3,9 @@ import { allPlugins, preloadPlugins } from 'virtual:plugins';
 
 import * as config from '@/config';
 import { t } from '@/i18n';
-import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
-
 import type { PreloadContext } from '@/types/contexts';
 import type { PluginConfig, PluginDef } from '@/types/plugins';
+import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
 
 const loadedPluginMap: Record<
   string,
@@ -28,11 +27,13 @@ const createContext = (id: string): PreloadContext<PluginConfig> => ({
 });
 
 export const forceUnloadPreloadPlugin = async (id: string) => {
-  if (!loadedPluginMap[id]) return;
+  if (!loadedPluginMap[id]) {
+    return;
+  }
 
   const hasStopped = await stopPlugin(id, loadedPluginMap[id], {
-    ctx: 'preload',
     context: createContext(id),
+    ctx: 'preload',
   });
   if (hasStopped || (hasStopped === null && loadedPluginMap[id].preload)) {
     console.log(
@@ -51,11 +52,13 @@ export const forceUnloadPreloadPlugin = async (id: string) => {
 export const forceLoadPreloadPlugin = async (id: string) => {
   try {
     const plugin = (await preloadPlugins())[id];
-    if (!plugin) return;
+    if (!plugin) {
+      return;
+    }
 
     const hasStarted = await startPlugin(id, plugin, {
-      ctx: 'preload',
       context: createContext(id),
+      ctx: 'preload',
     });
 
     if (
@@ -71,12 +74,12 @@ export const forceLoadPreloadPlugin = async (id: string) => {
       LoggerPrefix,
       t('common.console.plugins.loaded', { pluginName: id }),
     );
-  } catch (err) {
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.initialize-failed', { pluginName: id }),
     );
-    console.trace(err);
+    console.trace(error);
   }
 };
 
@@ -107,10 +110,6 @@ export const unloadAllPreloadPlugins = async () => {
 
 export const getLoadedPreloadPlugin = (
   id: string,
-): PluginDef<unknown, unknown, unknown> | undefined => {
-  return loadedPluginMap[id];
-};
+): PluginDef<unknown, unknown, unknown> | undefined => loadedPluginMap[id];
 
-export const getAllLoadedPreloadPlugins = () => {
-  return loadedPluginMap;
-};
+export const getAllLoadedPreloadPlugins = () => loadedPluginMap;

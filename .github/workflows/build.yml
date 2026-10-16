@@ -2,13 +2,13 @@ name: Build Watchdeck
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
 permissions: {}
 
 env:
-  NODE_VERSION: "24.x"
+  NODE_VERSION: '24.x'
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ macos-26, ubuntu-latest, windows-latest ]
+        os: [macos-26, ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -171,4 +171,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
         with:
           commit_message: Update changelog for ${{ env.VERSION_TAG }}
-          file_pattern: "changelog.md"
+          file_pattern: 'changelog.md'

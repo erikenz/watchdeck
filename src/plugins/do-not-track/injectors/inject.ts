@@ -56,20 +56,20 @@ export const inject = (contextBridge: ContextBridge): void => {
 
   const chains = [
     {
+      cValue: 'undefined',
       chain: 'playerResponse.adPlacements',
-      cValue: 'undefined',
     },
     {
+      cValue: 'undefined',
       chain: 'ytInitialPlayerResponse.playerAds',
-      cValue: 'undefined',
     },
     {
+      cValue: 'undefined',
       chain: 'ytInitialPlayerResponse.adPlacements',
-      cValue: 'undefined',
     },
     {
-      chain: 'ytInitialPlayerResponse.adSlots',
       cValue: 'undefined',
+      chain: 'ytInitialPlayerResponse.adSlots',
     },
   ];
 
@@ -205,16 +205,8 @@ export const inject = (contextBridge: ContextBridge): void => {
       const pos = chain.indexOf('.');
       if (pos === -1) {
         trapProp(owner, chain, false, {
-          v: undefined,
           getter() {
             return document.currentScript === thisScript ? this.v : cValue;
-          },
-          setter(a) {
-            if (!mustAbort(a)) {
-              return;
-            }
-
-            cValue = a;
           },
           init(v) {
             if (mustAbort(v)) {
@@ -224,6 +216,14 @@ export const inject = (contextBridge: ContextBridge): void => {
             this.v = v;
             return true;
           },
+          setter(a) {
+            if (!mustAbort(a)) {
+              return;
+            }
+
+            cValue = a;
+          },
+          v: undefined,
         });
         return;
       }
@@ -238,9 +238,12 @@ export const inject = (contextBridge: ContextBridge): void => {
       }
 
       trapProp(owner, prop, true, {
-        v: undefined,
         getter() {
           return this.v;
+        },
+        init(v) {
+          this.v = v;
+          return true;
         },
         setter(a) {
           this.v = a;
@@ -248,10 +251,7 @@ export const inject = (contextBridge: ContextBridge): void => {
             trapChain(a as PropertyOwner, remainingChain);
           }
         },
-        init(v) {
-          this.v = v;
-          return true;
-        },
+        v: undefined,
       });
     };
 

@@ -1,20 +1,20 @@
 import { t } from '@/i18n';
+import type { MusicPlayer } from '@/types/music-player';
 import { createPlugin } from '@/utils';
 
-import type { MusicPlayer } from '@/types/music-player';
-
 export default createPlugin({
-  name: () => t('plugins.exponential-volume.name'),
-  description: () => t('plugins.exponential-volume.description'),
-  restartNeeded: true,
   config: {
     enabled: false,
   },
+  description: () => t('plugins.exponential-volume.description'),
+  name: () => t('plugins.exponential-volume.name'),
   renderer: {
     onPlayerApiReady(playerApi) {
       const syncVolume = (playerApi: MusicPlayer) => {
         if (playerApi.getPlayerState() === 3) {
-          setTimeout(() => syncVolume(playerApi), 0);
+          setTimeout(() => {
+            syncVolume(playerApi);
+          }, 0);
           return;
         }
 
@@ -62,4 +62,5 @@ export default createPlugin({
       syncVolume(playerApi);
     },
   },
+  restartNeeded: true,
 });

@@ -1,5 +1,4 @@
 import { t } from '@/i18n';
-
 import type {
   BackendContext,
   PreloadContext,
@@ -108,14 +107,14 @@ export const startPlugin = async <Config extends PluginConfig>(
     console.log(
       LoggerPrefix,
       t('common.console.plugins.executed-at-ms', {
-        pluginName: id,
         contextName: options.ctx,
         ms: (performance.now() - start).toFixed(2),
+        pluginName: id,
       }),
     );
 
     return lifecycle ? true : null;
-  } catch (err) {
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.execute-failed', {
@@ -123,7 +122,7 @@ export const startPlugin = async <Config extends PluginConfig>(
         contextName: options.ctx,
       }),
     );
-    console.trace(err);
+    console.trace(error);
     return false;
   }
 };
@@ -133,16 +132,22 @@ export const stopPlugin = async <Config extends PluginConfig>(
   def: PluginDef<unknown, unknown, unknown, Config>,
   options: Options<Config>,
 ) => {
-  if (!def || !def[options.ctx]) return false;
-  if (typeof def[options.ctx] === 'function') return false;
+  if (!def || !def[options.ctx]) {
+    return false;
+  }
+  if (typeof def[options.ctx] === 'function') {
+    return false;
+  }
 
   const defCtx = def[options.ctx] as
     | { stop: PluginLifecycleSimple<Config, unknown> }
     | undefined;
-  if (!defCtx?.stop) return null;
+  if (!defCtx?.stop) {
+    return null;
+  }
 
   try {
-    const stop = defCtx.stop;
+    const { stop } = defCtx;
     const start = performance.now();
     await stop.call(
       def[options.ctx],
@@ -152,14 +157,14 @@ export const stopPlugin = async <Config extends PluginConfig>(
     console.log(
       LoggerPrefix,
       t('common.console.plugins.executed-at-ms', {
-        pluginName: id,
         contextName: options.ctx,
         ms: performance.now() - start,
+        pluginName: id,
       }),
     );
 
     return true;
-  } catch (err) {
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.execute-failed', {
@@ -167,7 +172,7 @@ export const stopPlugin = async <Config extends PluginConfig>(
         contextName: options.ctx,
       }),
     );
-    console.trace(err);
+    console.trace(error);
     return false;
   }
 };

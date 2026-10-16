@@ -1,5 +1,5 @@
-appId: "com.github.erikenz.watchdeck"
-productName: "Watchdeck"
+appId: 'com.github.erikenz.watchdeck'
+productName: 'Watchdeck'
 files:
   - '!*'
   - dist
@@ -44,7 +44,7 @@ linux:
   syncDesktopName: true
   desktop:
     entry:
-      StartupWMClass: "com.github.erikenz.watchdeck"
+      StartupWMClass: 'com.github.erikenz.watchdeck'
   target:
     - target: AppImage
       arch:
@@ -95,7 +95,7 @@ flatpak:
     - '--talk-name=org.freedesktop.Notifications'
     - '--talk-name=org.gnome.SessionManager'
     - '--talk-name=org.kde.StatusNotifierWatcher'
-    - "--own-name=org.mpris.MediaPlayer2.Watchdeck.*"
+    - '--own-name=org.mpris.MediaPlayer2.Watchdeck.*'
 deb:
   depends:
     - libgtk-3-0

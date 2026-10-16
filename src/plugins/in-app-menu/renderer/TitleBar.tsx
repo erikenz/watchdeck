@@ -1,4 +1,4 @@
-import { type Menu, type MenuItem } from 'electron';
+import type { Menu, MenuItem } from 'electron';
 import {
   createEffect,
   createResource,
@@ -14,15 +14,14 @@ import { css } from 'solid-styled-components';
 import { TransitionGroup } from 'solid-transition-group';
 
 import { cacheNoArgs } from '@/providers/decorators';
+import type { RendererContext } from '@/types/contexts';
 
+import type { InAppMenuConfig } from '../constants';
 import { IconButton } from './IconButton';
 import { MenuButton } from './MenuButton';
 import { Panel } from './Panel';
 import { PanelItem } from './PanelItem';
 import { WindowController } from './WindowController';
-
-import type { InAppMenuConfig } from '../constants';
-import type { RendererContext } from '@/types/contexts';
 
 const titleStyle = cacheNoArgs(
   () => css`
@@ -105,11 +104,11 @@ const animationStyle = cacheNoArgs(() => ({
   `,
 }));
 
-export type PanelRendererProps = {
+export interface PanelRendererProps {
   items: Electron.Menu['items'];
   level?: number[];
   onClick?: (commandId: number, radioGroup?: MenuItem[]) => void;
-};
+}
 const PanelRenderer = (props: PanelRendererProps) => {
   const radioGroup = () => props.items.filter((it) => it.type === 'radio');
 
@@ -178,12 +177,12 @@ const PanelRenderer = (props: PanelRendererProps) => {
   );
 };
 
-export type TitleBarProps = {
+export interface TitleBarProps {
   ipc: RendererContext<InAppMenuConfig>['ipc'];
   isMacOS?: boolean;
   enableController?: boolean;
   initialCollapsed?: boolean;
-};
+}
 export const TitleBar = (props: TitleBarProps) => {
   const [collapsed, setCollapsed] = createSignal(props.initialCollapsed);
   const [ignoreTransition, setIgnoreTransition] = createSignal(false);
@@ -370,7 +369,7 @@ export const TitleBar = (props: TitleBarProps) => {
         }}
         onBeforeEnter={(element) => {
           if (ignoreTransition()) return;
-          const index = Number(element.getAttribute('data-index') ?? 0);
+          const index = Number((element as HTMLElement).dataset.index ?? 0);
 
           (element as HTMLElement).style.setProperty(
             'transition-delay',
@@ -379,12 +378,12 @@ export const TitleBar = (props: TitleBarProps) => {
         }}
         onBeforeExit={(element) => {
           if (ignoreTransition()) return;
-          const index = Number(element.getAttribute('data-index') ?? 0);
-          const length = Number(element.getAttribute('data-length') ?? 1);
+          const index = Number((element as HTMLElement).dataset.index ?? 0);
+          const length = Number((element as HTMLElement).dataset.length ?? 1);
 
           (element as HTMLElement).style.setProperty(
             'transition-delay',
-            `${(length * 0.025) - (index * 0.025)}s`,
+            `${length * 0.025 - index * 0.025}s`,
           );
         }}
       >

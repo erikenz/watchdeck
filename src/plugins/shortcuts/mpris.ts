@@ -1,24 +1,22 @@
-import MprisPlayer, {
-  type LoopStatus,
-  type PlayBackStatus,
-  type PlayerOptions,
-  type Position,
-  type Track,
+import MprisPlayer from '@jellybrick/mpris-service';
+import type {
+  LoopStatus,
+  PlayBackStatus,
+  PlayerOptions,
+  Position,
+  Track,
 } from '@jellybrick/mpris-service';
-import { type BrowserWindow, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import * as config from '@/config';
 import { APPLICATION_NAME } from '@/i18n';
 import { getSongControls } from '@/providers/song-controls';
-import {
-  registerCallback,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
-import { LoggerPrefix } from '@/utils';
-
+import { registerCallback, SongInfoEvent } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
 import type { RepeatMode, VolumeState } from '@/types/datahost-get-state';
 import type { QueueResponse } from '@/types/music-player-desktop-internal';
+import { LoggerPrefix } from '@/utils';
 
 class YTPlayer extends MprisPlayer {
   /**
@@ -63,10 +61,10 @@ class YTPlayer extends MprisPlayer {
 
 function setupMPRIS() {
   const instance = new YTPlayer({
-    name: 'Watchdeck',
     identity: APPLICATION_NAME,
-    supportedMimeTypes: ['audio/mpeg'],
+    name: 'Watchdeck',
     supportedInterfaces: ['player'],
+    supportedMimeTypes: ['audio/mpeg'],
   });
 
   instance.canRaise = true;
@@ -96,9 +94,7 @@ export function registerMPRIS(win: BrowserWindow) {
     const secToMicro = (n: number) => Math.round(Number(n) * 1e6);
     const microToSec = (n: number) => Math.round(Number(n) / 1e6);
 
-    const correctId = (videoId: string) => {
-      return videoId.replace(/-/g, '_MINUS_');
-    };
+    const correctId = (videoId: string) => videoId.replace(/-/g, '_MINUS_');
 
     const player = setupMPRIS();
 
@@ -107,7 +103,10 @@ export function registerMPRIS(win: BrowserWindow) {
         currentSongInfo?.videoId &&
         event.trackId.endsWith(correctId(currentSongInfo.videoId))
       ) {
-        win.webContents.send('watchdeck:seek-to', microToSec(event.position ?? 0));
+        win.webContents.send(
+          'watchdeck:seek-to',
+          microToSec(event.position ?? 0),
+        );
         player.setPosition(event.position ?? 0);
       }
     };
@@ -122,8 +121,14 @@ export function registerMPRIS(win: BrowserWindow) {
       win.webContents.send('watchdeck:setup-repeat-changed-listener', 'mpris');
       win.webContents.send('watchdeck:setup-volume-changed-listener', 'mpris');
       win.webContents.send('watchdeck:setup-shuffle-changed-listener', 'mpris');
-      win.webContents.send('watchdeck:setup-fullscreen-changed-listener', 'mpris');
-      win.webContents.send('watchdeck:setup-autoplay-changed-listener', 'mpris');
+      win.webContents.send(
+        'watchdeck:setup-fullscreen-changed-listener',
+        'mpris',
+      );
+      win.webContents.send(
+        'watchdeck:setup-autoplay-changed-listener',
+        'mpris',
+      );
       requestShuffleInformation();
       requestFullscreenInformation();
       requestQueueInformation();
@@ -167,7 +172,7 @@ export function registerMPRIS(win: BrowserWindow) {
       }
 
       player.fullscreen =
-        changedTo !== undefined ? changedTo : !player.fullscreen;
+        changedTo === undefined ? !player.fullscreen : changedTo;
     });
 
     ipcMain.on(

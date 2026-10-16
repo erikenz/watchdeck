@@ -1,9 +1,8 @@
 import Butterchurn from 'butterchurn';
 import ButterchurnPresets from 'butterchurn-presets';
 
-import { Visualizer } from './visualizer';
-
 import type { VisualizerPluginConfig } from '../index';
+import { Visualizer } from './visualizer';
 
 class ButterchurnVisualizer extends Visualizer {
   private readonly visualizer: ReturnType<typeof Butterchurn.createVisualizer>;
@@ -22,14 +21,16 @@ class ButterchurnVisualizer extends Visualizer {
 
     const preset = ButterchurnPresets[config.butterchurn.preset];
     const renderVisualizer = () => {
-      if (this.destroyed) return;
+      if (this.destroyed) {
+        return;
+      }
       this.visualizer.render();
       this.animFrameHandle = requestAnimationFrame(renderVisualizer);
     };
 
     this.visualizer = Butterchurn.createVisualizer(audioContext, canvas, {
-      width: canvas.width,
       height: canvas.height,
+      width: canvas.width,
     });
     this.visualizer.loadPreset(preset, config.butterchurn.blendTimeInSeconds);
     this.visualizer.connectAudio(audioNode);
@@ -43,7 +44,9 @@ class ButterchurnVisualizer extends Visualizer {
   }
 
   destroy() {
-    if (this.animFrameHandle) cancelAnimationFrame(this.animFrameHandle);
+    if (this.animFrameHandle) {
+      cancelAnimationFrame(this.animFrameHandle);
+    }
     this.destroyed = true;
     try {
       this.audioSource.disconnect(this.audioNode);

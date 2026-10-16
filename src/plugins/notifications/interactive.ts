@@ -2,25 +2,22 @@ import nextIcon from '@assets/media-icons-black/next.png?asset&asarUnpack';
 import pauseIcon from '@assets/media-icons-black/pause.png?asset&asarUnpack';
 import playIcon from '@assets/media-icons-black/play.png?asset&asarUnpack';
 import previousIcon from '@assets/media-icons-black/previous.png?asset&asarUnpack';
-import { app, type BrowserWindow, Notification } from 'electron';
+import { app, Notification } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import {
   APP_PROTOCOL,
   changeProtocolHandler,
 } from '@/providers/protocol-handler';
 import { getSongControls } from '@/providers/song-controls';
-import {
-  registerCallback,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+import { registerCallback, SongInfoEvent } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
 import { setTrayOnClick, setTrayOnDoubleClick } from '@/tray';
+import type { BackendContext } from '@/types/contexts';
 import { mediaIcons } from '@/types/media-icons';
 
-import { notificationImage, secondsToMinutes, ToastStyles } from './utils';
-
 import type { NotificationsPluginConfig } from './index';
-import type { BackendContext } from '@/types/contexts';
+import { notificationImage, secondsToMinutes, ToastStyles } from './utils';
 
 let songControls: ReturnType<typeof getSongControls>;
 let savedNotification: Notification | undefined;
@@ -98,16 +95,21 @@ export default (
 
   const selectIcon = (kind: keyof typeof mediaIcons): string => {
     switch (kind) {
-      case 'play':
+      case 'play': {
         return playIcon;
-      case 'pause':
+      }
+      case 'pause': {
         return pauseIcon;
-      case 'next':
+      }
+      case 'next': {
         return nextIcon;
-      case 'previous':
+      }
+      case 'previous': {
         return previousIcon;
-      default:
+      }
+      default: {
         return '';
+      }
     }
   };
 
@@ -262,9 +264,9 @@ export default (
   songControls = getSongControls(win);
 
   let currentSeconds = 0;
-  on('watchdeck:player-api-loaded', () =>
-    send('watchdeck:setup-time-changed-listener'),
-  );
+  on('watchdeck:player-api-loaded', () => {
+    send('watchdeck:setup-time-changed-listener');
+  });
 
   let savedSongInfo: SongInfo;
   let lastUrl: string | undefined;
@@ -322,13 +324,13 @@ export default (
         config().refreshOnPlayPause &&
         (cmd === 'pause' || (cmd === 'play' && !config().unpauseNotification))
       ) {
-        setImmediate(() =>
+        setImmediate(() => {
           sendNotification({
             ...savedSongInfo,
-            isPaused: cmd === 'pause',
             elapsedSeconds: currentSeconds,
-          }),
-        );
+            isPaused: cmd === 'pause',
+          });
+        });
       }
     }
   });

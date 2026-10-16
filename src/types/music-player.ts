@@ -1,9 +1,10 @@
 // TODO: fully type definitions for music-player
 
+import type { WatchNextResponse } from '@/types/music-player-desktop-internal';
+
 import type { GetPlayerResponse } from './get-player-response';
 import type { PlayerAPIEvents } from './player-api-events';
 import type { VideoDetails } from './video-details';
-import type { WatchNextResponse } from '@/types/music-player-desktop-internal';
 
 export interface MusicPlayer {
   getInternalApiInterface: <Parameters extends unknown[], Return>(

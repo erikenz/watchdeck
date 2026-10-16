@@ -1,14 +1,13 @@
 import { deepmerge } from 'deepmerge-ts';
+import type { BrowserWindow, MenuItemConstructorOptions } from 'electron';
 import { allPlugins } from 'virtual:plugins';
 
 import * as config from '@/config';
 import { t } from '@/i18n';
 import { setApplicationMenu } from '@/menu';
-import { LoggerPrefix } from '@/utils';
-
 import type { MenuContext } from '@/types/contexts';
 import type { PluginConfig } from '@/types/plugins';
-import type { BrowserWindow, MenuItemConstructorOptions } from 'electron';
+import { LoggerPrefix } from '@/utils';
 
 const menuTemplateMap: Record<string, MenuItemConstructorOptions[]> = {};
 const createContext = (
@@ -20,6 +19,13 @@ const createContext = (
       (await allPlugins())[id].config ?? { enabled: false },
       config.get(`plugins.${id}`) ?? {},
     ) as PluginConfig,
+  refresh: async () => {
+    await setApplicationMenu(win);
+
+    if (await config.plugins.isEnabled('in-app-menu')) {
+      win.webContents.send('refresh-in-app-menu');
+    }
+  },
   setConfig: async (newConfig) => {
     config.setPartial(
       `plugins.${id}`,
@@ -28,19 +34,14 @@ const createContext = (
     );
   },
   window: win,
-  refresh: async () => {
-    await setApplicationMenu(win);
-
-    if (await config.plugins.isEnabled('in-app-menu')) {
-      win.webContents.send('refresh-in-app-menu');
-    }
-  },
 });
 
 export const forceLoadMenuPlugin = async (id: string, win: BrowserWindow) => {
   try {
     const plugin = (await allPlugins())[id];
-    if (!plugin) return;
+    if (!plugin) {
+      return;
+    }
 
     const menu = plugin.menu?.(createContext(id, win));
     if (menu) {
@@ -50,20 +51,22 @@ export const forceLoadMenuPlugin = async (id: string, win: BrowserWindow) => {
       } else {
         return;
       }
-    } else return;
+    } else {
+      return;
+    }
 
     console.log(
       LoggerPrefix,
       t('common.console.plugins.loaded', { pluginName: `${id}::menu` }),
     );
-  } catch (err) {
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.initialize-failed', {
         pluginName: `${id}::menu`,
       }),
     );
-    console.trace(err);
+    console.trace(error);
   }
 };
 
@@ -84,10 +87,6 @@ export const loadAllMenuPlugins = async (win: BrowserWindow) => {
 
 export const getMenuTemplate = (
   id: string,
-): MenuItemConstructorOptions[] | undefined => {
-  return menuTemplateMap[id];
-};
+): MenuItemConstructorOptions[] | undefined => menuTemplateMap[id];
 
-export const getAllMenuTemplate = () => {
-  return menuTemplateMap;
-};
+export const getAllMenuTemplate = () => menuTemplateMap;

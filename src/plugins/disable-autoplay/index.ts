@@ -1,13 +1,12 @@
 import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
-
 import type { MusicPlayer } from '@/types/music-player';
 import type { VideoDataChanged } from '@/types/video-data-changed';
+import { createPlugin } from '@/utils';
 
-export type DisableAutoPlayPluginConfig = {
+export interface DisableAutoPlayPluginConfig {
   enabled: boolean;
   applyOnce: boolean;
-};
+}
 
 export default createPlugin<
   unknown,
@@ -20,13 +19,11 @@ export default createPlugin<
   },
   DisableAutoPlayPluginConfig
 >({
-  name: () => t('plugins.disable-autoplay.name'),
-  description: () => t('plugins.disable-autoplay.description'),
-  restartNeeded: false,
   config: {
-    enabled: false,
     applyOnce: false,
+    enabled: false,
   },
+  description: () => t('plugins.disable-autoplay.description'),
   menu: async ({ getConfig, setConfig }) => {
     const config = await getConfig();
 
@@ -44,9 +41,10 @@ export default createPlugin<
       },
     ];
   },
+  name: () => t('plugins.disable-autoplay.name'),
   renderer: {
-    config: null,
     api: null,
+    config: null,
     eventListener(event: CustomEvent<VideoDataChanged>) {
       if (this.config?.applyOnce) {
         document.removeEventListener('videodatachange', this.eventListener);
@@ -61,24 +59,25 @@ export default createPlugin<
           });
       }
     },
-    timeUpdateListener(e: Event) {
-      if (e.target instanceof HTMLVideoElement) {
-        e.target.pause();
-      }
-    },
-    async start({ getConfig }) {
-      this.config = await getConfig();
+    onConfigChange(newConfig) {
+      this.config = newConfig;
     },
     onPlayerApiReady(api) {
       this.api = api;
 
       document.addEventListener('videodatachange', this.eventListener);
     },
+    async start({ getConfig }) {
+      this.config = await getConfig();
+    },
     stop() {
       document.removeEventListener('videodatachange', this.eventListener);
     },
-    onConfigChange(newConfig) {
-      this.config = newConfig;
+    timeUpdateListener(e: Event) {
+      if (e.target instanceof HTMLVideoElement) {
+        e.target.pause();
+      }
     },
   },
+  restartNeeded: false,
 });

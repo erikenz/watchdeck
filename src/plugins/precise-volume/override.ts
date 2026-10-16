@@ -16,13 +16,17 @@ function overrideAddEventListener() {
   // oxlint-disable-next-line typescript/unbound-method
   Element.prototype._addEventListener = Element.prototype.addEventListener;
   // Override addEventListener to Ignore specific events in volume-slider
-  Element.prototype.addEventListener = function (
+  Element.prototype.addEventListener = function addEventListener(
     type: string,
     listener: (event: Event) => void,
     useCapture = false,
   ) {
     if (!(ignored.id.includes(this.id) && ignored.types.includes(type))) {
-      (this as CustomElementPrototype)._addEventListener!(type, listener, useCapture);
+      (this as CustomElementPrototype)._addEventListener!(
+        type,
+        listener,
+        useCapture,
+      );
     } else if (window.electronIs.dev()) {
       console.log(`Ignoring event: "${this.id}.${type}()"`);
     }
@@ -38,7 +42,8 @@ export const overrideListener = () => {
       Element.prototype.addEventListener = (
         Element.prototype as CustomElementPrototype
       )._addEventListener!;
-      (Element.prototype as CustomElementPrototype)._addEventListener = undefined;
+      (Element.prototype as CustomElementPrototype)._addEventListener =
+        undefined;
     },
     { once: true },
   );

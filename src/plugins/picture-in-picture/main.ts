@@ -1,7 +1,8 @@
 import { app } from 'electron';
 
-import type { PictureInPicturePluginConfig } from './index';
 import type { BackendContext } from '@/types/contexts';
+
+import type { PictureInPicturePluginConfig } from './index';
 
 let config: PictureInPicturePluginConfig;
 

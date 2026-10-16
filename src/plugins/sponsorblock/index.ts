@@ -1,14 +1,13 @@
 import is from 'electron-is';
 
 import { t } from '@/i18n';
+import type { GetPlayerResponse } from '@/types/get-player-response';
 import { createPlugin } from '@/utils';
 
 import { sortSegments } from './segments';
-
 import type { Segment, SkipSegment } from './types';
-import type { GetPlayerResponse } from '@/types/get-player-response';
 
-export type SponsorBlockPluginConfig = {
+export interface SponsorBlockPluginConfig {
   enabled: boolean;
   apiURL: string;
   categories: (
@@ -19,26 +18,11 @@ export type SponsorBlockPluginConfig = {
     | 'selfpromo'
     | 'music_offtopic'
   )[];
-};
+}
 
 let currentSegments: Segment[] = [];
 
 export default createPlugin({
-  name: () => t('plugins.sponsorblock.name'),
-  description: () => t('plugins.sponsorblock.description'),
-  restartNeeded: true,
-  config: {
-    enabled: false,
-    apiURL: 'https://sponsor.ajay.app',
-    categories: [
-      'sponsor',
-      'intro',
-      'outro',
-      'interaction',
-      'selfpromo',
-      'music_offtopic',
-    ],
-  } as SponsorBlockPluginConfig,
   async backend({ getConfig, ipc }) {
     const fetchSegments = async (
       apiURL: string,
@@ -84,7 +68,42 @@ export default createPlugin({
       ipc.send('sponsorblock-skip', segments);
     });
   },
+  config: {
+    enabled: false,
+    apiURL: 'https://sponsor.ajay.app',
+    categories: [
+      'sponsor',
+      'intro',
+      'outro',
+      'interaction',
+      'selfpromo',
+      'music_offtopic',
+    ],
+  },
+  description: () => t('plugins.sponsorblock.description'),
+  name: () => t('plugins.sponsorblock.name'),
   renderer: {
+    onPlayerApiReady() {
+      const video = document.querySelector<HTMLVideoElement>('video');
+      if (!video) return;
+
+      video.addEventListener('timeupdate', this.timeUpdateListener);
+      // Reset segments on song end
+      video.addEventListener('emptied', this.resetSegments);
+    },
+    resetSegments: () => (currentSegments = []),
+    start({ ipc }) {
+      ipc.on('sponsorblock-skip', (segments: Segment[]) => {
+        currentSegments = segments;
+      });
+    },
+    stop() {
+      const video = document.querySelector<HTMLVideoElement>('video');
+      if (!video) return;
+
+      video.removeEventListener('timeupdate', this.timeUpdateListener);
+      video.removeEventListener('emptied', this.resetSegments);
+    },
     timeUpdateListener: (e: Event) => {
       if (e.target instanceof HTMLVideoElement) {
         const target = e.target;
@@ -102,26 +121,6 @@ export default createPlugin({
         }
       }
     },
-    resetSegments: () => (currentSegments = []),
-    start({ ipc }) {
-      ipc.on('sponsorblock-skip', (segments: Segment[]) => {
-        currentSegments = segments;
-      });
-    },
-    onPlayerApiReady() {
-      const video = document.querySelector<HTMLVideoElement>('video');
-      if (!video) return;
-
-      video.addEventListener('timeupdate', this.timeUpdateListener);
-      // Reset segments on song end
-      video.addEventListener('emptied', this.resetSegments);
-    },
-    stop() {
-      const video = document.querySelector<HTMLVideoElement>('video');
-      if (!video) return;
-
-      video.removeEventListener('timeupdate', this.timeUpdateListener);
-      video.removeEventListener('emptied', this.resetSegments);
-    },
   },
+  restartNeeded: true,
 });

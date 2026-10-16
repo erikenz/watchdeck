@@ -49,7 +49,7 @@ export const loadTrackerBlockerEngine = async (
 
   try {
     blocker = await ElectronBlocker.fromLists(
-      (url: string) => net.fetch(url),
+      async (url: string) => net.fetch(url),
       lists,
       {
         enableCompression: true,

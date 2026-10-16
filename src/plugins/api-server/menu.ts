@@ -2,16 +2,12 @@ import prompt from 'custom-electron-prompt';
 import { dialog } from 'electron';
 
 import { t } from '@/i18n';
-import promptOptions from '@/providers/prompt-options';
-
-import {
-  type APIServerConfig,
-  AuthStrategy,
-  defaultAPIServerConfig,
-} from './config';
-
 import type { MenuTemplate } from '@/menu';
+import promptOptions from '@/providers/prompt-options';
 import type { MenuContext } from '@/types/contexts';
+
+import { AuthStrategy, defaultAPIServerConfig } from './config';
+import type { APIServerConfig } from './config';
 
 export const onMenu = async ({
   getConfig,
@@ -22,8 +18,6 @@ export const onMenu = async ({
 
   return [
     {
-      label: t('plugins.api-server.menu.hostname.label'),
-      type: 'normal',
       async click() {
         const config = await getConfig();
 
@@ -44,10 +38,10 @@ export const onMenu = async ({
 
         setConfig({ ...config, hostname: newHostname });
       },
+      label: t('plugins.api-server.menu.hostname.label'),
+      type: 'normal',
     },
     {
-      label: t('plugins.api-server.menu.port.label'),
-      type: 'normal',
       async click() {
         const config = await getConfig();
 
@@ -69,10 +63,11 @@ export const onMenu = async ({
 
         setConfig({ ...config, port: newPort });
       },
+      label: t('plugins.api-server.menu.port.label'),
+      type: 'normal',
     },
     {
       label: t('plugins.api-server.menu.auth-strategy.label'),
-      type: 'submenu',
       submenu: [
         {
           label: t(
@@ -93,10 +88,10 @@ export const onMenu = async ({
           },
         },
       ],
+      type: 'submenu',
     },
     {
       label: t('plugins.api-server.menu.https.label'),
-      type: 'submenu',
       submenu: [
         {
           label: t('plugins.api-server.menu.https.submenu.enable-https.label'),
@@ -139,6 +134,7 @@ export const onMenu = async ({
           },
         },
       ],
+      type: 'submenu',
     },
   ];
 };

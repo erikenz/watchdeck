@@ -1,16 +1,17 @@
+// oxlint-disable unicorn/prefer-import-meta-properties
+// electron-vite bundles its config and the vite plugins below before running
+// them, so `import.meta.dirname` would resolve to the bundle instead of this
+// file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
 import { readFileSync } from 'node:fs';
 import { resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import {
-  Project,
-  ts,
-  VariableDeclarationKind,
-  type ObjectLiteralExpression,
-  type Node,
-  type ObjectLiteralElementLike,
+import { Project, ts, VariableDeclarationKind } from 'ts-morph';
+import type {
+  ObjectLiteralExpression,
+  Node,
+  ObjectLiteralElementLike,
 } from 'ts-morph';
-
 import type { PluginOption } from 'vite';
 
 // Initialize a global project instance to reuse across load calls

@@ -4,10 +4,12 @@ import { createPlugin } from '@/utils';
 import { onConfigChange, onMainLoad } from './main';
 import { onMenu } from './menu';
 import { onPlayerApiReady, onRendererLoad } from './renderer';
-import style from './style.css?inline';
-import { DefaultPresetList, type Preset } from './types';
+import { DefaultPresetList } from './types';
+import type { Preset } from './types';
 
-export type DownloaderPluginConfig = {
+import style from './style.css?inline';
+
+export interface DownloaderPluginConfig {
   enabled: boolean;
   downloadFolder?: string;
   downloadOnFinish?: {
@@ -21,37 +23,37 @@ export type DownloaderPluginConfig = {
   customPresetSetting: Preset;
   skipExisting: boolean;
   playlistMaxItems?: number;
-};
+}
 
 export const defaultConfig: DownloaderPluginConfig = {
-  enabled: false,
+  customPresetSetting: DefaultPresetList['mp3 (256kbps)'], // Presets
   downloadFolder: undefined,
   downloadOnFinish: {
     enabled: false,
-    seconds: 20,
-    percent: 10,
-    mode: 'seconds',
     folder: undefined,
+    mode: 'seconds',
+    percent: 10,
+    seconds: 20,
   },
-  selectedPreset: 'mp3 (256kbps)', // Selected preset
-  customPresetSetting: DefaultPresetList['mp3 (256kbps)'], // Presets
-  skipExisting: false,
+  enabled: false,
   playlistMaxItems: undefined,
+  selectedPreset: 'mp3 (256kbps)', // Selected preset
+  skipExisting: false,
 };
 
 export default createPlugin({
-  name: () => t('plugins.downloader.name'),
-  description: () => t('plugins.downloader.description'),
-  restartNeeded: true,
-  config: defaultConfig,
-  stylesheets: [style],
-  menu: onMenu,
   backend: {
-    start: onMainLoad,
     onConfigChange,
+    start: onMainLoad,
   },
+  config: defaultConfig,
+  description: () => t('plugins.downloader.description'),
+  menu: onMenu,
+  name: () => t('plugins.downloader.name'),
   renderer: {
-    start: onRendererLoad,
     onPlayerApiReady,
+    start: onRendererLoad,
   },
+  restartNeeded: true,
+  stylesheets: [style],
 });

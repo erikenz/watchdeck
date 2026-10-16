@@ -1,8 +1,8 @@
 import { Mutex } from 'async-mutex';
-import { type BrowserWindow, ipcMain, nativeImage, net } from 'electron';
+import { ipcMain, nativeImage, net } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import * as config from '@/config';
-
 import type { GetPlayerResponse } from '@/types/get-player-response';
 
 export enum MediaType {
@@ -53,7 +53,7 @@ export const getImage = async (src: string): Promise<Electron.NativeImage> => {
   );
   if (output.isEmpty() && !src.endsWith('.jpg') && src.includes('.jpg')) {
     // Fix hidden webp files (https://github.com/erikenz/watchdeck/issues/315)
-    return getImage(src.slice(0, src.lastIndexOf('.jpg') + 4));
+    return await getImage(src.slice(0, src.lastIndexOf('.jpg') + 4));
   }
 
   return output;
@@ -69,23 +69,23 @@ const handleData = async (
 
   // Fill songInfo with empty values
   const songInfo: SongInfo = {
-    title: '',
+    album: undefined,
     alternativeTitle: '',
     artist: '',
     artistUrl: '',
-    views: 0,
-    uploadDate: '',
-    imageSrc: '',
-    image: null,
-    isPaused: undefined,
-    songDuration: 0,
     elapsedSeconds: 0,
-    url: '',
-    album: undefined,
-    videoId: '',
-    playlistId: '',
+    image: null,
+    imageSrc: '',
+    isPaused: undefined,
     mediaType: MediaType.Audio,
+    playlistId: '',
+    songDuration: 0,
     tags: [],
+    title: '',
+    uploadDate: '',
+    url: '',
+    videoId: '',
+    views: 0,
   } satisfies SongInfo;
 
   const microformat = data.microformat?.microformatDataRenderer;
@@ -95,7 +95,7 @@ const handleData = async (
     songInfo.playlistId =
       URL.parse(microformat.urlCanonical)?.searchParams?.get('list') ?? '';
     if (microformat.pageOwnerDetails?.externalChannelId) {
-      songInfo.artistUrl = `https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
+      songInfo.artistUrl = `https://www.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
     }
     // Used for options.resumeOnStart
     config.set('url', microformat.urlCanonical);
@@ -117,16 +117,19 @@ const handleData = async (
     songInfo.album = videoDetails.album; // Will be undefined if video exist
 
     switch (videoDetails?.musicVideoType) {
-      case 'MUSIC_VIDEO_TYPE_ATV':
+      case 'MUSIC_VIDEO_TYPE_ATV': {
         songInfo.mediaType = MediaType.Audio;
         break;
-      case 'MUSIC_VIDEO_TYPE_OMV':
+      }
+      case 'MUSIC_VIDEO_TYPE_OMV': {
         songInfo.mediaType = MediaType.OriginalMusicVideo;
         break;
-      case 'MUSIC_VIDEO_TYPE_UGC':
+      }
+      case 'MUSIC_VIDEO_TYPE_UGC': {
         songInfo.mediaType = MediaType.UserGeneratedContent;
         break;
-      case 'MUSIC_VIDEO_TYPE_PODCAST_EPISODE':
+      }
+      case 'MUSIC_VIDEO_TYPE_PODCAST_EPISODE': {
         songInfo.mediaType = MediaType.PodcastEpisode;
         // HACK: Podcast's participant is not the artist
         if (!config.get('options.usePodcastParticipantAsArtist')) {
@@ -135,7 +138,8 @@ const handleData = async (
           );
         }
         break;
-      default:
+      }
+      default: {
         songInfo.mediaType = MediaType.OtherVideo;
         // HACK: This is a workaround for "podcast" types where "musicVideoType" doesn't exist. Google :facepalm:
         if (
@@ -149,6 +153,7 @@ const handleData = async (
           );
         }
         break;
+      }
     }
 
     const thumbnails = videoDetails.thumbnail?.thumbnails;
@@ -161,7 +166,9 @@ const handleData = async (
       songInfo.imageSrc = thumbnails.at(-1)?.url;
     }
 
-    if (songInfo.imageSrc) songInfo.image = await getImage(songInfo.imageSrc);
+    if (songInfo.imageSrc) {
+      songInfo.image = await getImage(songInfo.imageSrc);
+    }
 
     win.webContents.send('watchdeck:update-song-info', songInfo);
   }
@@ -180,7 +187,7 @@ export type SongInfoCallback = (
   songInfo: SongInfo,
   event: SongInfoEvent,
 ) => void;
-const callbacks: Set<SongInfoCallback> = new Set();
+const callbacks = new Set<SongInfoCallback>();
 
 // This function will allow plugins to register callback that will be triggered when data changes
 export const registerCallback = (callback: SongInfoCallback) => {
@@ -192,20 +199,23 @@ const registerProvider = (win: BrowserWindow) => {
   let songInfo: SongInfo | null = null;
 
   // This will be called when the song-info-front finds a new request with song data
-  ipcMain.on('watchdeck:video-src-changed', async (_, data: GetPlayerResponse) => {
-    const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(
-      async () => {
-        songInfo = await handleData(data, win);
-        return songInfo;
-      },
-    );
+  ipcMain.on(
+    'watchdeck:video-src-changed',
+    async (_, data: GetPlayerResponse) => {
+      const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(
+        async () => {
+          songInfo = await handleData(data, win);
+          return songInfo;
+        },
+      );
 
-    if (tempSongInfo) {
-      for (const c of callbacks) {
-        c(tempSongInfo, SongInfoEvent.VideoSrcChanged);
+      if (tempSongInfo) {
+        for (const c of callbacks) {
+          c(tempSongInfo, SongInfoEvent.VideoSrcChanged);
+        }
       }
-    }
-  });
+    },
+  );
   ipcMain.on(
     'watchdeck:play-or-paused',
     async (

@@ -6,12 +6,11 @@ import { defaultAPIServerConfig } from './config';
 import { onMenu } from './menu';
 
 export default createPlugin({
-  name: () => t('plugins.api-server.name'),
-  description: () => t('plugins.api-server.description'),
-  restartNeeded: false,
-  config: defaultAPIServerConfig,
   addedVersion: '3.6.X',
-  menu: onMenu,
-
   backend,
+  config: defaultAPIServerConfig,
+  description: () => t('plugins.api-server.description'),
+  menu: onMenu,
+  name: () => t('plugins.api-server.name'),
+  restartNeeded: false,
 });

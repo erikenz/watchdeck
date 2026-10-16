@@ -5,27 +5,26 @@ import { createServer as createHttpsServer } from 'node:https';
 import { serve, upgradeWebSocket } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono as Hono } from '@hono/zod-openapi';
+import type { MiddlewareHandler } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt';
 import { WebSocketServer } from 'ws';
 
 import { APPLICATION_NAME } from '@/i18n';
 import { registerCallback } from '@/providers/song-info';
-import { createBackend } from '@/utils';
-
-import { API_VERSION } from './api-version';
-import { registerAuth, registerControl, registerWebsocket } from './routes';
-import { JWTPayloadSchema } from './scheme';
-
-import { type APIServerConfig, AuthStrategy } from '../config';
-
-import type { BackendType } from './types';
 import type {
   LikeType,
   RepeatMode,
   VolumeState,
 } from '@/types/datahost-get-state';
-import type { MiddlewareHandler } from 'hono';
+import { createBackend } from '@/utils';
+
+import { AuthStrategy } from '../config';
+import type { APIServerConfig } from '../config';
+import { API_VERSION } from './api-version';
+import { registerAuth, registerControl, registerWebsocket } from './routes';
+import { JWTPayloadSchema } from './scheme';
+import type { BackendType } from './types';
 
 export const backend = createBackend<BackendType, APIServerConfig>({
   async start(ctx) {

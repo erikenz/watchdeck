@@ -1,15 +1,10 @@
-import {
-  BrowserWindow,
-  Menu,
-  type MenuItem,
-  ipcMain,
-  nativeImage,
-  type WebContents,
-} from 'electron';
+import { BrowserWindow, Menu, ipcMain, nativeImage } from 'electron';
+import type { MenuItem, WebContents } from 'electron';
 import { register } from 'electron-localshortcut';
 
-import type { InAppMenuConfig } from './constants';
 import type { BackendContext } from '@/types/contexts';
+
+import type { InAppMenuConfig } from './constants';
 
 export const onMainLoad = ({
   window: win,
@@ -27,8 +22,10 @@ export const onMainLoad = ({
 
   handle('get-menu', () =>
     JSON.parse(
-      JSON.stringify(Menu.getApplicationMenu(), (key: string, value: unknown) =>
-        key !== 'commandsMap' && key !== 'menu' ? value : undefined,
+      JSON.stringify(
+        Menu.getApplicationMenu(),
+        (key: string, value: unknown) =>
+          key !== 'commandsMap' && key !== 'menu' ? value : undefined,
       ),
     ),
   );
@@ -53,7 +50,7 @@ export const onMainLoad = ({
 
   ipcMain.handle('watchdeck:menu-event', (event, commandId: number) => {
     const target = getMenuItemById(commandId);
-    if (target)
+    if (target) {
       (
         target.click as (
           args0: unknown,
@@ -61,6 +58,7 @@ export const onMainLoad = ({
           args3: WebContents,
         ) => void
       )(undefined, BrowserWindow.fromWebContents(event.sender), event.sender);
+    }
   });
 
   handle('get-menu-by-id', (commandId: number) => {
@@ -75,12 +73,24 @@ export const onMainLoad = ({
 
   handle('window-is-maximized', () => win.isMaximized());
 
-  handle('window-close', () => win.close());
-  handle('window-minimize', () => win.minimize());
-  handle('window-maximize', () => win.maximize());
-  win.on('maximize', () => send('window-maximize'));
-  handle('window-unmaximize', () => win.unmaximize());
-  win.on('unmaximize', () => send('window-unmaximize'));
+  handle('window-close', () => {
+    win.close();
+  });
+  handle('window-minimize', () => {
+    win.minimize();
+  });
+  handle('window-maximize', () => {
+    win.maximize();
+  });
+  win.on('maximize', () => {
+    send('window-maximize');
+  });
+  handle('window-unmaximize', () => {
+    win.unmaximize();
+  });
+  win.on('unmaximize', () => {
+    send('window-unmaximize');
+  });
 
   handle('image-path-to-data-url', (imagePath: string) => {
     const nativeImageIcon = nativeImage.createFromPath(imagePath);

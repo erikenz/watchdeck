@@ -1,8 +1,8 @@
+import type { RendererContext } from '@/types/contexts';
+import type { MusicPlayer } from '@/types/music-player';
 import { createRenderer } from '@/utils';
 
 import type { CustomOutputPluginConfig } from './index';
-import type { RendererContext } from '@/types/contexts';
-import type { MusicPlayer } from '@/types/music-player';
 
 const updateDeviceList = async (
   context: RendererContext<CustomOutputPluginConfig>,
@@ -27,8 +27,12 @@ const updateSinkId = async (
   },
   sinkId?: string,
 ) => {
-  if (!audioContext || !sinkId) return;
-  if (!('setSinkId' in audioContext)) return;
+  if (!audioContext || !sinkId) {
+    return;
+  }
+  if (!('setSinkId' in audioContext)) {
+    return;
+  }
 
   if (typeof audioContext.setSinkId === 'function') {
     await audioContext.setSinkId(sinkId);
@@ -48,11 +52,17 @@ export const renderer = createRenderer<
     await updateSinkId(audioContext, this.options!.output);
   },
 
+  async onConfigChange(config) {
+    this.options = config;
+    await updateSinkId(this.audioContext, config.output);
+  },
+
   async onPlayerApiReady(_: MusicPlayer, context) {
     this.options = await context.getConfig();
     await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    navigator.mediaDevices.ondevicechange = async () =>
+    navigator.mediaDevices.ondevicechange = async () => {
       await updateDeviceList(context);
+    };
 
     document.addEventListener(
       'watchdeck:audio-can-play',
@@ -71,10 +81,5 @@ export const renderer = createRenderer<
       this.audioCanPlayHandler,
     );
     navigator.mediaDevices.ondevicechange = null;
-  },
-
-  async onConfigChange(config) {
-    this.options = config;
-    await updateSinkId(this.audioContext, config.output);
   },
 });

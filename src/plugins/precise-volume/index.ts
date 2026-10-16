@@ -1,5 +1,7 @@
-import prompt, { type KeybindOptions } from 'custom-electron-prompt';
-import { globalShortcut, type MenuItem } from 'electron';
+import prompt from 'custom-electron-prompt';
+import type { KeybindOptions } from 'custom-electron-prompt';
+import { globalShortcut } from 'electron';
+import type { MenuItem } from 'electron';
 
 import { t } from '@/i18n';
 import promptOptions from '@/providers/prompt-options';
@@ -7,9 +9,10 @@ import { createPlugin } from '@/utils';
 
 import { overrideListener } from './override';
 import { onConfigChange, onPlayerApiReady } from './renderer';
+
 import hudStyle from './volume-hud.css?inline';
 
-export type PreciseVolumePluginConfig = {
+export interface PreciseVolumePluginConfig {
   enabled: boolean;
   /**
    * Percentage of volume to change
@@ -27,12 +30,15 @@ export type PreciseVolumePluginConfig = {
    * Plugin save volume between session here
    */
   savedVolume: number | undefined;
-};
+}
 
 export default createPlugin({
   name: () => t('plugins.precise-volume.name'),
   description: () => t('plugins.precise-volume.description'),
   restartNeeded: true,
+  // The assertion below widens this object's literals to the plugin config
+  // type (without it TS narrows e.g. `blocker` to the literal).
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
     steps: 1,
@@ -52,9 +58,10 @@ export default createPlugin({
       options: PreciseVolumePluginConfig,
     ) {
       for (const option in changedOptions) {
-        // HACK: Weird TypeScript error
-        (options as Record<string, unknown>)[option] = (
-          changedOptions as Record<string, unknown>
+        // HACK: Weird TypeScript error - the config is an interface, so it needs
+        // the double assertion to be indexed by a string
+        (options as unknown as Record<string, unknown>)[option] = (
+          changedOptions as unknown as Record<string, unknown>
         )[option];
       }
 

@@ -3,12 +3,11 @@ import crypto from 'node:crypto';
 import { BrowserWindow, dialog, net } from 'electron';
 
 import { t } from '@/i18n';
-
-import { ScrobblerBase } from './base';
+import type { SongInfo } from '@/providers/song-info';
 
 import type { ScrobblerPluginConfig } from '../index';
 import type { SetConfType } from '../main';
-import type { SongInfo } from '@/providers/song-info';
+import { ScrobblerBase } from './base';
 
 interface LastFmData {
   method: string;
@@ -140,7 +139,7 @@ export class LastFmScrobbler extends ScrobblerBase {
     const postData: LastFmSongData = {
       track: title,
       duration: songInfo.songDuration,
-      artist: artist,
+      artist,
       ...(songInfo.album ? { album: songInfo.album } : undefined), // Will be undefined if current song is a video
       api_key: config.scrobblers.lastfm.apiKey,
       sk: config.scrobblers.lastfm.sessionKey,
@@ -152,8 +151,8 @@ export class LastFmScrobbler extends ScrobblerBase {
     const formData = createFormData(postData);
     net
       .fetch('https://ws.audioscrobbler.com/2.0/', {
-        method: 'POST',
         body: formData,
+        method: 'POST',
       })
       .catch(
         async (error: {
@@ -208,7 +207,7 @@ const createQueryString = (
     );
   }
 
-  return '?' + queryData.join('&');
+  return `?${queryData.join('&')}`;
 };
 
 const createApiSig = (parameters: LastFmSongData, secret: string) => {
@@ -240,9 +239,9 @@ const createToken = async ({
     api_key: string;
     format: string;
   } = {
-    method: 'auth.gettoken',
     api_key: apiKey,
     format: 'json',
+    method: 'auth.gettoken',
   };
   const apiSigature = createApiSig(data, secret);
   const response = await net.fetch(
@@ -258,8 +257,8 @@ let latestAuthResult = false;
 const authenticate = async (
   config: ScrobblerPluginConfig,
   mainWindow: BrowserWindow,
-) => {
-  return new Promise<boolean>((resolve) => {
+) =>
+  await new Promise<boolean>((resolve) => {
     if (!authWindowOpened) {
       authWindowOpened = true;
       const url = `https://www.last.fm/api/auth/?api_key=${config.scrobblers.lastfm.apiKey}&token=${config.scrobblers.lastfm.token}`;
@@ -320,4 +319,3 @@ const authenticate = async (
       resolve(latestAuthResult);
     }
   });
-};

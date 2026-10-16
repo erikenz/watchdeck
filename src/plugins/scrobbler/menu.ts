@@ -1,14 +1,14 @@
 import prompt from 'custom-electron-prompt';
-import { type BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import { t } from '@/i18n';
-import promptOptions from '@/providers/prompt-options';
-
-import { type ScrobblerPluginConfig } from './index';
-import { type SetConfType, backend } from './main';
-
 import type { MenuTemplate } from '@/menu';
+import promptOptions from '@/providers/prompt-options';
 import type { MenuContext } from '@/types/contexts';
+
+import type { ScrobblerPluginConfig } from './index';
+import { backend } from './main';
+import type { SetConfType } from './main';
 
 async function promptLastFmOptions(
   options: ScrobblerPluginConfig,
@@ -17,9 +17,8 @@ async function promptLastFmOptions(
 ) {
   const output = await prompt(
     {
-      title: t('plugins.scrobbler.menu.lastfm.api-settings'),
+      height: 360,
       label: t('plugins.scrobbler.menu.lastfm.api-settings'),
-      type: 'multiInput',
       multiInputOptions: [
         {
           label: t('plugins.scrobbler.prompt.lastfm.api-key'),
@@ -37,7 +36,8 @@ async function promptLastFmOptions(
         },
       ],
       resizable: true,
-      height: 360,
+      title: t('plugins.scrobbler.menu.lastfm.api-settings'),
+      type: 'multiInput',
       ...promptOptions(),
     },
     window,
@@ -63,8 +63,8 @@ async function promptListenbrainzOptions(
 ) {
   const output = await prompt(
     {
-      title: t('plugins.scrobbler.prompt.listenbrainz.token.title'),
       label: t('plugins.scrobbler.prompt.listenbrainz.token.label'),
+      title: t('plugins.scrobbler.prompt.listenbrainz.token.title'),
       type: 'input',
       value: options.scrobblers.listenbrainz?.token,
       ...promptOptions(),
@@ -87,50 +87,50 @@ export const onMenu = async ({
 
   return [
     {
-      label: t('plugins.scrobbler.menu.scrobble-other-media'),
-      type: 'checkbox',
       checked: Boolean(config.scrobbleOtherMedia),
       click(item) {
         config.scrobbleOtherMedia = item.checked;
         setConfig(config);
       },
+      label: t('plugins.scrobbler.menu.scrobble-other-media'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.scrobbler.menu.scrobble-alternative-title'),
-      type: 'checkbox',
       checked: Boolean(config.alternativeTitles),
       click(item) {
         config.alternativeTitles = item.checked;
         setConfig(config);
       },
+      label: t('plugins.scrobbler.menu.scrobble-alternative-title'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.scrobbler.menu.scrobble-alternative-artist'),
-      type: 'checkbox',
       checked: Boolean(config.alternativeArtist),
       click(item) {
         config.alternativeArtist = item.checked;
         setConfig(config);
       },
+      label: t('plugins.scrobbler.menu.scrobble-alternative-artist'),
+      type: 'checkbox',
     },
     {
       label: 'Last.fm',
       submenu: [
         {
-          label: t('main.menu.plugins.enabled'),
-          type: 'checkbox',
           checked: Boolean(config.scrobblers.lastfm?.enabled),
           click(item) {
             backend.toggleScrobblers(config, window);
             config.scrobblers.lastfm.enabled = item.checked;
             setConfig(config);
           },
+          label: t('main.menu.plugins.enabled'),
+          type: 'checkbox',
         },
         {
-          label: t('plugins.scrobbler.menu.lastfm.api-settings'),
           click() {
             promptLastFmOptions(config, setConfig, window);
           },
+          label: t('plugins.scrobbler.menu.lastfm.api-settings'),
         },
       ],
     },
@@ -138,20 +138,20 @@ export const onMenu = async ({
       label: 'ListenBrainz',
       submenu: [
         {
-          label: t('main.menu.plugins.enabled'),
-          type: 'checkbox',
           checked: Boolean(config.scrobblers.listenbrainz?.enabled),
           click(item) {
             backend.toggleScrobblers(config, window);
             config.scrobblers.listenbrainz.enabled = item.checked;
             setConfig(config);
           },
+          label: t('main.menu.plugins.enabled'),
+          type: 'checkbox',
         },
         {
-          label: t('plugins.scrobbler.menu.listenbrainz.token'),
           click() {
             promptListenbrainzOptions(config, setConfig, window);
           },
+          label: t('plugins.scrobbler.menu.listenbrainz.token'),
         },
       ],
     },

@@ -4,11 +4,15 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 
 import * as config from '@/config';
 
-export const restart = () => restartInternal();
+export const restart = () => {
+  restartInternal();
+};
 
 export const setupAppControls = () => {
   ipcMain.on('watchdeck:restart', restart);
-  ipcMain.handle('watchdeck:get-downloads-folder', () => app.getPath('downloads'));
+  ipcMain.handle('watchdeck:get-downloads-folder', () =>
+    app.getPath('downloads'),
+  );
   ipcMain.on('watchdeck:reload', () =>
     BrowserWindow.getFocusedWindow()?.webContents.loadURL(config.get('url')),
   );

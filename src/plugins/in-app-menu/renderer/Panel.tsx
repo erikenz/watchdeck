@@ -1,12 +1,8 @@
-import {
-  autoUpdate,
-  flip,
-  offset,
-  type OffsetOptions,
-  size,
-} from '@floating-ui/dom';
+import { autoUpdate, flip, offset, size } from '@floating-ui/dom';
+import type { OffsetOptions } from '@floating-ui/dom';
 import { useFloating } from 'solid-floating-ui';
-import { createSignal, type JSX, Show, splitProps, mergeProps } from 'solid-js';
+import { createSignal, Show, splitProps, mergeProps } from 'solid-js';
+import type { JSX } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { css } from 'solid-styled-components';
 import { Transition } from 'solid-transition-group';
@@ -55,14 +51,14 @@ const animationStyle = cacheNoArgs(() => ({
       opacity 0.225s cubic-bezier(0.33, 1, 0.68, 1),
       transform 0.225s cubic-bezier(0.33, 1, 0.68, 1);
   `,
-  exitTo: css`
-    opacity: 0;
-    transform: scale(0.9);
-  `,
   exitActive: css`
     transition:
       opacity 0.225s cubic-bezier(0.32, 0, 0.67, 0),
       transform 0.225s cubic-bezier(0.32, 0, 0.67, 0);
+  `,
+  exitTo: css`
+    opacity: 0;
+    transform: scale(0.9);
   `,
 }));
 
@@ -97,9 +93,6 @@ export const Panel = (props: PanelProps) => {
   const [panel, setPanel] = createSignal<HTMLElement | null>(null);
 
   const position = useFloating(() => elements.anchor, panel, {
-    whileElementsMounted: autoUpdate,
-    placement: local.placement as Placement,
-    strategy: 'fixed',
     middleware: [
       offset(local.offset),
       size({
@@ -117,30 +110,49 @@ export const Panel = (props: PanelProps) => {
       }),
       flip({ fallbackStrategy: 'initialPlacement' }),
     ],
+    placement: local.placement as Placement,
+    strategy: 'fixed',
+    whileElementsMounted: autoUpdate,
   });
 
   const originX = () => {
-    if (position.placement.includes('left')) return '100%';
-    if (position.placement.includes('right')) return '0';
+    if (position.placement.includes('left')) {
+      return '100%';
+    }
+    if (position.placement.includes('right')) {
+      return '0';
+    }
     if (
       position.placement.includes('top') ||
       position.placement.includes('bottom')
     ) {
-      if (position.placement.includes('start')) return '0';
-      if (position.placement.includes('end')) return '100%';
+      if (position.placement.includes('start')) {
+        return '0';
+      }
+      if (position.placement.includes('end')) {
+        return '100%';
+      }
     }
 
     return '50%';
   };
   const originY = () => {
-    if (position.placement.includes('top')) return '100%';
-    if (position.placement.includes('bottom')) return '0';
+    if (position.placement.includes('top')) {
+      return '100%';
+    }
+    if (position.placement.includes('bottom')) {
+      return '0';
+    }
     if (
       position.placement.includes('left') ||
       position.placement.includes('right')
     ) {
-      if (position.placement.includes('start')) return '0';
-      if (position.placement.includes('end')) return '100%';
+      if (position.placement.includes('start')) {
+        return '0';
+      }
+      if (position.placement.includes('end')) {
+        return '100%';
+      }
     }
     return '50%';
   };

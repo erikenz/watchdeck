@@ -1,10 +1,10 @@
+import type { GatewayActivityButton } from 'discord-api-types/v10';
+
 import { APPLICATION_NAME } from '@/i18n';
+import type { SongInfo } from '@/providers/song-info';
 
 import { HANGUL_FILLER } from './constants';
-
 import type { DiscordPluginConfig } from './index';
-import type { SongInfo } from '@/providers/song-info';
-import type { GatewayActivityButton } from 'discord-api-types/v10';
 
 /**
  * Truncates a string to a specified length, adding ellipsis if truncated.
@@ -54,12 +54,7 @@ export const buildDiscordButtons = (
   songInfo: SongInfo,
 ): GatewayActivityButton[] | undefined => {
   const buttons: GatewayActivityButton[] = [];
-  if (
-    config[
-      'playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music'
-    ] &&
-    songInfo.url
-  ) {
+  if (config.playOnYouTubeMusic && songInfo.url) {
     buttons.push({
       label: `Play on ${APPLICATION_NAME}`,
       url: songInfo.url,
@@ -94,8 +89,7 @@ export const padHangulFields = (songInfo: SongInfo): void => {
  * @param newSeconds - The current elapsed time in seconds.
  * @returns True if the time difference suggests a seek, false otherwise.
  */
-export const isSeek = (oldSeconds: number, newSeconds: number): boolean => {
+export const isSeek = (oldSeconds: number, newSeconds: number): boolean =>
   // Consider it a seek if the time difference is greater than 2 seconds
   // (allowing for minor discrepancies in reporting)
-  return Math.abs(newSeconds - oldSeconds) > 2;
-};
+  Math.abs(newSeconds - oldSeconds) > 2;

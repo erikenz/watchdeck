@@ -1,4 +1,5 @@
-import { contextBridge, webFrame, type BrowserWindow } from 'electron';
+import { contextBridge, webFrame } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import { t } from '@/i18n';
 import { createPlugin } from '@/utils';
@@ -45,6 +46,9 @@ export default createPlugin({
   name: () => t('plugins.do-not-track.name'),
   description: () => t('plugins.do-not-track.description'),
   restartNeeded: false,
+  // The assertion below widens this object's literals to the plugin config
+  // type (without it TS narrows e.g. `blocker` to the literal).
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
     cache: true,

@@ -3,10 +3,8 @@ import path from 'node:path';
 import url from 'node:url';
 
 import ErrorHtmlAsset from '@assets/error.html?asset';
-import {
-  enhanceWebRequest,
-  type BetterSession,
-} from '@jellybrick/electron-better-web-request';
+import { enhanceWebRequest } from '@jellybrick/electron-better-web-request';
+import type { BetterSession } from '@jellybrick/electron-better-web-request';
 import { deepmerge } from 'deepmerge-ts';
 import {
   BrowserWindow,
@@ -18,8 +16,8 @@ import {
   dialog,
   ipcMain,
   protocol,
-  type BrowserWindowConstructorOptions,
 } from 'electron';
+import type { BrowserWindowConstructorOptions } from 'electron';
 import electronDebug from 'electron-debug';
 import is from 'electron-is';
 import unhandled from 'electron-unhandled';
@@ -37,7 +35,6 @@ import {
   loadAllMainPlugins,
 } from '@/loader/main';
 import { refreshMenu, setApplicationMenu } from '@/menu';
-import musicPlayerCss from '@/music-player.css?inline';
 import { defaultAuthProxyConfig } from '@/plugins/auth-proxy-adapter/config';
 import { fileExists, injectCSS, injectCSSAsFile } from '@/plugins/utils/main';
 import { restart, setupAppControls } from '@/providers/app-controls';
@@ -48,10 +45,11 @@ import {
 } from '@/providers/protocol-handler';
 import { setupSongInfo } from '@/providers/song-info';
 import { setUpTray } from '@/tray';
+import type { PluginConfig } from '@/types/plugins';
 import { LoggerPrefix } from '@/utils';
 import { isTesting } from '@/utils/testing';
 
-import type { PluginConfig } from '@/types/plugins';
+import musicPlayerCss from '@/music-player.css?inline';
 
 // Catch errors and log them
 unhandled({
@@ -69,30 +67,30 @@ if (!gotTheLock) {
 
 protocol.registerSchemesAsPrivileged([
   {
-    scheme: 'http',
     privileges: {
-      standard: true,
-      bypassCSP: true,
       allowServiceWorkers: true,
-      supportFetchAPI: true,
-      corsEnabled: true,
-      stream: true,
+      bypassCSP: true,
       codeCache: true,
+      corsEnabled: true,
+      standard: true,
+      stream: true,
+      supportFetchAPI: true,
     },
+    scheme: 'http',
   },
   {
-    scheme: 'https',
     privileges: {
-      standard: true,
-      bypassCSP: true,
       allowServiceWorkers: true,
-      supportFetchAPI: true,
-      corsEnabled: true,
-      stream: true,
+      bypassCSP: true,
       codeCache: true,
+      corsEnabled: true,
+      standard: true,
+      stream: true,
+      supportFetchAPI: true,
     },
+    scheme: 'https',
   },
-  { scheme: 'mailto', privileges: { standard: true } },
+  { privileges: { standard: true }, scheme: 'mailto' },
 ]);
 
 // Ozone platform hint: Required for Wayland support
@@ -109,7 +107,7 @@ app.commandLine.appendSwitch(
 
 // Disable Fluent Scrollbar (for OverlayScrollbar)
 const disabledFeatures = ['FluentScrollbar'];
-let disableHardwareAcceleration = config.get(
+const disableHardwareAcceleration = config.get(
   'options.disableHardwareAcceleration',
 );
 
@@ -121,18 +119,15 @@ if (is.linux()) {
   }
 
   // Overrides WM_CLASS for X11 to correspond to icon filename
-  app.setName(
-    'com.github.erikenz.watchdeck',
-  );
+  app.setName('com.github.erikenz.watchdeck');
   // for wayland
-  app.commandLine.appendSwitch(
-    'class',
-    'com.github.erikenz.watchdeck',
-  );
+  app.commandLine.appendSwitch('class', 'com.github.erikenz.watchdeck');
 }
 
 if (disableHardwareAcceleration) {
-  if (is.dev()) console.log('Disabling hardware acceleration');
+  if (is.dev()) {
+    console.log('Disabling hardware acceleration');
+  }
   app.disableHardwareAcceleration();
 }
 
@@ -193,9 +188,9 @@ const initHook = async (win: BrowserWindow) => {
         config.get(`plugins.${id}`) ?? {},
       ) as PluginConfig,
   );
-  ipcMain.handle('watchdeck:set-config', (_, name: string, obj: object) =>
-    config.setPartial(`plugins.${name}`, obj, allPluginStubs[name].config),
-  );
+  ipcMain.handle('watchdeck:set-config', (_, name: string, obj: object) => {
+    config.setPartial(`plugins.${name}`, obj, allPluginStubs[name].config);
+  });
 
   config.watch((newValue, oldValue) => {
     const newPluginConfigList = (newValue?.plugins ?? {}) as Record<
@@ -253,20 +248,20 @@ const showNeedToRestartDialog = async (id: string) => {
   const plugin = (await allPlugins())[id];
 
   const dialogOptions: Electron.MessageBoxOptions = {
-    type: 'info',
     buttons: [
       t('main.dialog.need-to-restart.buttons.restart-now'),
       t('main.dialog.need-to-restart.buttons.later'),
     ],
-    title: t('main.dialog.need-to-restart.title'),
-    message: t('main.dialog.need-to-restart.message', {
-      pluginName: plugin?.name?.() ?? id,
-    }),
+    cancelId: 1,
+    defaultId: 0,
     detail: t('main.dialog.need-to-restart.detail', {
       pluginName: plugin?.name?.() ?? id,
     }),
-    defaultId: 0,
-    cancelId: 1,
+    message: t('main.dialog.need-to-restart.message', {
+      pluginName: plugin?.name?.() ?? id,
+    }),
+    title: t('main.dialog.need-to-restart.title'),
+    type: 'info',
   };
 
   let dialogPromise: Promise<Electron.MessageBoxReturnValue>;
@@ -328,11 +323,12 @@ async function createMainWindow() {
 
   const defaultTitleBarOverlayOptions: Electron.TitleBarOverlay = {
     color: '#00000000',
-    symbolColor: '#ffffff',
     height: 32,
+    symbolColor: '#ffffff',
   };
 
   const decorations: Partial<BrowserWindowConstructorOptions> = {
+    autoHideMenuBar: config.get('options.hideMenu'),
     frame: !is.macOS() && !useInlineMenu,
     titleBarOverlay: defaultTitleBarOverlayOptions,
     titleBarStyle: useInlineMenu
@@ -340,7 +336,6 @@ async function createMainWindow() {
       : is.macOS()
         ? 'hiddenInset'
         : 'default',
-    autoHideMenuBar: config.get('options.hideMenu'),
   };
 
   // Note: on linux, for some weird reason, having these extra properties with 'frame: false' does not work
@@ -350,12 +345,11 @@ async function createMainWindow() {
   }
 
   const electronWindowSettings: Electron.BrowserWindowConstructorOptions = {
-    icon,
-    width: windowSize.width,
-    height: windowSize.height,
-    minWidth: 325,
-    minHeight: 425,
     backgroundColor: '#000',
+    height: windowSize.height,
+    icon,
+    minHeight: 425,
+    minWidth: 325,
     show: false,
     webPreferences: {
       contextIsolation: true,
@@ -368,6 +362,7 @@ async function createMainWindow() {
             sandbox: false,
           }),
     },
+    width: windowSize.width,
     ...decorations,
   };
 
@@ -394,19 +389,19 @@ async function createMainWindow() {
     const scaledY = windowY;
 
     if (
-      scaledX + (scaledWidth / 2) < display.bounds.x - 8 || // Left
-      scaledX + (scaledWidth / 2) > display.bounds.x + display.bounds.width || // Right
+      scaledX + scaledWidth / 2 < display.bounds.x - 8 || // Left
+      scaledX + scaledWidth / 2 > display.bounds.x + display.bounds.width || // Right
       scaledY < display.bounds.y - 8 || // Top
-      scaledY + (scaledHeight / 2) > display.bounds.y + display.bounds.height // Bottom
+      scaledY + scaledHeight / 2 > display.bounds.y + display.bounds.height // Bottom
     ) {
       // Window is offscreen
       if (is.dev()) {
         console.warn(
           LoggerPrefix,
           t('main.console.window.tried-to-render-offscreen', {
-            windowSize: String(winSize),
             displaySize: JSON.stringify(display.bounds),
             position: JSON.stringify(windowPosition),
+            windowSize: String(winSize),
           }),
         );
       }
@@ -454,8 +449,8 @@ async function createMainWindow() {
     }
 
     lateSave('window-size', {
-      width,
       height,
+      width,
     });
   });
 
@@ -506,13 +501,13 @@ async function createMainWindow() {
     // Google sign-in page instead of the paywall. Inherited; revisit in P1.
     if (
       url &&
-      url.hostname.endsWith('\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com') &&
+      url.hostname.endsWith('\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com') &&
       url.pathname === '/premium'
     ) {
       event.preventDefault();
 
       win.webContents.loadURL(
-        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006f\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%252F',
+        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006F\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%252F',
       );
     }
   });
@@ -527,11 +522,11 @@ app.once('browser-window-created', (_event, win) => {
     // User agents are from https://developers.whatismybrowser.com/useragents/explore/
     const originalUserAgent = win.webContents.userAgent;
     const userAgents = {
+      linux:
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
       mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
       windows:
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
-      linux:
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
     };
 
     const updatedUserAgent = is.macOS()
@@ -575,10 +570,10 @@ app.once('browser-window-created', (_event, win) => {
           error: 'did-fail-load',
           errorCode,
           errorDescription,
-          validatedURL,
-          isMainFrame,
           frameProcessId,
           frameRoutingId,
+          isMainFrame,
+          validatedURL,
         },
         null,
         '\t',
@@ -665,8 +660,7 @@ app.whenReady().then(async () => {
 
   // Register appID on windows
   if (is.windows()) {
-    const appID =
-      'com.github.erikenz.watchdeck';
+    const appID = 'com.github.erikenz.watchdeck';
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
     const appData = app.getPath('appData');
@@ -699,10 +693,10 @@ app.whenReady().then(async () => {
           shortcutPath,
           error === 'needUpdate' ? 'update' : 'create',
           {
-            target: appLocation,
+            appUserModelId: appID,
             cwd: path.dirname(appLocation),
             description: `${APPLICATION_NAME} Desktop App - including custom plugins`,
-            appUserModelId: appID,
+            target: appLocation,
           },
         );
       }
@@ -752,7 +746,7 @@ app.whenReady().then(async () => {
       const scriptString = fs.readFileSync(scriptPath, 'utf-8');
       event.returnValue = [
         url.pathToFileURL(scriptPath).toString(),
-        scriptString + ';0',
+        `${scriptString};0`,
       ];
     }
   });
@@ -809,9 +803,9 @@ app.whenReady().then(async () => {
   // config for that day.
   if (config.get('options.hideMenu') && !config.get('options.hideMenuWarned')) {
     dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      title: t('main.dialog.hide-menu-enabled.title'),
       message: t('main.dialog.hide-menu-enabled.message'),
+      title: t('main.dialog.hide-menu-enabled.title'),
+      type: 'info',
     });
     config.set('options.hideMenuWarned', true);
   }
@@ -852,16 +846,16 @@ function showUnresponsiveDialog(
 
   dialog
     .showMessageBox(win, {
-      type: 'error',
-      title: t('main.dialog.unresponsive.title'),
-      message: t('main.dialog.unresponsive.message'),
-      detail: t('main.dialog.unresponsive.detail'),
       buttons: [
         t('main.dialog.unresponsive.buttons.wait'),
         t('main.dialog.unresponsive.buttons.relaunch'),
         t('main.dialog.unresponsive.buttons.quit'),
       ],
       cancelId: 0,
+      detail: t('main.dialog.unresponsive.detail'),
+      message: t('main.dialog.unresponsive.message'),
+      title: t('main.dialog.unresponsive.title'),
+      type: 'error',
     })
     .then((result) => {
       switch (result.response) {
@@ -902,7 +896,7 @@ function removeContentSecurityPolicy(
         !details.responseHeaders['access-control-allow-origin'] &&
         !details.responseHeaders['Access-Control-Allow-Origin']
       ) {
-        details.responseHeaders['access-control-allow-origin'] = ['https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com'];
+        details.responseHeaders['access-control-allow-origin'] = ['https://www.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com'];
       }
     }
 
@@ -912,8 +906,8 @@ function removeContentSecurityPolicy(
   // When multiple listeners are defined, apply them all
   betterSession.webRequest.setResolver(
     'onHeadersReceived',
-    async (listeners) => {
-      return listeners.reduce(
+    async (listeners) =>
+      await listeners.reduce(
         async (accumulator, listener) => {
           const acc = await accumulator;
           if (acc.cancel) {
@@ -924,7 +918,6 @@ function removeContentSecurityPolicy(
           return { ...acc, ...result };
         },
         Promise.resolve({ cancel: false }),
-      );
-    },
+      ),
   );
 }

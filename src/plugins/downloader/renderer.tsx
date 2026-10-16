@@ -9,11 +9,10 @@ import {
 } from '@/plugins/utils/renderer/check';
 import { getSongMenu } from '@/providers/dom-elements';
 import { getSongInfo } from '@/providers/song-info-front';
-
-import { DownloadButton } from './templates/download';
+import type { RendererContext } from '@/types/contexts';
 
 import type { DownloaderPluginConfig } from './index';
-import type { RendererContext } from '@/types/contexts';
+import { DownloadButton } from './templates/download';
 
 let download: () => void;
 
@@ -61,12 +60,11 @@ export const onRendererLoad = ({
 
     if (videoUrl) {
       if (videoUrl.startsWith('watch?')) {
-        videoUrl = defaultConfig.url + '/' + videoUrl;
+        videoUrl = `${defaultConfig.url}/${videoUrl}`;
       }
 
       if (videoUrl.startsWith('podcast/')) {
-        videoUrl =
-          defaultConfig.url + '/watch?' + videoUrl.replace('podcast/', 'v=');
+        videoUrl = `${defaultConfig.url}/watch?${videoUrl.replace('podcast/', 'v=')}`;
       }
 
       if (videoUrl.includes('?playlist=')) {

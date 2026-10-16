@@ -1,8 +1,5 @@
-import { LikeType, type GetState } from '@/types/datahost-get-state';
-
-import { singleton } from './decorators';
-
-import type { SongInfo } from './song-info';
+import { LikeType } from '@/types/datahost-get-state';
+import type { GetState } from '@/types/datahost-get-state';
 import type { MusicPlayer } from '@/types/music-player';
 import type {
   AlbumDetails,
@@ -10,6 +7,9 @@ import type {
   VideoDataChangeValue,
 } from '@/types/player-api-events';
 import type { VideoDataChanged } from '@/types/video-data-changed';
+
+import { singleton } from './decorators';
+import type { SongInfo } from './song-info';
 
 const DATAUPDATED_FALLBACK_TIMEOUT_MS = 1500;
 
@@ -102,8 +102,8 @@ export const setupLikeChangedListener = singleton(() => {
   const likeButtonRenderer = document.querySelector('#like-button-renderer');
   if (likeButtonRenderer) {
     likeDislikeObserver.observe(likeButtonRenderer, {
-      attributes: true,
       attributeFilter: [LIKE_STATUS_ATTRIBUTE],
+      attributes: true,
     });
 
     // Emit the initial value as well; as it's persistent between launches.
@@ -117,15 +117,15 @@ export const setupLikeChangedListener = singleton(() => {
 export const setupVolumeChangedListener = singleton((api: MusicPlayer) => {
   document.querySelector('video')?.addEventListener('volumechange', () => {
     window.ipcRenderer.send('watchdeck:volume-changed', {
-      state: api.getVolume(),
       isMuted: api.isMuted(),
+      state: api.getVolume(),
     });
   });
 
   // Emit the initial value as well; as it's persistent between launches.
   window.ipcRenderer.send('watchdeck:volume-changed', {
-    state: api.getVolume(),
     isMuted: api.isMuted(),
+    state: api.getVolume(),
   });
 });
 
@@ -145,8 +145,8 @@ export const setupShuffleChangedListener = singleton(() => {
   });
 
   observer.observe(playerBar, {
-    attributes: true,
     attributeFilter: ['shuffle-on'],
+    attributes: true,
     childList: false,
     subtree: false,
   });
@@ -169,8 +169,8 @@ export const setupFullScreenChangedListener = singleton(() => {
   });
 
   observer.observe(playerBar, {
-    attributes: true,
     attributeFilter: ['player-fullscreened'],
+    attributes: true,
     childList: false,
     subtree: false,
   });
@@ -231,15 +231,19 @@ export const setupSongInfo = (api: MusicPlayer) => {
       Math.round(e.target.currentTime) > 0
     ) {
       window.ipcRenderer.send('watchdeck:play-or-paused', {
-        isPaused: status === 'pause',
         elapsedSeconds: Math.floor(e.target.currentTime),
+        isPaused: status === 'pause',
       });
     }
   };
 
   const playPausedHandlers = {
-    playing: (e: Event) => playPausedHandler(e, 'playing'),
-    pause: (e: Event) => playPausedHandler(e, 'pause'),
+    pause: (e: Event) => {
+      playPausedHandler(e, 'pause');
+    },
+    playing: (e: Event) => {
+      playPausedHandler(e, 'playing');
+    },
   };
 
   const videoEventDispatcher = async (
@@ -316,15 +320,13 @@ export const setupSongInfo = (api: MusicPlayer) => {
       const watchNextResponse = api.getWatchNextResponse();
 
       sendSongInfo({
-        title,
         author,
-        videoId,
-        playlistId,
-
         isUpcoming: false,
         lengthSeconds: video.duration,
         loading: true,
-
+        playlistId,
+        title,
+        videoId,
         ['wdWatchNextResponse']: watchNextResponse,
       } satisfies VideoDataChangeValue);
     }
@@ -335,15 +337,14 @@ export const setupSongInfo = (api: MusicPlayer) => {
 
     let playerOverlay: PlayerOverlays | undefined;
 
-    if (!videoData['wdWatchNextResponse']) {
+    if (videoData.wdWatchNextResponse) {
+      playerOverlay = videoData.wdWatchNextResponse?.playerOverlays;
+    } else {
       playerOverlay = (
         Object.entries(videoData).find(
           ([, value]) => value && Object.hasOwn(value, 'playerOverlays'),
         ) as [string, AlbumDetails | undefined]
       )?.[1]?.playerOverlays;
-    } else {
-      playerOverlay =
-        videoData['wdWatchNextResponse']?.playerOverlays;
     }
     data.videoDetails.album =
       playerOverlay?.playerOverlayRenderer?.browserMediaSession?.browserMediaSessionRenderer?.album?.runs?.at(

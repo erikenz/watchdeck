@@ -5,10 +5,9 @@ const domParser = new DOMParser();
  * @param html The HTML string
  * @returns The DOM element
  */
-export const ElementFromHtml = (html: string): HTMLElement => {
-  return (domParser.parseFromString(html, 'text/html') as HTMLDocument).body
+export const ElementFromHtml = (html: string): HTMLElement =>
+  domParser.parseFromString(html, 'text/html').body
     .firstElementChild as HTMLElement;
-};
 
 /**
  * Creates a DOM element from a src string

@@ -1,5 +1,6 @@
-import type { SkipSilencesPluginConfig } from './index';
 import type { RendererContext } from '@/types/contexts';
+
+import type { SkipSilencesPluginConfig } from './index';
 
 let config: SkipSilencesPluginConfig;
 
@@ -124,7 +125,10 @@ export const onRendererLoad = async ({
 };
 
 export const onRendererUnload = () => {
-  document.removeEventListener('watchdeck:audio-can-play', audioCanPlayListener);
+  document.removeEventListener(
+    'watchdeck:audio-can-play',
+    audioCanPlayListener,
+  );
 
   if (playOrSeekHandler) {
     const video = document.querySelector('video');

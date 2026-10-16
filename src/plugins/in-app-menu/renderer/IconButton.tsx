@@ -1,4 +1,4 @@
-import { type JSX } from 'solid-js';
+import type { JSX } from 'solid-js';
 import { css } from 'solid-styled-components';
 
 import { cacheNoArgs } from '@/providers/decorators';
@@ -37,10 +37,8 @@ const iconButton = cacheNoArgs(
 );
 
 type CollapseIconButtonProps = JSX.HTMLAttributes<HTMLButtonElement>;
-export const IconButton = (props: CollapseIconButtonProps) => {
-  return (
-    <button {...props} class={iconButton()}>
-      {props.children}
-    </button>
-  );
-};
+export const IconButton = (props: CollapseIconButtonProps) => (
+  <button {...props} class={iconButton()}>
+    {props.children}
+  </button>
+);

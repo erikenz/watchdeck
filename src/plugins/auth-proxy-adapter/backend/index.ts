@@ -1,28 +1,31 @@
 import * as net from 'node:net';
 
 import is from 'electron-is';
-import { SocksClient, type SocksClientOptions } from 'socks';
+import { SocksClient } from 'socks';
+import type { SocksClientOptions } from 'socks';
 
 import * as config from '@/config';
+import type { BackendContext } from '@/types/contexts';
 import { createBackend, LoggerPrefix } from '@/utils';
 
-import { type AuthProxyConfig, defaultAuthProxyConfig } from '../config';
-
+import { defaultAuthProxyConfig } from '../config';
+import type { AuthProxyConfig } from '../config';
 import type { BackendType } from './types';
-import type { BackendContext } from '@/types/contexts';
 
 // Parsing the upstream authentication SOCK proxy URL
 const parseSocksUrl = (socksUrl: string) => {
   // Format: socks5://username:password@your_server_ip:port
 
   const url = URL.parse(socksUrl);
-  if (!url) return null;
+  if (!url) {
+    return null;
+  }
   return {
     host: url.hostname,
+    password: url.password,
     port: parseInt(url.port, 10),
     type: url.protocol === 'socks5:' ? 5 : 4,
     username: url.username,
-    password: url.password,
   };
 };
 
@@ -113,7 +116,9 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
 
       // Wait for client's connection request
       clientSocket.once('data', (data) => {
-        if (!Buffer.isBuffer(data)) return;
+        if (!Buffer.isBuffer(data)) {
+          return;
+        }
         this.processSocks5Request(clientSocket, data, upstreamProxyUrl);
       });
     } else {
@@ -130,7 +135,8 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
     upstreamProxyUrl: string,
   ) {
     // Parse target address and port
-    let targetHost, targetPort;
+    let targetHost;
+    let targetPort;
     const cmd = data[1]; // Command: 0x01=CONNECT, 0x02=BIND, 0x03=UDP
     const atyp = data[3]; // Address type: 0x01=IPv4, 0x03=Domain, 0x04=IPv6
 
@@ -179,17 +185,17 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
     }
 
     const options: SocksClientOptions = {
-      proxy: {
-        host: socksProxy.host,
-        port: socksProxy.port,
-        type: socksProxy.type as 4 | 5,
-        userId: socksProxy.username,
-        password: socksProxy.password,
-      },
       command: 'connect',
       destination: {
         host: targetHost || defaultAuthProxyConfig.hostname,
         port: targetPort || defaultAuthProxyConfig.port,
+      },
+      proxy: {
+        host: socksProxy.host,
+        password: socksProxy.password,
+        port: socksProxy.port,
+        type: socksProxy.type as 4 | 5,
+        userId: socksProxy.username,
       },
     };
     SocksClient.createConnection(options)
@@ -217,12 +223,16 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
 
         proxySocket.on('error', (error) => {
           console.error(LoggerPrefix, '[SOCKS5] Proxy socket error:', error);
-          if (clientSocket.writable) clientSocket.end();
+          if (clientSocket.writable) {
+            clientSocket.end();
+          }
         });
 
         clientSocket.on('error', (error) => {
           console.error(LoggerPrefix, '[SOCKS5] Client socket error:', error);
-          if (proxySocket.writable) proxySocket.end();
+          if (proxySocket.writable) {
+            proxySocket.end();
+          }
         });
       })
       .catch((error) => {

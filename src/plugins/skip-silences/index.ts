@@ -3,21 +3,21 @@ import { createPlugin } from '@/utils';
 
 import { onRendererLoad, onRendererUnload } from './renderer';
 
-export type SkipSilencesPluginConfig = {
+export interface SkipSilencesPluginConfig {
   enabled: boolean;
   onlySkipBeginning: boolean;
-};
+}
 
 export default createPlugin({
-  name: () => t('plugins.skip-silences.name'),
-  description: () => t('plugins.skip-silences.description'),
-  restartNeeded: true,
   config: {
     enabled: false,
     onlySkipBeginning: false,
-  } as SkipSilencesPluginConfig,
+  },
+  description: () => t('plugins.skip-silences.description'),
+  name: () => t('plugins.skip-silences.name'),
   renderer: {
     start: onRendererLoad,
     stop: onRendererUnload,
   },
+  restartNeeded: true,
 });

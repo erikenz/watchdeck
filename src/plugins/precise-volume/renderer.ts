@@ -1,9 +1,8 @@
 import { debounce } from '@/providers/decorators';
-
-import { type PreciseVolumePluginConfig } from './index';
-
 import type { RendererContext } from '@/types/contexts';
 import type { MusicPlayer } from '@/types/music-player';
+
+import type { PreciseVolumePluginConfig } from './index';
 
 function $<E extends Element = Element>(selector: string) {
   return document.querySelector<E>(selector);
@@ -69,9 +68,9 @@ export const onPlayerApiReady = async (
       const videoMode = () =>
         api.getPlayerResponse().videoDetails?.musicVideoType !==
         'MUSIC_VIDEO_TYPE_ATV';
-      $('video')?.addEventListener('watchdeck:src-changed', () =>
-        moveVolumeHud(videoMode()),
-      );
+      $('video')?.addEventListener('watchdeck:src-changed', () => {
+        moveVolumeHud(videoMode());
+      });
     }
   }
 
@@ -111,7 +110,9 @@ export const onPlayerApiReady = async (
   /** Add onwheel event to video player */
   function setupVideoPlayerOnwheel() {
     const panel = $<HTMLElement>('#main-panel');
-    if (!panel) return;
+    if (!panel) {
+      return;
+    }
 
     panel.addEventListener('wheel', (event) => {
       event.preventDefault();
@@ -128,7 +129,9 @@ export const onPlayerApiReady = async (
   /** Add onwheel event to play bar and also track if play bar is hovered */
   function setupPlaybar() {
     const playerbar = $<HTMLElement>('ytmusic-player-bar');
-    if (!playerbar) return;
+    if (!playerbar) {
+      return;
+    }
 
     playerbar.addEventListener('wheel', (event) => {
       event.preventDefault();
@@ -170,7 +173,9 @@ export const onPlayerApiReady = async (
     });
 
     const slider = $('#volume-slider');
-    if (!slider) return;
+    if (!slider) {
+      return;
+    }
 
     // Observing only changes in 'value' of volume-slider
     sliderObserver.observe(slider, {
@@ -221,7 +226,9 @@ export const onPlayerApiReady = async (
 
   function showVolumeSlider() {
     const slider = $<HTMLElement>('#volume-slider');
-    if (!slider) return;
+    if (!slider) {
+      return;
+    }
 
     // This class display the volume slider if not in minimized mode
     slider.classList.add('on-hover');
@@ -272,10 +279,12 @@ export const onPlayerApiReady = async (
     }
   }
 
-  context.ipc.on('changeVolume', (toIncrease: boolean) =>
-    changeVolume(toIncrease),
-  );
-  context.ipc.on('setVolume', (value: number) => setVolume(value));
+  context.ipc.on('changeVolume', (toIncrease: boolean) => {
+    changeVolume(toIncrease);
+  });
+  context.ipc.on('setVolume', (value: number) => {
+    setVolume(value);
+  });
 
   firstRun();
 };

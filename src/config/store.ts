@@ -1,9 +1,9 @@
+import type { TrackerBlockerConfig } from '@/plugins/do-not-track';
 import { blockers } from '@/plugins/do-not-track/types';
-import { DefaultPresetList, type Preset } from '@/plugins/downloader/types';
+import { DefaultPresetList } from '@/plugins/downloader/types';
+import type { Preset } from '@/plugins/downloader/types';
 
 import { defaultConfig as defaults } from './defaults';
-
-import type { TrackerBlockerConfig } from '@/plugins/do-not-track';
 
 // HACK: electron-store is ESM, but rolldown has a bug that prevents it from being imported properly in CommonJS context, so we have to use require here
 /* oxlint-disable typescript/no-require-imports */
@@ -19,8 +19,172 @@ export type IStore = InstanceType<
 >;
 
 const migrations = {
+  '>=1.11.0'(store: IStore) {
+    if (store.get('options.resumeOnStart') === undefined) {
+      store.set('options.resumeOnStart', true);
+    }
+  },
+  '>=1.12.0'(store: IStore) {
+    const options = store.get('plugins.shortcuts') as
+      | Record<
+          string,
+          | {
+              action: string;
+              shortcut: unknown;
+            }[]
+          | Record<string, unknown>
+        >
+      | undefined;
+    if (options) {
+      let updated = false;
+      for (const optionType of ['global', 'local']) {
+        if (
+          Object.hasOwn(options, optionType) &&
+          Array.isArray(options[optionType])
+        ) {
+          const optionsArray = options[optionType] as {
+            action: string;
+            shortcut: unknown;
+          }[];
+          const updatedOptions: Record<string, unknown> = {};
+          for (const optionObject of optionsArray) {
+            if (optionObject.action && optionObject.shortcut) {
+              updatedOptions[optionObject.action] = optionObject.shortcut;
+            }
+          }
+
+          options[optionType] = updatedOptions;
+          updated = true;
+        }
+      }
+      if (updated) {
+        store.set('plugins.shortcuts', options);
+      }
+    }
+  },
+  '>=1.13.0'(store: IStore) {
+    if (store.get('plugins.discord.listenAlong') === undefined) {
+      store.set('plugins.discord.listenAlong', true);
+    }
+  },
+  '>=1.14.0'(store: IStore) {
+    if (
+      typeof store.get('plugins.precise-volume.globalShortcuts') !== 'object'
+    ) {
+      store.set('plugins.precise-volume.globalShortcuts', {});
+    }
+  },
+  '>=1.17.0'(store: IStore) {
+    store.delete('plugins.picture-in-picture'); // default value is now in the plugin
+  },
+  '>=1.20.0'(store: IStore) {
+    store.delete('plugins.visualizer'); // default value is now in the plugin
+
+    if (store.get('plugins.notifications.toastStyle') === undefined) {
+      const pluginOptions = store.get('plugins.notifications') || {};
+      store.set('plugins.notifications', {
+        ...pluginOptions,
+      });
+    }
+
+    if (store.get('options.ForceShowLikeButtons')) {
+      store.delete('options.ForceShowLikeButtons');
+      store.set('options.likeButtons', 'force');
+    }
+  },
+  '>=1.7.0'(store: IStore) {
+    const enabledPlugins = store.get('plugins') as string[];
+    if (!Array.isArray(enabledPlugins)) {
+      console.warn('Plugins are not in array format, cannot migrate');
+      return;
+    }
+
+    // Include custom options
+    // oxlint-disable-next-line typescript/no-explicit-any
+    const plugins: Record<string, any> = {
+      adblocker: {
+        enabled: true,
+        cache: true,
+        additionalBlockLists: [],
+      },
+      downloader: {
+        enabled: false,
+        ffmpegArgs: [], // E.g. ["-b:a", "192k"] for an audio bitrate of 192kb/s
+        downloadFolder: undefined, // Custom download folder (absolute path)
+      },
+    };
+
+    for (const enabledPlugin of enabledPlugins) {
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
+      plugins[enabledPlugin] = {
+        ...plugins[enabledPlugin],
+        enabled: true,
+      };
+    }
+
+    store.set('plugins', plugins);
+  },
+  '>=2.1.0'(store: IStore) {
+    const originalPreset = store.get('plugins.downloader.preset') as
+      | string
+      | undefined;
+    if (originalPreset) {
+      if (originalPreset !== 'opus') {
+        store.set('plugins.downloader.selectedPreset', 'Custom');
+        store.set('plugins.downloader.customPresetSetting', {
+          extension: 'mp3',
+          ffmpegArgs:
+            (store.get('plugins.downloader.ffmpegArgs') as string[]) ??
+            DefaultPresetList['mp3 (256kbps)'].ffmpegArgs,
+        } satisfies Preset);
+      } else {
+        store.set('plugins.downloader.selectedPreset', 'Source');
+        store.set('plugins.downloader.customPresetSetting', {
+          extension: null,
+          ffmpegArgs:
+            (store.get('plugins.downloader.ffmpegArgs') as string[]) ?? [],
+        } satisfies Preset);
+      }
+      store.delete('plugins.downloader.preset');
+      store.delete('plugins.downloader.ffmpegArgs');
+    }
+  },
+  '>=2.1.3'(store: IStore) {
+    const listenAlong = store.get('plugins.discord.listenAlong');
+    if (listenAlong !== undefined) {
+      store.set(
+        'plugins.discord.playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music',
+        listenAlong,
+      );
+      store.delete('plugins.discord.listenAlong');
+    }
+  },
+  '>=3.0.0'(store: IStore) {
+    const discordConfig = store.get('plugins.discord') as Record<
+      string,
+      unknown
+    >;
+    if (discordConfig) {
+      const oldActivityTimoutEnabled = store.get(
+        'plugins.discord.activityTimoutEnabled',
+      ) as boolean | undefined;
+      const oldActivityTimoutTime = store.get(
+        'plugins.discord.activityTimoutTime',
+      ) as number | undefined;
+      if (oldActivityTimoutEnabled !== undefined) {
+        discordConfig.activityTimeoutEnabled = oldActivityTimoutEnabled;
+        store.set('plugins.discord', discordConfig);
+      }
+      if (oldActivityTimoutTime !== undefined) {
+        discordConfig.activityTimeoutTime = oldActivityTimoutTime;
+        store.set('plugins.discord', discordConfig);
+      }
+    }
+  },
   '>=3.12.0'(store: IStore) {
-    const blockerConfig = store.get('plugins.adblocker') as TrackerBlockerConfig;
+    const blockerConfig = store.get(
+      'plugins.adblocker',
+    ) as TrackerBlockerConfig;
     if (blockerConfig) {
       if (!Object.values(blockers).includes(blockerConfig.blocker)) {
         blockerConfig.blocker = blockers.InPlayer;
@@ -79,176 +243,13 @@ const migrations = {
       store.delete('plugins.lastfm');
     }
   },
-  '>=3.0.0'(store: IStore) {
-    const discordConfig = store.get('plugins.discord') as Record<
-      string,
-      unknown
-    >;
-    if (discordConfig) {
-      const oldActivityTimoutEnabled = store.get(
-        'plugins.discord.activityTimoutEnabled',
-      ) as boolean | undefined;
-      const oldActivityTimoutTime = store.get(
-        'plugins.discord.activityTimoutTime',
-      ) as number | undefined;
-      if (oldActivityTimoutEnabled !== undefined) {
-        discordConfig.activityTimeoutEnabled = oldActivityTimoutEnabled;
-        store.set('plugins.discord', discordConfig);
-      }
-      if (oldActivityTimoutTime !== undefined) {
-        discordConfig.activityTimeoutTime = oldActivityTimoutTime;
-        store.set('plugins.discord', discordConfig);
-      }
-    }
-  },
-  '>=2.1.3'(store: IStore) {
-    const listenAlong = store.get('plugins.discord.listenAlong');
-    if (listenAlong !== undefined) {
-      store.set(
-        'plugins.discord.playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music',
-        listenAlong,
-      );
-      store.delete('plugins.discord.listenAlong');
-    }
-  },
-  '>=2.1.0'(store: IStore) {
-    const originalPreset = store.get('plugins.downloader.preset') as
-      | string
-      | undefined;
-    if (originalPreset) {
-      if (originalPreset !== 'opus') {
-        store.set('plugins.downloader.selectedPreset', 'Custom');
-        store.set('plugins.downloader.customPresetSetting', {
-          extension: 'mp3',
-          ffmpegArgs:
-            (store.get('plugins.downloader.ffmpegArgs') as string[]) ??
-            DefaultPresetList['mp3 (256kbps)'].ffmpegArgs,
-        } satisfies Preset);
-      } else {
-        store.set('plugins.downloader.selectedPreset', 'Source');
-        store.set('plugins.downloader.customPresetSetting', {
-          extension: null,
-          ffmpegArgs:
-            (store.get('plugins.downloader.ffmpegArgs') as string[]) ?? [],
-        } satisfies Preset);
-      }
-      store.delete('plugins.downloader.preset');
-      store.delete('plugins.downloader.ffmpegArgs');
-    }
-  },
-  '>=1.20.0'(store: IStore) {
-    store.delete('plugins.visualizer'); // default value is now in the plugin
-
-    if (store.get('plugins.notifications.toastStyle') === undefined) {
-      const pluginOptions = store.get('plugins.notifications') || {};
-      store.set('plugins.notifications', {
-        ...pluginOptions,
-      });
-    }
-
-    if (store.get('options.ForceShowLikeButtons')) {
-      store.delete('options.ForceShowLikeButtons');
-      store.set('options.likeButtons', 'force');
-    }
-  },
-  '>=1.17.0'(store: IStore) {
-    store.delete('plugins.picture-in-picture'); // default value is now in the plugin
-  },
-  '>=1.14.0'(store: IStore) {
-    if (
-      typeof store.get('plugins.precise-volume.globalShortcuts') !== 'object'
-    ) {
-      store.set('plugins.precise-volume.globalShortcuts', {});
-    }
-
-  },
-  '>=1.13.0'(store: IStore) {
-    if (store.get('plugins.discord.listenAlong') === undefined) {
-      store.set('plugins.discord.listenAlong', true);
-    }
-  },
-  '>=1.12.0'(store: IStore) {
-    const options = store.get('plugins.shortcuts') as
-      | Record<
-          string,
-          | {
-              action: string;
-              shortcut: unknown;
-            }[]
-          | Record<string, unknown>
-        >
-      | undefined;
-    if (options) {
-      let updated = false;
-      for (const optionType of ['global', 'local']) {
-        if (
-          Object.hasOwn(options, optionType) &&
-          Array.isArray(options[optionType])
-        ) {
-          const optionsArray = options[optionType] as {
-            action: string;
-            shortcut: unknown;
-          }[];
-          const updatedOptions: Record<string, unknown> = {};
-          for (const optionObject of optionsArray) {
-            if (optionObject.action && optionObject.shortcut) {
-              updatedOptions[optionObject.action] = optionObject.shortcut;
-            }
-          }
-
-          options[optionType] = updatedOptions;
-          updated = true;
-        }
-      }
-      if (updated) {
-        store.set('plugins.shortcuts', options);
-      }
-    }
-  },
-  '>=1.11.0'(store: IStore) {
-    if (store.get('options.resumeOnStart') === undefined) {
-      store.set('options.resumeOnStart', true);
-    }
-  },
-  '>=1.7.0'(store: IStore) {
-    const enabledPlugins = store.get('plugins') as string[];
-    if (!Array.isArray(enabledPlugins)) {
-      console.warn('Plugins are not in array format, cannot migrate');
-      return;
-    }
-
-    // Include custom options
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const plugins: Record<string, any> = {
-      adblocker: {
-        enabled: true,
-        cache: true,
-        additionalBlockLists: [],
-      },
-      downloader: {
-        enabled: false,
-        ffmpegArgs: [], // E.g. ["-b:a", "192k"] for an audio bitrate of 192kb/s
-        downloadFolder: undefined, // Custom download folder (absolute path)
-      },
-    };
-
-    for (const enabledPlugin of enabledPlugins) {
-      // oxlint-disable-next-line typescript/no-unsafe-assignment
-      plugins[enabledPlugin] = {
-        ...plugins[enabledPlugin],
-        enabled: true,
-      };
-    }
-
-    store.set('plugins', plugins);
-  },
 };
 
 export const store = new Store({
+  clearInvalidConfig: false,
   defaults: {
     ...defaults,
     // README: 'plugin' uses deepmerge to populate the default values, so it is not necessary to include it here
   },
-  clearInvalidConfig: false,
   migrations,
 });

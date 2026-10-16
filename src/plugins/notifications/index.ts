@@ -26,23 +26,23 @@ export interface NotificationsPluginConfig {
 
 export const defaultConfig: NotificationsPluginConfig = {
   enabled: false,
+  hideButtonText: false,
+  interactive: true,
+  refreshOnPlayPause: false,
+  toastStyle: 1,
+  trayControls: true,
   unpauseNotification: false,
   urgency: 'normal',
-  interactive: true,
-  toastStyle: 1,
-  refreshOnPlayPause: false,
-  trayControls: true,
-  hideButtonText: false,
 };
 
 export default createPlugin({
-  name: () => t('plugins.notifications.name'),
-  description: () => t('plugins.notifications.description'),
-  restartNeeded: true,
-  config: defaultConfig,
-  menu: onMenu,
   backend: {
-    start: onMainLoad,
     onConfigChange,
+    start: onMainLoad,
   },
+  config: defaultConfig,
+  description: () => t('plugins.notifications.description'),
+  menu: onMenu,
+  name: () => t('plugins.notifications.name'),
+  restartNeeded: true,
 });

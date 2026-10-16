@@ -1,6 +1,7 @@
+import type { SongInfo } from '@/providers/song-info';
+
 import type { ScrobblerPluginConfig } from '../index';
 import type { SetConfType } from '../main';
-import type { SongInfo } from '@/providers/song-info';
 
 export abstract class ScrobblerBase {
   public abstract isSessionCreated(config: ScrobblerPluginConfig): boolean;

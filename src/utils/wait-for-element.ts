@@ -1,4 +1,4 @@
-export const waitForElement = <T extends Element>(
+export const waitForElement = async <T extends Element>(
   selector: string,
   options: {
     maxRetry?: number;
@@ -7,8 +7,8 @@ export const waitForElement = <T extends Element>(
     maxRetry: -1,
     retryInterval: 100,
   },
-): Promise<T> => {
-  return new Promise<T>((resolve) => {
+): Promise<T> =>
+  new Promise<T>((resolve) => {
     let retryCount = 0;
     const maxRetry = options.maxRetry ?? -1;
     const retryInterval = options.retryInterval ?? 100;
@@ -27,4 +27,3 @@ export const waitForElement = <T extends Element>(
       resolve(elem);
     }, retryInterval /* ms */);
   });
-};

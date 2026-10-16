@@ -40,8 +40,8 @@ export const isAlbumOrPlaylist = () => {
   return false;
 };
 
-export const isPlayerMenu = (menu?: HTMLElement | null) => {
-  return (
+export const isPlayerMenu = (menu?: HTMLElement | null) =>
+  (
     menu?.parentElement as
       | (HTMLElement & {
           ytEventForwardingBehavior: {
@@ -54,4 +54,3 @@ export const isPlayerMenu = (menu?: HTMLElement | null) => {
   )?.ytEventForwardingBehavior?.forwarder_?.eventSink?.matches(
     'ytmusic-menu-renderer.ytmusic-player-bar',
   );
-};

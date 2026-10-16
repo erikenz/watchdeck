@@ -6,7 +6,7 @@ import { createPlugin } from '@/utils';
 import { backend } from './main';
 import { onMenu } from './menu';
 
-export type DiscordPluginConfig = {
+export interface DiscordPluginConfig {
   'enabled': boolean;
   /**
    * If enabled, will try to reconnect to discord every 5 seconds after disconnecting or failing to connect
@@ -40,12 +40,10 @@ export type DiscordPluginConfig = {
    * Controls which field is displayed in the Discord status text
    */
   'statusDisplayType': (typeof StatusDisplayType)[keyof typeof StatusDisplayType];
-};
+}
 
 export default createPlugin({
-  name: () => t('plugins.discord.name'),
-  description: () => t('plugins.discord.description'),
-  restartNeeded: false,
+  backend,
   config: {
     'enabled': false,
     'autoReconnect': true,
@@ -55,7 +53,9 @@ export default createPlugin({
     'hideGitHubButton': false,
     'hideDurationLeft': false,
     'statusDisplayType': StatusDisplayType.Details,
-  } as DiscordPluginConfig,
+  },
+  description: () => t('plugins.discord.description'),
   menu: onMenu,
-  backend,
+  name: () => t('plugins.discord.name'),
+  restartNeeded: false,
 });

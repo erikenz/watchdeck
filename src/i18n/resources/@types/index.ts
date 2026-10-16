@@ -1,5 +1,6 @@
-export interface LanguageResources {
-  [lang: string]: {
+export type LanguageResources = Record<
+  string,
+  {
     translation: Record<string, unknown> & {
       language?: {
         'name': string;
@@ -7,5 +8,5 @@ export interface LanguageResources {
         'code': string;
       };
     };
-  };
-}
+  }
+>;

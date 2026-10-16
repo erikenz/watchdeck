@@ -1,12 +1,16 @@
+// oxlint-disable unicorn/prefer-import-meta-properties
+// electron-vite bundles its config and the vite plugins below before running
+// them, so `import.meta.dirname` would resolve to the bundle instead of this
+// file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import builtinModules from 'builtin-modules';
-import {
-  defineConfig,
-  type MainViteConfig,
-  type PreloadViteConfig,
-  type RendererViteConfig,
+import { defineConfig } from 'electron-vite';
+import type {
+  MainViteConfig,
+  PreloadViteConfig,
+  RendererViteConfig,
 } from 'electron-vite';
 import { withFilter } from 'vite';
 import Inspect from 'vite-plugin-inspect';
@@ -27,7 +31,11 @@ const resolveAlias = {
 export default defineConfig(({ mode }) => {
   const isDev = mode === 'development';
 
-  const mainAndPreloadExcludes = ['electron', 'custom-electron-prompt', ...builtinModules];
+  const mainAndPreloadExcludes = [
+    'electron',
+    'custom-electron-prompt',
+    ...builtinModules,
+  ];
   const mainConfig: MainViteConfig = {
     plugins: [
       pluginLoader('backend'),

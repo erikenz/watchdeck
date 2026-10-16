@@ -5,12 +5,12 @@ export const APPLICATION_NAME = 'Watchdeck';
 
 export const loadI18n = async () =>
   await init({
-    resources: await languageResources(),
-    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },
+    lng: 'en',
+    resources: await languageResources(),
   });
 
 export const setLanguage = async (language: string) =>

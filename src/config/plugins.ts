@@ -2,10 +2,9 @@ import { deepmerge } from 'deepmerge-ts';
 import { allPlugins } from 'virtual:plugins';
 
 import { restart } from '@/providers/app-controls';
+import type { PluginConfig } from '@/types/plugins';
 
 import { store } from './store';
-
-import type { PluginConfig } from '@/types/plugins';
 
 export function getPlugins() {
   return store.get('plugins') as Record<string, PluginConfig>;
@@ -25,7 +24,7 @@ export async function isEnabled(plugin: string) {
  * @param options Options to set
  * @param exclude Options to exclude from the options object
  */
-export function setOptions<T>(
+export function setOptions<T extends object>(
   plugin: string,
   options: T,
   exclude: string[] = ['enabled'],
@@ -33,7 +32,7 @@ export function setOptions<T>(
   const plugins = store.get('plugins') as Record<string, T>;
   // HACK: This is a workaround for preventing changed options from being overwritten
   exclude.forEach((key) => {
-    if (Object.prototype.hasOwnProperty.call(options, key)) {
+    if (Object.hasOwn(options, key)) {
       delete options[key as keyof T];
     }
   });
@@ -46,7 +45,7 @@ export function setOptions<T>(
   });
 }
 
-export function setMenuOptions<T>(
+export function setMenuOptions<T extends object>(
   plugin: string,
   options: T,
   exclude: string[] = ['enabled'],

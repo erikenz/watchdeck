@@ -2,26 +2,26 @@ import type { GetState, QueueItem } from '@/types/datahost-get-state';
 import type { MusicPlayer } from '@/types/music-player';
 
 type StoreState = GetState;
-export type Store = {
+export interface Store {
   dispatch: (obj: { type: string; payload?: unknown }) => void;
 
   getState: () => StoreState;
   replaceReducer: (param1: unknown) => unknown;
   subscribe: (callback: () => void) => unknown;
-};
+}
 
 export type QueueElement = HTMLElement & {
   dispatch(obj: { type: string; payload?: unknown }): void;
   queue: QueueAPI;
 };
-export type QueueAPI = {
+export interface QueueAPI {
   getItems(): QueueItem[];
   store: {
     store: Store;
   };
   continuation?: string;
   autoPlaying?: boolean;
-};
+}
 
 export type ToastElement = HTMLElement & {
   autoFitOnAttach: boolean;
@@ -50,11 +50,11 @@ export interface ToastService {
 }
 
 export type AppElement = HTMLElement & AppAPI;
-export type AppAPI = {
+export interface AppAPI {
   queue: QueueAPI;
   playerApi: MusicPlayer;
 
   toastService: ToastService;
 
   // TODO: Add more
-};
+}

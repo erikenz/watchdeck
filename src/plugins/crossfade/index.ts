@@ -1,24 +1,23 @@
 import prompt from 'custom-electron-prompt';
+import type { BrowserWindow } from 'electron';
 import { Howl } from 'howler';
 import { Innertube } from 'youtubei.js';
 
 import { t } from '@/i18n';
 import { getNetFetchAsFetch } from '@/plugins/utils/main';
 import promptOptions from '@/providers/prompt-options';
+import type { RendererContext } from '@/types/contexts';
 import { createPlugin } from '@/utils';
 
 import { VolumeFader } from './fader';
 
-import type { RendererContext } from '@/types/contexts';
-import type { BrowserWindow } from 'electron';
-
-export type CrossfadePluginConfig = {
+export interface CrossfadePluginConfig {
   enabled: boolean;
   fadeInDuration: number;
   fadeOutDuration: number;
   secondsBeforeEnd: number;
   fadeScaling: 'linear' | 'logarithmic' | number;
-};
+}
 
 export default createPlugin<
   unknown,
@@ -29,9 +28,16 @@ export default createPlugin<
   },
   CrossfadePluginConfig
 >({
-  name: () => t('plugins.crossfade.name'),
-  description: () => t('plugins.crossfade.description'),
-  restartNeeded: true,
+  async backend({ ipc }) {
+    const yt = await Innertube.create({
+      fetch: getNetFetchAsFetch(),
+    });
+
+    ipc.handle('audio-url', async (videoID: string) => {
+      const info = await yt.getBasicInfo(videoID);
+      return await info.streaming_data?.formats[0].decipher(yt.session.player);
+    });
+  },
   config: {
     enabled: false,
     /**
@@ -47,19 +53,20 @@ export default createPlugin<
      */
     fadeOutDuration: 5000,
     /**
-     * The duration of the fade in and fade out in seconds.
-     *
-     * @default 10s
-     */
-    secondsBeforeEnd: 10,
-    /**
      * The scaling algorithm to use for the fade.
      * (or a positive number in dB)
      *
      * @default 'linear'
      */
     fadeScaling: 'linear',
+    /**
+     * The duration of the fade in and fade out in seconds.
+     *
+     * @default 10s
+     */
+    secondsBeforeEnd: 10,
   },
+  description: () => t('plugins.crossfade.description'),
   menu({ window, getConfig, setConfig }) {
     const promptCrossfadeValues = async (
       win: BrowserWindow,
@@ -163,23 +170,8 @@ export default createPlugin<
       },
     ];
   },
-
-  async backend({ ipc }) {
-    const yt = await Innertube.create({
-      fetch: getNetFetchAsFetch(),
-    });
-
-    ipc.handle('audio-url', async (videoID: string) => {
-      const info = await yt.getBasicInfo(videoID);
-      return info.streaming_data?.formats[0].decipher(yt.session.player);
-    });
-  },
-
+  name: () => t('plugins.crossfade.name'),
   renderer: {
-    async start({ ipc, getConfig }) {
-      this.config = await getConfig();
-      this.ipc = ipc;
-    },
     onConfigChange(newConfig) {
       this.config = newConfig;
     },
@@ -189,7 +181,7 @@ export default createPlugin<
       let waitForTransition: Promise<unknown>;
 
       const getStreamURL = async (videoID: string): Promise<string> =>
-        this.ipc?.invoke('audio-url', videoID) as Promise<string>;
+        await (this.ipc?.invoke('audio-url', videoID) as Promise<string>);
 
       const getVideoIDFromURL = (url: string) =>
         new URLSearchParams(url.split('?')?.at(-1)).get('v');
@@ -317,5 +309,10 @@ export default createPlugin<
         createAudioForCrossfade(url);
       });
     },
+    async start({ ipc, getConfig }) {
+      this.config = await getConfig();
+      this.ipc = ipc;
+    },
   },
+  restartNeeded: true,
 });

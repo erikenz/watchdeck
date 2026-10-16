@@ -4,18 +4,11 @@ import { MediaType } from '@/providers/song-info';
 
 export type ResponseSongInfo = z.infer<typeof SongInfoSchema>;
 export const SongInfoSchema = z.object({
-  title: z.string(),
+  album: z.string().nullable().optional(),
   artist: z.string(),
-  views: z.number(),
-  uploadDate: z.string().optional(),
+  elapsedSeconds: z.number().optional(),
   imageSrc: z.string().nullable().optional(),
   isPaused: z.boolean().optional(),
-  songDuration: z.number(),
-  elapsedSeconds: z.number().optional(),
-  url: z.string().optional(),
-  album: z.string().nullable().optional(),
-  videoId: z.string(),
-  playlistId: z.string().optional(),
   mediaType: z.enum([
     MediaType.Audio,
     MediaType.OriginalMusicVideo,
@@ -23,4 +16,11 @@ export const SongInfoSchema = z.object({
     MediaType.PodcastEpisode,
     MediaType.OtherVideo,
   ]),
+  playlistId: z.string().optional(),
+  songDuration: z.number(),
+  title: z.string(),
+  uploadDate: z.string().optional(),
+  url: z.string().optional(),
+  videoId: z.string(),
+  views: z.number(),
 });

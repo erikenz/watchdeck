@@ -1,12 +1,12 @@
 import prompt from 'custom-electron-prompt';
 
 import { t } from '@/i18n';
-import promptOptions from '@/providers/prompt-options';
-
-import { type AuthProxyConfig, defaultAuthProxyConfig } from './config';
-
 import type { MenuTemplate } from '@/menu';
+import promptOptions from '@/providers/prompt-options';
 import type { MenuContext } from '@/types/contexts';
+
+import { defaultAuthProxyConfig } from './config';
+import type { AuthProxyConfig } from './config';
 
 export const onMenu = async ({
   getConfig,
@@ -16,8 +16,6 @@ export const onMenu = async ({
   await getConfig();
   return [
     {
-      label: t('plugins.auth-proxy-adapter.menu.hostname.label'),
-      type: 'normal',
       async click() {
         const config = await getConfig();
 
@@ -38,10 +36,10 @@ export const onMenu = async ({
 
         setConfig({ ...config, hostname: newHostname });
       },
+      label: t('plugins.auth-proxy-adapter.menu.hostname.label'),
+      type: 'normal',
     },
     {
-      label: t('plugins.auth-proxy-adapter.menu.port.label'),
-      type: 'normal',
       async click() {
         const config = await getConfig();
 
@@ -63,6 +61,8 @@ export const onMenu = async ({
 
         setConfig({ ...config, port: newPort });
       },
+      label: t('plugins.auth-proxy-adapter.menu.port.label'),
+      type: 'normal',
     },
   ];
 };

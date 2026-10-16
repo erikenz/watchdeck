@@ -1,5 +1,6 @@
 import musicPlayerIcon from '@assets/icon.png?asset&asarUnpack';
-import { nativeImage, type NativeImage, TouchBar } from 'electron';
+import { nativeImage, TouchBar } from 'electron';
+import type { NativeImage } from 'electron';
 
 import { t } from '@/i18n';
 import { getSongControls } from '@/providers/song-controls';
@@ -8,13 +9,6 @@ import { Platform } from '@/types/plugins';
 import { createPlugin } from '@/utils';
 
 export default createPlugin({
-  name: () => t('plugins.touchbar.name'),
-  description: () => t('plugins.touchbar.description'),
-  restartNeeded: true,
-  platform: Platform.macOS,
-  config: {
-    enabled: false,
-  },
   backend({ window }) {
     const {
       TouchBarButton,
@@ -57,7 +51,9 @@ export default createPlugin({
           label: '👍',
         }),
       ],
-      change: (i) => controls[i](),
+      change: (i) => {
+        controls[i]();
+      },
     });
 
     // This is the touchbar object, this combines everything with proper layout
@@ -103,4 +99,11 @@ export default createPlugin({
       });
     });
   },
+  config: {
+    enabled: false,
+  },
+  description: () => t('plugins.touchbar.description'),
+  name: () => t('plugins.touchbar.name'),
+  platform: Platform.macOS,
+  restartNeeded: true,
 });

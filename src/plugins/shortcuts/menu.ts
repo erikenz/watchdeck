@@ -1,12 +1,13 @@
-import prompt, { type KeybindOptions } from 'custom-electron-prompt';
+import prompt from 'custom-electron-prompt';
+import type { KeybindOptions } from 'custom-electron-prompt';
+import type { BrowserWindow } from 'electron';
 
 import { t } from '@/i18n';
+import type { MenuTemplate } from '@/menu';
 import promptOptions from '@/providers/prompt-options';
+import type { MenuContext } from '@/types/contexts';
 
 import type { ShortcutsPluginConfig } from './index';
-import type { MenuTemplate } from '@/menu';
-import type { MenuContext } from '@/types/contexts';
-import type { BrowserWindow } from 'electron';
 
 export const onMenu = async ({
   window,
@@ -22,7 +23,7 @@ export const onMenu = async ({
     label_: string,
     value_: string,
     default_?: string,
-  ): KeybindOptions => ({ value: value_, label: label_, default: default_ });
+  ): KeybindOptions => ({ default: default_, label: label_, value: value_ });
 
   async function promptKeybind(
     config: ShortcutsPluginConfig,
@@ -30,9 +31,7 @@ export const onMenu = async ({
   ) {
     const output = await prompt(
       {
-        title: t('plugins.shortcuts.prompt.keybind.title'),
-        label: t('plugins.shortcuts.prompt.keybind.label'),
-        type: 'keybind',
+        height: 270,
         keybindOptions: [
           // If default=undefined then no default is used
           kb(
@@ -51,7 +50,9 @@ export const onMenu = async ({
             config.global?.next,
           ),
         ],
-        height: 270,
+        label: t('plugins.shortcuts.prompt.keybind.label'),
+        title: t('plugins.shortcuts.prompt.keybind.title'),
+        type: 'keybind',
         ...promptOptions(),
       },
       win,
@@ -72,14 +73,14 @@ export const onMenu = async ({
 
   return [
     {
+      click: async () => promptKeybind(config, window),
       label: t('plugins.shortcuts.menu.set-keybinds'),
-      click: () => promptKeybind(config, window),
     },
     {
-      label: t('plugins.shortcuts.menu.override-media-keys'),
-      type: 'checkbox',
       checked: config.overrideMediaKeys,
       click: (item) => setConfig({ overrideMediaKeys: item.checked }),
+      label: t('plugins.shortcuts.menu.override-media-keys'),
+      type: 'checkbox',
     },
   ];
 };

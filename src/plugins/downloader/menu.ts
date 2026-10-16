@@ -3,15 +3,15 @@ import { deepmerge } from 'deepmerge-ts';
 import { dialog } from 'electron';
 
 import { t } from '@/i18n';
+import type { MenuTemplate } from '@/menu';
 import promptOptions from '@/providers/prompt-options';
+import type { MenuContext } from '@/types/contexts';
 
-import { type DownloaderPluginConfig, defaultConfig } from './index';
+import { defaultConfig } from './index';
+import type { DownloaderPluginConfig } from './index';
 import { downloadPlaylist } from './main';
 import { getFolder } from './main/utils';
 import { DefaultPresetList } from './types';
-
-import type { MenuTemplate } from '@/menu';
-import type { MenuContext } from '@/types/contexts';
 
 export const onMenu = async ({
   getConfig,
@@ -22,7 +22,6 @@ export const onMenu = async ({
   return [
     {
       label: t('plugins.downloader.menu.download-finish-settings.label'),
-      type: 'submenu',
       submenu: [
         {
           label: t(
@@ -175,14 +174,14 @@ export const onMenu = async ({
           },
         },
       ],
+      type: 'submenu',
     },
 
     {
+      click: async () => downloadPlaylist(),
       label: t('plugins.downloader.menu.download-playlist'),
-      click: () => downloadPlaylist(),
     },
     {
-      label: t('plugins.downloader.menu.choose-download-folder'),
       click() {
         const result = dialog.showOpenDialogSync({
           properties: ['openDirectory', 'createDirectory'],
@@ -192,25 +191,26 @@ export const onMenu = async ({
           setConfig({ downloadFolder: result[0] });
         } // Else = user pressed cancel
       },
+      label: t('plugins.downloader.menu.choose-download-folder'),
     },
     {
       label: t('plugins.downloader.menu.presets'),
       submenu: Object.keys(DefaultPresetList).map((preset) => ({
-        label: preset,
-        type: 'radio',
         checked: config.selectedPreset === preset,
         click() {
           setConfig({ selectedPreset: preset });
         },
+        label: preset,
+        type: 'radio',
       })),
     },
     {
-      label: t('plugins.downloader.menu.skip-existing'),
-      type: 'checkbox',
       checked: config.skipExisting,
       click(item) {
         setConfig({ skipExisting: item.checked });
       },
+      label: t('plugins.downloader.menu.skip-existing'),
+      type: 'checkbox',
     },
   ];
 };

@@ -1,8 +1,7 @@
 import { Wave } from '@foobar404/wave';
 
-import { Visualizer } from './visualizer';
-
 import type { VisualizerPluginConfig } from '../index';
+import { Visualizer } from './visualizer';
 
 class WaveVisualizer extends Visualizer {
   private readonly visualizer: Wave;

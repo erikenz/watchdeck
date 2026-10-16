@@ -1,8 +1,9 @@
-import type { AuthProxyConfig } from '../config';
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 import type { Server as NodeServer, Socket as NodeSocket } from 'node:net';
 
-export type BackendType = {
+import type { AuthProxyConfig } from '../config';
+
+export interface BackendType {
   server?: Server | NodeServer;
   oldConfig?: AuthProxyConfig;
   startServer: (serverConfig: AuthProxyConfig) => void;
@@ -17,4 +18,4 @@ export type BackendType = {
     data: Buffer,
     upstreamProxyUrl: string,
   ) => void;
-};
+}

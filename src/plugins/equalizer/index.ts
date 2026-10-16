@@ -1,21 +1,16 @@
 import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
-
-import {
-  defaultPresets,
-  presetConfigs,
-  type Preset,
-  type FilterConfig,
-} from './presets';
-
 import type { MenuTemplate } from '@/menu';
 import type { MenuContext } from '@/types/contexts';
+import { createPlugin } from '@/utils';
 
-export type EqualizerPluginConfig = {
+import { defaultPresets, presetConfigs } from './presets';
+import type { Preset, FilterConfig } from './presets';
+
+export interface EqualizerPluginConfig {
   enabled: boolean;
   filters: FilterConfig[];
   presets: { [preset in Preset]: boolean };
-};
+}
 
 let appliedFilters: BiquadFilterNode[] = [];
 
@@ -24,6 +19,9 @@ export default createPlugin({
   description: () => t('plugins.equalizer.description'),
   restartNeeded: false,
   addedVersion: '3.7.X',
+  // The assertion below widens this object's literals to the plugin config
+  // type (without it TS narrows e.g. `blocker` to the literal).
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
     filters: [],

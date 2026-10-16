@@ -1,11 +1,11 @@
 import prompt from 'custom-electron-prompt';
 
 import { t } from '@/i18n';
+import type { MenuTemplate } from '@/menu';
 import promptOptions from '@/providers/prompt-options';
+import type { MenuContext } from '@/types/contexts';
 
 import type { PictureInPicturePluginConfig } from './index';
-import type { MenuTemplate } from '@/menu';
-import type { MenuContext } from '@/types/contexts';
 
 export const onMenu = async ({
   window,
@@ -16,33 +16,31 @@ export const onMenu = async ({
 
   return [
     {
-      label: t('plugins.picture-in-picture.menu.always-on-top'),
-      type: 'checkbox',
       checked: config.alwaysOnTop,
       click(item) {
         setConfig({ alwaysOnTop: item.checked });
         window.setAlwaysOnTop(item.checked);
       },
+      label: t('plugins.picture-in-picture.menu.always-on-top'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.picture-in-picture.menu.save-window-position'),
-      type: 'checkbox',
       checked: config.savePosition,
       click(item) {
         setConfig({ savePosition: item.checked });
       },
+      label: t('plugins.picture-in-picture.menu.save-window-position'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.picture-in-picture.menu.save-window-size'),
-      type: 'checkbox',
       checked: config.saveSize,
       click(item) {
         setConfig({ saveSize: item.checked });
       },
+      label: t('plugins.picture-in-picture.menu.save-window-size'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.picture-in-picture.menu.hotkey.label'),
-      type: 'checkbox',
       checked: !!config.hotkey,
       async click(item) {
         const output = await prompt(
@@ -74,14 +72,16 @@ export const onMenu = async ({
           item.checked = !item.checked;
         }
       },
+      label: t('plugins.picture-in-picture.menu.hotkey.label'),
+      type: 'checkbox',
     },
     {
-      label: t('plugins.picture-in-picture.menu.use-native-pip'),
-      type: 'checkbox',
       checked: config.useNativePiP,
       click(item) {
         setConfig({ useNativePiP: item.checked });
       },
+      label: t('plugins.picture-in-picture.menu.use-native-pip'),
+      type: 'checkbox',
     },
   ];
 };

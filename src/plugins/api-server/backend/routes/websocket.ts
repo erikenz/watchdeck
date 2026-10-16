@@ -1,24 +1,21 @@
+import type { WebSocketLike, upgradeWebSocket } from '@hono/node-server';
 import { createRoute, z } from '@hono/zod-openapi';
 import { app as electronApp } from 'electron';
+import type { Context, Next } from 'hono';
 import { verify } from 'hono/jwt';
+import type { WSContext } from 'hono/ws';
 
-import {
-  registerCallback,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
-import { LoggerPrefix } from '@/utils';
-
-import { AuthStrategy, type APIServerConfig } from '../../config';
-import { API_VERSION } from '../api-version';
-import { JWTPayloadSchema } from '../scheme';
-
-import type { HonoApp } from '../types';
+import { registerCallback, SongInfoEvent } from '@/providers/song-info';
+import type { SongInfo } from '@/providers/song-info';
 import type { BackendContext } from '@/types/contexts';
 import type { RepeatMode, VolumeState } from '@/types/datahost-get-state';
-import type { WebSocketLike, upgradeWebSocket } from '@hono/node-server';
-import type { Context, Next } from 'hono';
-import type { WSContext } from 'hono/ws';
+import { LoggerPrefix } from '@/utils';
+
+import { AuthStrategy } from '../../config';
+import type { APIServerConfig } from '../../config';
+import { API_VERSION } from '../api-version';
+import { JWTPayloadSchema } from '../scheme';
+import type { HonoApp } from '../types';
 
 enum DataTypes {
   PlayerInfo = 'PLAYER_INFO',
@@ -30,7 +27,7 @@ enum DataTypes {
   ShuffleChanged = 'SHUFFLE_CHANGED',
 }
 
-type PlayerState = {
+interface PlayerState {
   song?: SongInfo;
   isPlaying: boolean;
   muted: boolean;
@@ -38,7 +35,7 @@ type PlayerState = {
   volume: number;
   repeat: RepeatMode;
   shuffle: boolean;
-};
+}
 
 export const register = (
   app: HonoApp,
@@ -163,14 +160,22 @@ export const register = (
 
           try {
             const payload = await verify(token, config.secret, 'HS256');
-            const parsedPayload = await JWTPayloadSchema.safeParseAsync(payload);
+            const parsedPayload =
+              await JWTPayloadSchema.safeParseAsync(payload);
 
-            if (!parsedPayload.success || !config.authorizedClients.includes(parsedPayload.data.id)) {
+            if (
+              !parsedPayload.success ||
+              !config.authorizedClients.includes(parsedPayload.data.id)
+            ) {
               ws.close(1008, 'Unauthorized');
               return;
             }
           } catch (err) {
-            console.error(LoggerPrefix, 'WebSocket authentication failed:', err);
+            console.error(
+              LoggerPrefix,
+              'WebSocket authentication failed:',
+              err,
+            );
             ws.close(1008, 'Unauthorized');
             return;
           }

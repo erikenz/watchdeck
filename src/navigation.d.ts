@@ -47,7 +47,7 @@ interface NavigationEventsMap {
 
 // oxlint-disable-next-line no-redeclare
 interface Navigation extends EventTarget {
-  entries(): Array<NavigationHistoryEntry>;
+  entries(): NavigationHistoryEntry[];
   readonly currentEntry?: NavigationHistoryEntry;
   updateCurrentEntry(options: NavigationUpdateCurrentEntryOptions): undefined;
   readonly transition?: NavigationTransition;

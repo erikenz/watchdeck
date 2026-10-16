@@ -202,7 +202,7 @@ export interface LinkAlternate {
 export interface PageOwnerDetails {
   name: string;
   externalChannelId: string;
-  ['\u0079\u006f\u0075\u0074\u0075\u0062\u0065ProfileUrl']: string;
+  ['\u0079\u006F\u0075\u0074\u0075\u0062\u0065ProfileUrl']: string;
 }
 
 export interface MicroformatDataRendererVideoDetails {
@@ -220,9 +220,9 @@ export interface PlayabilityStatus {
   transportControlsConfig?: TransportControlsConfig;
 }
 
-type ReplaceDefaultType = {
+interface ReplaceDefaultType {
   replaceDefault: boolean;
-};
+}
 
 export interface TransportControlsConfig {
   seekForwardStatus: ReplaceDefaultType;

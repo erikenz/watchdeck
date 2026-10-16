@@ -15,10 +15,10 @@ export const PictureInPictureButton = (props: PictureInPictureButtonProps) => (
         class="style-scope yt-icon"
         id="Layer_1"
         style={{
-          'pointer-events': 'none',
           'display': 'block',
-          'width': '100%',
           'height': '100%',
+          'pointer-events': 'none',
+          'width': '100%',
         }}
         viewBox="0 0 512 512"
         x="0px"

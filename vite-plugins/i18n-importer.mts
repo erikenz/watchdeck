@@ -1,3 +1,7 @@
+// oxlint-disable unicorn/prefer-import-meta-properties
+// electron-vite bundles its config and the vite plugins below before running
+// them, so `import.meta.dirname` would resolve to the bundle instead of this
+// file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
 import { basename, resolve, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,10 +31,7 @@ export const i18nImporter = () => {
       writer.writeLine('export const languageResources = async () => {');
       writer.writeLine('  const entries = await Promise.all([');
       for (const { name, path } of plugins) {
-        const absolutePath = resolve(srcPath, '..', path).replace(
-          /\\/g,
-          '/',
-        );
+        const absolutePath = resolve(srcPath, '..', path).replace(/\\/g, '/');
 
         writer.writeLine(
           `    import('${absolutePath}').then((mod) => ({ "${name}": { translation: mod.default } })),`,

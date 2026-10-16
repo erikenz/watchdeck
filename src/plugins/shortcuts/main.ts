@@ -1,13 +1,13 @@
-import { type BrowserWindow, globalShortcut } from 'electron';
+import { globalShortcut } from 'electron';
+import type { BrowserWindow } from 'electron';
 import is from 'electron-is';
 import { register as registerElectronLocalShortcut } from 'electron-localshortcut';
 
 import { getSongControls } from '@/providers/song-controls';
-
-import { registerMPRIS } from './mpris';
+import type { BackendContext } from '@/types/contexts';
 
 import type { ShortcutMappingType, ShortcutsPluginConfig } from './index';
-import type { BackendContext } from '@/types/contexts';
+import { registerMPRIS } from './mpris';
 
 function _registerGlobalShortcut(
   webContents: Electron.WebContents,

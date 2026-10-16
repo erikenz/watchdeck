@@ -1,3 +1,7 @@
+// oxlint-disable unicorn/prefer-import-meta-properties
+// electron-vite bundles its config and the vite plugins below before running
+// them, so `import.meta.dirname` would resolve to the bundle instead of this
+// file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
 import { basename, resolve, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -138,9 +142,11 @@ export const pluginVirtualModuleGenerator = (
 function supportsPlatform({ platform }: { platform: string }) {
   if (typeof platform !== 'number') return true;
 
-  const is = (globalThis as typeof globalThis & {
-    electronIs: typeof import('electron-is');
-  }).electronIs;
+  const is = (
+    globalThis as typeof globalThis & {
+      electronIs: typeof import('electron-is');
+    }
+  ).electronIs;
 
   if (is.windows()) return (platform & Platform.Windows) !== 0;
   if (is.macOS()) return (platform & Platform.macOS) !== 0;

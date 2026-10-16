@@ -3,44 +3,49 @@ import { createPlugin } from '@/utils';
 import { waitForElement } from '@/utils/wait-for-element';
 
 import { menu } from './menu';
+import type { AmbientModePluginConfig } from './types';
+
 import style from './style.css?inline';
-import { type AmbientModePluginConfig } from './types';
 
 const defaultConfig: AmbientModePluginConfig = {
-  enabled: false,
-  quality: 50,
-  buffer: 30,
-  interpolationTime: 1500,
   blur: 100,
-  size: 100,
-  opacity: 1,
+  buffer: 30,
+  enabled: false,
   fullscreen: false,
+  interpolationTime: 1500,
+  opacity: 1,
+  quality: 50,
+  size: 100,
 };
 
 export default createPlugin({
-  name: () => t('plugins.ambient-mode.name'),
-  description: () => t('plugins.ambient-mode.description'),
-  restartNeeded: false,
   config: defaultConfig,
-  stylesheets: [style],
+  description: () => t('plugins.ambient-mode.description'),
   menu: menu,
-
+  name: () => t('plugins.ambient-mode.name'),
   renderer: {
-    interpolationTime: defaultConfig.interpolationTime,
-    buffer: defaultConfig.buffer,
-    qualityRatio: defaultConfig.quality,
-    size: defaultConfig.size,
     blur: defaultConfig.blur,
-    opacity: defaultConfig.opacity,
-    isFullscreen: defaultConfig.fullscreen,
-
-    unregister: null as (() => void) | null,
-    update: null as (() => void) | null,
+    buffer: defaultConfig.buffer,
+    interpolationTime: defaultConfig.interpolationTime,
     interval: null as NodeJS.Timeout | null,
+    isFullscreen: defaultConfig.fullscreen,
+    lastImageSource: null as string | null,
     lastMediaType: null as 'video' | 'image' | null,
     lastVideoSource: null as string | null,
-    lastImageSource: null as string | null,
+    onConfigChange(newConfig) {
+      this.interpolationTime = newConfig.interpolationTime;
+      this.buffer = newConfig.buffer;
+      this.qualityRatio = newConfig.quality;
+      this.size = newConfig.size;
+      this.blur = newConfig.blur;
+      this.opacity = newConfig.opacity;
+      this.isFullscreen = newConfig.fullscreen;
 
+      this.update?.();
+    },
+    opacity: defaultConfig.opacity,
+    qualityRatio: defaultConfig.quality,
+    size: defaultConfig.size,
     async start({ getConfig }) {
       const config = await getConfig();
       this.interpolationTime = config.interpolationTime;
@@ -128,7 +133,7 @@ export default createPlugin({
             if (lastImageData) {
               const frameOffset =
                 (1 / this.buffer) * (1000 / this.interpolationTime);
-              context.globalAlpha = 1 - (frameOffset * 2); // because of alpha value must be < 1
+              context.globalAlpha = 1 - frameOffset * 2; // because of alpha value must be < 1
               context.putImageData(lastImageData, 0, 0);
               context.globalAlpha = frameOffset;
             }
@@ -255,21 +260,14 @@ export default createPlugin({
         this.interval = setInterval(injectBlurElement, 1000);
       }
     },
-    onConfigChange(newConfig) {
-      this.interpolationTime = newConfig.interpolationTime;
-      this.buffer = newConfig.buffer;
-      this.qualityRatio = newConfig.quality;
-      this.size = newConfig.size;
-      this.blur = newConfig.blur;
-      this.opacity = newConfig.opacity;
-      this.isFullscreen = newConfig.fullscreen;
-
-      this.update?.();
-    },
     stop() {
       this.update = null;
       this.unregister?.();
       if (this.interval) clearInterval(this.interval);
     },
+    unregister: null as (() => void) | null,
+    update: null as (() => void) | null,
   },
+  restartNeeded: false,
+  stylesheets: [style],
 });

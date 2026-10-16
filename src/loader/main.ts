@@ -1,13 +1,13 @@
 import { deepmerge } from 'deepmerge-ts';
-import { type BrowserWindow, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
+import type { BrowserWindow } from 'electron';
 import { allPlugins, mainPlugins } from 'virtual:plugins';
 
 import * as config from '@/config';
 import { t } from '@/i18n';
-import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
-
 import type { BackendContext } from '@/types/contexts';
 import type { PluginConfig, PluginDef } from '@/types/plugins';
+import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
 
 const loadedPluginMap: Record<
   string,
@@ -23,18 +23,7 @@ const createContext = (
       (await allPlugins())[id].config ?? { enabled: false },
       config.get(`plugins.${id}`) ?? {},
     ) as PluginConfig,
-  setConfig: async (newConfig) => {
-    config.setPartial(
-      `plugins.${id}`,
-      newConfig,
-      (await allPlugins())[id].config,
-    );
-  },
-
   ipc: {
-    send: (event: string, ...args: unknown[]) => {
-      win.webContents.send(event, ...args);
-    },
     handle: (event: string, listener: CallableFunction) => {
       // oxlint-disable-next-line typescript/no-unsafe-return,typescript/no-unsafe-call
       ipcMain.handle(event, (_, ...args: unknown[]) => listener(...args));
@@ -48,8 +37,17 @@ const createContext = (
     removeHandler: (event: string) => {
       ipcMain.removeHandler(event);
     },
+    send: (event: string, ...args: unknown[]) => {
+      win.webContents.send(event, ...args);
+    },
   },
-
+  setConfig: async (newConfig) => {
+    config.setPartial(
+      `plugins.${id}`,
+      newConfig,
+      (await allPlugins())[id].config,
+    );
+  },
   window: win,
 });
 
@@ -58,12 +56,14 @@ export const forceUnloadMainPlugin = async (
   win: BrowserWindow,
 ): Promise<void> => {
   const plugin = loadedPluginMap[id];
-  if (!plugin) return;
+  if (!plugin) {
+    return;
+  }
 
   try {
     const hasStopped = await stopPlugin(id, plugin, {
-      ctx: 'backend',
       context: createContext(id, win),
+      ctx: 'backend',
     });
     if (
       hasStopped ||
@@ -77,20 +77,19 @@ export const forceUnloadMainPlugin = async (
         t('common.console.plugins.unloaded', { pluginName: id }),
       );
       return;
-    } else {
-      const message = t('common.console.plugins.unload-failed', {
-        pluginName: id,
-      });
-      console.log(LoggerPrefix, message);
-      return Promise.reject(new Error(message));
     }
-  } catch (err) {
+    const message = t('common.console.plugins.unload-failed', {
+      pluginName: id,
+    });
+    console.log(LoggerPrefix, message);
+    return Promise.reject(new Error(message));
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.unload-failed', { pluginName: id }),
     );
-    console.trace(err);
-    return Promise.reject(err as Error);
+    console.trace(error);
+    return await Promise.reject(error);
   }
 };
 
@@ -99,12 +98,14 @@ export const forceLoadMainPlugin = async (
   win: BrowserWindow,
 ): Promise<void> => {
   const plugin = (await mainPlugins())[id];
-  if (!plugin) return;
+  if (!plugin) {
+    return;
+  }
 
   try {
     const hasStarted = await startPlugin(id, plugin, {
-      ctx: 'backend',
       context: createContext(id, win),
+      ctx: 'backend',
     });
     if (
       hasStarted ||
@@ -120,13 +121,13 @@ export const forceLoadMainPlugin = async (
       console.log(LoggerPrefix, message);
       return Promise.reject(new Error(message));
     }
-  } catch (err) {
+  } catch (error) {
     console.error(
       LoggerPrefix,
       t('common.console.plugins.initialize-failed', { pluginName: id }),
     );
-    console.trace(err);
-    return Promise.reject(err as Error);
+    console.trace(error);
+    return await Promise.reject(error);
   }
 };
 
@@ -155,10 +156,6 @@ export const unloadAllMainPlugins = async (win: BrowserWindow) => {
 
 export const getLoadedMainPlugin = (
   id: string,
-): PluginDef<unknown, unknown, unknown> | undefined => {
-  return loadedPluginMap[id];
-};
+): PluginDef<unknown, unknown, unknown> | undefined => loadedPluginMap[id];
 
-export const getAllLoadedMainPlugins = () => {
-  return loadedPluginMap;
-};
+export const getAllLoadedMainPlugins = () => loadedPluginMap;

@@ -1,9 +1,16 @@
 import i18next from 'i18next';
 import { setTheme } from 'mdui/functions/setTheme.js';
+
 import 'mdui/mdui.css';
 import 'mdui';
 
 import { loadI18n, setLanguage, t as i18t } from '@/i18n';
+import type { MusicPlayer } from '@/types/music-player';
+import type { MusicPlayerAppElement } from '@/types/music-player-app-element';
+import type { QueueResponse } from '@/types/music-player-desktop-internal';
+import type { PluginConfig } from '@/types/plugins';
+import type { QueueElement } from '@/types/queue';
+import type { SearchBoxElement } from '@/types/search-box-element';
 import {
   defaultTrustedTypePolicy,
   registerWindowDefaultTrustedTypePolicy,
@@ -19,13 +26,6 @@ import {
 } from './loader/renderer';
 import { startingPages } from './providers/extracted-data';
 import { setupSongInfo } from './providers/song-info-front';
-
-import type { MusicPlayer } from '@/types/music-player';
-import type { MusicPlayerAppElement } from '@/types/music-player-app-element';
-import type { QueueResponse } from '@/types/music-player-desktop-internal';
-import type { PluginConfig } from '@/types/plugins';
-import type { QueueElement } from '@/types/queue';
-import type { SearchBoxElement } from '@/types/search-box-element';
 
 setTheme('dark');
 
@@ -58,7 +58,7 @@ async function onApiLoaded() {
     } else if (window.electronIs.linux()) {
       osType = 'Linux';
     }
-    document.documentElement.setAttribute('data-os', osType);
+    document.documentElement.dataset.os = osType;
   }
 
   // Workaround for #2459
@@ -85,11 +85,18 @@ async function onApiLoaded() {
     api?.pauseVideo();
   });
   window.ipcRenderer.on('watchdeck:toggle-play', (_) => {
-    if (api?.getPlayerState() === 2) api?.playVideo();
-    else api?.pauseVideo();
+    if (api?.getPlayerState() === 2) {
+      api?.playVideo();
+    } else {
+      api?.pauseVideo();
+    }
   });
-  window.ipcRenderer.on('watchdeck:seek-to', (_, t: number) => api!.seekTo(t));
-  window.ipcRenderer.on('watchdeck:seek-by', (_, t: number) => api!.seekBy(t));
+  window.ipcRenderer.on('watchdeck:seek-to', (_, t: number) => {
+    api!.seekTo(t);
+  });
+  window.ipcRenderer.on('watchdeck:seek-by', (_, t: number) => {
+    api!.seekBy(t);
+  });
   window.ipcRenderer.on('watchdeck:shuffle', () => {
     document
       .querySelector<HTMLElement & { queue: { shuffle: () => void } }>(
@@ -182,9 +189,9 @@ async function onApiLoaded() {
   window.ipcRenderer.on('watchdeck:get-queue', () => {
     const queue = document.querySelector<QueueElement>('#queue');
     window.ipcRenderer.send('watchdeck:get-queue-response', {
-      items: queue?.queue.getItems(),
       autoPlaying: queue?.queue.autoPlaying,
       continuation: queue?.queue.continuation,
+      items: queue?.queue.getItems(),
     } satisfies QueueResponse);
   });
 
@@ -193,10 +200,14 @@ async function onApiLoaded() {
     (_, videoId: string, queueInsertPosition: string) => {
       const queue = document.querySelector<QueueElement>('#queue');
       const app = document.querySelector<MusicPlayerAppElement>('ytmusic-app');
-      if (!app) return;
+      if (!app) {
+        return;
+      }
 
       const store = queue?.queue.store.store;
-      if (!store) return;
+      if (!store) {
+        return;
+      }
 
       app.networkManager
         .fetch('/music/get_queue', {
@@ -214,9 +225,7 @@ async function onApiLoaded() {
             const queueItems = store.getState().queue.items;
             const queueItemsLength = queueItems.length ?? 0;
             queue?.dispatch({
-              type: 'ADD_ITEMS',
               payload: {
-                nextQueueItemId: store.getState().queue.nextQueueItemId,
                 index:
                   queueInsertPosition === 'INSERT_AFTER_CURRENT_VIDEO'
                     ? queueItems.findIndex(
@@ -235,9 +244,11 @@ async function onApiLoaded() {
                       : null,
                   )
                   .filter(Boolean),
-                shuffleEnabled: false,
+                nextQueueItemId: store.getState().queue.nextQueueItemId,
                 shouldAssignIds: true,
+                shuffleEnabled: false,
               },
+              type: 'ADD_ITEMS',
             });
           }
         });
@@ -248,33 +259,33 @@ async function onApiLoaded() {
     (_, fromIndex: number, toIndex: number) => {
       const queue = document.querySelector<QueueElement>('#queue');
       queue?.dispatch({
-        type: 'MOVE_ITEM',
         payload: {
           fromIndex,
           toIndex,
         },
+        type: 'MOVE_ITEM',
       });
     },
   );
   window.ipcRenderer.on('watchdeck:remove-from-queue', (_, index: number) => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.dispatch({
-      type: 'REMOVE_ITEM',
       payload: index,
+      type: 'REMOVE_ITEM',
     });
   });
   window.ipcRenderer.on('watchdeck:set-queue-index', (_, index: number) => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.dispatch({
-      type: 'SET_INDEX',
       payload: index,
+      type: 'SET_INDEX',
     });
   });
   window.ipcRenderer.on('watchdeck:clear-queue', () => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.queue.store.store.dispatch({
-      type: 'SET_PLAYER_PAGE_INFO',
       payload: { open: false },
+      type: 'SET_PLAYER_PAGE_INFO',
     });
     queue?.dispatch({
       type: 'CLEAR',
@@ -288,7 +299,9 @@ async function onApiLoaded() {
       const searchBox =
         document.querySelector<SearchBoxElement>('ytmusic-search-box');
 
-      if (!app || !searchBox) return;
+      if (!app || !searchBox) {
+        return;
+      }
 
       const result = await app.networkManager.fetch<
         unknown,
@@ -299,9 +312,9 @@ async function onApiLoaded() {
           suggestStats?: unknown;
         }
       >('/search', {
-        query,
-        params,
         continuation,
+        params,
+        query,
         suggestStats: searchBox.getSearchboxStats(),
       });
 
@@ -370,18 +383,18 @@ async function onApiLoaded() {
     let selector = 'ytmusic-guide-entry-renderer:last-child';
 
     const upgradeBtnIcon = document.querySelector<SVGGElement>(
-      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006f\u0075\u0074\u0075\u0062\u0065_music_monochrome',
+      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome',
     );
     if (upgradeBtnIcon) {
       const path = upgradeBtnIcon.firstChild as SVGPathElement;
-      const data = path.getAttribute('d')!.substring(0, 15);
+      const data = path.getAttribute('d')!.slice(0, 15);
       selector = `ytmusic-guide-entry-renderer:has(> tp-yt-paper-item > yt-icon path[d^="${data}"])`;
     }
 
     const styles = document.createElement('style');
     styles.textContent = `${itemsSelector} ${selector} { display: none; }`;
 
-    document.head.appendChild(styles);
+    document.head.append(styles);
   }
 
   // Hide / Force show like buttons
@@ -402,7 +415,7 @@ async function onApiLoaded() {
         } !important;
       }`;
 
-    document.head.appendChild(style);
+    document.head.append(style);
   }
 
   // Swap like button order
@@ -414,7 +427,7 @@ async function onApiLoaded() {
         flex-direction: row-reverse;
       }`;
 
-    document.head.appendChild(style);
+    document.head.append(style);
   }
 }
 
@@ -496,9 +509,15 @@ const initObserver = async () => {
   // check document.documentElement is ready
   await new Promise<void>((resolve) => {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => resolve(), {
-        once: true,
-      });
+      document.addEventListener(
+        'DOMContentLoaded',
+        () => {
+          resolve();
+        },
+        {
+          once: true,
+        },
+      );
     } else {
       resolve();
     }

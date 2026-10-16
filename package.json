@@ -1,17 +1,15 @@
 {
   "name": "watchdeck",
-  "desktopName": "com.github.erikenz.watchdeck",
-  "productName": "Watchdeck",
   "version": "0.1.0",
   "description": "Unofficial YouTube desktop client, built around a plugin system",
-  "main": "./dist/main/index.js",
-  "type": "module",
   "license": "MIT",
-  "repository": "erikenz/watchdeck",
   "author": {
     "name": "erikenz",
     "url": "https://github.com/erikenz"
   },
+  "repository": "erikenz/watchdeck",
+  "type": "module",
+  "main": "./dist/main/index.js",
   "scripts": {
     "postinstall": "pnpm install-electron",
     "test": "pnpm playwright test",
@@ -41,10 +39,6 @@
     "release:win": "pnpm clean && pnpm build && pnpm electron-builder --win -p always",
     "typecheck": "pnpm tsc -p tsconfig.json --noEmit",
     "check": "ultracite check && pnpm typecheck"
-  },
-  "engines": {
-    "node": ">=22",
-    "pnpm": ">=11"
   },
   "dependencies": {
     "@dehoist/romanize-thai": "1.0.0",
@@ -156,8 +150,14 @@
   },
   "auto-changelog": {
     "hideCredit": true,
+    "output": "changelog.md",
     "package": true,
-    "unreleased": true,
-    "output": "changelog.md"
-  }
+    "unreleased": true
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=11"
+  },
+  "desktopName": "com.github.erikenz.watchdeck",
+  "productName": "Watchdeck"
 }

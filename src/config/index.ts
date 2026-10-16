@@ -2,9 +2,9 @@ import { deepmergeCustom } from 'deepmerge-ts';
 
 import { restart } from '@/providers/app-controls';
 
-import { store, type IStore } from './store';
-
 import type { defaultConfig } from './defaults';
+import { store } from './store';
+import type { IStore } from './store';
 
 const deepmerge = deepmergeCustom({
   mergeArrays: false,
@@ -84,7 +84,7 @@ type PathValue<T, K extends string> =
 export const get = <Key extends Paths<typeof defaultConfig>>(key: Key) =>
   store.get(key) as PathValue<typeof defaultConfig, typeof key>;
 
-export const edit = () => store.openInEditor();
+export const edit = async () => store.openInEditor();
 
 export const watch = (cb: Parameters<IStore['onDidAnyChange']>[0]) => {
   store.onDidAnyChange(cb);

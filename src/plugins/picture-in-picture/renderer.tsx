@@ -8,12 +8,11 @@ import {
   isPlayerMenu,
 } from '@/plugins/utils/renderer/check';
 import { getSongMenu } from '@/providers/dom-elements';
-
-import { PictureInPictureButton } from './templates/picture-in-picture-button';
-
-import type { PictureInPicturePluginConfig } from './index';
 import type { RendererContext } from '@/types/contexts';
 import type { MusicPlayer } from '@/types/music-player';
+
+import type { PictureInPicturePluginConfig } from './index';
+import { PictureInPictureButton } from './templates/picture-in-picture-button';
 
 export const onPlayerApiReady = async (
   _: MusicPlayer,

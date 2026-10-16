@@ -176,7 +176,10 @@ const ICONS: Record<string, string> = {
 export type ButtonState = "saved" | "unsaved" | "pending" | "error";
 
 /** What each button was last painted with, so a repaint that changes nothing can be skipped. */
-const painted = new WeakMap<HTMLButtonElement, { label: string; state: ButtonState }>();
+const painted = new WeakMap<
+  HTMLButtonElement,
+  { label: string; state: ButtonState }
+>();
 
 export const paintButton = (
   button: HTMLButtonElement,

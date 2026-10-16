@@ -55,6 +55,12 @@ const Toolbar = (props: ToolbarProps) => {
     ]);
     setState(nextState);
     setEntries(list);
+    // A walk the backend starts on its own - the one-page reconcile after an add, or the period -
+    // ends without this component being told, and its last line would otherwise sit in the status
+    // for the rest of the session. The state says whether a walk is running: if none is, clear it.
+    if (!nextState.syncing) {
+      setProgress(null);
+    }
     props.onChange(
       bucket() === "all" && !search().trim()
         ? null

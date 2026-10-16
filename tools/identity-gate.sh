@@ -11,6 +11,9 @@
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
+# These literals are what this script searches FOR — they are the only place the
+# upstream name still appears in a file we ship, and the script excludes itself
+# from its own scan (see the list above).
 pattern='pear-desktop|peard:|ytmd|youtube-music|th-ch'
 if matches=$(grep -rniE "$pattern" . \
   --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=docs \

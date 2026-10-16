@@ -37,9 +37,9 @@ export const menu = async ({
       : []),
     { type: "separator" as const },
     {
-      checked: config.showLibraryPanel,
-      click: () => setConfig({ showLibraryPanel: !config.showLibraryPanel }),
-      label: t("plugins.watch-later.menu.library-panel"),
+      checked: config.enhancePage,
+      click: () => setConfig({ enhancePage: !config.enhancePage }),
+      label: t("plugins.watch-later.menu.enhance-page"),
       type: "checkbox" as const,
     },
     {

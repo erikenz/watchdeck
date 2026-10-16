@@ -6,6 +6,7 @@ import type { MusicPlayer } from "@/types/music-player";
 
 import { isWatchLaterPage } from "../site";
 import type {
+  WatchLaterEntry,
   WatchLaterPluginConfig,
   WatchLaterState,
   WatchLaterSyncProgress,
@@ -20,11 +21,16 @@ import {
   videoIdFromHost,
 } from "./dom";
 import type { ButtonState } from "./dom";
-import Panel from "./ui/panel";
-import type { WatchLaterBridge } from "./ui/panel";
-
-/** The panel's host element in the page. */
-const PANEL_ROOT_CLASS = "wd-wl-panel-root";
+import type { WatchLaterBridge } from "./ui/bridge";
+import {
+  applyRowVisibility,
+  enhanceRow,
+  ROW_SELECTOR,
+  rowVideoId,
+  TOOLBAR_HOST_CLASS,
+  toolbarAnchor,
+} from "./ui/rows";
+import Toolbar from "./ui/toolbar";
 
 /** How often the local high-water mark is reported while something plays. */
 const PROGRESS_INTERVAL_MS = 5000;
@@ -41,7 +47,9 @@ export const renderer = {
   scanQueued: false,
   lastProgressSentAt: 0,
   sessionIndexAttempts: 0,
-  panel: null as HTMLElement | null,
+  toolbarHost: null as HTMLElement | null,
+  filter: null as Set<string> | null,
+  rowEntries: new Map<string, WatchLaterEntry>(),
   context: null as RendererContext<WatchLaterPluginConfig> | null,
   videoDataListener: null as ((event: Event) => void) | null,
   timeUpdateListener: null as ((event: Event) => void) | null,
@@ -53,7 +61,7 @@ export const renderer = {
 
     await this.hydrate();
     this.reportSessionIndex(context);
-    this.mountPanel(context);
+    this.mountToolbar(context);
 
     this.observer = new MutationObserver(() => this.queueScan());
     this.observer.observe(document.body, {
@@ -81,21 +89,32 @@ export const renderer = {
       ?.addEventListener("timeupdate", this.timeUpdateListener);
   },
 
-  /** The site's own Watch Later page is where the panel belongs. */
-  mountPanel(context: RendererContext<WatchLaterPluginConfig>) {
-    if (!this.config?.showLibraryPanel || !isWatchLaterPage()) {
-      this.panel?.remove();
-      this.panel = null;
-      return;
-    }
-    if (document.querySelector(`.${PANEL_ROOT_CLASS}`)) {
+  /**
+   * The site's Watch Later page gets a toolbar above its own list and a line of context on
+   * each of its rows. Nothing is re-rendered here: the page keeps its list, and the
+   * filters decide which of its rows stay visible.
+   */
+  mountToolbar(context: RendererContext<WatchLaterPluginConfig>) {
+    if (!this.config?.enhancePage || !isWatchLaterPage()) {
+      this.toolbarHost?.remove();
+      this.toolbarHost = null;
+      this.filter = null;
+      this.applyRows();
       return;
     }
 
-    const root = document.createElement("div");
-    root.className = PANEL_ROOT_CLASS;
-    root.dataset.open = "true";
-    document.body.append(root);
+    const anchor = toolbarAnchor();
+    if (!anchor) {
+      return;
+    }
+    if (this.toolbarHost && anchor.contains(this.toolbarHost)) {
+      return;
+    }
+
+    const host = document.createElement("div");
+    host.className = TOOLBAR_HOST_CLASS;
+    this.toolbarHost = host;
+    anchor.prepend(host);
 
     const bridge: WatchLaterBridge = {
       add: (videoId) =>
@@ -120,22 +139,50 @@ export const renderer = {
       sync: () => context.ipc.invoke("watchdeck:watch-later-sync"),
     };
 
-    this.panel = root;
-    render(() => <Panel bridge={bridge} />, root);
+    render(
+      () => (
+        <Toolbar
+          bridge={bridge}
+          onChange={(visible, entries) => {
+            this.filter = visible;
+            this.rowEntries = entries;
+            this.applyRows();
+          }}
+        />
+      ),
+      host
+    );
   },
 
-  /** The site is a single-page app: the panel follows navigation. */
   navigateListener: null as ((event: Event) => void) | null,
 
+  /** Enrich and (when a filter is on) show or hide each of the site's own rows. */
+  applyRows() {
+    for (const row of document.querySelectorAll(ROW_SELECTOR)) {
+      const videoId = rowVideoId(row);
+      const visible = applyRowVisibility(row, this.filter);
+      if (visible && videoId) {
+        enhanceRow(row, this.rowEntries.get(videoId));
+      }
+    }
+  },
+
+  /** The site is a single-page app: the toolbar and the row state follow navigation. */
   onNavigate() {
     if (this.context) {
-      this.mountPanel(this.context);
+      this.mountToolbar(this.context);
+      this.applyRows();
     }
   },
 
   stop(context: RendererContext<WatchLaterPluginConfig>) {
-    this.panel?.remove();
-    this.panel = null;
+    this.toolbarHost?.remove();
+    this.toolbarHost = null;
+    this.filter = null;
+    for (const row of document.querySelectorAll(ROW_SELECTOR)) {
+      row.classList.remove("wd-wl-row-hidden");
+      row.querySelector(".wd-wl-row-meta")?.remove();
+    }
     if (this.navigateListener) {
       document.removeEventListener("yt-navigate-finish", this.navigateListener);
       this.navigateListener = null;
@@ -219,6 +266,11 @@ export const renderer = {
   },
 
   scan() {
+    if (this.context) {
+      this.mountToolbar(this.context);
+    }
+    this.applyRows();
+
     if (this.config && !this.config.showHoverButton) {
       return;
     }

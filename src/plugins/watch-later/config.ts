@@ -7,7 +7,7 @@ export const defaultConfig: WatchLaterPluginConfig = {
   requestsPerSecond: 1,
   enrichMetadata: true,
   showHoverButton: true,
-  showLibraryPanel: true,
+  enhancePage: true,
   watched: { minutes: 0, percent: 90 },
   inProgress: { minMinutes: 2, minPercent: 5, maxPercent: 90 },
   activeAccountId: "",

@@ -25,8 +25,8 @@ export interface WatchLaterPluginConfig {
   activeAccountId: string;
   /** Show the save button when hovering a thumbnail. */
   showHoverButton: boolean;
-  /** Show the panel on the site's own Watch Later page. */
-  showLibraryPanel: boolean;
+  /** Add the toolbar and the enriched rows to the site's own Watch Later page. */
+  enhancePage: boolean;
 }
 
 export interface WatchLaterAccount {

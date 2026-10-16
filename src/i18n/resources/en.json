@@ -687,20 +687,46 @@
       "name": "Visualizer"
     },
     "watch-later": {
+      "account": {
+        "label": "Account"
+      },
       "button": {
         "remove": "Remove from Watch Later",
         "save": "Save to Watch Later"
       },
       "description": "Mirrors your Watch Later list into a local database: search, filter and group it by how much you have watched",
+      "filter": {
+        "all": "All ({{count}})",
+        "in-progress": "Continue watching",
+        "unwatched": "Unwatched",
+        "watched": "Watched"
+      },
       "menu": {
-        "account": "Account",
+        "enhance-page": "Enhance the Watch Later page",
         "enrich-metadata": "Fetch descriptions and tags",
         "hover-button": "Show the save button on thumbnails",
         "sync-now": "Sync Watch Later now",
         "sync-on-start": "Sync when the app starts",
-        "library-panel": "Enhance the Watch Later page"
+        "account": "Account"
       },
-      "name": "Watch Later"
+      "name": "Watch Later",
+      "row": {
+        "in-progress": "Continue watching",
+        "percent": "{{percent}}% watched ({{source}})",
+        "saved": "saved {{date}}",
+        "title": "Watch progress comes from: {{source}}",
+        "unwatched": "Unwatched",
+        "watched": "Watched"
+      },
+      "search": {
+        "label": "Search Watch Later",
+        "placeholder": "Search title, channel or description…"
+      },
+      "sync": {
+        "now": "Sync now",
+        "progress": "{{items}} of {{total}} entries (page {{pages}})",
+        "running": "Syncing…"
+      }
     }
   }
 }

@@ -363,7 +363,7 @@ export const onMainLoad = async ({
       // The page has not told us which account it is on yet; syncing now would pull
       // whichever identity happens to answer first.
       startupSyncPending = true;
-      setTimeout(() => void flushStartupSync("timeout"), 20_000);
+      setTimeout(() => flushStartupSync("timeout"), 20_000);
     }
   }
 

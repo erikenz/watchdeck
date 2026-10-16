@@ -20,6 +20,8 @@ export default defineConfig({
     "pack/**",
     "test-results/**",
     "playwright-report/**",
+    // Installed by the skills CLI (see skills-lock.json); third-party documents.
+    ".agents/**",
   ],
   // Requires oxlint-tsgolint (installed); turns on the type-aware rules.
   options: { typeAware: true },

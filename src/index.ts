@@ -351,6 +351,7 @@ async function createMainWindow() {
     minHeight: 425,
     minWidth: 325,
     show: false,
+    title: config.get("options.customWindowTitle") || APPLICATION_NAME,
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, "..", "preload", "preload.cjs"),
@@ -565,6 +566,13 @@ app.once("browser-window-created", (_event, win) => {
       frameProcessId,
       frameRoutingId
     ) => {
+      // -3 is ERR_ABORTED: the load was replaced (a redirect, or the dev server
+      // reloading the page after optimizing dependencies). Logging it as a failure
+      // in every dev run trains people to ignore the log.
+      if (errorCode === -3) {
+        return;
+      }
+
       const log = JSON.stringify(
         {
           error: "did-fail-load",
@@ -598,14 +606,14 @@ app.once("browser-window-created", (_event, win) => {
     event.preventDefault();
   });
 
-  const customWindowTitle = config.get("options.customWindowTitle");
-
-  if (customWindowTitle) {
-    win.on("page-title-updated", (event) => {
-      event.preventDefault();
-      win.setTitle(customWindowTitle);
-    });
-  }
+  // Every page sets its own title, and the site's is "YouTube" - not this app's name.
+  // Keep the window titled after the app, unless a custom title is configured; the
+  // config is re-read here so a change from the menu takes effect on the next
+  // navigation instead of needing a restart.
+  win.on("page-title-updated", (event) => {
+    event.preventDefault();
+    win.setTitle(config.get("options.customWindowTitle") || APPLICATION_NAME);
+  });
 });
 
 app.on("window-all-closed", () => {

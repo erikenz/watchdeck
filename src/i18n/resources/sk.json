@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Pridať podporu scrobbling (napr. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Nepodarilo sa autentifikovať s Last.fm\nSkryť vyskakovacie okno do ďalšieho reštartu.",
-            "title": "Autentifikácia zlyhala"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API Nastavenia"
-        },
-        "listenbrainz": {
-          "token": "Vložiť ListenBrainz používateľský token"
-        },
-        "scrobble-alternative-artist": "Použiť alternatívnych umelcov",
-        "scrobble-alternative-title": "Použiť alternatívne názvy",
-        "scrobble-other-media": "Scrobble iných médií"
-      },
-      "name": "Posuvník",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API kľúč",
-          "api-secret": "Last.fm API tajomstvo"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Vlož svoj ListenBrainz používateľský token:",
-            "title": "ListenBrainz token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Povoľuje nastaviť globálne klávesové skratky pre prehrávanie (Prehrať/Pozastaviť/Ďalšie/Predošlé) a vypínať media OSD prepisovaním media kľúčov, zapne Ctrl/CMD + F pre vyhľadávanie, zapne Linux MPRIS podporu pre media kľúče a vlastné klávesové skratky pre pokročilých používateľov",
       "menu": {

@@ -547,41 +547,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Lisa kraasimise tugi (last.fm, Listenbrainz, jne)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm'i autentimine ei õnnestunud\nPeida hüpikaken järgmise taaskäivituseni.",
-            "title": "Autentimine ei õnnestunud"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API seadistused"
-        },
-        "listenbrainz": {
-          "token": "Sisesta ListenBrainz'i kasutaja tunnusluba"
-        },
-        "scrobble-alternative-artist": "Kasuta alternatiivseid esitajaid",
-        "scrobble-alternative-title": "Kasuta alternatiivseid pealkirju",
-        "scrobble-other-media": "Kraasi muud meediat"
-      },
-      "name": "Kraasija",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API võti",
-          "api-secret": "Last.fm API saladus"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Sisesta oma ListenBrainz'i tunnusluba:",
-            "title": "ListenBrainz'i tunnusluba"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "name": "Kiirklahvid (& MPRIS)",
       "prompt": {

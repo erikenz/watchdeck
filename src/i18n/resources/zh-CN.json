@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "添加歌曲追踪支持（如 Last.fm 和 Listenbrainz）",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "与 Last.fm 认证时失败\n弹出窗口将在下次重启前隐藏。",
-            "title": "认证失败"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API 设置"
-        },
-        "listenbrainz": {
-          "token": "输入 ListenBrainz 用户令牌"
-        },
-        "scrobble-alternative-artist": "使用替代艺术家",
-        "scrobble-alternative-title": "使用替代标题",
-        "scrobble-other-media": "记录其他媒体文件"
-      },
-      "name": "歌曲记录器",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API 密钥（Key）",
-          "api-secret": "Last.fm API 密文（Secret）"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "输入您的 ListenBrainz 用户令牌：",
-            "title": "ListenBrainz 令牌"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "允许为音频回放操作（播放/暂停/上一曲/下一曲）设置全局热键，兼具覆盖物理键以禁用 OSD、启用 Ctrl/CMD + F 搜索、为物理键启用 Linux MPRIS 支持及自定义热键等高级功能",
       "menu": {

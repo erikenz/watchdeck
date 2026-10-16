@@ -585,41 +585,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "ச்க்ரோப்ளிங் ஆதரவைச் சேர் (last.fm, Listenbrainz முதலியன)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm உடன் அங்கீகரிக்கத் தவறிவிட்டது\n அடுத்த மறுதொடக்கம் வரை பாப்அப்பை மறைக்கவும்.",
-            "title": "ஏற்பு தோல்வியடைந்தது"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm பநிஇ அமைப்புகள்"
-        },
-        "listenbrainz": {
-          "token": "WeskBrainz பயனர் கிள்ளாக்கை உள்ளிடவும்"
-        },
-        "scrobble-alternative-artist": "மாற்று கலைஞர்களை பயன்படுத்துங்கள்",
-        "scrobble-alternative-title": "மாற்று தலைப்புகளைப் பயன்படுத்தவும்",
-        "scrobble-other-media": "மற்ற ஊடகங்களை வெல்லுங்கள்"
-      },
-      "name": "ச்க்ரோபிளர்",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm பநிஇ key",
-          "api-secret": "Last.fm பநிஇ மறைபொருள்"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "உங்கள் கயிட் பிரைன்ச் பயனர் கிள்ளாக்கை உள்ளிடவும்:",
-            "title": "கேளுங்கள் பிரெய்ன்ச் கிள்ளாக்கு"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "பிளேபேக்கிற்கான உலகளாவிய ஆட்கீசை அமைக்க அனுமதிக்கிறது (நாடகம்/இடைநிறுத்தம்/அடுத்த/முந்தைய) மீடியா விசைகளை மீறுவதன் மூலம் மீடியா ஓஎச்டி",
       "menu": {

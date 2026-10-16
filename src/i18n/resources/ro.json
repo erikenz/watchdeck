@@ -598,41 +598,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Adaugă asistenta pentru scrobbling (etc. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Autentificarea cu Last.fm a eșuat\nAscunde acest pop-up până la următoarea repornire.",
-            "title": "Autentificare Eșuată"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Setări pentru API-ul Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Introdu token-ul de utilizator ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Utilizați artiști alternativi",
-        "scrobble-alternative-title": "Folosește titluri alternative",
-        "scrobble-other-media": "Scrobble alte surse media"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Cheia API Last.fm",
-          "api-secret": "Secret API Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Introdu token-ul tău de utilizator ListenBrainz:",
-            "title": "Token-ul ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Permite setari globale pentru scurtături pe tastatură pentru redare (redă/pauză/următorul/anteriorul) și pentru oprirea media OSD prin suprascriera tastelor media, pentru folosirea combinației Ctrl/CMD + F pentru a căuta, pentru pornirea asistenței Linux MPRIS pentru taste media și pentru scurtături personalizate pentru utilizatori avansați",
       "menu": {

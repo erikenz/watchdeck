@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Ajouter le support de scrobbling (ex. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Erreur lors de l'authetification avec Last.fm\nCacher la popup jusqu'au prochain redémarrage.",
-            "title": "Authentification échouée"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Paramètres API de Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Entrer le token utilisateur de ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Utilisez d'autres artistes",
-        "scrobble-alternative-title": "Utiliser des titres alternatifs",
-        "scrobble-other-media": "Scrobbler d'autres médias"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Clé API de Last.fm",
-          "api-secret": "Secret de l'API de Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Entrez votre token utilisateur ListenBrainz :",
-            "title": "Token ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Permet de définir des raccourcis clavier globaux pour la lecture (lecture/pause/suivant/précédent) + désactiver l'OSD multimédia en remplaçant les touches multimédias + activer Ctrl/CMD + F pour rechercher + activer la prise en charge Linux MPRIS pour les touches multimédias + raccourcis clavier personnalisés pour les utilisateurs avancés.",
       "menu": {

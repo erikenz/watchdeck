@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Scrobbling támogatás hozzáadása (pl. last.fm, ListenBrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm hitelesítése nem sikerült\nA felugró ablak elrejtése a következő újraindításig.",
-            "title": "Hitelesítés sikertelen"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API beállítások"
-        },
-        "listenbrainz": {
-          "token": "Add meg a ListenBrainz felhasználói tokenedet"
-        },
-        "scrobble-alternative-artist": "Alternatív előadók használata",
-        "scrobble-alternative-title": "Alternatív címek használata",
-        "scrobble-other-media": "Más média scrobbelése"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API kulcs",
-          "api-secret": "Last.fm titkos API kulcs"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Add meg a ListenBrainz felhasználói tokenedet:",
-            "title": "ListenBrainz kulcs"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Lehetővé teszi globális gyorsbillentyűk beállítását a lejátszáshoz (lejátszás/szünet/következő/előző), valamint a média OSD kikapcsolását a médiagombok felülírásával. Bekapcsolja a Ctrl/CMD + F billentyűkombinációt a kereséshez, a Linux MPRIS támogatását a médiagombokhoz, és egyedi gyorsbillentyűket a haladó felhasználók számára",
       "menu": {

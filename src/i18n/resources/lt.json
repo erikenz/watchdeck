@@ -602,41 +602,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Pridėti „scrobbling“ palaikymą (pvz., last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Nepavyko autentifikuotis su Last.fm\nPaslėpkite iššokantį langą iki kito paleidimo.",
-            "title": "Autentifikacija nepavyko"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API nustatymai"
-        },
-        "listenbrainz": {
-          "token": "Įvesti „ListenBrainz“ vartotojo žetoną"
-        },
-        "scrobble-alternative-artist": "Naudoti alternatyvius atlikėjus",
-        "scrobble-alternative-title": "Naudoti alternatyvius pavadinimus",
-        "scrobble-other-media": "„Scrobble“ kitas medijas"
-      },
-      "name": "„Scrobbler“",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API raktas",
-          "api-secret": "Last.fm API paslaptis"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Įveskite savo „ListenBrainz“ vartotojo žetoną:",
-            "title": "„ListenBrainz“ žetonas"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Leidžia nustatyti visuotinius atkūrimo sparčiuosius klavišus (paleisti / pristabdyti / kitą / ankstesnį) ir išjungti medijos OSD nepaisant medijos klavišų, įjungti Ctrl / CMD + F ieškoti, įjungti Linux MPRIS palaikymą medijos klavišams ir pasirinktinius sparčiuosius klavišus pažengusiems vartotojams",
       "menu": {

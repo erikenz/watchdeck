@@ -592,40 +592,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Idagdag ang scrobbling support (last.fm, Listenbrains, atbp.)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Nabigong mag-authenticate sa Last.fm\nItago ang popup hanggang sa susunod na pag-restart.",
-            "title": "Nabigo ang Authentication"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Mga setting ng API para sa Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Ilagay ang user token ng ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Gumamit ng mga alternatibong artist",
-        "scrobble-alternative-title": "Gumamit ng alternatibong mga title",
-        "scrobble-other-media": "Mag-Scrobble ng ibang media"
-      },
-      "prompt": {
-        "lastfm": {
-          "api-key": "API key ng Last.fm",
-          "api-secret": "API secret ng Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Ilagay ang ListenBrainz user token:",
-            "title": "Token ng ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Nagbibigay-daan sa pagtatakda ng mga global hotkey para sa playback (play/pause/susunod/nakaraan) at pag-off ng media OSD sa pamamagitan ng pag-override sa mga media key, pag-on sa Ctrl/CMD + F para maghanap, pag-on sa suporta ng Linux MPRIS para sa mga media key, at mga custom na hotkey para sa mga advanced na user",
       "menu": {

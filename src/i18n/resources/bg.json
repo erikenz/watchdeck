@@ -585,41 +585,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Добавяне на скробблинг поддръжка (last.fm, Listenbrainz и т.н.)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Грешка при удостоверяване с Last.fm\nСкрий изкачащия прозорец до следващо пускане.",
-            "title": "Грешка при удостоверяване"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Настройки за Last.fm API"
-        },
-        "listenbrainz": {
-          "token": "Въведете ListenBrainz потребителски токен"
-        },
-        "scrobble-alternative-artist": "Използвай алтернативни изпълнители",
-        "scrobble-alternative-title": "Използвай алтернативни заглавия",
-        "scrobble-other-media": "Скробъл на други медии"
-      },
-      "name": "Скробълър",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API ключ",
-          "api-secret": "Last.fm API тайна"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Въведете вашия ListenBrainz потребителски токен:",
-            "title": "ListenBrainz токен"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Позволява задаване на глобални бързи клавиши за възпроизвеждане (пускане/пауза/следваща/предишна), изключване на медиен OSD чрез презаписване на медийни клавиши, включване на Ctrl/CMD + F за търсене, включване на Linux MPRIS поддръжка за медийни клавиши и персонализирани бързи клавиши за напреднали потребители",
       "menu": {

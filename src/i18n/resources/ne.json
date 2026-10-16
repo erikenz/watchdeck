@@ -564,40 +564,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "स्क्रोब्लिङ समर्थन थप्नुहोस् (etc. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm सँग प्रमाणिकरण गर्न असफल\nअर्को पुनः सुरु नभएसम्म पपअप लुकाउनुहोस्।",
-            "title": "प्रमाणीकरण असफल"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API सेटिङहरू"
-        },
-        "listenbrainz": {
-          "token": "ListenBrainz प्रयोगकर्ता टोकन प्रविष्ट गर्नुहोस्"
-        },
-        "scrobble-alternative-title": "वैकल्पिक शीर्षकहरू प्रयोग गर्नुहोस्",
-        "scrobble-other-media": "अन्य मिडियालाई स्क्रबल गर्नुहोस्"
-      },
-      "name": "स्क्रबबलर",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API कुञ्जी",
-          "api-secret": "Last.fm एपीआई गुप्त"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "आफ्नो ListenBrainz प्रयोगकर्ता टोकन प्रविष्ट गर्नुहोस्:",
-            "title": "ListenBrainz टोकन"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "प्लेब्याक (प्ले/विराम/अर्को/अघिल्लो) का लागि ग्लोबल हटकीहरू सेट गर्न र मिडिया कुञ्जीहरू ओभरराइड गरेर मिडिया ओएसडी बन्द गर्न अनुमति दिन्छ, खोजी गर्न Ctrl/CMD + F सक्रिय गर्दछ, मिडिया कुञ्जीहरूका लागि लिनक्स MPRIS र उन्नत प्रयोगकर्ताहरूका लागि कस्टम हटकीहरू समर्थन सक्रिय गर्दछ",
       "menu": {

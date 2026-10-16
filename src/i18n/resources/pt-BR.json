@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Adicionar suporte para scrobbling (last.fm, Listenbrainz, etc.)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Falha ao autenticar com Last.fm\nOcultar o pop-up até a próxima reinicialização.",
-            "title": "Falha na autenticação"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Configurações da API do Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Insira o token de usuário ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Use artistas alternativos",
-        "scrobble-alternative-title": "Usar títulos alternativos",
-        "scrobble-other-media": "Scrobble outras mídias"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Chave de API do Last.fm",
-          "api-secret": "Chave secreta da API do Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Insira seu token de usuário do ListenBrainz:",
-            "title": "ListenBrainz token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Permite definir teclas de atalho globais para reprodução (reproduzir/pausar/próximo/anterior) e desativar o OSD de mídia substituindo as teclas de mídia, ativando Ctrl/CMD + F para pesquisar, ativando o suporte Linux MPRIS para teclas de mídia e teclas de atalho personalizadas para usuários avançados",
       "menu": {

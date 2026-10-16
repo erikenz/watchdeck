@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Lägg till stöd för skrobbling (t.ex. Last.fm och ListenBrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Det gick inte att autentisera med Last.fm\nDölj popup-fönstret fram till nästa omstart.",
-            "title": "Autentisering misslyckades"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "API-inställningar för Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Ange användartoken för ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Använd alternativa artister",
-        "scrobble-alternative-title": "Använd alternativa titlar",
-        "scrobble-other-media": "Scrobbla annan media"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm-API-nyckel",
-          "api-secret": "Last.fm-API-hemlighet"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Ange din användartoken för ListenBrainz:",
-            "title": "ListenBrainz-token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Gör det möjligt att ange globala snabbkommandon för uppspelning (spela upp/pausa/nästa/föregående), inaktivera medie-OSD genom att åsidosätta medietangenterna, aktivera Ctrl/Cmd + F för sökning, aktivera Linux MPRIS-stöd för medietangenter och ange egna snabbkommandon för avancerade användare",
       "menu": {

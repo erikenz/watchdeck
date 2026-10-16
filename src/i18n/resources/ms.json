@@ -527,21 +527,6 @@
     "notifications": {
       "name": "Notifikasi"
     },
-    "scrobbler": {
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "title": "Atuntikasi Gagal"
-          }
-        }
-      },
-      "prompt": {
-        "lastfm": {
-          "api-key": "kunci API Last.fm",
-          "api-secret": "rahasia API Last.fm"
-        }
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Kawalan main balik dari bar tugas Windows anda",
       "name": "Kawalan Media Bar Tugas"

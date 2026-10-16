@@ -601,41 +601,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Dodaj podršku za 'četkanje' (poput last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Autentifikacija sa Last.fm nije uspjela.\nZatvori skočni prozor do sljedećeg ponovnog pokretanja.",
-            "title": "Autentifikacija je neuspješna"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Postavke za Last.fm API"
-        },
-        "listenbrainz": {
-          "token": "Unesi korisnički žeton za ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Izaberite druge glazbenike",
-        "scrobble-alternative-title": "Koristi alternativne naslove",
-        "scrobble-other-media": "Učetkaj druge medije"
-      },
-      "name": "Četkarnik",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API ključ",
-          "api-secret": "Last.fm API tajna"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Unesi svoj ListenBrainz korisnički žeton:",
-            "title": "ListenBrainz žeton"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Dozvoljava postavljanje globalnih prečaca na tipkovnici za reproduciranje (pokreni/zaustavi/sljedeće/prijethodno) i isključivanje OSD-a za medije tako što će prebrisati tipke za medije, uključiti Ctrl/CMD + F za pretragu, isključiti MPRIS podršku za medijske tipke na Linux-u, i prilagođene prečace za napredne korisnike",
       "menu": {

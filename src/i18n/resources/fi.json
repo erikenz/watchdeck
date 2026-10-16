@@ -564,40 +564,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Lisää jakamistuki (esim. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm-varmennus epäonnistui\nPiilota ponnahdusikkuna kunnes käynnistät ohjelman uudelleen.",
-            "title": "Todennus epäonnistui"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API:n asetukset"
-        },
-        "listenbrainz": {
-          "token": "Syötä ListenBrainz-käyttötunnus (token)"
-        },
-        "scrobble-alternative-title": "Käytä vaihtoehtoisia otsikoita",
-        "scrobble-other-media": "Jaa muuta mediaa"
-      },
-      "name": "Jakaja",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm:n API-avain",
-          "api-secret": "Last.fm:n API-salaisuus"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Syötä ListenBrainz käyttötunnuksesi (token):",
-            "title": "ListenBrainz-käyttötunnus"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "prompt": {
         "keybind": {

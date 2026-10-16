@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "ເພີ່ມການຮອງຮັບການບັນທຶກປະຫວັດການຟັງ (ເຊັ່ນ last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "ຢືນຢັນຕົວຕົນກັບ Last.fm ບໍ່ສຳເລັດ\nເຊື່ອງປັອບອັບຈົນກວ່າຈະເລີ່ມລະບົບໃໝ່.",
-            "title": "ການຢືນຢັນຕົວຕົນຫຼົ້ມເຫຼວ"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "ການຕັ້ງຄ່າ Last.fm API"
-        },
-        "listenbrainz": {
-          "token": "ປ້ອນໂທເຄັນຜູ້ໃຊ້ ListenBrainz"
-        },
-        "scrobble-alternative-artist": "ໃຊ້ສິລະປິນທາງເລືອກ",
-        "scrobble-alternative-title": "ໃຊ້ຫົວຂໍ້ທາງເລືອກ",
-        "scrobble-other-media": "ບັນທຶກປະຫວັດສື່ທາງເລືອກອື່ນ"
-      },
-      "name": "ຕົວບັນທຶກປະຫວັດການຟັງ (Scrobbler)",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API key",
-          "api-secret": "Last.fm API secret"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "ປ້ອນໂທເຄັນຜູ້ໃຊ້ ListenBrainz ຂອງທ່ານ:",
-            "title": "ListenBrainz token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "ອະນຸຍາດໃຫ້ຕັ້ງຄ່າຄີລັດທົ່ວໂລກສຳລັບການຫຼິ້ນ (ຫຼິ້ນ/ຢຸດ/ຕໍ່ໄປ/ກ່ອນໜ້າ) ແລະ ປິດການໃຊ້ງານ media OSD ໂດຍການຂຽນທັບປຸ່ມສື່, ເປີດໃຊ້ Ctrl/CMD + F ເພື່ອຄົ້ນຫາ, ເປີດໃຊ້ການຮອງຮັບ Linux MPRIS ສຳລັບປຸ່ມສື່ ແລະ ຄີລັດແບບກຳນົດເອງສຳລັບຜູ້ໃຊ້ຂັ້ນສູງ",
       "menu": {

@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "स्क्रोब्लिंग सपोर्ट जोड़ें (etc. last.fm, listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm के साथ प्रमाणीकरण विफल\nअगले पुनरारंभ तक पॉपअप छिपाएँ।",
-            "title": "प्रमाणीकरण विफल"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API सेटिंग्स"
-        },
-        "listenbrainz": {
-          "token": "listenbrainz उपयोगकर्ता टोकन दर्ज करें"
-        },
-        "scrobble-alternative-artist": "वैकल्पिक आर्टिस्ट का उपयोग करें",
-        "scrobble-alternative-title": "वैकल्पिक शीर्षक का उपयोग करें",
-        "scrobble-other-media": "अन्य मीडिया स्क्रोबल करें"
-      },
-      "name": "स्क्रोब्लर",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API की",
-          "api-secret": "Last.fm गुप्त API"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "अपना ListenBrainz उपयोगकर्ता टोकन दर्ज करें:",
-            "title": "ListenBrainz टोकन"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "प्लेबैक (प्ले/पॉज़/नेक्स्ट/प्रीवियस) के लिए ग्लोबल हॉटकी सेट करने की सुविधा देता है, मीडिया कुंजियों को ओवरराइड करके मीडिया OSD बंद करता है, Ctrl/CMD + F से खोज चालू करता है, Linux में मीडिया कुंजियों के लिए MPRIS सपोर्ट चालू करता है, और उन्नत उपयोगकर्ताओं के लिए कस्टम हॉटकी की अनुमति देता है",
       "menu": {

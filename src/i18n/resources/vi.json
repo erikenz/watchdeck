@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Thêm hỗ trợ scrobbling (v.v. Last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Không thể xác minh với Last.fm \nẨn thông báo cho đến lần bật ứng dụng tiếp theo.",
-            "title": "Xác minh thất bại"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Cài đặt API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Nhập mã người dùng ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Dùng nghệ sĩ thay thế",
-        "scrobble-alternative-title": "Dùng tiêu đề thay thế",
-        "scrobble-other-media": "Scrobber nội dung khác"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Khóa API Last.fm",
-          "api-secret": "API Last.fm bảo mật"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Nhập mã người dùng ListenBrainz của bạn:",
-            "title": "Mã ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Cho phép thiết lập các phím nóng chung để phát lại (phát/tạm dừng/tiếp theo/trước) và tắt OSD media bằng cách ghi đè các phím media, bật Ctrl/CMD + F để tìm kiếm, bật hỗ trợ Linux MPRIS cho các phím media và các phím nóng tùy chỉnh cho người dùng nâng cao",
       "menu": {

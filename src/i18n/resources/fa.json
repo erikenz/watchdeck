@@ -601,41 +601,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "اضافه کردن پشتیبانی از اسکرابلینگ (etc. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "احراز هویت با Last.fm ناموفق بود\nپنجره شناور را تا راه‌اندازی مجدد بعدی مخفی کن.",
-            "title": "احراز هویت ناموفق بود"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "تنظیمات \"Last.fm \"API"
-        },
-        "listenbrainz": {
-          "token": "توکن کاربری ListenBrainz را وارد کنید"
-        },
-        "scrobble-alternative-artist": "از هنرمند دىگرى استفاده کنىد",
-        "scrobble-alternative-title": "از عناوین جایگزین استفاده کنید",
-        "scrobble-other-media": "ردیابی رسانه‌های دیگر"
-      },
-      "name": "ابزار ثبت‌کننده‌ی آهنگ",
-      "prompt": {
-        "lastfm": {
-          "api-key": "کلید Last.fm API",
-          "api-secret": "API مخفی Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "توکن کاربری ListenBrainz خود را وارد کنید:",
-            "title": "توکن ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "امکان تنظیم میانبرهای سراسری برای کنترل (پخش/توقف/بعدی/قبلی) و خاموش کردن OSD رسانه با بازنویسی کلیدهای رسانه‌ای، فعال‌سازی Ctrl/CMD + F برای جستجو، فعال‌سازی پشتیبانی MPRIS در لینوکس برای کلیدهای رسانه‌ای، و میانبرهای سفارشی برای کاربران پیشرفته",
       "menu": {

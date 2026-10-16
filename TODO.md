@@ -29,11 +29,6 @@ the rework and deliberately left for the plugin or phase that owns it:
 - [ ] **`providers/dom-elements.ts` is YouTube Music's menu-popup selector** (`getSongMenu`), used
   by the downloader / picture-in-picture / playback-speed renderers to add buttons to the site's
   menu. Delete it with the rework that re-hosts those buttons.
-- [ ] **Scrobbler**: `scrobbleOtherMedia` / `alternativeTitles` / `alternativeArtist` went away with
-  the metadata that fed them (YouTube Music's `musicVideoType`, `alternativeTitle`, `tags`), so
-  scrobbles now always use the video's own title and channel. Re-establish a classification filter
-  from YouTube data (`videoDetails.musicVideoType` exists on watch pages) if music scrobbling is
-  wanted. The three i18n labels are still in the 41 locale files.
 - [ ] **Downloader**: titles and channels are no longer run through `cleanupName` (the music
   suffix stripper), and `CustomSongInfo` is now a `Pick<VideoInfo, ...>` instead of the old song
   shape. Its YouTube rework (§R5) owns the rest.

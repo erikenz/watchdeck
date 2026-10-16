@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Umożliwia scrobbling utworów do m.in. last.fm lub Listenbrainz",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Podczas autoryzowania z last.fm wystąpił błąd.\nSchowaj pop-up aż do następnego uruchomienia.",
-            "title": "Podczas autoryzowania wystąpił błąd"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Ustawienia API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Podaj token użytkownika ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Urzyj alternatywnych artytów",
-        "scrobble-alternative-title": "Użyj alternatywnych tytułów",
-        "scrobble-other-media": "Scrobbluj pozostałe multimedia"
-      },
-      "name": "Scrobblowanie",
-      "prompt": {
-        "lastfm": {
-          "api-key": "klucz API Last.fm",
-          "api-secret": "Sekretny klucz Last.fm API (\"secret key\")"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Podaj swój token użytkownika ListenBrainz:",
-            "title": "Token ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Umożliwia ustawienie globalnych skrótów klawiszowych do odtwarzania (odtwarzanie/pauza/następny/poprzedni) + wyłączanie OSD multimediów poprzez zastąpienie klawiszy multimediów, włączając kombinację klawiszy Ctrl/CMD + F w celu wyszukiwania, obsługę Linux MPRIS dla klawiszy multimediów oraz niestandardowe skróty klawiszowe dla zaawansowanych użytkowników",
       "menu": {

@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Scrobbling-Unterstützung aktivieren (z.B. für last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Die Authentifizierung von Last.fm ist fehlgeschlagen.\nBlende das Pop-up bis zum nächsten Neustart aus.",
-            "title": "Authentifizierung fehlgeschlagen"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API Einstellungen"
-        },
-        "listenbrainz": {
-          "token": "ListenBrainz-Benutzer-Token eintragen"
-        },
-        "scrobble-alternative-artist": "Benutze Alternative Künstler",
-        "scrobble-alternative-title": "Nutze alternative Titel",
-        "scrobble-other-media": "Andere Medien scrobbeln"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API-Schlüssel",
-          "api-secret": "Last.fm API-Kennwort"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "ListenBrainz-Benutzer-Token eintragen:",
-            "title": "ListenBrainz-Token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Ermöglicht das Festlegen globaler Hotkeys für die Wiedergabe (Abspielen/Pause/Nächster/Vorheriger) + Deaktivieren des Medien-OSD durch Überschreiben der Medientasten + Aktivieren von Strg/CMD + F zum Suchen + Aktivieren der Linux mpris-Unterstützung für Medientasten + Angepasste Tastenkürzel für fortgeschrittene Benutzer",
       "menu": {

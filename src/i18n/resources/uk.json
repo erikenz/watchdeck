@@ -606,41 +606,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Додає підтримку скроблінгу (last.fm, Listenbrainz тощо)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Не вдалося автентифікуватися на Last.fm\nСховати до наступного запуску.",
-            "title": "Не вдалося автентифікуватися"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Налаштування API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Ввести токен користувача ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Використати іншого виконавця",
-        "scrobble-alternative-title": "Використовувати альтернативні назви",
-        "scrobble-other-media": "Скробилити інші медіа"
-      },
-      "name": "Скроблер",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Ключ API Last.fm",
-          "api-secret": "Секрет API Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Введіть ваш токен користувача ListenBrainz:",
-            "title": "Токен ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Дозволяє встановлювати глобальні гарячі клавіші для управління відтворенням (відтворення/пауза/наступний/попередній), вимикаючи OSD для мультимедійних клавіш, увімкнення пошуку за допомогою Ctrl/CMD + F, увімкнення підтримки Linux MPRIS для мультимедійних клавіш та власних гарячих клавіш для досвідчених користувачів",
       "menu": {

@@ -587,40 +587,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "স্ক্রবলিং সমর্থন যোগ করুন (যেমন last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm এর সাথে প্রমাণীকরণ ব্যর্থ হয়েছে\nপরবর্তী পুনরায় চালু না হওয়া পর্যন্ত পপআপ লুকান।",
-            "title": "প্রমাণীকরণ ব্যর্থ হয়েছে"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API সেটিংস"
-        },
-        "listenbrainz": {
-          "token": "ListenBrainz ব্যবহারকারী টোকেন লিখুন"
-        },
-        "scrobble-alternative-title": "বিকল্প শিরোনাম ব্যবহার করুন",
-        "scrobble-other-media": "অন্যান্য মিডিয়া স্ক্রবল করুন"
-      },
-      "name": "স্ক্রবলার",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API কি",
-          "api-secret": "Last.fm API সিক্রেট"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "আপনার ListenBrainz ব্যবহারকারী টোকেন লিখুন:",
-            "title": "ListenBrainz টোকেন"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "প্লেব্যাকের জন্য গ্লোবাল হটকি (প্লে/পজ/পরবর্তী/পূর্ববর্তী) সেট করতে এবং মিডিয়া কী ওভাররাইড করে মিডিয়া OSD বন্ধ করতে, Ctrl/CMD + F চালু করে অনুসন্ধান করতে, মিডিয়া কীগুলির জন্য Linux MPRIS সমর্থন চালু করতে এবং অ্যাডভান্সড ব্যবহারকারীদের জন্য কাস্টম হটকি সেট করতে অনুমতি দেয়",
       "menu": {

@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Afegeix suport per scrobbling (Last.fm, ListenBrainz, etc.)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Error al autenticar amb Last.fm\nAmaga la finestra emergent fins el següent reinici.",
-            "title": "Error d'autenticació"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Configuració de l'API de Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Introduir token d'usuari de ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Utilitza artistes alternatius",
-        "scrobble-alternative-title": "Useu títols alternatius",
-        "scrobble-other-media": "Scrobble amb altres mitjans"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Clau d'API de Last.fm",
-          "api-secret": "Clau secreta de l'API de Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Introdueix el teu token de ListenBrainz:",
-            "title": "Token de ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Permet l'ús de dreceres globals del teclat per la reproducció (reproduir/pausar/següent/anterior) i desactivar l'OSD dels mitjans en sobreescriure les tecles de control multimèdia, habilita el Ctrl/CMD + F per buscar, habilita el suport MPRIS a Linux per tecles de control multimèdia, i dreceres de teclat personalitzades per usuaris avançats",
       "menu": {

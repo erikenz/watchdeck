@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "額外新增 scrobbling 支援 (例如：last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Last.fm 認證失敗\n將隱藏彈出視窗直到重啟。",
-            "title": "認證失敗"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API 設定"
-        },
-        "listenbrainz": {
-          "token": "輸入 ListenBrainz 使用者憑證"
-        },
-        "scrobble-alternative-artist": "使用替代的藝人",
-        "scrobble-alternative-title": "使用替代歌曲標題",
-        "scrobble-other-media": "紀錄其他媒體檔案"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API 金鑰",
-          "api-secret": "Last.fm API 密鑰"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "輸入您的 ListenBrainz 使用者憑證：",
-            "title": "ListenBrainz 使用者憑證"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "使用全域快捷鍵控制音樂 (播放／暫停／下一首／上一首) + 透過覆寫媒體快捷鍵停用媒體 OSD + 允許 Ctrl/CMD + F 來搜尋 + 支援 Linux MPRIS 媒體快捷鍵 + 更多自訂快捷鍵給進階使用者",
       "menu": {

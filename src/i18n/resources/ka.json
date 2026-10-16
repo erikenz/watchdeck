@@ -548,36 +548,6 @@
         }
       }
     },
-    "scrobbler": {
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "title": "ავთენტიფიკაცია ვერ მოხერხდა"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API-ს პარამეტრები"
-        },
-        "listenbrainz": {
-          "token": "შეიყვანეთ ListenBrainz-ის მომხმარებლის ტოკენი"
-        },
-        "scrobble-alternative-title": "გამოიყენეთ ალტერნატიული სათაურები"
-      },
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm-ს API გასაღები",
-          "api-secret": "Last.fm-ს API საიდუმლო"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "შეიყვანეთ თქვენი ListenBrainz მომხმარებლის ტოკენი:",
-            "title": "ListenBrainz-ის ტოკენი"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "name": "მალსახმობები (& MPRIS)",
       "prompt": {

@@ -509,39 +509,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Bæta við scrobbling stuðningi (osv. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Mistókst að auðkenna með Last.fm\nFela sprettigluggann þar til næstu endurræsingu.",
-            "title": "Auðkenning Mistókst"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API Stillingar"
-        },
-        "listenbrainz": {
-          "token": "Sláðu inn ListenBrainz notandalykilinn"
-        },
-        "scrobble-other-media": "Scrobble aðra fjölmiðla"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API lykill",
-          "api-secret": "Last.fm API leyndarmál"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Sláðu inn ListenBrainz notandatáknið þitt:",
-            "title": "ListenBrainz tákn"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Leyfir að stilla alþjóðlegaflýtilykla fyrir spilun (spila/gera hlé/næsta/fyrri) og slökkva á OSD miðla með því að hnekkja miðlunartökkum, kveikja á Ctrl/CMD + F til að leita, kveikja á Linux MPRIS stuðningi fyrir miðlunarlykla og sérsniðna flýtilykla fyrir lengra komna notendur",
       "menu": {

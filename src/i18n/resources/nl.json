@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Ondersteuning voor scrobbling toevoegen (etc. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Kan niet verifiëren bij Last.fm\nVerberg de pop-up tot de volgende herstart.",
-            "title": "Authenticatie mislukt"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API Instellingen"
-        },
-        "listenbrainz": {
-          "token": "Voer het ListenBrainz-gebruikerstoken in"
-        },
-        "scrobble-alternative-artist": "Gebruik alternatieve artiesten",
-        "scrobble-alternative-title": "Gebruik alternatieve titels",
-        "scrobble-other-media": "Scrobble andere media"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last.fm API sleutel",
-          "api-secret": "Last.fm API geheim"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Voer uw ListenBrainz-gebruikerstoken in:",
-            "title": "ListenBrainz token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Maakt het mogelijk algemene sneltoetsen in te stellen voor afspelen (afspelen/pauzeren/volgende/vorige) en het uitschakelen van media-OSD door mediatoetsen te overschrijven, het inschakelen van Ctrl/CMD + F om te zoeken, het inschakelen van Linux MPRIS-ondersteuning voor mediatoetsen en aangepaste sneltoetsen voor gevorderde gebruikers",
       "menu": {

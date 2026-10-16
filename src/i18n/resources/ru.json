@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Добавляет поддержку скробблинга (last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Не удалось войти с помощью Last.fm\nСкрыть сообщение до следующего запуска.",
-            "title": "Ошибка аунтефикации"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Настройки API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Введите токен пользователя ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Использовать альтернативных исполнителей",
-        "scrobble-alternative-title": "Использовать альтернативные названия",
-        "scrobble-other-media": "Скробблинг других медиа"
-      },
-      "name": "Скробблер",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Ключ API Last.fm",
-          "api-secret": "Секрет API Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Введите токен пользователя ListenBrainz:",
-            "title": "Токен ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Позволяет задать глобальные горячие клавиши для воспроизведения (play/pause/next/previous) и отключить экранное мультимедийное меню, изменяя мультимедийные клавиши, также включает Ctrl/CMD + F для поиска, добавляет поддержку Linux MPRIS для мультимедийных клавиш, а также пользовательские горячие клавиши для опытных пользователей",
       "menu": {

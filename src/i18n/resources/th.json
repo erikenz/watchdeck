@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "รองรับการบันทึกการเล่นเพลง (เช่น last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "เกิดปัญหาระหว่างเข้าใช้งาน Last.fm\nซ่อนข้อความนี้จนการรีสตาร์ตครั้งถัดไป",
-            "title": "เกิดปัญหาในการเข้าใช้งาน"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "การตั้งค่า API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "ใส่ user token ของ ListenBrainz"
-        },
-        "scrobble-alternative-artist": "ใช้ชื่อศิลปินอื่น",
-        "scrobble-alternative-title": "ใช้ชื่ออื่น",
-        "scrobble-other-media": "บันทึกการเล่นสื่ออื่นๆ"
-      },
-      "name": "บันทึกการเล่น (Scrobbler)",
-      "prompt": {
-        "lastfm": {
-          "api-key": "API Key ของ Last.fm",
-          "api-secret": "API secret ของ Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "ใส่ user token ListenBrainz ของคุณ:",
-            "title": "token ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "อนุญาตให้ตั้งปุ่มลัดทั่วระบบสำหรับการเล่น (เล่น/หยุดชั่วคราว/ถัดไป/ก่อนหน้า) และปิดการแสดงผลสื่อโดยทับปุ่มควบคุมสื่อ เปิด Ctrl/CMD + F เพื่อค้นหา เปิดการใช้งานการควบคุมเพลงผ่าน MPRIS สำหรับ Linux และปุ่มลัดที่กำหนดเองได้สำหรับผู้ใช้ขั้นสูง",
       "menu": {

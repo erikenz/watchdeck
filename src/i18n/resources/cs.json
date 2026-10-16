@@ -585,41 +585,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Přidat scrobbing podporu (např .last.fm , Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Selhalo ověření s Last.fm\nSchovat vyskakovací okno do dalšího restartu.",
-            "title": "Ověření Selhalo"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Last.fm API nastavení"
-        },
-        "listenbrainz": {
-          "token": "Vložte Listenbrainz user token"
-        },
-        "scrobble-alternative-artist": "Použij alternativní umělce",
-        "scrobble-alternative-title": "Používat alternativní názvy",
-        "scrobble-other-media": "Scrobble jiné média"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Last,fm API klíč",
-          "api-secret": "Tajný klíč API Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Vložte svůj Listenbrainz user token:",
-            "title": "ListenBrainz token"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Dovoluje nastavit globální klávesové zkratky pro playback (přehrát/pozastavit/další/předchozí) a vypínání media OSD pomocí přepisování media klíčů, zapínání Ctrl/CMD + F k vyhledávání, zapínání Linux MPRIS podporu pro media klíče, a vlastní klávesové zkratky pro pokročilé uživatele.",
       "menu": {

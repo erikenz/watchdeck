@@ -609,41 +609,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "Tambahkan dukungan scrobbling (mis. last.fm, Listenbrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "Gagal mengotentikasi Last.fm\nSembunyikan munculan hingga muat ulang selanjutnya.",
-            "title": "Otentikasi Gagal"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "Pengaturan API Last.fm"
-        },
-        "listenbrainz": {
-          "token": "Masukkan token pengguna ListenBrainz"
-        },
-        "scrobble-alternative-artist": "Pindah ke artis lain",
-        "scrobble-alternative-title": "Gunakan judul alternatif",
-        "scrobble-other-media": "Scrobble media lain"
-      },
-      "name": "Scrobbler",
-      "prompt": {
-        "lastfm": {
-          "api-key": "Kunci API Last.fm",
-          "api-secret": "Secret API Last.fm"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "Masukkan token pengguna ListenBrainz Anda:",
-            "title": "Token ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "Izinkan pengaturan pintasan global untuk pemutar (main/jeda/selanjutnya/sebelumnya) dan mematikan OSD media dengan mengesampingkan tombol media, mengaktifkan Ctrl/CMD + F untuk pencarian, mengaktifkan dukungan MPRIS Linux untuk tombol media, dan tombol pintasan kustom untuk pengguna lanjutan",
       "menu": {

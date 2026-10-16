@@ -608,41 +608,6 @@
         }
       }
     },
-    "scrobbler": {
-      "description": "إضافة دعم Scrobbling (مثل Last.fm، ListenBrainz)",
-      "dialog": {
-        "lastfm": {
-          "auth-failed": {
-            "message": "فشل التفويض مع Last.fm\nإخفاء النافذة المصغرة حتى إعادة التشغيل التالية.",
-            "title": "فشل التفويض"
-          }
-        }
-      },
-      "menu": {
-        "lastfm": {
-          "api-settings": "إعدادات Last.fm API"
-        },
-        "listenbrainz": {
-          "token": "أدخل رمز مستخدم ListenBrainz"
-        },
-        "scrobble-alternative-artist": "استخدم فنانين بديلين",
-        "scrobble-alternative-title": "استخدم عناوين بديلة",
-        "scrobble-other-media": "Scrobble الوسائط الأخرى"
-      },
-      "name": "أداة تتبع الاستماع",
-      "prompt": {
-        "lastfm": {
-          "api-key": "مفتاح Last.fm API",
-          "api-secret": "الرمز السري لـ Last.fm API"
-        },
-        "listenbrainz": {
-          "token": {
-            "label": "أدخل رمز مستخدم ListenBrainz الخاص بك:",
-            "title": "رمز ListenBrainz"
-          }
-        }
-      }
-    },
     "shortcuts": {
       "description": "يسمح بضبط اختصارات لوحة المفاتيح للتحكم في التشغيل (تشغيل/إيقاف/التالي/السابق) وإيقاف تشغيل OSD الوسائط عن طريق تجاوز مفاتيح الوسائط، وتشغيل Ctrl/CMD + F للبحث، وتفعيل دعم Linux MPRIS لمفاتيح الوسائط، واختصارات مخصصة للمستخدمين المتقدمين",
       "menu": {

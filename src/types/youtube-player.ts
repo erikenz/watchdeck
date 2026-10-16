@@ -43,6 +43,8 @@ export interface YouTubePlayer {
   ): void;
   getCurrentTime(): number;
   getDuration(): number;
+  /** Playback speed multiplier, 1 being normal. */
+  getPlaybackRate(): number;
   getPlayerResponse(): GetPlayerResponse;
   /** One of YouTube's own states; see {@link PlayerState}. */
   getPlayerState(): PlayerState;
@@ -56,6 +58,8 @@ export interface YouTubePlayer {
   playVideo(): void;
   previousVideo(): void;
   seekTo(seconds: number, allowSeekAhead?: boolean): void;
+  /** Playback speed multiplier, 1 being normal. */
+  setPlaybackRate(rate: number): void;
   /** 0-100. */
   setVolume(percent: number): void;
   unMute(): void;

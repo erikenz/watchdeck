@@ -710,6 +710,17 @@
         "mirrored": "{{count}} mirrored",
         "mirrored-of": "{{items}} of {{total}} mirrored"
       }
+    },
+    "gestures": {
+      "description": "Right-drag the player: up/down for volume, left/right to seek, Shift for speed",
+      "menu": {
+        "seek-drag": "Right-drag left/right to seek",
+        "sensitivity-hint": "Drag lengths and step sizes live in the config file",
+        "speed-drag": "Shift + right-drag to change speed",
+        "volume-drag": "Right-drag up/down for volume",
+        "wheel-volume": "Right + wheel for volume"
+      },
+      "name": "Gestures"
     }
   }
 }

@@ -1,0 +1,22 @@
+/** Readout for the gesture in progress, appended to the player (docs/PRD.md §5.6). */
+.wd-gesture-hud {
+  z-index: 999;
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  translate: -50% 0;
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  color: var(--yt-spec-text-primary-inverse, #fff);
+  background: var(--yt-spec-general-background-a, rgba(0, 0, 0, 0.7));
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+
+  /* The readout must never take the pointer: the gesture it describes is in flight. */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}

@@ -45,8 +45,8 @@ export const backend = createBackend<
       });
     }
 
-    ctx.ipc.on('peard:player-api-loaded', () => {
-      ctx.ipc.send('peard:setup-time-changed-listener');
+    ctx.ipc.on('watchdeck:player-api-loaded', () => {
+      ctx.ipc.send('watchdeck:setup-time-changed-listener');
     });
 
     app.on('before-quit', () => {

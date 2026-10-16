@@ -7,12 +7,12 @@ import * as config from '@/config';
 export const restart = () => restartInternal();
 
 export const setupAppControls = () => {
-  ipcMain.on('peard:restart', restart);
-  ipcMain.handle('peard:get-downloads-folder', () => app.getPath('downloads'));
-  ipcMain.on('peard:reload', () =>
+  ipcMain.on('watchdeck:restart', restart);
+  ipcMain.handle('watchdeck:get-downloads-folder', () => app.getPath('downloads'));
+  ipcMain.on('watchdeck:reload', () =>
     BrowserWindow.getFocusedWindow()?.webContents.loadURL(config.get('url')),
   );
-  ipcMain.handle('peard:get-path', (_, ...args: string[]) =>
+  ipcMain.handle('watchdeck:get-path', (_, ...args: string[]) =>
     path.join(...args),
   );
 };

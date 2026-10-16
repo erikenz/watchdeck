@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "If an ad play it mutes the audio and sets playback speed to 16x",
-      "name": "Ad Speedup"
-    },
-    "album-actions": {
-      "description": "Adds Undislike, Dislike, Like, and Unlike buttons to apply this to all songs in a playlist or album",
-      "name": "Album Actions"
-    },
-    "album-color-theme": {
-      "description": "Applies a dynamic theme and visual effects based on the album color palette",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Color mix ratio",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Enable seekbar theming"
-      },
-      "name": "Album Color Theme"
-    },
     "ambient-mode": {
       "description": "Applies a lighting effect by casting gentle colors from the video, into your screen’s background",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Ambient Mode"
-    },
-    "amuse": {
-      "description": "Adds {{applicationName}} support for the Amuse now playing widget by 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API server is running. GET /query to get song info."
-      }
     },
     "api-server": {
       "description": "Adds an API server to control the player",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Apply compression to audio (lowers the volume of the loudest parts of the signal and raises the volume of the softest parts)",
-      "name": "Audio Compressor"
-    },
     "auth-proxy-adapter": {
       "description": "Support for the use of authentication proxy services",
       "menu": {
@@ -374,52 +342,6 @@
           "label": "Enter port for local proxy server (requires restart):"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Makes navigation bar transparent and blurry",
-      "name": "Blur Navigation Bar"
-    },
-    "bypass-age-restrictions": {
-      "description": "Bypass Music Player's age verification",
-      "name": "Bypass Age Restrictions"
-    },
-    "captions-selector": {
-      "description": "Caption selector for {{applicationName}} audio tracks",
-      "menu": {
-        "autoload": "Automatically select last used caption",
-        "disable-captions": "No captions by default"
-      },
-      "name": "Captions Selector",
-      "prompt": {
-        "selector": {
-          "label": "Current caption language: {{language}}",
-          "none": "None",
-          "title": "Select caption language"
-        }
-      },
-      "templates": {
-        "title": "Open captions selector"
-      },
-      "toast": {
-        "caption-changed": "Caption changed to {{language}}",
-        "caption-disabled": "Captions disabled",
-        "no-captions": "No captions available for this song"
-      }
-    },
-    "clock": {
-      "description": "Add a clock to the navigation bar",
-      "name": "Clock",
-      "menu": {
-        "format": {
-          "label": "Format",
-          "display-seconds": "Display Seconds",
-          "24-hour-format": "24-Hour Format"
-        }
-      }
-    },
-    "compact-sidebar": {
-      "description": "Always set the sidebar in compact mode",
-      "name": "Compact Sidebar"
     },
     "crossfade": {
       "description": "Crossfade between songs",
@@ -600,66 +522,6 @@
       },
       "name": "In-App Menu"
     },
-    "lumiastream": {
-      "description": "Adds Lumia Stream support",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Adds lyrics support for most songs",
-      "menu": {
-        "romanized-lyrics": "Romanized Lyrics"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "Fetched lyrics for Genius"
-      }
-    },
-    "music-together": {
-      "description": "Share a playlist with others. When the host plays a song, everyone else will hear the same song",
-      "dialog": {
-        "enter-host": "Enter Host ID"
-      },
-      "internal": {
-        "save": "Save",
-        "track-source": "Track Source",
-        "unknown-user": "Unknown User"
-      },
-      "menu": {
-        "click-to-copy-id": "Copy Host ID",
-        "close": "Close Music Together",
-        "connected-users": "Connected Users",
-        "disconnect": "Disconnect Music Together",
-        "empty-user": "No connected users",
-        "host": "Music Together Host",
-        "join": "Join Music Together",
-        "permission": {
-          "all": "Allow guests to control playlist and player",
-          "host-only": "Only the host can control playlist and player",
-          "playlist": "Allow guests to control playlist"
-        },
-        "set-permission": "Change Control Permission",
-        "status": {
-          "disconnected": "Disconnected",
-          "guest": "Connected as Guest",
-          "host": "Connected as Host"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Failed to add song",
-        "closed": "Music Together closed",
-        "disconnected": "Music Together disconnected",
-        "host-failed": "Failed to host Music Together",
-        "id-copied": "Host ID copied to clipboard",
-        "id-copy-failed": "Failed to copy Host ID to clipboard",
-        "join-failed": "Failed to join Music Together",
-        "joined": "Joined Music Together",
-        "permission-changed": "Music Together permission changed to \"{{permission}}\"",
-        "remove-song-failed": "Failed to remove song",
-        "user-connected": "{{name}} joined Music Together",
-        "user-disconnected": "{{name}} left Music Together"
-      }
-    },
     "navigation": {
       "description": "Next/Back navigation arrows directly integrated in the interface, like in your favorite browser",
       "name": "Navigation",
@@ -671,10 +533,6 @@
           "title": "Go to next page"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Remove Google login buttons and links from the interface",
-      "name": "No Google Login"
     },
     "notifications": {
       "description": "Display a notification when a song starts playing (interactive notifications are available on Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Current Quality: {{quality}}",
-            "message": "Choose Video Quality:",
-            "title": "Choose Video Quality"
-          }
-        }
-      },
-      "description": "Allows changing the video quality with a button on the video overlay",
-      "name": "Video Quality Changer",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Open player quality changer"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Add scrobbling support (etc. last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Skips disliked songs",
-      "name": "Skip Disliked Songs"
-    },
     "skip-silences": {
       "description": "Automatically skip silences sections in songs",
       "name": "Skip Silences"
@@ -835,93 +671,6 @@
       "description": "Automatically Skips non-music parts like intro/outro or parts of music videos where the song isn't playing",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "Provides synced lyrics to songs, using providers like LRClib.",
-      "errors": {
-        "fetch": "⚠️\tAn error occurred while fetching the lyrics.\n\tPlease try again later.",
-        "not-found": "⚠️ No lyrics found for this song."
-      },
-      "menu": {
-        "preferred-provider": {
-          "label": "Preferred Provider",
-          "tooltip": "Choose the default provider to use",
-          "none": {
-            "label": "None",
-            "tooltip": "No preferred provider"
-          }
-        },
-        "default-text-string": {
-          "label": "Default character between lyrics",
-          "tooltip": "Choose the default character to use for the gap between lyrics"
-        },
-        "line-effect": {
-          "label": "Line effect",
-          "submenu": {
-            "fancy": {
-              "label": "Fancy",
-              "tooltip": "Use large, app-like effects on the current line"
-            },
-            "focus": {
-              "label": "Focus",
-              "tooltip": "Make only the current line white"
-            },
-            "offset": {
-              "label": "Offset",
-              "tooltip": "Offset on the right the current line"
-            },
-            "scale": {
-              "label": "Scale",
-              "tooltip": "Scale the current line"
-            }
-          },
-          "tooltip": "Choose the effect to apply to the current line"
-        },
-        "precise-timing": {
-          "label": "Make the lyrics perfectly synced",
-          "tooltip": "Calculate to the milisecond the display of the next line (can have a small impact on performance)"
-        },
-        "romanization": {
-          "label": "Romanize lyrics",
-          "tooltip": "If the lyrics are in a different language, try to display a latin version."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Show lyrics even if inexact",
-          "tooltip": "If the song is not found, the plugin tries again with a different search query.\nThe result from the second attempt may not be exact."
-        },
-        "show-time-codes": {
-          "label": "Show time codes",
-          "tooltip": "Show the time codes next to the lyrics"
-        },
-        "convert-chinese-character": {
-          "label": "Convert Chinese character",
-          "submenu": {
-            "disabled": {
-              "label": "Disabled",
-              "tooltip": "Disable Chinese character conversion"
-            },
-            "simplified-to-traditional": {
-              "label": "Simplified to Traditional",
-              "tooltip": "Convert Simplified Chinese to Traditional Chinese"
-            },
-            "traditional-to-simplified": {
-              "label": "Traditional to Simplified",
-              "tooltip": "Convert Traditional Chinese to Simplified Chinese"
-            }
-          },
-          "tooltip": "Convert Chinese character to Traditional or Simplified"
-        }
-      },
-      "name": "Synced Lyrics",
-      "refetch-btn": {
-        "fetching": "Fetching...",
-        "normal": "Refetch lyrics"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - The lyrics may be out of sync due to a duration mismatch.",
-        "inexact": "⚠️ - The lyrics for this song may not be exact",
-        "instrumental": "⚠️ - This is an instrumental song"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Control playback from your Windows taskbar",
       "name": "Taskbar Media Control"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "Adds a TouchBar widget for macOS users",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Makes the app window transparent",
-      "name": "Transparent Player",
-      "menu": {
-        "opacity": {
-          "label": "Opacity",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Type",
-          "submenu": {
-            "acrylic": "Acrylic",
-            "content": "Content",
-            "fullscreen-ui": "Fullscreen UI",
-            "mica": "Mica",
-            "tabbed": "Tabbed",
-            "under-page": "Under Page",
-            "under-window": "Under Window",
-            "window": "Window",
-            "none": "None"
-          }
-        }
-      }
-    },
-    "tuna-obs": {
-      "description": "Integration with OBS's plugin Tuna",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Prevents the player from popping up when playing a song",
-      "name": "Unobtrusive Player"
-    },
-    "video-toggle": {
-      "description": "Adds a button to switch between Video/Song mode. can also optionally remove the whole video tab",
-      "menu": {
-        "align": {
-          "label": "Alignment",
-          "submenu": {
-            "left": "Left",
-            "middle": "Middle",
-            "right": "Right"
-          }
-        },
-        "force-hide": "Force remove video tab",
-        "mode": {
-          "label": "Mode",
-          "submenu": {
-            "custom": "Custom toggle",
-            "disabled": "Disabled",
-            "native": "Native toggle"
-          }
-        }
-      },
-      "name": "Video Toggle",
-      "templates": {
-        "button-song": "Song",
-        "button-video": "Video"
-      }
     },
     "visualizer": {
       "description": "Adds a visualizer to the player",

@@ -37,7 +37,7 @@ ytmusic-app-layout.pip ytmusic-player-bar ytmusic-menu-renderer {
   display: none !important;
 }
 
-/* disable the video-toggle button when in PiP mode */
+/* hide the video/song switch button while in PiP mode */
 ytmusic-app-layout.pip .video-switch-button {
   display: none !important;
 }

@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Ha egy hirdetés elindul, elnémítja a hangot, és a lejátszási sebességet 16x-ra állítja",
-      "name": "Hirdetésgyorsítás"
-    },
-    "album-actions": {
-      "description": "Hozzáadja a Tetszik, Nem tetszik és ezek visszavonására szolgáló gombokat, hogy ezeket az összes dalra alkalmazhasd egy lejátszási listán vagy albumban",
-      "name": "Album műveletek"
-    },
-    "album-color-theme": {
-      "description": "Dinamikus témát és vizuális effekteket alkalmaz az album színpalettája alapján",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Színkeverés mértéke",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Keresősáv színezésének engedélyezése"
-      },
-      "name": "Album színtéma"
-    },
     "ambient-mode": {
       "description": "Fényhatás effektust alkalmaz, amely a videóból származó lágy színeket vetíti a képernyő hátterére",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Ambient mód"
-    },
-    "amuse": {
-      "description": "Hozzáadja a {{applicationName}} támogatását az Amuse \"now playing\" widgethez a 6K Labs által",
-      "name": "Amuse",
-      "response": {
-        "query": "Az Amuse API szerver fut. Használja a GET /query kérést a dalinformációk lekéréséhez."
-      }
     },
     "api-server": {
       "description": "Hozzáad egy API szervert a lejátszó vezérléséhez",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Hang tömörítés alkalmazása (csökkenti a jel legzajosabb részeinek hangerősségét, és emeli a legcsendesebb részek hangerősségét)",
-      "name": "Hangtömörítő"
-    },
     "auth-proxy-adapter": {
       "description": "Hitelesítési proxy szolgáltatások használatának támogatása",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Proxy Port"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Átlátszóvá és elmosódottá teszi a navigációs sávot",
-      "name": "Navigációs sáv elmosása"
-    },
-    "bypass-age-restrictions": {
-      "description": "A Music Player korellenőrzését kihagyja, ezáltal nem kel meg erősíteni a zene meghallgatása elött. (Automatikusan megerősítve lesz.)",
-      "name": "Korellenőrzés kihagyása"
-    },
-    "captions-selector": {
-      "description": "Felirat választó a {{applicationName}} zenékhez",
-      "menu": {
-        "autoload": "Automatikusan kiválasztja az utoljára használt feliratot",
-        "disable-captions": "Alapértelmezetten nincsenek feliratok"
-      },
-      "name": "Feliratválasztó",
-      "prompt": {
-        "selector": {
-          "label": "Jelenlegi feliratnyelv: {{language}}",
-          "none": "Nincs",
-          "title": "Felirat nyelvének kiválasztása"
-        }
-      },
-      "templates": {
-        "title": "Feliratválasztó megnyitása"
-      },
-      "toast": {
-        "caption-changed": "Felirat {{language}} nyelvűre állítva",
-        "caption-disabled": "Feliratok kikapcsolva",
-        "no-captions": "Nincsenek elérhető feliratok ehhez a dalhoz"
-      }
-    },
-    "clock": {
-      "description": "Óra hozzáadása a navigációs sávhoz",
-      "menu": {
-        "format": {
-          "24-hour-format": "24 órás időformátum",
-          "display-seconds": "Másodpercek megjelenítése",
-          "label": "Formátum"
-        }
-      },
-      "name": "Óra"
-    },
-    "compact-sidebar": {
-      "description": "Mindig becsukva tartja a bal oldali savót, ahol a Kezdőlap. Felfedezés, Könyvtár és egyebek láthatók. (Amit bármikor ki lehet nyitni)",
-      "name": "Kompakt oldalsáv"
     },
     "crossfade": {
       "description": "Áttünést biztosít a dalok között, ami folytonossá teszi a zenehallgatást anélkül, hogy érezhető lenne a váltás",
@@ -600,66 +522,6 @@
       },
       "name": "Alkalmazáson belüli menü"
     },
-    "lumiastream": {
-      "description": "Lumia Stream támogatás hozzáadása",
-      "name": "Lumia Stream [Béta]"
-    },
-    "lyrics-genius": {
-      "description": "Dalszöveg támogatást ad a legtöbb dalhoz",
-      "menu": {
-        "romanized-lyrics": "Latin betűs dalszövegek"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "Dalszövegek lekérése a Genius-ról"
-      }
-    },
-    "music-together": {
-      "description": "Lehetővé teszi a lejátszási listák megosztását másokkal. Amikor a házigazda lejátszik egy dalt, mindenki más is ugyanazt a dalt fogja hallani",
-      "dialog": {
-        "enter-host": "Adja meg a házigazda azonosítóját"
-      },
-      "internal": {
-        "save": "Mentés",
-        "track-source": "Zeneszám forrása",
-        "unknown-user": "Ismeretlen felhasználó"
-      },
-      "menu": {
-        "click-to-copy-id": "Házigazda azonosítójának másolása",
-        "close": "Zene együtt bezárása",
-        "connected-users": "Csatlakozott felhasználók",
-        "disconnect": "Zene együtt kapcsolatának megszakítása",
-        "empty-user": "Nincs csatlakozva felhasználó",
-        "host": "Music Together Házigazda",
-        "join": "Csatlakozás a Zene együtt-höz",
-        "permission": {
-          "all": "Engedélyezi a vendégeknek a lejátszási lista és a lejátszó vezérlését",
-          "host-only": "Csak a házigazda tudja vezérelni a lejátszási listát és a lejátszót",
-          "playlist": "Engedélyezi a vendégeknek a lejátszási lista vezérlését"
-        },
-        "set-permission": "Vezérlési engedély módosítása",
-        "status": {
-          "disconnected": "Kapcsolat bontva",
-          "guest": "Csatlakozva vendégként",
-          "host": "Csatlakozva házigazdaként"
-        }
-      },
-      "name": "Zene együtt [Béta]",
-      "toast": {
-        "add-song-failed": "Sikertelen volt a dal hozzáadása",
-        "closed": "Zene együtt bezárva",
-        "disconnected": "Kapcsolat megszakadt a Music Together-el",
-        "host-failed": "Sikertelen volt a Zene együtt indítása",
-        "id-copied": "Házigazda azonosító a vágólapra másolva",
-        "id-copy-failed": "Nem sikerült a Házigazda azonosítóját a vágólapra másolni",
-        "join-failed": "Nem sikerült csatlakozni a Music Together-hez",
-        "joined": "Csatlakozott a Music Together-hez",
-        "permission-changed": "Music Together engedély megváltoztatva \"{{permission}}\" -re",
-        "remove-song-failed": "A dal eltávolítása sikertelen",
-        "user-connected": "{{name}} csatlakozott a Music Together-hez",
-        "user-disconnected": "{{name}} elhagyta a Music Together-t"
-      }
-    },
     "navigation": {
       "description": "Következő/Vissza navigációs nyilak közvetlenül az interfészbe integrálva, mint a kedvenc böngésződben",
       "name": "Navigáció",
@@ -671,10 +533,6 @@
           "title": "Következő oldal"
         }
       }
-    },
-    "no-google-login": {
-      "description": "A Bejelentkezés gomb eltávolítása az interfészről (Jobb fentről eltünik a bejelentkezés gomb.)",
-      "name": "Nincs Google bejelentkezés"
     },
     "notifications": {
       "description": "Értesítés megjelenítése, amikor egy dal elindul (interaktív értesítések elérhetők Windows-on)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Jelenlegi minőség: {{quality}}",
-            "message": "Válaszd ki a videó minőségét:",
-            "title": "Válaszd ki a videó minőségét"
-          }
-        }
-      },
-      "description": "Lehetővé teszi a videó minőségének megváltoztatását egy gombbal a videó fedvényen",
-      "name": "Videóminőség módosító",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Minőségbeállítások megnyitása"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Scrobbling támogatás hozzáadása (pl. last.fm, ListenBrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Kihagyja a nem kedvelt dalokat",
-      "name": "Nem kedvelt dal kihagyása"
-    },
     "skip-silences": {
       "description": "Automatikusan kihagyja a csendes részeket a dalokban",
       "name": "Csend kihagyása"
@@ -835,93 +671,6 @@
       "description": "Automatikusan kihagyja a nem zenés részeket, mint például az intro/outro vagy a zenei videók olyan részeit, ahol a zene nem szól",
       "name": "SzponzorBlokk"
     },
-    "synced-lyrics": {
-      "description": "Szinkronizált dalszövegeket biztosít dalokhoz, LRClib-hez hasonló szolgáltatókat használva.",
-      "errors": {
-        "fetch": "⚠️\tHiba történt a dalszöveg lekérése közben.\n\tKérjük, próbálja meg később újra.",
-        "not-found": "⚠️ - Ehhez a dalhoz nem található dalszöveg."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Kínai írásjelek átalakítása",
-          "submenu": {
-            "disabled": {
-              "label": "kikapcsolva",
-              "tooltip": "Kínai írásjelek átalakításának kikapcsolása"
-            },
-            "simplified-to-traditional": {
-              "label": "Egyszerűsített kínairól hagyományosra",
-              "tooltip": "Egyszerűsített kínai átalakítása hagyományos kínaira"
-            },
-            "traditional-to-simplified": {
-              "label": "Hagyományosról egyszerűsítettre",
-              "tooltip": "Hagyományos kínai írásjelek átalakítása egyszerűsített kínaira"
-            }
-          },
-          "tooltip": "Kínai írásjelek átalakítása hagyományosra vagy egyszerűsítettre"
-        },
-        "default-text-string": {
-          "label": "Alapértelmezett karakter a dalszövegek között",
-          "tooltip": "Válassza ki az alapértelmezett karaktert, amelyet a dalszövegek közötti szünethez használni szeretne"
-        },
-        "line-effect": {
-          "label": "Soreffekt",
-          "submenu": {
-            "fancy": {
-              "label": "Díszes",
-              "tooltip": "Használj nagy, alkalmazásszerű effektusokat az aktuális sorhoz"
-            },
-            "focus": {
-              "label": "Fókuszált",
-              "tooltip": "Az aktuális sor kijelőlése fehérrel"
-            },
-            "offset": {
-              "label": "Eltolás",
-              "tooltip": "Az aktuális sort jobbra tolja. (mintha tabulálnád)"
-            },
-            "scale": {
-              "label": "Méretezett",
-              "tooltip": "Az aktuális sort kissé nagyobbra méretezi, kiemelve azt a többi sor közül"
-            }
-          },
-          "tooltip": "Válassza ki az aktuális sorra alkalmazandó effektust"
-        },
-        "precise-timing": {
-          "label": "Dalszöveg tökéletes szinkronizálása",
-          "tooltip": "Számítsa ki az aktuális sor megjelenítésének idejét ezredmásodperc pontossággal (ez kis mértékben befolyásolhatja a teljesítményt)"
-        },
-        "preferred-provider": {
-          "label": "Előnyben részesített szolgáltató",
-          "none": {
-            "label": "Nincs",
-            "tooltip": "Nincs előnyben részesített szolgáltató"
-          },
-          "tooltip": "Alapértelmezett szolgáltató kiválasztása"
-        },
-        "romanization": {
-          "label": "Latin betűs szöveg",
-          "tooltip": "Idegennyelvű szöveg esetén próbálkozás a szöveglatin betűs megjelenítésével."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Pontatlan időzítésű dalszövegek megjelenítése",
-          "tooltip": "Ha a dalt nem találja, a bővítmény újra próbálkozik egy másik keresési lekérdezéssel.\nAz eredmény a második próbálkozás után nem biztos, hogy pontos lesz."
-        },
-        "show-time-codes": {
-          "label": "Időkódok megjelenítése",
-          "tooltip": "Az időkódok megjelenítése a dalszövegek mellett"
-        }
-      },
-      "name": "Szinkronizált dalszövegek",
-      "refetch-btn": {
-        "fetching": "Lekérés folyamatban...",
-        "normal": "Dalszöveg újra lekérése"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - A dalszövegek időzítése eltérhet a zene hossza miatt.",
-        "inexact": "⚠️ - Ennek a zenének a dalszövege pontatlan lehet",
-        "instrumental": "⚠️ - Ez egy hangszerekkel játszott zene"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Lejátszás vezérlése a Windows tálcáról",
       "name": "Médiavezérlés a tálcán"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "macOS felhasználók számára hozzáad egy widgetet a TouchBar-hoz",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Átlátszóvá teszi az alkalmazás ablakát",
-      "menu": {
-        "opacity": {
-          "label": "Átlátszóság",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Típus",
-          "submenu": {
-            "acrylic": "Akril",
-            "content": "Tartalom",
-            "fullscreen-ui": "Teljes képernyős felület",
-            "mica": "Mica",
-            "none": "Nincs",
-            "tabbed": "Tabbed",
-            "under-page": "Oldal alatt",
-            "under-window": "Ablak alatt",
-            "window": "Ablak"
-          }
-        }
-      },
-      "name": "Áttetsző lejátszó"
-    },
-    "tuna-obs": {
-      "description": "Integráció az OBS Tuna pluginjával",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Megakadályozza a lejátszó felugrását zenehallgatás közben",
-      "name": "Rejtett lejátszó"
-    },
-    "video-toggle": {
-      "description": "Hozzáad egy gombot a Videó/Dal mód közötti váltáshoz. Opcionálisan teljesen eltávolíthatja a videó fület is",
-      "menu": {
-        "align": {
-          "label": "Igazítás",
-          "submenu": {
-            "left": "Balra",
-            "middle": "Középre",
-            "right": "Jobbra"
-          }
-        },
-        "force-hide": "Videó fül kényszeritett eltávolítása",
-        "mode": {
-          "label": "Mód",
-          "submenu": {
-            "custom": "Egyedi kapcsoló",
-            "disabled": "Letiltva",
-            "native": "Natív kapcsoló"
-          }
-        }
-      },
-      "name": "Videó váltó",
-      "templates": {
-        "button-song": "Zeneszám",
-        "button-video": "Videó"
-      }
     },
     "visualizer": {
       "description": "Vizualizációt ad a lejátszóhoz",

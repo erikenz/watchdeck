@@ -192,10 +192,6 @@
     }
   },
   "plugins": {
-    "album-color-theme": {
-      "description": "Ifører dynamisk drakt og visuelle effekter basert på albumsfargepaletten",
-      "name": "Albumsfargedrakt"
-    },
     "ambient-mode": {
       "description": "Ifører lyseffekt ved å hente myke farger fra videoen inn i skjermens bakgrunn.",
       "menu": {
@@ -240,40 +236,6 @@
         }
       },
       "name": "Omgivelsesmodus"
-    },
-    "audio-compressor": {
-      "description": "Anvend kompresjon for lyd (senker lydstyrken for de kraftigste delene av signalet og øker nivået i de svakeste)",
-      "name": "Lydkompressor"
-    },
-    "blur-nav-bar": {
-      "description": "Gjør navigeringsbjelken gjennomsiktig og tilslørt",
-      "name": "Tilslør navigasjonsfelt"
-    },
-    "bypass-age-restrictions": {
-      "description": "Omgå Music Player sin aldersgrenser",
-      "name": "Omgå aldersgrense"
-    },
-    "captions-selector": {
-      "description": "Undertekstverktøy for lydspor i {{applicationName}}",
-      "menu": {
-        "autoload": "Auto-velg sist brukte undertekst",
-        "disable-captions": "Ingen undertekst som forvalg"
-      },
-      "name": "Undertekstvelger",
-      "prompt": {
-        "selector": {
-          "label": "Nåværende tekstingsspråk: {{language}}",
-          "none": "Ingen",
-          "title": "Velg tekstingsspråk"
-        }
-      },
-      "templates": {
-        "title": "Åpne undertekstvelger"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Alltid sett sidefeltet i kompakt modus",
-      "name": "Kompakt sidefelt"
     },
     "crossfade": {
       "description": "Overgang mellom spor",
@@ -399,27 +361,9 @@
       },
       "name": "Meny i programmet"
     },
-    "lumiastream": {
-      "description": "Legger til Lumia Stream-støtte",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Gir sangtekststøtte for de fleste spor",
-      "menu": {
-        "romanized-lyrics": "Romaniserte sangtekster"
-      },
-      "name": "Sangtekster fra Genius",
-      "renderer": {
-        "fetched-lyrics": "Henter sangtekster for Genius"
-      }
-    },
     "navigation": {
       "description": "Direkte integrering av neste/tilbake-navigasjonspilene i grensesnittet, som din favorittnettleser",
       "name": "Navigasjon"
-    },
-    "no-google-login": {
-      "description": "Fjern Google-innloggingsknapper og lenker fra grensesnittet",
-      "name": "Ingen Google-innlogging"
     },
     "notifications": {
       "description": "Vis en merknad når et spor starter avspilling (interaktive merknader er tilgjengelig på Windows)",
@@ -491,19 +435,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Nåværende kvalitet: {{quality}}",
-            "message": "Velg videokvalitet:",
-            "title": "Velg videokvalitet"
-          }
-        }
-      },
-      "description": "Tillat endring av videokvalitet med en knapp i videooverlaget",
-      "name": "Vindukvalitetsvelger"
-    },
     "shortcuts": {
       "description": "Tillater bruk av hurtigtaster for hele programmet til avspilling (spill/pause/neste/forrige) + skru av media-videooverlag ved å overstyre mediataster + skru på Ctrl+CMD+F for å søke, pluss å egge til MPRIS støtte på linux for mediataster pluss egendefinerte hurtigtaster for avanserte brukere",
       "menu": {
@@ -523,10 +454,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Hopper over mislikte spor",
-      "name": "Hopp over mislikte spor"
-    },
     "skip-silences": {
       "description": "Hopp over stille deler av spor",
       "name": "Hopp over pauser"
@@ -542,36 +469,6 @@
     "touchbar": {
       "description": "Legger til et pekefelt-miniprogram for macOS-brukere",
       "name": "Pekefelt"
-    },
-    "tuna-obs": {
-      "description": "Integrasjon med Tuna-programtillegget i OBS",
-      "name": "OBS Tuna"
-    },
-    "video-toggle": {
-      "description": "Leger til en knapp for å bytte mellom video/spormodus. Kan også alternativt fjerne hele videofanen.",
-      "menu": {
-        "align": {
-          "label": "Justering",
-          "submenu": {
-            "left": "Venstre",
-            "middle": "Midten",
-            "right": "Høyre"
-          }
-        },
-        "force-hide": "Påtving fjerning av videofane",
-        "mode": {
-          "label": "Modus",
-          "submenu": {
-            "custom": "Egendefinert veksling",
-            "disabled": "Avskrudd",
-            "native": "Innebygd veksling"
-          }
-        }
-      },
-      "name": "Videoveksling",
-      "templates": {
-        "button-song": "Spor"
-      }
     },
     "visualizer": {
       "description": "Legger til en visualisator i avspilleren",

@@ -207,26 +207,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Ef auglýsing spilar slökknar hún á hljóðinu og stillir spilunarhraðann á 16x",
-      "name": "Auglýsingahraða"
-    },
-    "album-actions": {
-      "description": "Bætir Ódíslika, Mislíkt, Líkt, og Ólíkt til að nota þetta á öll lög á spilunarlista eða albúm",
-      "name": "Albúmsaðgerðir"
-    },
-    "album-color-theme": {
-      "description": "Beitir kraftmikið þema og sjónrænum áhrifum sem byggjast á litavali albúmsins",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Litablöndunarhlutfall",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Albúmlitaþema"
-    },
     "ambient-mode": {
       "description": "Beitir lýsingaráhrifum með því að varpa mildum litum úr myndbandinu í bakgrunn skjásins",
       "menu": {
@@ -314,40 +294,6 @@
           "title": "Tengi"
         }
       }
-    },
-    "audio-compressor": {
-      "description": "Notaðu þjöppun á hljóð (lækkar hljóðstyrk háværustu hluta merkis og hækkar hljóðstyrk í mýkstu hlutunum)",
-      "name": "Hljóðþjöppu"
-    },
-    "blur-nav-bar": {
-      "description": "Gerir leiðsögustikuna gagnsæja og óskýrt",
-      "name": "Þoka Leiðsagnarstika"
-    },
-    "bypass-age-restrictions": {
-      "description": "Framhjá aldursstaðfestingu Music Player",
-      "name": "Farið Framhjá Aldurstakmörkunum"
-    },
-    "captions-selector": {
-      "description": "Skjátextavali fyrir {{applicationName}} hljóðrásir",
-      "menu": {
-        "autoload": "Veldu sjálfkrafa síðast notaða myndatexta",
-        "disable-captions": "Engir skjátextar sjálfgefið"
-      },
-      "name": "Yfirskriftarval",
-      "prompt": {
-        "selector": {
-          "label": "Núverandi tungumál skjátexta: {{language}}",
-          "none": "Enginn",
-          "title": "Veldu tungumál fyrir skjátexta"
-        }
-      },
-      "templates": {
-        "title": "Opnaðu skjátextavali"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Stilltu hliðarstikuna alltaf í þétta stillingu",
-      "name": "Fyrirferðarlítillhliðarstika"
     },
     "crossfade": {
       "description": "Krossfæra á milli lög",
@@ -488,73 +434,9 @@
       },
       "name": "Valmynd í forriti"
     },
-    "lumiastream": {
-      "description": "Bætir við Lumia Stream stuðningi",
-      "name": "Lumia Stream [Prófunarútgáfa]"
-    },
-    "lyrics-genius": {
-      "description": "Bætir stuðningi við texta fyrir flest lög",
-      "menu": {
-        "romanized-lyrics": "Rómaníseraðir Söngtexti"
-      },
-      "name": "Söngtexti Snilld",
-      "renderer": {
-        "fetched-lyrics": "Sótt söngtexti fyrir Snilld"
-      }
-    },
-    "music-together": {
-      "description": "Deila spilunarlista með öðrum. Þegar gestgjafinn spilar lag munu allir aðrir heyra sama lagið",
-      "dialog": {
-        "enter-host": "Sláðu inn auðkenni gestgjafa"
-      },
-      "internal": {
-        "save": "Vista",
-        "track-source": "Lagsuppspretta",
-        "unknown-user": "Óþekktur notandi"
-      },
-      "menu": {
-        "click-to-copy-id": "Afritaðu hýsingarauðkenni",
-        "close": "Lokaðu Tónlist Saman",
-        "connected-users": "Tengdir Notendur",
-        "disconnect": "Aftengdu Tónlist Saman",
-        "empty-user": "Engir tengdir notendur",
-        "host": "Tónlist Saman Gestgjafi",
-        "join": "Vertu með Tónlist Saman",
-        "permission": {
-          "all": "Leyfðu gestum að stjórna spilunarlista og spilara",
-          "host-only": "Aðeins gestgjafi getur stjórnað spilunarlista og spilara",
-          "playlist": "Leyfðu gestum að stjórna spilunarlista"
-        },
-        "set-permission": "Breyta Stjórnunarheimild",
-        "status": {
-          "disconnected": "Aftengt",
-          "guest": "Tengdur sem Gestur",
-          "host": "Tengdur sem Gestgjafi"
-        }
-      },
-      "name": "Tónlist Saman [Prófunarútgáfa]",
-      "toast": {
-        "add-song-failed": "Mistókst að bæta við lagi",
-        "closed": "Tónlist Saman lokað",
-        "disconnected": "Tónlist Saman aftengt",
-        "host-failed": "Mistókst að hýsa Tónlist Saman",
-        "id-copied": "Gestgjafaauðkenni afritað á klippiborð",
-        "id-copy-failed": "Mistókst að afrita Hýsingarauðkenni á klippiborð",
-        "join-failed": "Ekki tókst að taka þátt í Tónlist Saman",
-        "joined": "Tengd Tónlist Saman",
-        "permission-changed": "Tónlist Saman leyfi breytt í \"{{permission}}\"",
-        "remove-song-failed": "Tókst ekki að fjarlægja lag",
-        "user-connected": "{{name}} tengd Tónlist Saman",
-        "user-disconnected": "{{name}} fór frá Tónlist Saman"
-      }
-    },
     "navigation": {
       "description": "Næsta/Til baka leiðsagnarörvar beint samþættar í viðmótinu, eins og í uppáhalds vafranum þínum",
       "name": "Leiðsögn"
-    },
-    "no-google-login": {
-      "description": "Fjarlægðu Google innskráningarhnappa og tengla úr viðmótinu",
-      "name": "Engin Google innskráning"
     },
     "notifications": {
       "description": "Birta tilkynningu þegar lag byrjar að spila (gagnvirkartilkynningar eru fáanlegar á Windows)",
@@ -627,19 +509,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Núverandi Gæði: {{quality}}",
-            "message": "Veldu Myndbandsgæði:",
-            "title": "Veldu Myndbandsgæði"
-          }
-        }
-      },
-      "description": "Leyfir að breyta myndbandgæðum með hnappi á myndbandsyfirlaginu",
-      "name": "Myndbandgæðisbreyting"
-    },
     "scrobbler": {
       "description": "Bæta við scrobbling stuðningi (osv. last.fm, Listenbrainz)",
       "dialog": {
@@ -692,10 +561,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Sleppir mislíkaði lög",
-      "name": "Slepptu Mislíkaði Lög"
-    },
     "skip-silences": {
       "description": "Slepptu sjálfkrafa þagnarköflum í lögum",
       "name": "Slepptu Þögnum"
@@ -704,59 +569,6 @@
       "description": "Sleppur sjálfkrafa hlutum sem ekki eru tónlist, eins og inngangur/lok eða hlutar af tónlistarmyndböndum þar sem lag er ekki að spila",
       "name": "Styrktarblokk"
     },
-    "synced-lyrics": {
-      "description": "Veitir samstillta texta við lög, með því að nota veitur eins og LRClib.",
-      "errors": {
-        "fetch": "⚠️ - Villa kom upp við að sækja textann. Vinsamlegast reyndu aftur síðar.",
-        "not-found": "⚠️ - Enginn texti fannst við þetta lag."
-      },
-      "menu": {
-        "default-text-string": {
-          "label": "Sjálfgefið tákn á milli texta",
-          "tooltip": "Veldu sjálfgefna tákn til að nota fyrir bilið á milli texta"
-        },
-        "line-effect": {
-          "label": "Línuafleiðing",
-          "submenu": {
-            "focus": {
-              "label": "Brennidepill",
-              "tooltip": "Gerðu aðeins núverandi línu hvíta"
-            },
-            "offset": {
-              "label": "Fararbyrjun",
-              "tooltip": "Fararbyrjun á hægri af núverandi línan"
-            },
-            "scale": {
-              "label": "Skali",
-              "tooltip": "Skala núverandi línu"
-            }
-          },
-          "tooltip": "Veldu áhrif til að nota á núverandi línu"
-        },
-        "precise-timing": {
-          "label": "Gera textana fullkomlega samstillta",
-          "tooltip": "Reikna upp á millisekúndu birtingu næstu línu (getur haft lítil áhrif á frammistöðu)"
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Sýna texta, jafnvel þótt hann sé ónákvæmur",
-          "tooltip": "Ef lagið finnst ekki reynir tengiforritið aftur með annarri leitarfyrirspurn.\nNiðurstaðan úr annarri tilraun er kannski ekki nákvæm."
-        },
-        "show-time-codes": {
-          "label": "Sýna tímikóðar",
-          "tooltip": "Sýna tímakóðana við hliðina á textanum"
-        }
-      },
-      "name": "Samstilltur texti",
-      "refetch-btn": {
-        "fetching": "Er að sækja",
-        "normal": "Endursækja texta"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Textarnir gætu verið ekki samstilltir vegna tímalengdar.",
-        "inexact": "⚠️ - Textinn við þetta lag er kannski ekki nákvæmur",
-        "instrumental": "⚠️ - Þetta er hljóðfærilegt lag"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Stjórnaðu spilun frá Windows verkefnastikunni þinni",
       "name": "Miðlunarstýringarverkefnastikunnar"
@@ -764,36 +576,6 @@
     "touchbar": {
       "description": "Bætir við Snertistiku græju fyrir macOS notendur",
       "name": "Snertistiku"
-    },
-    "tuna-obs": {
-      "description": "Samþætting við OBS viðbót Tuna",
-      "name": "Tuna OBS"
-    },
-    "video-toggle": {
-      "description": "Bætir við hnappi til að skipta á milli myndbands/lagshams. Getur einnig valfrjálst fjarlægt allan myndbandsflipann",
-      "menu": {
-        "align": {
-          "label": "Jöfnun",
-          "submenu": {
-            "left": "Vinstri",
-            "middle": "Miðja",
-            "right": "Rétt"
-          }
-        },
-        "force-hide": "Þvingaðu fjarlægja myndbandsflipann",
-        "mode": {
-          "label": "Hamur",
-          "submenu": {
-            "custom": "Sérsniðinn rofi",
-            "disabled": "Fötluð",
-            "native": "Innfæddsrofi"
-          }
-        }
-      },
-      "name": "Myndbandsrofi",
-      "templates": {
-        "button-song": "Lag"
-      }
     },
     "visualizer": {
       "description": "Bætir sýndarstýringar við spilarann",

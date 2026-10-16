@@ -77,7 +77,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     ipcRenderer.sendToHost(channel, ...args),
 });
 contextBridge.exposeInMainWorld('reload', () =>
-  ipcRenderer.send('peard:reload'),
+  ipcRenderer.send('watchdeck:reload'),
 );
 contextBridge.exposeInMainWorld(
   'ELECTRON_RENDERER_URL',

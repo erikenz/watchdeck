@@ -650,7 +650,7 @@ export const register = (
   app.openapi(routes.getShuffleState, async (ctx) => {
     const stateResponsePromise = new Promise<boolean>((resolve) => {
       ipcMain.once(
-        'peard:get-shuffle-response',
+        'watchdeck:get-shuffle-response',
         (_, isShuffled: boolean | undefined) => {
           return resolve(!!isShuffled);
         },
@@ -713,7 +713,7 @@ export const register = (
   app.openapi(routes.getFullscreenState, async (ctx) => {
     const stateResponsePromise = new Promise<boolean>((resolve) => {
       ipcMain.once(
-        'peard:set-fullscreen',
+        'watchdeck:set-fullscreen',
         (_, isFullscreen: boolean | undefined) => {
           return resolve(!!isFullscreen);
         },
@@ -748,7 +748,7 @@ export const register = (
   // Queue
   const queueInfo = async (ctx: Context) => {
     const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
-      ipcMain.once('peard:get-queue-response', (_, queue: QueueResponse) => {
+      ipcMain.once('watchdeck:get-queue-response', (_, queue: QueueResponse) => {
         return resolve(queue);
       });
 
@@ -770,7 +770,7 @@ export const register = (
 
   app.openapi(routes.nextSongInfo, async (ctx) => {
     const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
-      ipcMain.once('peard:get-queue-response', (_, queue: QueueResponse) => {
+      ipcMain.once('watchdeck:get-queue-response', (_, queue: QueueResponse) => {
         return resolve(queue);
       });
 

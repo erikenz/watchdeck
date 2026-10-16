@@ -154,7 +154,7 @@
                 "label": "Pielāgots loga nosaukums",
                 "prompt": {
                   "label": "Ievadiet pielāgotu loga nosaukumu: (atstājiet tukšu, lai atspējotu)",
-                  "placeholder": "Piemērs: Pear mūzika"
+                  "placeholder": "Piemērs: Watchdeck"
                 }
               },
               "like-buttons": {
@@ -214,26 +214,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Ja reklāma atskaņojas, tad skaņa izlēdzas, un ātrums pārslēdzas uz 16x",
-      "name": "Reklāmu paātrinājums"
-    },
-    "album-actions": {
-      "description": "Pievieno Undislike, Dislike, Like, un Unlike pogas lai izdarītu to visām dziesmām Mūzikas sarakstā vai albumā",
-      "name": "Darbības ar Albumu"
-    },
-    "album-color-theme": {
-      "description": "Iestata dinamisku motīvu un efektus, pamatojoties uz albuma krāsu paleti",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Krāsu attiecība",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Albuma krāsu tēma"
-    },
     "ambient-mode": {
       "description": "Pielieto apgaismojuma efektu, kas maigā krāsā atstaro video attēlu uz ekrāna fona",
       "menu": {
@@ -279,13 +259,6 @@
       },
       "name": "Ambientais Režīms"
     },
-    "amuse": {
-      "description": "Pievieno {{applicationName}} atblastu priekš Amuse \"tagad spēlē\" no 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API serveris ir palaists. GET /query lai dabūtu dziesmas info."
-      }
-    },
     "api-server": {
       "description": "Pievieno API serveri lai kontrolētu atskaņotāju",
       "dialog": {
@@ -329,10 +302,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Pievieno saspiešanu pie audio (samazina skaļāko audio daļu skaļumu un palielina mīkstāko daļu skaļumu)",
-      "name": "Audio saspiedējs"
-    },
     "auth-proxy-adapter": {
       "description": "Atbalsts priekš proxy servisu autentifikācijas",
       "menu": {
@@ -356,41 +325,6 @@
           "title": "Proxy Ports"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Taisa navigāzijas joslu caurspīdīgu un izplūdušu",
-      "name": "Izplūdusi Navigācijas Josla"
-    },
-    "bypass-age-restrictions": {
-      "description": "Apiet Music Player vecuma pārbaudi",
-      "name": "Apiet Vecuma Ierobežojumus"
-    },
-    "captions-selector": {
-      "description": "Subtitru izvēlne priekš {{applicationName}} audio ceļiem",
-      "menu": {
-        "autoload": "Automātiski izvēlēties pēdējo izmantotos subtitrus",
-        "disable-captions": "Bez subtitriem pēc noklusējuma"
-      },
-      "name": "Subtitru Izvēlne",
-      "prompt": {
-        "selector": {
-          "label": "Tekošā subtitru valoda: {{language}}",
-          "none": "Neviens",
-          "title": "Izvēlieties subtitru valodu"
-        }
-      },
-      "templates": {
-        "title": "Atvērt subtitru izvēlni"
-      },
-      "toast": {
-        "caption-changed": "Subtitri pamainīti uz {{language}}",
-        "caption-disabled": "Subtitri izslēgti",
-        "no-captions": "Subtitri nav pieejami priekš šīs dziesmas"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Vienmēr iestatīt malējo paneli kompaktajā režīmā",
-      "name": "Kompakts malējais panelis"
     },
     "crossfade": {
       "description": "Maiga pāreja starp dziesmām",
@@ -562,58 +496,6 @@
         "hide-dom-window-controls": "Slēpt DOM loga vadīklas"
       },
       "name": "Lietotnes izvēlne"
-    },
-    "lumiastream": {
-      "description": "Pievieno Lumia Stream atbalstu",
-      "name": "Lumia Stream [Beta versija]"
-    },
-    "lyrics-genius": {
-      "description": "Pievieno dziesmu tekstu atbalstu lielākajai daļai dziesmu",
-      "menu": {
-        "romanized-lyrics": "Romanizēti dziesmu teksti"
-      },
-      "name": "Dziesmu vārdu ģēnijs",
-      "renderer": {
-        "fetched-lyrics": "Iegūti dziesmu vārdi priekš oriģināla"
-      }
-    },
-    "music-together": {
-      "description": "Kopīgojiet atskaņošanas sarakstu ar citiem. Kad vadītājs atskaņo dziesmu, visi pārējie dzirdēs to pašu dziesmu.",
-      "dialog": {
-        "enter-host": "Ievadiet resursdatora ID"
-      },
-      "internal": {
-        "save": "Saglabāt",
-        "track-source": "Dziesmas avots",
-        "unknown-user": "Nezināms lietotājs"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopēt resursdatora ID",
-        "close": "Aizvērt mūziku kopā",
-        "connected-users": "Savienotie lietotāji",
-        "disconnect": "Atvienojiet mūziku kopā",
-        "empty-user": "Nav pievienotu lietotāju",
-        "host": "Kopklausīšanās vadītājs",
-        "join": "Pievienojieties mūzikai kopā",
-        "permission": {
-          "all": "Atļaut viesiem kontrolēt atskaņošanas sarakstu un atskaņotāju",
-          "host-only": "Tikai resursdators var kontrolēt atskaņošanas sarakstu un atskaņotāju",
-          "playlist": "Atļaut viesiem kontrolēt atskaņošanas sarakstu"
-        },
-        "set-permission": "Izmainīt kontroles piekļuvi",
-        "status": {
-          "disconnected": "Atvienots",
-          "guest": "Pieslēdzies kā viesis",
-          "host": "Pieslēdzies kā vadītājs"
-        }
-      },
-      "name": "Mūzika Kopā [Beta]",
-      "toast": {
-        "add-song-failed": "Neizdevās pievienot dziesmu",
-        "closed": "Mūzika Kopā slēgta",
-        "disconnected": "Mūzika Kopā atvienota",
-        "host-failed": "Neizdevās uzsākt Mūziku Kopā"
-      }
     }
   }
 }

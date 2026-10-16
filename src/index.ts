@@ -23,7 +23,6 @@ import {
 import electronDebug from 'electron-debug';
 import is from 'electron-is';
 import unhandled from 'electron-unhandled';
-import electronUpdater from 'electron-updater';
 import { deepEqual } from 'fast-equals';
 import { parse } from 'node-html-parser';
 import { languageResources } from 'virtual:i18n';
@@ -62,7 +61,6 @@ unhandled({
 
 // Prevent window being garbage collected
 let mainWindow: Electron.BrowserWindow | null;
-electronUpdater.autoUpdater.autoDownload = false;
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -122,21 +120,14 @@ if (is.linux()) {
     disabledFeatures.push('MediaSessionService');
   }
 
-  // https://github.com/electron/electron/issues/15947
-  if (await config.plugins.isEnabled('transparent-player')) {
-    disableHardwareAcceleration = true;
-    app.commandLine.appendSwitch('enable-transparent-visuals');
-    app.commandLine.appendSwitch('enable-unsafe-swiftshader');
-  }
-
   // Overrides WM_CLASS for X11 to correspond to icon filename
   app.setName(
-    'com.github.th-ch.\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063',
+    'com.github.erikenz.watchdeck',
   );
   // for wayland
   app.commandLine.appendSwitch(
     'class',
-    'com.github.th-ch.\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063',
+    'com.github.erikenz.watchdeck',
   );
 }
 
@@ -187,7 +178,7 @@ function onClosed() {
   mainWindow = null;
 }
 
-ipcMain.handle('peard:get-main-plugin-names', async () =>
+ipcMain.handle('watchdeck:get-main-plugin-names', async () =>
   Object.keys(await mainPlugins()),
 );
 
@@ -195,14 +186,14 @@ const initHook = async (win: BrowserWindow) => {
   const allPluginStubs = await allPlugins();
 
   ipcMain.handle(
-    'peard:get-config',
+    'watchdeck:get-config',
     (_, id: string) =>
       deepmerge(
         allPluginStubs[id].config ?? { enabled: false },
         config.get(`plugins.${id}`) ?? {},
       ) as PluginConfig,
   );
-  ipcMain.handle('peard:set-config', (_, name: string, obj: object) =>
+  ipcMain.handle('watchdeck:set-config', (_, name: string, obj: object) =>
     config.setPartial(`plugins.${name}`, obj, allPluginStubs[name].config),
   );
 
@@ -511,16 +502,17 @@ async function createMainWindow() {
   win.webContents.on('will-redirect', (event) => {
     const url = URL.parse(event.url);
 
-    // Workarounds for regions where YTM is restricted
+    // Workaround for the regional "/premium" redirect: send the user to the
+    // Google sign-in page instead of the paywall. Inherited; revisit in P1.
     if (
       url &&
-      url.hostname.endsWith('\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com') &&
+      url.hostname.endsWith('youtube.com') &&
       url.pathname === '/premium'
     ) {
       event.preventDefault();
 
       win.webContents.loadURL(
-        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006f\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fmusic.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%252F',
+        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.youtube.com%252F',
       );
     }
   });
@@ -674,7 +666,7 @@ app.whenReady().then(async () => {
   // Register appID on windows
   if (is.windows()) {
     const appID =
-      'com.github.th-ch.\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063';
+      'com.github.erikenz.watchdeck';
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
     const appData = app.getPath('appData');
@@ -811,57 +803,10 @@ app.whenReady().then(async () => {
     openAtLogin: config.get('options.startAtLogin'),
   });
 
-  if (!is.dev() && config.get('options.autoUpdates')) {
-    const updateTimeout = setTimeout(() => {
-      electronUpdater.autoUpdater.checkForUpdatesAndNotify();
-      clearTimeout(updateTimeout);
-    }, 2000);
-    electronUpdater.autoUpdater.on('update-available', () => {
-      const downloadLink =
-        'https://github.com/pear-devs/pear-desktop/releases/latest';
-      const dialogOptions: Electron.MessageBoxOptions = {
-        type: 'info',
-        buttons: [
-          t('main.dialog.update-available.buttons.ok'),
-          t('main.dialog.update-available.buttons.download'),
-          t('main.dialog.update-available.buttons.disable'),
-        ],
-        title: t('main.dialog.update-available.title'),
-        message: t('main.dialog.update-available.message'),
-        detail: t('main.dialog.update-available.detail', { downloadLink }),
-        defaultId: 1,
-        cancelId: 0,
-      };
-
-      let dialogPromise: Promise<Electron.MessageBoxReturnValue>;
-      if (mainWindow) {
-        dialogPromise = dialog.showMessageBox(mainWindow, dialogOptions);
-      } else {
-        dialogPromise = dialog.showMessageBox(dialogOptions);
-      }
-
-      dialogPromise.then((dialogOutput) => {
-        switch (dialogOutput.response) {
-          // Download
-          case 1: {
-            shell.openExternal(downloadLink);
-            break;
-          }
-
-          // Disable updates
-          case 2: {
-            config.set('options.autoUpdates', false);
-            break;
-          }
-
-          case 0: {
-            break;
-          }
-        }
-      });
-    });
-  }
-
+  // No update feed: the inherited auto-updater pointed at the upstream project's
+  // GitHub releases and was removed in the P0 reset (docs/PRD.md §R8). Updates come
+  // back once Watchdeck owns a signed feed — `options.autoUpdates` stays in the
+  // config for that day.
   if (config.get('options.hideMenu') && !config.get('options.hideMenuWarned')) {
     dialog.showMessageBox(mainWindow, {
       type: 'info',
@@ -957,7 +902,7 @@ function removeContentSecurityPolicy(
         !details.responseHeaders['access-control-allow-origin'] &&
         !details.responseHeaders['Access-Control-Allow-Origin']
       ) {
-        details.responseHeaders['access-control-allow-origin'] = ['https://music.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com'];
+        details.responseHeaders['access-control-allow-origin'] = ['https://www.youtube.com'];
       }
     }
 

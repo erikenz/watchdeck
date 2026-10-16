@@ -262,8 +262,8 @@ export default (
   songControls = getSongControls(win);
 
   let currentSeconds = 0;
-  on('peard:player-api-loaded', () =>
-    send('peard:setup-time-changed-listener'),
+  on('watchdeck:player-api-loaded', () =>
+    send('watchdeck:setup-time-changed-listener'),
   );
 
   let savedSongInfo: SongInfo;

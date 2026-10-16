@@ -79,7 +79,7 @@ export const onPlayerApiReady = async (
   const mouseLeaveEventListener = () => middleControls?.click();
 
   const titleBar = document.querySelector<HTMLElement>(
-    'nav[data-ytmd-main-panel]',
+    'nav[data-wd-main-panel]',
   );
 
   const pipClickEventListener = async (e: Event) => {
@@ -88,7 +88,7 @@ export const onPlayerApiReady = async (
     await togglePictureInPicture();
   };
 
-  ipc.on('peard:pip-toggle', (isPip: boolean) => {
+  ipc.on('watchdeck:pip-toggle', (isPip: boolean) => {
     if (exitFullScreenButton && player) {
       if (isPip) {
         exitFullScreenButton?.addEventListener('click', pipClickEventListener);

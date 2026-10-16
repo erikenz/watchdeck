@@ -39,46 +39,46 @@ const parseStringFromArgsType = (args: ArgsType<string>) => {
 export const getSongControls = (win: BrowserWindow) => {
   return {
     // Playback
-    previous: () => win.webContents.send('peard:previous-video'),
-    next: () => win.webContents.send('peard:next-video'),
-    play: () => win.webContents.send('peard:play'),
-    pause: () => win.webContents.send('peard:pause'),
-    playPause: () => win.webContents.send('peard:toggle-play'),
-    like: () => win.webContents.send('peard:update-like', LikeType.Like),
-    dislike: () => win.webContents.send('peard:update-like', LikeType.Dislike),
+    previous: () => win.webContents.send('watchdeck:previous-video'),
+    next: () => win.webContents.send('watchdeck:next-video'),
+    play: () => win.webContents.send('watchdeck:play'),
+    pause: () => win.webContents.send('watchdeck:pause'),
+    playPause: () => win.webContents.send('watchdeck:toggle-play'),
+    like: () => win.webContents.send('watchdeck:update-like', LikeType.Like),
+    dislike: () => win.webContents.send('watchdeck:update-like', LikeType.Dislike),
     seekTo: (seconds: ArgsType<number>) => {
       const secondsNumber = parseNumberFromArgsType(seconds);
       if (secondsNumber !== null) {
-        win.webContents.send('peard:seek-to', seconds);
+        win.webContents.send('watchdeck:seek-to', seconds);
       }
     },
     goBack: (seconds: ArgsType<number>) => {
       const secondsNumber = parseNumberFromArgsType(seconds);
       if (secondsNumber !== null) {
-        win.webContents.send('peard:seek-by', -secondsNumber);
+        win.webContents.send('watchdeck:seek-by', -secondsNumber);
       }
     },
     goForward: (seconds: ArgsType<number>) => {
       const secondsNumber = parseNumberFromArgsType(seconds);
       if (secondsNumber !== null) {
-        win.webContents.send('peard:seek-by', seconds);
+        win.webContents.send('watchdeck:seek-by', seconds);
       }
     },
     requestShuffleInformation: () => {
-      win.webContents.send('peard:get-shuffle');
+      win.webContents.send('watchdeck:get-shuffle');
     },
-    shuffle: () => win.webContents.send('peard:shuffle'),
+    shuffle: () => win.webContents.send('watchdeck:shuffle'),
     switchRepeat: (n: ArgsType<number> = 1) => {
       const repeat = parseNumberFromArgsType(n);
       if (repeat !== null) {
-        win.webContents.send('peard:switch-repeat', n);
+        win.webContents.send('watchdeck:switch-repeat', n);
       }
     },
     // General
     setVolume: (volume: ArgsType<number>) => {
       const volumeNumber = parseNumberFromArgsType(volume);
       if (volumeNumber !== null) {
-        win.webContents.send('peard:update-volume', volume);
+        win.webContents.send('watchdeck:update-volume', volume);
       }
     },
     setFullscreen: (isFullscreen: ArgsType<boolean>) => {
@@ -86,18 +86,18 @@ export const getSongControls = (win: BrowserWindow) => {
       if (isFullscreenValue !== null) {
         win.setFullScreen(isFullscreenValue);
         win.webContents.send(
-          'peard:click-fullscreen-button',
+          'watchdeck:click-fullscreen-button',
           isFullscreenValue,
         );
       }
     },
     requestFullscreenInformation: () => {
-      win.webContents.send('peard:get-fullscreen');
+      win.webContents.send('watchdeck:get-fullscreen');
     },
     requestQueueInformation: () => {
-      win.webContents.send('peard:get-queue');
+      win.webContents.send('watchdeck:get-queue');
     },
-    muteUnmute: () => win.webContents.send('peard:toggle-mute'),
+    muteUnmute: () => win.webContents.send('watchdeck:toggle-mute'),
     openSearchBox: () => {
       win.webContents.sendInputEvent({
         type: 'keyDown',
@@ -110,7 +110,7 @@ export const getSongControls = (win: BrowserWindow) => {
       if (videoIdValue === null) return;
 
       win.webContents.send(
-        'peard:add-to-queue',
+        'watchdeck:add-to-queue',
         videoIdValue,
         queueInsertPosition,
       );
@@ -123,28 +123,28 @@ export const getSongControls = (win: BrowserWindow) => {
       const toIndexValue = parseNumberFromArgsType(toIndex);
       if (fromIndexValue === null || toIndexValue === null) return;
 
-      win.webContents.send('peard:move-in-queue', fromIndexValue, toIndexValue);
+      win.webContents.send('watchdeck:move-in-queue', fromIndexValue, toIndexValue);
     },
     removeSongFromQueue: (index: ArgsType<number>) => {
       const indexValue = parseNumberFromArgsType(index);
       if (indexValue === null) return;
 
-      win.webContents.send('peard:remove-from-queue', indexValue);
+      win.webContents.send('watchdeck:remove-from-queue', indexValue);
     },
     setQueueIndex: (index: ArgsType<number>) => {
       const indexValue = parseNumberFromArgsType(index);
       if (indexValue === null) return;
 
-      win.webContents.send('peard:set-queue-index', indexValue);
+      win.webContents.send('watchdeck:set-queue-index', indexValue);
     },
-    clearQueue: () => win.webContents.send('peard:clear-queue'),
+    clearQueue: () => win.webContents.send('watchdeck:clear-queue'),
 
     search: (query: string, params?: string, continuation?: string) =>
       new Promise((resolve) => {
-        ipcMain.once('peard:search-results', (_, result) => {
+        ipcMain.once('watchdeck:search-results', (_, result) => {
           resolve(result as string);
         });
-        win.webContents.send('peard:search', query, params, continuation);
+        win.webContents.send('watchdeck:search', query, params, continuation);
       }),
   };
 };

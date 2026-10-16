@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Si es reprodueix un anunci, silencia l'àudio i el reprodueix a la velocitat 16x",
-      "name": "Accelera els anuncis"
-    },
-    "album-actions": {
-      "description": "Afegeix botons de «no m'agrada / retirar el no m'agrada» i «m'agrada / retirar el m'agrada» per aplicar-ho a totes les cançons en una llista de reproducció o àlbum",
-      "name": "Accions a l'àlbum"
-    },
-    "album-color-theme": {
-      "description": "Aplica un tema dinàmic i efectes visuals basats en la paleta de colors de l'àlbum",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Proporció de la barreja de colors",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Activar el tema en la barra de progrés"
-      },
-      "name": "Tema de color de l'àlbum"
-    },
     "ambient-mode": {
       "description": "Aplica un efecte d'il·luminació que projecta colors difusos del vídeo al fons de la pantalla",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Mode ambient"
-    },
-    "amuse": {
-      "description": "Afegeix suport a {{applicationName}} per el widget \"now playing\" d'Amuse per 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "L'API del servidor de Amuse està funcionant. GET /query per tenir informació de la cançó."
-      }
     },
     "api-server": {
       "description": "Afegeix un servidor API per controlar el reproductor",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Aplica compressió a l'àudio (baixa el volum de les parts més sorolloses de la senyal d'àudio i puja el volum de les parts més fluixes)",
-      "name": "Compressió d'àudio"
-    },
     "auth-proxy-adapter": {
       "description": "Suport per l'ús de servidors d'autenticació proxy",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Port proxy"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Desenfoca i aplica transparència a la barra de navegació",
-      "name": "Desenfoca la barra de navegació"
-    },
-    "bypass-age-restrictions": {
-      "description": "Esquiva la verificació d'edat de Music Player",
-      "name": "Esquiva les restriccions d'edat"
-    },
-    "captions-selector": {
-      "description": "Selector de subtítols per les pistes d'àudio de {{applicationName}}",
-      "menu": {
-        "autoload": "Selecciona automàticament l'últim subtítol emprat",
-        "disable-captions": "Sense subtítols per defecte"
-      },
-      "name": "Selector de subtítols",
-      "prompt": {
-        "selector": {
-          "label": "Idioma actual dels subtítols: {{language}}",
-          "none": "Cap",
-          "title": "Selecciona l'idioma dels subtítols"
-        }
-      },
-      "templates": {
-        "title": "Obra el selector de subtítols"
-      },
-      "toast": {
-        "caption-changed": "Subtítols canviats a {{language}}",
-        "caption-disabled": "Subtítols desactivats",
-        "no-captions": "Subtítols no disponibles per aquesta cançó"
-      }
-    },
-    "clock": {
-      "description": "Afegeix un rellotge a la barra de navegació",
-      "menu": {
-        "format": {
-          "24-hour-format": "Format 24 Hores",
-          "display-seconds": "Mostra els segons",
-          "label": "Format"
-        }
-      },
-      "name": "Rellotge"
-    },
-    "compact-sidebar": {
-      "description": "Sempre mostrar la barra lateral en mode compacte",
-      "name": "Barra lateral compacta"
     },
     "crossfade": {
       "description": "Transició creuada (crossfade) entre cançons",
@@ -600,66 +522,6 @@
       },
       "name": "Menú integrat In-App"
     },
-    "lumiastream": {
-      "description": "Afegeix suport pel Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Afegeix suport per la lletra de la majoria de cançons",
-      "menu": {
-        "romanized-lyrics": "Lletra romanitzada"
-      },
-      "name": "Lletres de Genius",
-      "renderer": {
-        "fetched-lyrics": "S'ha buscat la lletra a Genius"
-      }
-    },
-    "music-together": {
-      "description": "Comparteix una llista de reproducció amb els demés. Quan l'amfitrió reprodueix una cançó, la resta també sentiran la mateixa",
-      "dialog": {
-        "enter-host": "Introdueix l'ID de l'amfitrió"
-      },
-      "internal": {
-        "save": "Desa",
-        "track-source": "Origen de la pista",
-        "unknown-user": "Usuari desconegut"
-      },
-      "menu": {
-        "click-to-copy-id": "Copia l'ID d'amfitrió",
-        "close": "Tanca el Music Together",
-        "connected-users": "Usuaris connectats",
-        "disconnect": "Desconnecta el Music Together",
-        "empty-user": "No hi ha usuaris connectats",
-        "host": "Amfitrió de Music Together",
-        "join": "Uneix-te a Music Together",
-        "permission": {
-          "all": "Permet que els convidats controlin la llista de reproducció i el reproductor",
-          "host-only": "Tan sols l'amfitrió pot controlar la llista de reproducció i el reproductor",
-          "playlist": "Permet que els convidats controlin la llista de reproducció"
-        },
-        "set-permission": "Canvia els permisos de control",
-        "status": {
-          "disconnected": "Desconnectat",
-          "guest": "Connectat com a convidat",
-          "host": "Connectat com amfitrió"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Error al afegir la cançó",
-        "closed": "Music Together tancat",
-        "disconnected": "Music Together desconnectat",
-        "host-failed": "No s'ha pogut començar el Music Together",
-        "id-copied": "L'ID d'amfitrió s'ha copiat al porta-retalls",
-        "id-copy-failed": "Error al copiar l'ID d'amfitrió al porta-retalls",
-        "join-failed": "Error al unir-se al Music Together",
-        "joined": "T'has unit al Music Together",
-        "permission-changed": "Els permisos de Music Together han canviat a «{{permission}}»",
-        "remove-song-failed": "Error al eliminar la cançó",
-        "user-connected": "{{name}} s'ha unit al Music Together",
-        "user-disconnected": "{{name}} s'ha desconnectat del Music Together"
-      }
-    },
     "navigation": {
       "description": "Fletxes de navegació Següent / Enrere integrades directament a la interfície, com al teu navegador preferit",
       "name": "Navegació",
@@ -671,10 +533,6 @@
           "title": "Pàgina següent"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Elimina els botons d'inici de sessió de Google de la interfície",
-      "name": "Amaga l'inici de sessió de Google"
     },
     "notifications": {
       "description": "Mostra una notificació quan una cançó es comença a reproduir (les notificacions interactives estan disponibles a Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Qualitat actual: {{quality}}",
-            "message": "Tria la qualitat del vídeo:",
-            "title": "Tria la qualitat del vídeo"
-          }
-        }
-      },
-      "description": "Permet canviar la qualitat del vídeo amb un botó que s'hi mostra a sobre",
-      "name": "Botó de qualitat del vídeo",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Obre les opcions de qualitat del reproductor"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Afegeix suport per scrobbling (Last.fm, ListenBrainz, etc.)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Salta les cançons amb «no m'agrada»",
-      "name": "Salta les cançons que no t'agraden"
-    },
     "skip-silences": {
       "description": "Omet automàticament les seccions amb silenci a les cançons",
       "name": "Omet els silencis"
@@ -835,93 +671,6 @@
       "description": "Omet automàticament els segments dels vídeos que no son música, com la intro o el final",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "Proporciona lletres sincronitzades amb les cançons, a través de proveïdors com LRClib.",
-      "errors": {
-        "fetch": "⚠️\tS'ha produït un error en descarregar la lletra.\n\tSi us plau, intenta-ho més tard.",
-        "not-found": "⚠️ No s'ha trobat la lletra per aquesta cançó."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Converteix Caràcters Xinesos",
-          "submenu": {
-            "disabled": {
-              "label": "Deshabilitat",
-              "tooltip": "Deshabilitar la conversió de caràcters Xinesos"
-            },
-            "simplified-to-traditional": {
-              "label": "Simplificat al Tradicional",
-              "tooltip": "Converteix Xinés Simplificat a Xinés Tradicional"
-            },
-            "traditional-to-simplified": {
-              "label": "Tradicional a Simplificat",
-              "tooltip": "Converteix Xinès Tradicional a Xinès Simplificat"
-            }
-          },
-          "tooltip": "Converteix caràcter Xinès a Tradicional o Simplificat"
-        },
-        "default-text-string": {
-          "label": "Caràcter per defecte entre lletres",
-          "tooltip": "Tria el caràcter per defecte que es mostrarà a l'espai entre les lletres"
-        },
-        "line-effect": {
-          "label": "Efecte de la línia",
-          "submenu": {
-            "fancy": {
-              "label": "Caprici",
-              "tooltip": "Utilitza efectes grans \"app-like\" en la línia actual"
-            },
-            "focus": {
-              "label": "Centrar",
-              "tooltip": "Mostra tan sols la línia actual en blanc"
-            },
-            "offset": {
-              "label": "Desplaçament",
-              "tooltip": "Desplaçament a la dreta de la línia actual"
-            },
-            "scale": {
-              "label": "Escala",
-              "tooltip": "Redimensiona la línia actual"
-            }
-          },
-          "tooltip": "Tria l'efecte a aplicar a la línia actual"
-        },
-        "precise-timing": {
-          "label": "Fes que les lletres es sincronitzin a la perfecció",
-          "tooltip": "Calcula al mil·lisegon l'aparició de la següent línia (pot tenir un petit impacte en el rendiment)"
-        },
-        "preferred-provider": {
-          "label": "Proveïdor preferit",
-          "none": {
-            "label": "Cap",
-            "tooltip": "Cap proveïdor preferit"
-          },
-          "tooltip": "Trieu el proveïdor predeterminat que voleu utilitzar"
-        },
-        "romanization": {
-          "label": "Romanitza les lletres",
-          "tooltip": "Si les lletres són en un idioma diferent, intenta mostrar la versió amb alfabet llatí."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Mostra la lletra tot i que sigui inexacta",
-          "tooltip": "Si no es troba la cançó, el plugin torna a intentar obtenir la lletra amb una cerca diferent.\nEl resultat d'aquesta segona cerca podria no ser exacte."
-        },
-        "show-time-codes": {
-          "label": "Mostra els codis de temps",
-          "tooltip": "Mostra els codis de temps al costat de la lletra"
-        }
-      },
-      "name": "Lletres sincronitzades",
-      "refetch-btn": {
-        "fetching": "Obtenint...",
-        "normal": "Tornar a obtenir la lletra"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - La lletra podria no estar ben sincronitzada, la durada no és coincident.",
-        "inexact": "⚠️ - La lletra d'aquesta cançó podria no ser exacta",
-        "instrumental": "⚠️ - Aquesta cançó és instrumental"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Controla la reproducció des de la barra de tasques del Windows",
       "name": "Control multimèdia a la barra de tasques"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "Afegeix un giny a la Touch Bar per usuaris de macOS",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Fa la finestra de l'aplicació transparent",
-      "menu": {
-        "opacity": {
-          "label": "Opacitat",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Tipus",
-          "submenu": {
-            "acrylic": "Acrílic",
-            "content": "Contingut",
-            "fullscreen-ui": "Interfície a pantalla completa",
-            "mica": "Mica",
-            "none": "Cap",
-            "tabbed": "En pestanyes",
-            "under-page": "Sota la pàgina",
-            "under-window": "Sota la finestra",
-            "window": "Finestra"
-          }
-        }
-      },
-      "name": "Reproductor Transparent"
-    },
-    "tuna-obs": {
-      "description": "Integració amb l'extensió «Tuna» del OBS",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Impedeix que salti el reproductor mentre se sent una cançó",
-      "name": "Reproductor Discret"
-    },
-    "video-toggle": {
-      "description": "Afegeix un botó per commutar entre el mode de vídeo o de cançó. Opcionalment, es pot eliminar la pestanya de vídeo per complet",
-      "menu": {
-        "align": {
-          "label": "Alineament",
-          "submenu": {
-            "left": "Esquerra",
-            "middle": "Mig",
-            "right": "Dreta"
-          }
-        },
-        "force-hide": "Força amagar la pestanya de vídeo",
-        "mode": {
-          "label": "Mode",
-          "submenu": {
-            "custom": "Commutador personalitzat",
-            "disabled": "Deshabilitat",
-            "native": "Commutador nadiu"
-          }
-        }
-      },
-      "name": "Botó de vídeo",
-      "templates": {
-        "button-song": "Cançó",
-        "button-video": "Vídeo"
-      }
     },
     "visualizer": {
       "description": "Afegeix un visualitzador al reproductor",

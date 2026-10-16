@@ -18,7 +18,7 @@ import {
   type YT,
   type YTMusic,
   type Types,
-} from '\u0079\u006f\u0075\u0074\u0075\u0062\u0065i.js';
+} from 'youtubei.js';
 
 import { t } from '@/i18n';
 import { getNetFetchAsFetch } from '@/plugins/utils/main';
@@ -89,7 +89,7 @@ const isPremium = async () => {
 
   // If signed in, check if the upgrade button is present
   const upgradeBtnIconPathData = (await win.webContents.executeJavaScript(
-    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006f\u0075\u0074\u0075\u0062\u0065_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
+    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #youtube_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
   )) as string | null;
 
   // Fallback to non-premium if the icon is not found
@@ -130,7 +130,7 @@ const sendError = (error: Error, source?: string) => {
 export const getCookieFromWindow = async (win: BrowserWindow) => {
   return (
     await win.webContents.session.cookies.get({
-      url: 'https://music.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+      url: 'https://www.youtube.com',
     })
   )
     .map((it) => it.name + '=' + it.value)
@@ -214,7 +214,7 @@ export const onMainLoad = async ({
   }
 
   ipc.handle('download-song', (url: string) => downloadSong(url));
-  ipc.on('peard:video-src-changed', (data: GetPlayerResponse) => {
+  ipc.on('watchdeck:video-src-changed', (data: GetPlayerResponse) => {
     playingUrl = data.microformat.microformatDataRenderer.urlCanonical;
   });
   ipc.handle('download-playlist-request', async (url: string) =>
@@ -320,8 +320,8 @@ function downloadSongOnFinishSetup({
     }
   });
 
-  ipcMain.on('peard:player-api-loaded', () => {
-    ipc.send('peard:setup-time-changed-listener');
+  ipcMain.on('watchdeck:player-api-loaded', () => {
+    ipc.send('watchdeck:setup-time-changed-listener');
   });
 }
 

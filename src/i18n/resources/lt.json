@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Jeigu gros reklama, įrašo garsas bus išjungtas ir pagreitintas 16x",
-      "name": "Reklamos Pagreitinimas"
-    },
-    "album-actions": {
-      "description": "Prideda mygtukus pažymėti „Nepatinka“, „Patinka“, „Atžymėti Nepatinka“ bei „Atžymėti Patinka“ visas dainas grojaraštyje arba albume",
-      "name": "Albumo Veiksmai"
-    },
-    "album-color-theme": {
-      "description": "Pritaiko dinamišką temą ir vizualinius efektus pagal albumo spalvų paletę",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Spalvų maišymo santykis",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Įjungti paieškos juostos temavimą"
-      },
-      "name": "Albumo Spalvų Tema"
-    },
     "ambient-mode": {
       "description": "Pritaiko apšvietimo efektą, perteikdamas švelnias vaizdo įrašo spalvas į ekrano foną",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Aplinkos rėžimas"
-    },
-    "amuse": {
-      "description": "Prideda {{applicationName}} palaikyma „Amuse“ grojimo valdikliui pagal „6K Labs“",
-      "name": "„Amuse“ (Platforma Dainininkams)",
-      "response": {
-        "query": "„Amuse“ API serveris veikia. Parašykite GET /query kad gautumėte dainos informacija."
-      }
     },
     "api-server": {
       "description": "Prideda API serveri, kad būtų galima kontroliuoti grotuvą",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Pritaikyti garso kompresiją (sumažina garsiausių signalo dalių garsumą ir padidina švelniausių dalių garsumą)",
-      "name": "Garso Kompresorius"
-    },
     "auth-proxy-adapter": {
       "description": "autentifikavimo „proxy“ paslaugų naudojimo palaikymas",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "„Proxy“ Prievadas"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Padaro navigacijos lentą permatomą ir susiliejusią",
-      "name": "Sulieti Navigacijos Lentą"
-    },
-    "bypass-age-restrictions": {
-      "description": "Apeiti muzikos grotuvo amžiaus patikrinimą",
-      "name": "Apeiti Amžiaus Apribojimus"
-    },
-    "captions-selector": {
-      "description": "„{{applicationName}}“ Garso takelių antraščių parinkiklis",
-      "menu": {
-        "autoload": "Automatiškai pasirinkti paskutinę naudotą antraštę",
-        "disable-captions": "Antraštės išjungtos pagal numatytuosius nustatymus"
-      },
-      "name": "Antraščių parinkiklis",
-      "prompt": {
-        "selector": {
-          "label": "Dabartinė antraščių kalba: {{language}}",
-          "none": "Joks",
-          "title": "Pasirinkti antraščių kalbą"
-        }
-      },
-      "templates": {
-        "title": "Atidaryti antraščių parinkiklį"
-      },
-      "toast": {
-        "caption-changed": "Antraštės pakeistos į {{language}}",
-        "caption-disabled": "Antraštės išjungtos",
-        "no-captions": "Šiai dainai antraštė nepasiekiama"
-      }
-    },
-    "clock": {
-      "description": "Pridėti laikrodį prie navigacijos lentos",
-      "menu": {
-        "format": {
-          "24-hour-format": "24‐Valandų Formatas",
-          "display-seconds": "Rodyti Sekundes",
-          "label": "Formatas"
-        }
-      },
-      "name": "Laikrodis"
-    },
-    "compact-sidebar": {
-      "description": "Visada nustatyti šoninę juostą kompaktiniame rėžime",
-      "name": "Kompaktinė šoninė juosta"
     },
     "crossfade": {
       "description": "Perliejimas tarp dainų",
@@ -593,66 +515,6 @@
       },
       "name": "Programos Meniu"
     },
-    "lumiastream": {
-      "description": "Prideda „Lumia Stream“ palaikymą",
-      "name": "„Lumia Stream“ [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Daugumai dainų prideda jų dainų žodžius",
-      "menu": {
-        "romanized-lyrics": "Romanizuoti dainų tekstai"
-      },
-      "name": "„Lyrics Genius“ dainų žodžiai",
-      "renderer": {
-        "fetched-lyrics": "Gauti žodžiai iš „Genius“"
-      }
-    },
-    "music-together": {
-      "description": "Pasidalinti grojaraščiu su kitais. Kai vedėjas paleis dainą, visi kiti girdės tą pačią dainą",
-      "dialog": {
-        "enter-host": "Įveskite vedėjo ID"
-      },
-      "internal": {
-        "save": "Išsaugoti",
-        "track-source": "Dainos Šaltinis",
-        "unknown-user": "Nežinomas Naudotojas"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopijuoti Vedėjo ID",
-        "close": "Uždaryti „Muzika Kartu“",
-        "connected-users": "Prisijungę vartotojai",
-        "disconnect": "Išjungti „Muzika Kartu“",
-        "empty-user": "Nėra prisijungusių vartotojų",
-        "host": "„Muzika Kartu“ Vedėjas",
-        "join": "Prisijungti prie „Muzika Kartu“",
-        "permission": {
-          "all": "Leisti svečiams valdyti grojaraštį ir grotuvą",
-          "host-only": "Tik vedėjas gali valdyti grojaraštį ir grotuvą",
-          "playlist": "Leisti svečiams valdyti grojaraštį"
-        },
-        "set-permission": "Keisti valdymo leidimus",
-        "status": {
-          "disconnected": "Atsijungta",
-          "guest": "Prisijungta kaip Svečias",
-          "host": "Prisijungta kaip Vedėjas"
-        }
-      },
-      "name": "„Muzika Kartu“ [Beta]",
-      "toast": {
-        "add-song-failed": "Nepavyko pridėti dainos",
-        "closed": "„Muzika Kartu“ uždaryta",
-        "disconnected": "„Muzika Kartu“ atsijungė",
-        "host-failed": "Nepavyko surengti „Muzika Kartu“",
-        "id-copied": "Vedėjo ID nukopijuota į iškarpinę",
-        "id-copy-failed": "Nepavyko nukopijuoti vedėjo ID į iškarpinę",
-        "join-failed": "Nepavyko prisijungti prie „Muzika Kartu“",
-        "joined": "Prisijungta prie „Muzika Kartu“",
-        "permission-changed": "„Muzika Kartu“ leidimas pakeistas į „{{permission}}“",
-        "remove-song-failed": "Nepavyko pašalinti dainos",
-        "user-connected": "{{name}} prisijungė prie „Muzika Kartu“",
-        "user-disconnected": "{{name}} išėjo iš „Muzika Kartu“"
-      }
-    },
     "navigation": {
       "description": "Kitas/Ankstenis navigacijos rodyklės tiesiogiai integruotos sąsajoje, kaip tavo mėgstamiausioje naršyklėje",
       "name": "Navigacija",
@@ -664,10 +526,6 @@
           "title": "Eiti į kitą puslapį"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Pašalinti „Google“ prisijungimo mygtukus ir nuorodas iš sąsajos",
-      "name": "Be „Google“ Prisijungimo"
     },
     "notifications": {
       "description": "Rodyti pranešimą, kai pradeda groti daina (interaktyvūs pranešimai pasiekiami sistemoje „Windows“)",
@@ -744,24 +602,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Dabartinė Kokybė: {{quality}}",
-            "message": "Pasirinkite Vaizdo Kokybę:",
-            "title": "Pasirinkite Vaizdo Kokybę"
-          }
-        }
-      },
-      "description": "Leidžia pakeisti vaizdo kokybę su mygtuku ant vaizdo perdangos",
-      "name": "Vaizdo Kokybės Keitėjas",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Atidaryti grotuvo kokybės keistuvą"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Pridėti „scrobbling“ palaikymą (pvz., last.fm, Listenbrainz)",
       "dialog": {
@@ -816,10 +656,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Praleidžia nepatinkančias dainas",
-      "name": "Praleisti Nepatinkančias Dainas"
-    },
     "skip-silences": {
       "description": "Automatiškai praleisti tylos dalis dainose",
       "name": "Praleisti Tylumas"
@@ -828,93 +664,6 @@
       "description": "Automatiškai praleidžia ne muzikines dalis, pvz., įžangą/užvedimą arba muzikinių vaizdo įrašų dalis, kuriose daina negrojama",
       "name": "Rėmėjų blokuotojas"
     },
-    "synced-lyrics": {
-      "description": "Teikia sinchronizuotus dainų žodžius, naudojantis tiekėjais kaip „LRClib“.",
-      "errors": {
-        "fetch": "⚠️\t\tĮvyko klaida gaunant dainos žodžius.\n\tPabandykite dar karta vėliau.",
-        "not-found": "⚠️ Šiai dainai nerasti dainos tekstai."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Konvertuoti Kinietišką ženklą",
-          "submenu": {
-            "disabled": {
-              "label": "Išjungtas",
-              "tooltip": "Išjungti Kinietiškų ženklų konvertavimą"
-            },
-            "simplified-to-traditional": {
-              "label": "Supaprastintą į Tradicinę",
-              "tooltip": "Konvertuoti Supaprastintą Kinų kalbą į Tradicinę Kinų kalbą"
-            },
-            "traditional-to-simplified": {
-              "label": "Tradicionalią į Supaprastintą",
-              "tooltip": "Konvertuoti Tradicionalią Kinų kalbą į Supaprastintą Kinų kalbą"
-            }
-          },
-          "tooltip": "Konvertuoti Kinietiškus ženklus į Tradicinę arba Supaprastintą"
-        },
-        "default-text-string": {
-          "label": "Numatyti simboliai tarp dainos žodžių",
-          "tooltip": "Pasirinkite numatytąjį simbolį kurį naudoti tarpui tarp dainos žodžių"
-        },
-        "line-effect": {
-          "label": "Teksto linijos efektas",
-          "submenu": {
-            "fancy": {
-              "label": "Prašmatnus",
-              "tooltip": "Naudoti didelius, panašius į programos efektus dabartinei eilutei"
-            },
-            "focus": {
-              "label": "Sutelkti dėmesį",
-              "tooltip": "Padaryti tik dabartinę eilutę baltą"
-            },
-            "offset": {
-              "label": "Nuokrypis",
-              "tooltip": "Dabartinę eilutę pastumti iš dešinės"
-            },
-            "scale": {
-              "label": "Skalė",
-              "tooltip": "Padidinti dabartinę eilutę"
-            }
-          },
-          "tooltip": "Pasirinkti efektą, kurį pritaikyti dabartinei linijai"
-        },
-        "precise-timing": {
-          "label": "Tobulai sinchronizuoti dainos žodžius",
-          "tooltip": "Apskaičiuoti kitos eilutės rodymą milisekundės tikslumu (gali turėti nedidelę įtaką našumui)"
-        },
-        "preferred-provider": {
-          "label": "Pageidaujamas tiekėjas",
-          "none": {
-            "label": "Jokio",
-            "tooltip": "Jokio pageidaujamo tiekėjo"
-          },
-          "tooltip": "Pasirinkti numatytąjį tiekėją kurį naudoti"
-        },
-        "romanization": {
-          "label": "Romanizuoti dainos žodžius",
-          "tooltip": "jei dainos žodžiai yra kita kalba, bandyti pateikti lotyniškų ženklų versiją."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Rodyti dainos žodžius, net jei jie netikslūs",
-          "tooltip": "Jeigu daina nerasta, įskiepis bando iš naujo su skirtinga paieškos užklausa.\nAntro bandymo rezultatas gali būti netikslus."
-        },
-        "show-time-codes": {
-          "label": "Rodyti laiko žymes",
-          "tooltip": "Rodyti laiko žymes kartu su dainos žodžiais"
-        }
-      },
-      "name": "„Synced Lyrics“",
-      "refetch-btn": {
-        "fetching": "Gaunama...",
-        "normal": "Atgauti dainos žodžius"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Dainos žodžiai gali būti nesinchronizuoti dėl trukmės nesutikimo.",
-        "inexact": "⚠️ - Dainos žodžiai gali šiek tiek skirtis",
-        "instrumental": "⚠️ – Tai instrumentinė daina"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Valdykite atkūrimą iš „Windows“ užduočių juostos",
       "name": "Užduočių juostos medijos valdymas"
@@ -922,62 +671,6 @@
     "touchbar": {
       "description": "Pridedamas jutiklinės juostos valdiklis „MacOS“ vartotojams",
       "name": "„TouchBar“"
-    },
-    "transparent-player": {
-      "description": "Padaro programos langą skaidrų",
-      "menu": {
-        "opacity": {
-          "label": "Skaidrumas",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Tipas",
-          "submenu": {
-            "acrylic": "Akrilas",
-            "mica": "Žėrutis",
-            "none": "Joks",
-            "tabbed": "Atskirtas"
-          }
-        }
-      },
-      "name": "Skaidrus Grotuvas"
-    },
-    "tuna-obs": {
-      "description": "Integracija su OBS papildiniu „Tuna“",
-      "name": "„Tuna OBS“"
-    },
-    "unobtrusive-player": {
-      "description": "Trukdo grotuvo atsidarymui grojant dainą",
-      "name": "Netrukdantis Grotuvas"
-    },
-    "video-toggle": {
-      "description": "Pridedamas mygtukas, skirtas perjungti vaizdo įrašo/dainos režimą. Taip pat galite pasirinktinai pašalinti visą vaizdo įrašo skirtuką",
-      "menu": {
-        "align": {
-          "label": "Lygiavimas",
-          "submenu": {
-            "left": "Kairė",
-            "middle": "Vidurys",
-            "right": "Dešinė"
-          }
-        },
-        "force-hide": "Priverstinai pašalinti vaizdo įrašo skirtuką",
-        "mode": {
-          "label": "Rėžimas",
-          "submenu": {
-            "custom": "Pasirinktinis perjungimas",
-            "disabled": "Išjungta",
-            "native": "Vietinis perjungimas"
-          }
-        }
-      },
-      "name": "Vaizdo įrašo perjungimas",
-      "templates": {
-        "button-song": "Daina",
-        "button-video": "Vaizdo įrašas"
-      }
     },
     "visualizer": {
       "description": "Prie grotuvo pridedamas vizualizatorius",

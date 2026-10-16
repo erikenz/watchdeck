@@ -55,7 +55,7 @@ export const renderer = createRenderer<
       await updateDeviceList(context);
 
     document.addEventListener(
-      'peard:audio-can-play',
+      'watchdeck:audio-can-play',
       this.audioCanPlayHandler,
       {
         once: true,
@@ -67,7 +67,7 @@ export const renderer = createRenderer<
 
   stop() {
     document.removeEventListener(
-      'peard:audio-can-play',
+      'watchdeck:audio-can-play',
       this.audioCanPlayHandler,
     );
     navigator.mediaDevices.ondevicechange = null;

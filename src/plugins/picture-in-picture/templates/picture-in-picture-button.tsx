@@ -10,7 +10,7 @@ export const PictureInPictureButton = (props: PictureInPictureButtonProps) => (
     onClick={(e) => props.onClick?.(e)}
     tabindex={-1}
   >
-    <div class="icon ytmd-menu-item style-scope ytmusic-menu-navigation-item-renderer">
+    <div class="icon wd-menu-item style-scope ytmusic-menu-navigation-item-renderer">
       <svg
         class="style-scope yt-icon"
         id="Layer_1"

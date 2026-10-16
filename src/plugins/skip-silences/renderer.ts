@@ -118,13 +118,13 @@ export const onRendererLoad = async ({
 }: RendererContext<SkipSilencesPluginConfig>) => {
   config = await getConfig();
 
-  document.addEventListener('peard:audio-can-play', audioCanPlayListener, {
+  document.addEventListener('watchdeck:audio-can-play', audioCanPlayListener, {
     passive: true,
   });
 };
 
 export const onRendererUnload = () => {
-  document.removeEventListener('peard:audio-can-play', audioCanPlayListener);
+  document.removeEventListener('watchdeck:audio-can-play', audioCanPlayListener);
 
   if (playOrSeekHandler) {
     const video = document.querySelector('video');

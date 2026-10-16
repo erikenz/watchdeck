@@ -214,26 +214,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Jos mainos toistuu, mykistä ääni ja aseta toistonopeus 16x:een",
-      "name": "Mainoksen nopeutus"
-    },
-    "album-actions": {
-      "description": "Lisää tykkäysnappulat, joilla voit lisätä tai poistaa tykkäyksiä kerralla kaikille soittolistan tai albumin kappaleille",
-      "name": "Albumin Toiminnot"
-    },
-    "album-color-theme": {
-      "description": "Käyttää dynaamista teemaa ja visuaalisia tehosteita albumin väripaletin perusteella",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Värien sekoitussuhde",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Albumin Värinen Teema"
-    },
     "ambient-mode": {
       "description": "Antaa valaistustehosteen heittämällä videosta lempeitä värejä näytön taustalle",
       "menu": {
@@ -279,13 +259,6 @@
       },
       "name": "Tunnelmallinen Tila"
     },
-    "amuse": {
-      "description": "Lisää {{applicationName}} tuen Amusen nyt soitetaan -widgetille, kehittäjänä 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API-palvelin on päällä. Käytä GET /query-rajapintaa saadaksesi kappaleen tiedot."
-      }
-    },
     "api-server": {
       "description": "Lisää API-palvelimen hallitsemaan soitinta",
       "dialog": {
@@ -329,10 +302,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Lisää äänen kompressointia (hiljentää voimakkaimpien äänien voimakkuutta ja tehostaa pehmeämpien äänien voimakkuutta)",
-      "name": "Äänen Kompressoija"
-    },
     "auth-proxy-adapter": {
       "description": "Tukee todennusvälipalvelinten käyttöä",
       "menu": {
@@ -356,41 +325,6 @@
           "title": "Välipalvelimen portti"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Tekee siirtymäpalkista läpikuultavan ja sumean",
-      "name": "Sumenna Siirtymäpalkki"
-    },
-    "bypass-age-restrictions": {
-      "description": "Ohita Music Player iän vahvistus",
-      "name": "Ohita Ikään Perustuvat Rajoitukset"
-    },
-    "captions-selector": {
-      "description": "{{applicationName}} ääniraitojen tekstitysten valitsin",
-      "menu": {
-        "autoload": "Valitse automaattisesti viimeksi käytetty tekstitys",
-        "disable-captions": "Tekstitys ei oletusarvoisesti käytössä"
-      },
-      "name": "Tekstitysten valinta",
-      "prompt": {
-        "selector": {
-          "label": "Tekstitysten nykyinen kieli: {{language}}",
-          "none": "Ei mitään",
-          "title": "Valitse tekstitysten kieli"
-        }
-      },
-      "templates": {
-        "title": "Avaa tekstitysten valitsin"
-      },
-      "toast": {
-        "caption-changed": "Tekstitys vaihdettu kieleksi {{language}}",
-        "caption-disabled": "Tekstitykset pois päältä",
-        "no-captions": "Tekstityksiä ei ole saatavilla tälle kappaleelle"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Asettaa sivupalkin aina kompaktiin tilaan",
-      "name": "Kompakti sivupalkki"
     },
     "crossfade": {
       "description": "Ristihäivytä kappaleet",
@@ -543,66 +477,6 @@
       },
       "name": "Sovelluksen sisäinen valikko"
     },
-    "lumiastream": {
-      "description": "Lisää tuen Lumia Stream -palvelulle",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Lisää tuen useimpien kappaleiden sanoituksille",
-      "menu": {
-        "romanized-lyrics": "Latinaistetut sanoitukset"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "Sanoitukset haettu Geniukselle"
-      }
-    },
-    "music-together": {
-      "description": "Jaa soittolista muiden kanssa. Kun isäntä soittaa kappaleen, kaikki muut kuulevat saman kappaleen",
-      "dialog": {
-        "enter-host": "Anna Istunnon tunniste"
-      },
-      "internal": {
-        "save": "Tallenna",
-        "track-source": "Kappaleen lähde",
-        "unknown-user": "Tuntematon käyttäjä"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopioi Istunnon tunniste",
-        "close": "Sulje \"Music Together\"",
-        "connected-users": "Yhdistetyt käyttäjät",
-        "disconnect": "Katkaise yhteys \"Music Together\" -istuntoon",
-        "empty-user": "Ei yhdistyneitä käyttäjiä",
-        "host": "\"Music Together\" -istunnon isäntä",
-        "join": "Yhdistä \"Music Together\" -istuntoon",
-        "permission": {
-          "all": "Salli vieraiden hallita soittolistaa ja soitinta",
-          "host-only": "Vain isäntä voi hallita soittolistaa ja soitinta",
-          "playlist": "Salli vieraiden hallita soittolistaa"
-        },
-        "set-permission": "Muuta hallintaoikeuksia",
-        "status": {
-          "disconnected": "Yhteys katkaistu",
-          "guest": "Yhdistetty vieraana",
-          "host": "Yhdistetty isäntänä"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Kappaleen lisääminen epäonnistui",
-        "closed": "Music Together suljettu",
-        "disconnected": "\"Music Together\" yhteys katkaistu",
-        "host-failed": "Music Together -istunnon isännöinti epäonnistui",
-        "id-copied": "Istunnon tunnus kopioitu leikepöydälle",
-        "id-copy-failed": "Istunnon tunnisteen kopioiminen epäonnistui",
-        "join-failed": "Music Together -istuntoon liittyminen epäonnistui",
-        "joined": "Liityttiin Music Together -istuntoon",
-        "permission-changed": "Music Together -istunnon oikeuksia muutettiin \"{{permission}}\"",
-        "remove-song-failed": "Kappaleen poistaminen epäonnistui",
-        "user-connected": "{{name}} liittyi Music Together -istuntoon",
-        "user-disconnected": "{{name}} poistui Music Together -istunnosta"
-      }
-    },
     "navigation": {
       "description": "Eteen- ja taaksepäin vievät nuolet suoraan integroituna käyttöliittymään. Juuri niin kuin lempiselaimessasi",
       "name": "Siirtyminen",
@@ -614,10 +488,6 @@
           "title": "Siirry seuraavalle sivulle"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Poista Googlen kirjautumispainikkeet ja linkit käyttöliittymästä",
-      "name": "Ei Google kirjautumista"
     },
     "notifications": {
       "description": "Näytä ilmoitus, kun kappale alkaa soida (interaktiiviset ilmoitukset ovat käytettävissä Windowsilla)",
@@ -694,24 +564,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Nykyinen laatu: {{quality}}",
-            "message": "Valitse videon laatu:",
-            "title": "Valitse videon laatu"
-          }
-        }
-      },
-      "description": "Salli videon laadun muuttaminen videon päällä näkyvällä painikkeella",
-      "name": "Videonlaadunmuuttaja",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Avaa toistimen laadun muuttaja"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Lisää jakamistuki (esim. last.fm, Listenbrainz)",
       "dialog": {
@@ -751,19 +603,6 @@
         "keybind": {
           "keybind-options": {
             "previous": "Edellinen"
-          }
-        }
-      }
-    },
-    "tuna-obs": {
-      "name": "Tuna OBS"
-    },
-    "video-toggle": {
-      "menu": {
-        "align": {
-          "submenu": {
-            "left": "Vasen",
-            "right": "Oikea"
           }
         }
       }

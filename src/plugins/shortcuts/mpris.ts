@@ -63,7 +63,7 @@ class YTPlayer extends MprisPlayer {
 
 function setupMPRIS() {
   const instance = new YTPlayer({
-    name: '\u0059\u006f\u0075\u0074\u0075\u0062\u0065\u004d\u0075\u0073\u0069\u0063',
+    name: 'Watchdeck',
     identity: APPLICATION_NAME,
     supportedMimeTypes: ['audio/mpeg'],
     supportedInterfaces: ['player'],
@@ -73,8 +73,7 @@ function setupMPRIS() {
   instance.canQuit = false;
   instance.canUsePlayerControls = true;
   instance.supportedUriSchemes = ['http', 'https'];
-  instance.desktopEntry =
-    '\u0079\u006f\u0075\u0074\u0075\u0062\u0065\u002d\u006d\u0075\u0073\u0069\u0063';
+  instance.desktopEntry = 'watchdeck';
   return instance;
 }
 
@@ -108,34 +107,34 @@ export function registerMPRIS(win: BrowserWindow) {
         currentSongInfo?.videoId &&
         event.trackId.endsWith(correctId(currentSongInfo.videoId))
       ) {
-        win.webContents.send('peard:seek-to', microToSec(event.position ?? 0));
+        win.webContents.send('watchdeck:seek-to', microToSec(event.position ?? 0));
         player.setPosition(event.position ?? 0);
       }
     };
     const seekBy = (offset: number) => {
-      win.webContents.send('peard:seek-by', microToSec(offset));
+      win.webContents.send('watchdeck:seek-by', microToSec(offset));
       player.setPosition(player.getPosition() + offset);
     };
 
-    ipcMain.on('peard:player-api-loaded', () => {
-      win.webContents.send('peard:setup-seeked-listener', 'mpris');
-      win.webContents.send('peard:setup-time-changed-listener', 'mpris');
-      win.webContents.send('peard:setup-repeat-changed-listener', 'mpris');
-      win.webContents.send('peard:setup-volume-changed-listener', 'mpris');
-      win.webContents.send('peard:setup-shuffle-changed-listener', 'mpris');
-      win.webContents.send('peard:setup-fullscreen-changed-listener', 'mpris');
-      win.webContents.send('peard:setup-autoplay-changed-listener', 'mpris');
+    ipcMain.on('watchdeck:player-api-loaded', () => {
+      win.webContents.send('watchdeck:setup-seeked-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-time-changed-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-repeat-changed-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-volume-changed-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-shuffle-changed-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-fullscreen-changed-listener', 'mpris');
+      win.webContents.send('watchdeck:setup-autoplay-changed-listener', 'mpris');
       requestShuffleInformation();
       requestFullscreenInformation();
       requestQueueInformation();
     });
 
-    ipcMain.on('peard:seeked', (_, t: number) => {
+    ipcMain.on('watchdeck:seeked', (_, t: number) => {
       player.setPosition(secToMicro(t));
       player.seeked(secToMicro(t));
     });
 
-    ipcMain.on('peard:repeat-changed', (_, mode: RepeatMode) => {
+    ipcMain.on('watchdeck:repeat-changed', (_, mode: RepeatMode) => {
       switch (mode) {
         case 'NONE': {
           player.setLoopStatus(MprisPlayer.LOOP_STATUS_NONE);
@@ -154,7 +153,7 @@ export function registerMPRIS(win: BrowserWindow) {
       requestQueueInformation();
     });
 
-    ipcMain.on('peard:shuffle-changed', (_, shuffleEnabled: boolean) => {
+    ipcMain.on('watchdeck:shuffle-changed', (_, shuffleEnabled: boolean) => {
       if (player.shuffle === undefined || !player.canUsePlayerControls) {
         return;
       }
@@ -162,7 +161,7 @@ export function registerMPRIS(win: BrowserWindow) {
       player.shuffle = shuffleEnabled ?? !player.shuffle;
     });
 
-    ipcMain.on('peard:fullscreen-changed', (_, changedTo: boolean) => {
+    ipcMain.on('watchdeck:fullscreen-changed', (_, changedTo: boolean) => {
       if (player.fullscreen === undefined || !player.canUsePlayerControls) {
         return;
       }
@@ -172,7 +171,7 @@ export function registerMPRIS(win: BrowserWindow) {
     });
 
     ipcMain.on(
-      'peard:set-fullscreen',
+      'watchdeck:set-fullscreen',
       (_, isFullscreen: boolean | undefined) => {
         if (!player.canUsePlayerControls || isFullscreen === undefined) {
           return;
@@ -183,16 +182,16 @@ export function registerMPRIS(win: BrowserWindow) {
     );
 
     ipcMain.on(
-      'peard:fullscreen-changed-supported',
+      'watchdeck:fullscreen-changed-supported',
       (_, isFullscreenSupported: boolean) => {
         player.canUsePlayerControls = isFullscreenSupported;
       },
     );
-    ipcMain.on('peard:autoplay-changed', (_) => {
+    ipcMain.on('watchdeck:autoplay-changed', (_) => {
       requestQueueInformation();
     });
 
-    ipcMain.on('peard:get-queue-response', (_, queue: QueueResponse) => {
+    ipcMain.on('watchdeck:get-queue-response', (_, queue: QueueResponse) => {
       if (!queue) {
         return;
       }
@@ -302,7 +301,7 @@ export function registerMPRIS(win: BrowserWindow) {
       console.trace(error);
     });
 
-    ipcMain.on('peard:volume-changed', (_, newVolumeState: VolumeState) => {
+    ipcMain.on('watchdeck:volume-changed', (_, newVolumeState: VolumeState) => {
       player.volume = newVolumeState.isMuted
         ? 0
         : Number.parseFloat((newVolumeState.state / 100).toFixed(2));

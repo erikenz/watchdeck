@@ -56,7 +56,7 @@ export const buildDiscordButtons = (
   const buttons: GatewayActivityButton[] = [];
   if (
     config[
-      'playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u004d\u0075\u0073\u0069\u0063'
+      'playOnYouTubeMusic'
     ] &&
     songInfo.url
   ) {
@@ -68,7 +68,7 @@ export const buildDiscordButtons = (
   if (!config.hideGitHubButton) {
     buttons.push({
       label: 'View App On GitHub',
-      url: 'https://github.com/pear-devs/pear-desktop',
+      url: 'https://github.com/erikenz/watchdeck',
     });
   }
   return buttons.length ? buttons : undefined;

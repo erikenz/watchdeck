@@ -212,20 +212,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Hvis en reklame afspilles, slår den lyden fra og sætter hastigheden til 16x",
-      "name": "Spol igennem reklamen"
-    },
-    "album-color-theme": {
-      "menu": {
-        "color-mix-ratio": {
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Albummets farve tema"
-    },
     "ambient-mode": {
       "menu": {
         "blur-amount": {
@@ -293,26 +279,6 @@
         "port": {
           "label": "Skriv API serverens port:",
           "title": "Port"
-        }
-      }
-    },
-    "audio-compressor": {
-      "name": "Lyd kompressor"
-    },
-    "blur-nav-bar": {
-      "description": "Gør navigationsbaren gennemsigtig og sløret",
-      "name": "Slør navigationsbar"
-    },
-    "captions-selector": {
-      "menu": {
-        "disable-captions": "Ingen undertekster som standard"
-      },
-      "name": "Vælg undertekster",
-      "prompt": {
-        "selector": {
-          "label": "Nuværende sprog på undertekster: {{language}}",
-          "none": "Ingen",
-          "title": "Vælg underteksternes sprog"
         }
       }
     },

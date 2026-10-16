@@ -36,22 +36,22 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.songInfo = songInfo;
     });
 
-    ctx.ipc.on('peard:player-api-loaded', () => {
-      ctx.ipc.send('peard:setup-seeked-listener');
-      ctx.ipc.send('peard:setup-time-changed-listener');
-      ctx.ipc.send('peard:setup-repeat-changed-listener');
-      ctx.ipc.send('peard:setup-like-changed-listener');
-      ctx.ipc.send('peard:setup-volume-changed-listener');
-      ctx.ipc.send('peard:setup-shuffle-changed-listener');
+    ctx.ipc.on('watchdeck:player-api-loaded', () => {
+      ctx.ipc.send('watchdeck:setup-seeked-listener');
+      ctx.ipc.send('watchdeck:setup-time-changed-listener');
+      ctx.ipc.send('watchdeck:setup-repeat-changed-listener');
+      ctx.ipc.send('watchdeck:setup-like-changed-listener');
+      ctx.ipc.send('watchdeck:setup-volume-changed-listener');
+      ctx.ipc.send('watchdeck:setup-shuffle-changed-listener');
     });
 
     ctx.ipc.on(
-      'peard:repeat-changed',
+      'watchdeck:repeat-changed',
       (mode: RepeatMode) => (this.currentRepeatMode = mode),
     );
 
     ctx.ipc.on(
-      'peard:volume-changed',
+      'watchdeck:volume-changed',
       (newVolumeState: VolumeState) => (this.volumeState = newVolumeState),
     );
 

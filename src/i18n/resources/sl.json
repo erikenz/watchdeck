@@ -207,26 +207,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Če se predvaja oglas se zvok utišja. Prav tako se hitrost predvajanja nastavi na 16 krat",
-      "name": "Pospeševanje oglasov"
-    },
-    "album-actions": {
-      "description": "Doda Undislike, Dislike, Like, in Unlike gumbe vsem glasbam v seznamu predvajanja ali albumu",
-      "name": "Nastavitve albuma"
-    },
-    "album-color-theme": {
-      "description": "Doda dinamično temo in vizualne efekte glede na barve albuma",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Razmerje barv",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Barvna tema Albuma"
-    },
     "ambient-mode": {
       "description": "Doda barvni učinek iz video posnetka na ozadje",
       "menu": {
@@ -314,40 +294,6 @@
           "title": "Port"
         }
       }
-    },
-    "audio-compressor": {
-      "description": "Doda kompresijo zvoka (izenači ravni zvoka, zniža glasnost najglasnejših delov in zviša najtišje)",
-      "name": "Kompresija zvoka"
-    },
-    "blur-nav-bar": {
-      "description": "Naredi navigacijsko vrstico prozorno in zamegljeno",
-      "name": "Zameglji navigacijsko vrstico"
-    },
-    "bypass-age-restrictions": {
-      "description": "Preskoči YouTubo-vo preverjanje starosti",
-      "name": "Preskoči starostno omejitev"
-    },
-    "captions-selector": {
-      "description": "Izberi podnapise za {{applicationName}} zvočne posnetke",
-      "menu": {
-        "autoload": "Avtomatsko uporabi zadnje izbrane podnapise",
-        "disable-captions": "Avtomatsko brez podnapisov"
-      },
-      "name": "Izberi podnapise",
-      "prompt": {
-        "selector": {
-          "label": "Trenutni jezik podnapisov: {{language}}",
-          "none": "Brez",
-          "title": "Izberi jezik podnapisov"
-        }
-      },
-      "templates": {
-        "title": "Odpri izbiro podnapisov"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Vedno izberi kompakten način stranske vrstice",
-      "name": "Kompaktna stranska vrstica"
     },
     "crossfade": {
       "description": "Bledenje med pesmimi",
@@ -487,60 +433,6 @@
         "hide-dom-window-controls": "Skrije DOM gumbe za okno"
       },
       "name": "Meni v aplikaciji"
-    },
-    "lumiastream": {
-      "description": "Doda podporo za Lumia pretočno predvajanje",
-      "name": "Lumina pretočno predavanje [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Doda podporo besedil za večino pesmi",
-      "menu": {
-        "romanized-lyrics": "Romanizerana besedila"
-      },
-      "name": "Besedila Genius",
-      "renderer": {
-        "fetched-lyrics": "Prestregel besedila za Genius"
-      }
-    },
-    "music-together": {
-      "description": "Delite seznam predvajanja z drugimi. Ko gostitelj predvaja skladbo, bodo vsi ostali slišali isto skladbo",
-      "dialog": {
-        "enter-host": "Vnesite Host ID"
-      },
-      "internal": {
-        "save": "Shrani",
-        "track-source": "Vir pesmi",
-        "unknown-user": "Neznan uporabnik"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopiraj Host ID",
-        "close": "Zapri Glasba Skupaj",
-        "connected-users": "Povezani uporabniki",
-        "disconnect": "Prekini povezavo z Pesmi Skupaj",
-        "empty-user": "Ni povezanih uporabnikov",
-        "host": "Gkasba Skupaj gostitelj",
-        "join": "Pridruži se Glasba Skupaj",
-        "permission": {
-          "all": "Dovoli da gosti nadzorujejo seznam predvajanja in predvajalnik",
-          "host-only": "Samo gostitelj lahko spreminja seznam predvajanja in predvajalnik",
-          "playlist": "Dovoli da gostje nadzorujejo predvajalnik"
-        },
-        "set-permission": "Spremeni dovoljenje nadzora",
-        "status": {
-          "disconnected": "Odklopljen",
-          "guest": "Povezan kot Gost",
-          "host": "Povezan kot Gostitelj"
-        }
-      },
-      "name": "Gkasba Skupaj [Beta]",
-      "toast": {
-        "add-song-failed": "Skladba ni bila dodana",
-        "closed": "Glasba Skupaj zaprto",
-        "disconnected": "Gkasba Skupaj odklopljena",
-        "host-failed": "Gkasba Skupaj nisem mogel gostiti",
-        "id-copied": "Host ID je kopiran v odložišče",
-        "id-copy-failed": "Host ID ni bilo mogoče kopirati"
-      }
     }
   }
 }

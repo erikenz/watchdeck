@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Bij het afspelen van een advertentie wordt het geluid gedempt en wordt de afspeelsnelheid wordt verhoogd naar 16x",
-      "name": "Advertenties versnellen"
-    },
-    "album-actions": {
-      "description": "Voegt niet-Niet Leuk, Niet Leuk, Leuk, niet-Leuk knoppen toe om dit toe te passen op alle nummers in een afspeellijst of album",
-      "name": "Albumacties"
-    },
-    "album-color-theme": {
-      "description": "Past een dynamisch thema en visuele effecten toe op basis van het kleurenpalet van het album",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Kleurmixverhouding",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Schakel thema's voor de schuifbalk in"
-      },
-      "name": "Albumkleurthema"
-    },
     "ambient-mode": {
       "description": "Past een verlichtingseffect toe door zachte kleuren van de video op het achtergrondscherm te werpen",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Omgevingsmodus"
-    },
-    "amuse": {
-      "description": "Voegt {{applicationName}} ondersteuning toe voor de Amuse now playing widget van 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API server loopt. Gebruik /query voor nummer informatie."
-      }
     },
     "api-server": {
       "description": "Voegt een API server toe om de speler te besturen",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Past compressie toe op audio (verlaagt het volume van de luidste delen van het signaal en verhoogt het volume van de zachtste delen)",
-      "name": "Audiocompressor"
-    },
     "auth-proxy-adapter": {
       "description": "Ondersteuning voor het gebruik van authenticatie proxy diensten",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Proxy poort"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Maakt de navigatiebalk transparant en wazig",
-      "name": "Vervagen Navigatiebalk"
-    },
-    "bypass-age-restrictions": {
-      "description": "Omzeil de leeftijdsverificatie van Music Player",
-      "name": "Leeftijdsbeperkingen Omzeilen"
-    },
-    "captions-selector": {
-      "description": "Ondertitelkeuze voor {{applicationName}}-audiotracks",
-      "menu": {
-        "autoload": "Automatisch de laatst gebruikte ondertitel selecteren",
-        "disable-captions": "Standaard geen ondertitels"
-      },
-      "name": "Ondertitelkeuze",
-      "prompt": {
-        "selector": {
-          "label": "Huidige ondertitel taal: {{language}}",
-          "none": "Geen",
-          "title": "Selecteer ondertitel taal"
-        }
-      },
-      "templates": {
-        "title": "Open ondertitelkeuze"
-      },
-      "toast": {
-        "caption-changed": "Ondertitel veranderd naar {{language}}",
-        "caption-disabled": "Ondertitels uitgeschakeld",
-        "no-captions": "Geen ondertitels beschikbaar voor dit lied"
-      }
-    },
-    "clock": {
-      "description": "Voeg een klok toe aan de navigatiebalk",
-      "menu": {
-        "format": {
-          "24-hour-format": "24-uursformaat",
-          "display-seconds": "Toon Seconden",
-          "label": "Formaat"
-        }
-      },
-      "name": "Klok"
-    },
-    "compact-sidebar": {
-      "description": "Stel de zijbalk altijd in op compacte modus",
-      "name": "Compacte Zijbalk"
     },
     "crossfade": {
       "description": "Vervagen tussen nummers",
@@ -600,66 +522,6 @@
       },
       "name": "In-App Menu"
     },
-    "lumiastream": {
-      "description": "Voegt ondersteuning voor Lumia Stream toe",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Voegt songtekstondersteuning toe voor de meeste nummers",
-      "menu": {
-        "romanized-lyrics": "Geromaniseerde Teksten"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "Teksten opgehaald voor Genius"
-      }
-    },
-    "music-together": {
-      "description": "Deel een afspeellijst met anderen. Wanneer de host een nummer afspeelt, hoort iedereen hetzelfde nummer",
-      "dialog": {
-        "enter-host": "Voer Host-ID in"
-      },
-      "internal": {
-        "save": "Opslaan",
-        "track-source": "Bron van nummers",
-        "unknown-user": "Onbekende gebruiker"
-      },
-      "menu": {
-        "click-to-copy-id": "Host-ID kopiëren",
-        "close": "Sluit Music Samen",
-        "connected-users": "Verbonden gebruikers",
-        "disconnect": "Music Samen verbreken",
-        "empty-user": "Geen verbonden gebruikers",
-        "host": "Music Samen Host",
-        "join": "Voeg Music Samen toe",
-        "permission": {
-          "all": "Gasten toestaan de afspeellijst en speler te bedienen",
-          "host-only": "Alleen de host kan de afspeellijst en speler bedienen",
-          "playlist": "Gasten toestaan de afspeellijst te bedienen"
-        },
-        "set-permission": "Bedieningsmachtiging wijzigen",
-        "status": {
-          "disconnected": "Verbroken",
-          "guest": "Verbonden als Gast",
-          "host": "Verbonden als Host"
-        }
-      },
-      "name": "Music Samen [Beta]",
-      "toast": {
-        "add-song-failed": "Toevoegen van nummer mislukt",
-        "closed": "Music Samen gesloten",
-        "disconnected": "Music Samen verbroken",
-        "host-failed": "Hosten van Music Samen mislukt",
-        "id-copied": "Host-ID gekopieerd naar klembord",
-        "id-copy-failed": "Kopiëren van Host-ID naar klembord mislukt",
-        "join-failed": "Aansluiten bij Music Samen mislukt",
-        "joined": "Music Samen toegetreden",
-        "permission-changed": "Music Samen machtiging gewijzigd naar \"{{permission}}\"",
-        "remove-song-failed": "Verwijderen van nummer mislukt",
-        "user-connected": "{{name}} heeft Music Samen toegetreden",
-        "user-disconnected": "{{name}} heeft Music Samen verlaten"
-      }
-    },
     "navigation": {
       "description": "Volgende/Vorige navigatiepijlen rechtstreeks geïntegreerd in de interface, zoals in je favoriete browser",
       "name": "Navigatie",
@@ -671,10 +533,6 @@
           "title": "Ga naar de volgende pagina"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Verwijder Google aanmeldknoppen en -links uit de interface",
-      "name": "Geen Google Aanmelding"
     },
     "notifications": {
       "description": "Toont een melding wanneer een nummer begint te spelen (interactieve meldingen zijn beschikbaar op Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Huidige kwaliteit: {{quality}}",
-            "message": "Kies videokwaliteit:",
-            "title": "Kies Videokwaliteit"
-          }
-        }
-      },
-      "description": "Maakt het mogelijk de videokwaliteit te wijzigen met een knop op de video-overlay",
-      "name": "Videokwaliteitwisselaar",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Open speler kwaliteitswisselaar"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Ondersteuning voor scrobbling toevoegen (etc. last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Slaat disliked nummers over",
-      "name": "Sla disliked nummers over"
-    },
     "skip-silences": {
       "description": "Sla automatisch stiltesecties in nummers over",
       "name": "Stiltes overslaan"
@@ -835,93 +671,6 @@
       "description": "Slaat automatisch niet-muziekgedeelten over, zoals intro/outro of gedeelten van muziekvideo's waarin het nummer niet wordt afgespeeld",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "Biedt gesynchroniseerde songteksten voor nummers, met behulp van providers zoals LRClib.",
-      "errors": {
-        "fetch": "⚠️\tEr is een fout opgetreden bij het ophalen van de songtekst.\n\tProbeer het later opnieuw.",
-        "not-found": "⚠️ Er is geen songtekst gevonden voor dit nummer."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Converteer Chinees karakter",
-          "submenu": {
-            "disabled": {
-              "label": "Uitgeschakeld",
-              "tooltip": "Schakel chinese karakter conversie"
-            },
-            "simplified-to-traditional": {
-              "label": "Vereenvoudigd naar Traditioneel",
-              "tooltip": "Zet Vereenvoudigd Chinees om naar Traditioneel Chinees"
-            },
-            "traditional-to-simplified": {
-              "label": "Traditioneel naar Vereenvoudigd",
-              "tooltip": "Zet Traditioneel Chinees om naar Vereenvoudigd Chinees"
-            }
-          },
-          "tooltip": "Vertaal Chinese karakters naar Vereenvoudigd of Traditioneel Chinees"
-        },
-        "default-text-string": {
-          "label": "Standaardteken tussen songteksten",
-          "tooltip": "Kies het standaardteken dat u wilt gebruiken voor de opening tussen de songteksten"
-        },
-        "line-effect": {
-          "label": "Lijneffect",
-          "submenu": {
-            "fancy": {
-              "label": "Luxe",
-              "tooltip": "Gebruik grote, app-achtige effecten op de huidige regel"
-            },
-            "focus": {
-              "label": "Focus",
-              "tooltip": "Maak alleen de huidige regel wit"
-            },
-            "offset": {
-              "label": "Offset",
-              "tooltip": "Offset aan de rechterkant van de huidige lijn"
-            },
-            "scale": {
-              "label": "Schaal",
-              "tooltip": "Schaal de huidige regel"
-            }
-          },
-          "tooltip": "Kies het effect dat u op de huidige regel wilt toepassen"
-        },
-        "precise-timing": {
-          "label": "Zorg ervoor dat de songteksten perfect gesynchroniseerd zijn",
-          "tooltip": "Bereken tot op de milliseconde de weergave van de volgende regel (kan een kleine impact hebben op de prestaties)"
-        },
-        "preferred-provider": {
-          "label": "Voorkeur van Provider",
-          "none": {
-            "label": "Geen",
-            "tooltip": "Geen provider beschikbaar"
-          },
-          "tooltip": "Kies de standaardprovider om te gebruiken"
-        },
-        "romanization": {
-          "label": "Romaniseer songtekst",
-          "tooltip": "Als de songtekst in een andere taal is, probeer dan een Latijnse versie weer te geven."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Toon songteksten, zelfs als ze onnauwkeurig zijn",
-          "tooltip": "Als het nummer niet wordt gevonden, probeert de plug-in het opnieuw met een andere zoekopdracht.\nHet resultaat van de tweede poging is mogelijk niet exact."
-        },
-        "show-time-codes": {
-          "label": "Toon tijdcodes",
-          "tooltip": "Toon de tijdcodes naast de songtekst"
-        }
-      },
-      "name": "Gesynchroniseerde songteksten",
-      "refetch-btn": {
-        "fetching": "Ophalen...",
-        "normal": "Songteksten opnieuw ophalen"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - De songteksten zijn mogelijk niet synchroon vanwege een niet-overeenkomende duur.",
-        "inexact": "⚠️ - De songtekst van dit nummer is mogelijk niet exact",
-        "instrumental": "⚠️ - Dit is een instrumentaal nummer"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Bedien het afspelen vanaf uw Windows-taakbalk",
       "name": "Taakbalk Mediabediening"
@@ -929,62 +678,6 @@
     "touchbar": {
       "description": "Voegt een TouchBar-widget toe voor macOS-gebruikers",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Maakt de applicatiescherm doorzichtbaar",
-      "menu": {
-        "opacity": {
-          "label": "Dekking",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Soort",
-          "submenu": {
-            "acrylic": "Acrylic",
-            "mica": "Mica",
-            "none": "Geen",
-            "tabbed": "Tabbed"
-          }
-        }
-      },
-      "name": "Doorzichtige muziek speler"
-    },
-    "tuna-obs": {
-      "description": "Integratie met OBS's plug-in Tuna",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Voorkomt dat de speler omhoog springt tijdens het afspelen van een nummer",
-      "name": "Minder opdringerige speler"
-    },
-    "video-toggle": {
-      "description": "Voegt een knop toe om te schakelen tussen de video-/nummermodus. kan optioneel ook het hele videotabblad verwijderen",
-      "menu": {
-        "align": {
-          "label": "Uitlijning",
-          "submenu": {
-            "left": "Links",
-            "middle": "Midden",
-            "right": "Rechts"
-          }
-        },
-        "force-hide": "Forceer het verwijderen van het videotabblad",
-        "mode": {
-          "label": "Modus",
-          "submenu": {
-            "custom": "Aangepaste schakelaar",
-            "disabled": "Uitgeschakeld",
-            "native": "Native schakelaar"
-          }
-        }
-      },
-      "name": "Videoschakelaar",
-      "templates": {
-        "button-song": "Nummer",
-        "button-video": "Video"
-      }
     },
     "visualizer": {
       "description": "Voegt een visualisator toe aan de speler",

@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Jika iklan diputar, audio akan dimatikan dan kecepatan pemutaran akan diatur ke 16x",
-      "name": "Percepatan Iklan"
-    },
-    "album-actions": {
-      "description": "Tambah tombol Suka, Batal Suka, Tidak Suka dan Batal Tidak Suka untuk diterapkan ke semua lagu dalam daftar putar atau album",
-      "name": "Tindakan Album"
-    },
-    "album-color-theme": {
-      "description": "Menerapkan tema dinamis dan efek visual berdasarkan palet warna album",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Rasio campuran warna",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Aktifkan tema seekbar"
-      },
-      "name": "Tema Warna Album"
-    },
     "ambient-mode": {
       "description": "Menerapkan efek pencahayaan dengan memancarkan warna-warna lembut dari video, ke dalam latar belakang layar Anda",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Mode ambient"
-    },
-    "amuse": {
-      "description": "Menambahkan dukungan {{applicationName}} untuk widget Amuse yang sedang diputar oleh 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Server API Amuse sedang berjalan. GET /query untuk mendapatkan info lagu."
-      }
     },
     "api-server": {
       "description": "Menambahkan server API untuk mengontrol pemutar",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Menerapkan kompresi pada audio (mengurangi volume pada bagian paling keras dari sinyal dan meningkatkan volume pada bagian paling lembut)",
-      "name": "Kompresi suara"
-    },
     "auth-proxy-adapter": {
       "description": "Dukungan untuk penggunaan layanan proxy autentikasi",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Port Proxy"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Jadikan bar navigasi blur dan transparan",
-      "name": "Buramkan Bar Navigasi"
-    },
-    "bypass-age-restrictions": {
-      "description": "Lewati verifikasi umur dari Music Player",
-      "name": "Lewati batasan umur"
-    },
-    "captions-selector": {
-      "description": "Pemilih caption untuk trek audio {{applicationName}}",
-      "menu": {
-        "autoload": "Pilih caption terakhir secara otomatis",
-        "disable-captions": "Tidak ada caption secara default"
-      },
-      "name": "Pemilih Caption",
-      "prompt": {
-        "selector": {
-          "label": "Bahasa caption saat ini: {{language}}",
-          "none": "Tidak ada",
-          "title": "Pilih bahasa caption"
-        }
-      },
-      "templates": {
-        "title": "Buka pemilih caption"
-      },
-      "toast": {
-        "caption-changed": "caption diganti ke bahasa {{language}}",
-        "caption-disabled": "Caption dinonaktifkan",
-        "no-captions": "tidak tersedia caption untuk lagu ini"
-      }
-    },
-    "clock": {
-      "description": "Tambahkan jam ke bilah navigasi",
-      "menu": {
-        "format": {
-          "24-hour-format": "Format 24 jam",
-          "display-seconds": "Tampilkan detik",
-          "label": "Format"
-        }
-      },
-      "name": "Jam"
-    },
-    "compact-sidebar": {
-      "description": "Selalu atur sidebar dalam mode kompak",
-      "name": "Sidebar Ringkas"
     },
     "crossfade": {
       "description": "Crossfade antar lagu",
@@ -600,66 +522,6 @@
       },
       "name": "Menu di Aplikasi"
     },
-    "lumiastream": {
-      "description": "Tambah dukungan Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Tambah dukungan lirik untuk kebanyakan lagu",
-      "menu": {
-        "romanized-lyrics": "Romanisasi Lirik"
-      },
-      "name": "Lirik Genius",
-      "renderer": {
-        "fetched-lyrics": "Lirik yang diambil untuk Genius"
-      }
-    },
-    "music-together": {
-      "description": "Bagikan daftar putar dengan yang lain. Saat host memainkan lagu, semua orang akan mendengarkan lagu yang sama",
-      "dialog": {
-        "enter-host": "Masukkan ID Host"
-      },
-      "internal": {
-        "save": "Simpan",
-        "track-source": "Sumber Trek",
-        "unknown-user": "Pengguna Tidak Diketahui"
-      },
-      "menu": {
-        "click-to-copy-id": "Salin ID Host",
-        "close": "Tutup Musik Bersama",
-        "connected-users": "Pengguna Terhubung",
-        "disconnect": "Putuskan Musik Bersama",
-        "empty-user": "Tidak ada pengguna terhubung",
-        "host": "Host Musik Bersama",
-        "join": "Gabung Musik Bersama",
-        "permission": {
-          "all": "Izinkan tamu untuk mengendalikan daftar putar dan pemutar",
-          "host-only": "Hanya host yang dapat mengendalikan daftar putar dan pemutar",
-          "playlist": "Izinkan tamu untuk mengendalikan daftar putar"
-        },
-        "set-permission": "Ubah Pengendali Izin",
-        "status": {
-          "disconnected": "Terputus",
-          "guest": "Terhubung sebagai Tamu",
-          "host": "Terhubung sebagai Host"
-        }
-      },
-      "name": "Musik Bersama [Beta]",
-      "toast": {
-        "add-song-failed": "Gagal untuk menambahkan lagu",
-        "closed": "Musik Bersama ditutup",
-        "disconnected": "Musik Bersama terputus",
-        "host-failed": "Gagal untuk memulai Musik Bersama",
-        "id-copied": "ID Host tersalin ke papan klip",
-        "id-copy-failed": "Gagal menyalin ID Host ke papan klip",
-        "join-failed": "Gagal untuk bergabung ke Musik Bersama",
-        "joined": "Bergabung ke Musik Bersama",
-        "permission-changed": "Perizinan Musik Bersama diubah ke \"{{permission}}\"",
-        "remove-song-failed": "Gagal menghapus lagu",
-        "user-connected": "{{name}} bergabung ke Musik Bersama",
-        "user-disconnected": "{{name}} meninggalkan Musik Bersama"
-      }
-    },
     "navigation": {
       "description": "panah navigasi Selanjutnya/Sebelumnya terintegrasi pada antarmuka, layaknya peramban kesukaan Anda",
       "name": "Navigasi",
@@ -671,10 +533,6 @@
           "title": "pergi ke halaman berikutnya"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Hapus tombol dan tautan masuk Google dari antarmuka",
-      "name": "Tanpa Google Login"
     },
     "notifications": {
       "description": "Tampilkan pemberitahuan saat lagu dimainkan (pemberitahuan interaktif tersedia di Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Kualitas Terkini: {{quality}}",
-            "message": "Pilih Kualitas Video:",
-            "title": "Pilih Kualitas Video"
-          }
-        }
-      },
-      "description": "Izinkan untuk mengubah kualitas video dengan tombol pada hamparan video",
-      "name": "Pengubah Kualitas Video",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "pengubah kualitas pemain terbuka"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Tambahkan dukungan scrobbling (mis. last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Lewati lagu yang tidak disukai",
-      "name": "Lewati Lagu yang Tidak Disukai"
-    },
     "skip-silences": {
       "description": "Otomatis lewati bagian hening dari lagu",
       "name": "Lewati Keheningan"
@@ -835,93 +671,6 @@
       "description": "Otomatis Melewati bagian yang bukan musik seperti intro/outro atau bagian dari video musik di mana lagu tidak dimainkan",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "Menyediakan lirik lagu yang disinkronkan, menggunakan penyedia seperti LRClib.",
-      "errors": {
-        "fetch": "⚠️\tTerjadi kesalahan saat mengambil lirik.\n\tSilakan coba lagi nanti.",
-        "not-found": "⚠️ Tidak ada lirik yang ditemukan untuk lagu ini."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Konversi karakter Tionghoa",
-          "submenu": {
-            "disabled": {
-              "label": "Dinonaktifkan",
-              "tooltip": "Nonaktifkan konversi karakter Tionghoa"
-            },
-            "simplified-to-traditional": {
-              "label": "Sederhana ke Tradisional",
-              "tooltip": "Konversi Tionghoa Sederhana ke Tionghoa Tradisional"
-            },
-            "traditional-to-simplified": {
-              "label": "Tradisional ke Sederhana",
-              "tooltip": "Konversi Tionghoa Tradisional ke Tionghoa Sederhana"
-            }
-          },
-          "tooltip": "Konversi karakter Tionghoa ke Tradisional atau Sederhana"
-        },
-        "default-text-string": {
-          "label": "Karakter default antara lirik",
-          "tooltip": "Pilih karakter default yang akan digunakan untuk celah antar lirik"
-        },
-        "line-effect": {
-          "label": "Efek garis",
-          "submenu": {
-            "fancy": {
-              "label": "Mewah",
-              "tooltip": "Gunakan efek besar seperti aplikasi pada baris saat ini"
-            },
-            "focus": {
-              "label": "Fokus",
-              "tooltip": "Jadikan hanya baris saat ini berwarna putih"
-            },
-            "offset": {
-              "label": "Offset",
-              "tooltip": "Mengimbangi garis saat ini di sebelah kanan"
-            },
-            "scale": {
-              "label": "Skala",
-              "tooltip": "Skala garis saat ini"
-            }
-          },
-          "tooltip": "Pilih efek yang akan diterapkan ke baris saat ini"
-        },
-        "precise-timing": {
-          "label": "Buat liriknya tersinkronisasi dengan sempurna",
-          "tooltip": "Hitung hingga milidetik tampilan baris berikutnya (dapat berdampak kecil pada kinerja)"
-        },
-        "preferred-provider": {
-          "label": "Penyedia Pilihan",
-          "none": {
-            "label": "Tidak ada",
-            "tooltip": "Tidak ada penyedia pilihan"
-          },
-          "tooltip": "Pilih penyedia bawaan untuk dipakai"
-        },
-        "romanization": {
-          "label": "Romanize Liriknya",
-          "tooltip": "Apabila lirik berada dalam bahasa berbeda, cobalah untuk menampilkan versi latinnya."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Tampilkan lirik meskipun tidak tepat",
-          "tooltip": "Jika lagu tidak ditemukan, plugin akan mencoba lagi dengan kueri pencarian yang berbeda.\nHasil dari percobaan kedua mungkin tidak tepat."
-        },
-        "show-time-codes": {
-          "label": "Tampilkan kode waktu",
-          "tooltip": "Tampilkan kode waktu di samping lirik"
-        }
-      },
-      "name": "Lirik yang Disinkronkan",
-      "refetch-btn": {
-        "fetching": "Mengambil...",
-        "normal": "Ambil ulang lirik"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Liriknya mungkin tidak sinkron karena ketidakcocokan durasi.",
-        "inexact": "⚠️ - Lirik lagu ini mungkin tidak tepat",
-        "instrumental": "⚠️ - Ini adalah lagu instrumental"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Kendalikan pemutaran dari bilah alat Windows",
       "name": "Pengendali Media di Bilah Alat"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "Tambahkan widget TouchBar untuk pengguna macOS",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Buat jendela aplikasi transparan",
-      "menu": {
-        "opacity": {
-          "label": "Opasitas",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Tipe",
-          "submenu": {
-            "acrylic": "Akrilik",
-            "content": "Konten",
-            "fullscreen-ui": "Tampilan UI Layar Penuh",
-            "mica": "Mika",
-            "none": "TIdak ada",
-            "tabbed": "Tabulasi",
-            "under-page": "Dibawah Halaman",
-            "under-window": "Dibawah Jendela",
-            "window": "Layar"
-          }
-        }
-      },
-      "name": "Pemutar Transparan"
-    },
-    "tuna-obs": {
-      "description": "Integrasi dengan plugin Tuna OBS",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Cegah pemutar musik muncul ketika memutar musik",
-      "name": "Pemutar simpel (tidak menganggu)"
-    },
-    "video-toggle": {
-      "description": "Tambahkan tombol untuk beralih antara mode Lagu/Video. secara opsional juga dapat menghapus keseluruhan tab video",
-      "menu": {
-        "align": {
-          "label": "Perataan",
-          "submenu": {
-            "left": "Kiri",
-            "middle": "Tengah",
-            "right": "Kanan"
-          }
-        },
-        "force-hide": "Paksa hapus tab video",
-        "mode": {
-          "label": "Mode",
-          "submenu": {
-            "custom": "Peralih kustom",
-            "disabled": "Mati",
-            "native": "Peralih bawaan"
-          }
-        }
-      },
-      "name": "Peralih Video",
-      "templates": {
-        "button-song": "Lagu",
-        "button-video": "video"
-      }
     },
     "visualizer": {
       "description": "Tambahkan visualisator ke pemutar",

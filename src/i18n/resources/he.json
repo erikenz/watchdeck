@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "במקרה של פרסומת, הסאונד מושתק ומהירות הוידאו מוכפלת ב-16",
-      "name": "הגבר מהירות פרסומת"
-    },
-    "album-actions": {
-      "description": "מוסיף לחצני ביטול אהבתי, דיסלייק, 'אהבתי' ו'לא אהבתי' כדי להחיל זאת על כל השירים ברשימת השמעה או אלבום",
-      "name": "פעולות אלבום"
-    },
-    "album-color-theme": {
-      "description": "מחיל נושא דינמי ואפקטים חזותיים המבוססים על לוח הצבעים של האלבום",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "יחס ערבוב צבעים",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "הפעל עיצוב של פס ההתקדמות"
-      },
-      "name": "ערכת נושא צבע אלבום"
-    },
     "ambient-mode": {
       "description": "מחיל אפקט תאורה על ידי הטלת צבעים עדינים מהסרטון, אל הרקע של המסך",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "מצב אווירה"
-    },
-    "amuse": {
-      "description": "מוסיף תמיכה ב-{{applicationName}} עבור הווידג'ט של Amuse המתנגן כעת על ידי 6K Labs",
-      "name": "משעשע",
-      "response": {
-        "query": "שרת ה-API של Amuse פועל. קבל מידע על השיר באמצעות GET /query."
-      }
     },
     "api-server": {
       "description": "הוסף כתובת שירות כדי לשלוט בנגן",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "החל דחיסה על אודיו (מורידה את עוצמת הקול של החלקים הרועשים ביותר של האות ומעלה את עוצמת הקול של החלקים החלשים ביותר)",
-      "name": "דוחס ומצפין קול"
-    },
     "auth-proxy-adapter": {
       "description": "תמיכה בשימוש בשירותי פרוקסי אימות",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "יציאת פרוקסי"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "הפוך את סרגל הניווט לשקוף ומטושטש",
-      "name": "טשטש את סרגל הניווט"
-    },
-    "bypass-age-restrictions": {
-      "description": "עקוף את אימות גיל המשתמש של יוטיוב",
-      "name": "עקוף את ההחמרות של הגיל"
-    },
-    "captions-selector": {
-      "description": "בורר כתוביות עבור רצועות אודיו של {{applicationName}}",
-      "menu": {
-        "autoload": "בחר אוטומטי את הכתובית האחרונה שנבחרה",
-        "disable-captions": "ברירת מחד ללא כתוביות"
-      },
-      "name": "בוחר כתוביות",
-      "prompt": {
-        "selector": {
-          "label": "שפת כתוביות נוכחית: {{language}}",
-          "none": "ללא",
-          "title": "בחר שפת כתוביות"
-        }
-      },
-      "templates": {
-        "title": "פתח בחירת כתוביות"
-      },
-      "toast": {
-        "caption-changed": "תרגום שונה ל {{שפה}}",
-        "caption-disabled": "כתוביות מושבתות",
-        "no-captions": "אין כתוביות זמינות לשיר הזה"
-      }
-    },
-    "clock": {
-      "description": "הוסף שעון לפס הניווט",
-      "menu": {
-        "format": {
-          "24-hour-format": "פורמט 24-שעות",
-          "display-seconds": "הצג שניות",
-          "label": "פורמט"
-        }
-      },
-      "name": "שעון"
-    },
-    "compact-sidebar": {
-      "description": "הגדר תמיד את סרגל הצד למצב קומפקטי",
-      "name": "סרגל צד קומפקטי"
     },
     "crossfade": {
       "description": "עמעם בין השירים",
@@ -597,55 +519,6 @@
         "hide-dom-window-controls": "הסתר פקדי חלון DOM"
       },
       "name": "תפריט פנים-אפליקצה"
-    },
-    "lumiastream": {
-      "description": "מוסיף תמיכת Lumia Stream",
-      "name": "Lumia Stream [בטא]"
-    },
-    "lyrics-genius": {
-      "description": "מוסיף תמיכת כתוביות לרוב השירים",
-      "renderer": {
-        "fetched-lyrics": "נאספו כתוביות לGenius"
-      }
-    },
-    "music-together": {
-      "description": "שתף רשימת השמעה עם אחרים. כאשר המארח מנגן שיר, כל השאר ישמעו את אותו שיר",
-      "dialog": {
-        "enter-host": "הזן את המזהה של המארח"
-      },
-      "internal": {
-        "save": "שמור",
-        "unknown-user": "משתמש לא מזוהה"
-      },
-      "menu": {
-        "click-to-copy-id": "העתק מזהה המארח",
-        "close": "סגור Music Together",
-        "connected-users": "משתמשים מחוברים",
-        "disconnect": "נתק Music Together",
-        "empty-user": "אין משתמשים מחוברים",
-        "host": "מארח Music Together",
-        "join": "הצטרף לMusic Together",
-        "permission": {
-          "all": "מרשה לאורחים לשלוט ברשימת ההשמעה ובנגן",
-          "host-only": "רק המארח יכול לשלוט ברשימת ההשמעה ובנגן",
-          "playlist": "הרשה לאורחים לשלוט ברשימת ההשמה"
-        },
-        "set-permission": "שנה רשות השליטה",
-        "status": {
-          "disconnected": "מנותק",
-          "guest": "מחובר בתור אורח",
-          "host": "מחובר בתור מארח"
-        }
-      },
-      "name": "Music Together [בטא]",
-      "toast": {
-        "add-song-failed": "נכשל בהוספת השיר",
-        "closed": "Music Together נסגר",
-        "disconnected": "Music Together נותק",
-        "host-failed": "נכשל באירוח Music Together",
-        "id-copied": "מזהה מארח הועתק ללוח",
-        "id-copy-failed": "נכשל בהעתקת מזהה המארח ללוח"
-      }
     }
   }
 }

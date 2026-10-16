@@ -1,5 +1,7 @@
 /**
- * Application ID registered by @th-ch/pear-desktop dev team
+ * Discord application ID inherited from the upstream project. It still
+ * identifies that app in Discord's UI — register a Watchdeck application
+ * and replace this before shipping the plugin to users.
  */
 export const clientId = '1177081335727267940';
 /**

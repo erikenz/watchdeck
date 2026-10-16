@@ -215,21 +215,6 @@
     }
   },
   "plugins": {
-    "album-actions": {
-      "name": "Accións do álbum"
-    },
-    "album-color-theme": {
-      "description": "Aplicar un tema dinámico e efectos visuáis baseados na paleta de cor do álbum",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Proporción da mezcla de cores",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        }
-      },
-      "name": "Temas de cor do álbum"
-    },
     "ambient-mode": {
       "menu": {
         "blur-amount": {
@@ -295,9 +280,6 @@
           "label": "Porto"
         }
       }
-    },
-    "audio-compressor": {
-      "name": "Compresor de audio"
     },
     "auth-proxy-adapter": {
       "menu": {

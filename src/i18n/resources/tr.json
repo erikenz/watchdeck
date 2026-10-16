@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Bir reklam oynatılırsa sesi kapatır ve oynatma hızını 16x olarak ayarlar",
-      "name": "Reklam Hızlandırma"
-    },
-    "album-actions": {
-      "description": "Çalma listesindeki veya albümdeki tüm şarkılara Beğendim ve Beğenmedim düğmeleri ekler",
-      "name": "Albüm Eylemleri"
-    },
-    "album-color-theme": {
-      "description": "Albümün renk paletine dayalı dinamik bir tema ve efektler uygular",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Renk karışım oranı",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Arama çubuğu temalarını etkinleştir"
-      },
-      "name": "Albüm Renk Teması"
-    },
     "ambient-mode": {
       "description": "Videodaki yumuşak renkleri ekranınızın arka planına yansıtarak bir ışık efekti uygular",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Ambiyans Modu"
-    },
-    "amuse": {
-      "description": "6K Labs'ın Amuse oynatma widget'ı için {{applicationName}} desteği ekler",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API sunucusu çalışıyor. Şarkı bilgilerini almak için GET /query kullanabilirsiniz."
-      }
     },
     "api-server": {
       "description": "Oynatıcıyı kontrol etmek için API sunucusu ekler",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Ses sıkıştırma (dalganın en gürültülü bölümlerinin ses düzeyini azaltır ve daha yumuşak bölümlerin ses düzeyini artırır)",
-      "name": "Ses Sıkıştırma"
-    },
     "auth-proxy-adapter": {
       "description": "Kimlik doğrulama proxy hizmetlerinin kullanımına destek",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Proxy Bağlantı Noktası"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Gezinme çubuğunu şeffaf ve bulanık yapar",
-      "name": "Navigasyon barını bulanıklaştır"
-    },
-    "bypass-age-restrictions": {
-      "description": "Music Player yaş doğrulamasını atla",
-      "name": "Yaş doğrulamasını atla"
-    },
-    "captions-selector": {
-      "description": "{{applicationName}} için altyazı seçici",
-      "menu": {
-        "autoload": "Son kullanılan altyazıyı otomatik olarak seç",
-        "disable-captions": "Varsayılan olarak altyazı yok"
-      },
-      "name": "Altyazı Seçici",
-      "prompt": {
-        "selector": {
-          "label": "Geçerli altyazı dili: {{language}}",
-          "none": "Hiçbiri",
-          "title": "Altyazı dilini seç"
-        }
-      },
-      "templates": {
-        "title": "Altyazı seçiciyi aç"
-      },
-      "toast": {
-        "caption-changed": "Başlık {{language}} olarak değiştirildi",
-        "caption-disabled": "Altyazılar devre dışı",
-        "no-captions": "Bu şarkı için altyazı mevcut değil"
-      }
-    },
-    "clock": {
-      "description": "Navigasyon barına bir saat ekle",
-      "menu": {
-        "format": {
-          "24-hour-format": "24-Saat Formatı",
-          "display-seconds": "Saniyeleri Göster",
-          "label": "Format"
-        }
-      },
-      "name": "Saat"
-    },
-    "compact-sidebar": {
-      "description": "Her zaman kompakt kenar çubugu",
-      "name": "Kompakt Kenar Çubuğu"
     },
     "crossfade": {
       "description": "Şarkılar arasında Çapraz Geçiş",
@@ -600,66 +522,6 @@
       },
       "name": "Uygulama İçi Menü"
     },
-    "lumiastream": {
-      "description": "Lumia Stream desteği ekler",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Çoğu şarkı için şarkı sözü desteği ekler",
-      "menu": {
-        "romanized-lyrics": "Romanlaştırılmış Şarkı Sözleri"
-      },
-      "name": "Genius Şarkı Sözleri",
-      "renderer": {
-        "fetched-lyrics": "Şarkı sözleri genius tarafından alındı"
-      }
-    },
-    "music-together": {
-      "description": "Oynatma listesini başkalarıyla paylaşın. Sunucu sahibi bir şarkı çaldığında, diğer herkes aynı şarkıyı duyacak",
-      "dialog": {
-        "enter-host": "Sunucu ID'si Girin"
-      },
-      "internal": {
-        "save": "Kaydet",
-        "track-source": "Parça Kaynağı",
-        "unknown-user": "Bilinmeyen Kullanıcı"
-      },
-      "menu": {
-        "click-to-copy-id": "Sunucu ID'sini kopyala",
-        "close": "Birlikte Müziği Kapat",
-        "connected-users": "Bağlanan Kullanıcılar",
-        "disconnect": "Birlikte Müzik Bağlantısını Kesin",
-        "empty-user": "Bağlı kullanıcı bulunmuyor",
-        "host": "Birlikte Müzik Sunucusu",
-        "join": "Birlikte Müziğe Katıl",
-        "permission": {
-          "all": "Konukların oynatma listesini ve oynatıcıyı kontrol etmesine izin ver",
-          "host-only": "Çalma listesini ve oynatıcıyı yalnızca yönetici kontrol edebilir",
-          "playlist": "Konukların oynatma listesini kontrol etmesine izin ver"
-        },
-        "set-permission": "Kontrol İznini Değiştir",
-        "status": {
-          "disconnected": "Bağlantı kesildi",
-          "guest": "Misafir olarak bağlandı",
-          "host": "Sunucu Sahibi olarak bağlandı"
-        }
-      },
-      "name": "Birlikte Müzik [Beta]",
-      "toast": {
-        "add-song-failed": "Şarkı eklenirken bir hata meydana geldi",
-        "closed": "Birlikte Müzik kapatıldı",
-        "disconnected": "Birlikte Müzik bağlantı kesildi",
-        "host-failed": "Birlikte Müzik sunucusu kurulamadı",
-        "id-copied": "Sunucu ID'si kopyalandı",
-        "id-copy-failed": "Sunucu ID'si panoya kopyalanamadı",
-        "join-failed": "Birlikte Müziğe katılırken bir hata meydana geldi",
-        "joined": "Birlikte Müziğe Katıldı",
-        "permission-changed": "Birlikte Müzik yetkisi \"{{permission}}\" olarak değiştirildi",
-        "remove-song-failed": "Şarkı kaldırılırken bir hata meydana geldi",
-        "user-connected": "{{name}} Birlikte Müziğe Katıldı",
-        "user-disconnected": "{{name}} Birlikte Müzik'ten ayrıldı"
-      }
-    },
     "navigation": {
       "description": "Favori tarayıcınızdaki gibi doğrudan arayüze entegre edilmiş İleri/Geri gezinme okları",
       "name": "Navigasyon",
@@ -671,10 +533,6 @@
           "title": "Sonraki sayfaya geç"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Google giriş düğmelerini ve bağlantılarını arayüzden kaldır",
-      "name": "Google Girişini Kaldır"
     },
     "notifications": {
       "description": "Bir şarkı çalmaya başladığında bir bildirim görüntüler (etkileşimli bildirimler Windows'ta mevcuttur)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Mevcut Kalite: {{quality}}",
-            "message": "Video Kalitesini Seçin:",
-            "title": "Video Kalitesini Seçin"
-          }
-        }
-      },
-      "description": "Video katmanı üzerindeki bir düğme ile video kalitesinin değiştirilmesine izin verir",
-      "name": "Video Kalitesi Değiştirici",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Açık oynatıcı kalite değiştirici"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Listeleme desteği ekler (lastfm, listenbrainz ve benzeri)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Beğenmediğin şarkıları atlar",
-      "name": "Beğenmediklerini Atla"
-    },
     "skip-silences": {
       "description": "Şarkılardaki sessiz bölümleri otomatik olarak atlar",
       "name": "Sessizlikleri Atla"
@@ -835,93 +671,6 @@
       "description": "Giriş/Çıkış gibi müzik olmayan kısımları veya müzik videolarında şarkının çalmadığı kısımları otomatik olarak atlar",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "LRClib gibi sağlayıcıları kullanarak şarkılara senkronize şarkı sözleri sağlar.",
-      "errors": {
-        "fetch": "⚠️ \tŞarkı sözleri alınırken bir hata oluştu.\n\tLütfen daha sonra tekrar deneyin.",
-        "not-found": "⚠️ Bu şarkı için şarkı sözleri bulunamadı."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Çince karakterleri çevir",
-          "submenu": {
-            "disabled": {
-              "label": "Devre dışı bırak",
-              "tooltip": "Çince karakterleri çevirmeyi devre dışı bırak"
-            },
-            "simplified-to-traditional": {
-              "label": "Basitleştirilmişten Geleneksele",
-              "tooltip": "Basitleştirilmiş Ç*nceyi Geleneksel Ç*nceye Çevir"
-            },
-            "traditional-to-simplified": {
-              "label": "Gelenekselden Basitleştirilmişe",
-              "tooltip": "Geleneksel Çince'yi Basitleştirilmiş Çince'ye dönüştür"
-            }
-          },
-          "tooltip": "Çince karakterleri Geleneksel veya Basitleştirilmiş Çinceye dönüştür"
-        },
-        "default-text-string": {
-          "label": "Şarkı sözleri arasında varsayılan karakter",
-          "tooltip": "Şarkı sözleri arasındaki boşluk için kullanılacak varsayılan karakteri seçin"
-        },
-        "line-effect": {
-          "label": "Çizgi etkisi",
-          "submenu": {
-            "fancy": {
-              "label": "Süslü",
-              "tooltip": "Mevcut satırda büyük, uygulama benzeri efektler kullan"
-            },
-            "focus": {
-              "label": "odak",
-              "tooltip": "Yalnızca geçerli satırı beyaz yapın"
-            },
-            "offset": {
-              "label": "telafi etmek,ofset",
-              "tooltip": "Geçerli satırın sağındaki ofset"
-            },
-            "scale": {
-              "label": "ölçek",
-              "tooltip": "Geçerli satırı ölçeklendirir"
-            }
-          },
-          "tooltip": "Geçerli satıra uygulanacak efekti seçin"
-        },
-        "precise-timing": {
-          "label": "Şarkı sözlerini mükemmel şekilde senkronize edin",
-          "tooltip": "Bir sonraki satırın görüntülenmesini milisaniyesine kadar hesaplayın (performans üzerinde küçük bir etkisi olabilir)"
-        },
-        "preferred-provider": {
-          "label": "Tercih edilen Sağlayıcı",
-          "none": {
-            "label": "Hiçbiri",
-            "tooltip": "Varsayılan sağlayıcı yok"
-          },
-          "tooltip": "Kullanmak İçin varsayılan sağlayıcıyı seçin"
-        },
-        "romanization": {
-          "label": "Sözleri Romanize Et",
-          "tooltip": "Sözler başka bir dilde gözüküyorsa, Latin versiyonunu dene."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Kesin olmasa bile şarkı sözlerini gösterin",
-          "tooltip": "Şarkı bulunamazsa, eklenti farklı bir arama sorgusuyla tekrar dener. \nİkinci denemenin sonucu tam olmayabilir."
-        },
-        "show-time-codes": {
-          "label": "Zaman kodlarını göster",
-          "tooltip": "Şarkı sözlerinin yanında zaman kodlarını gösterin"
-        }
-      },
-      "name": "Senkronize Şarkı Sözleri",
-      "refetch-btn": {
-        "fetching": "Getiriliyor...",
-        "normal": "Refetch şarkı sözleri"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Süre uyuşmazlığı nedeniyle şarkı sözleri senkronize olmayabilir.",
-        "inexact": "⚠️ - Bu şarkının sözleri tam olmayabilir",
-        "instrumental": "⚠️ - Bu enstrümantal bir şarkıdır"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Windows görev çubuğu üzerinden oynatmayı kontrol edebilmenize olanak sağlar",
       "name": "Görev Çubuğu Medya Kontrolü"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "macOS kullanıcıları için bir TouchBar widget'ı ekler",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Uygulama penceresini şeffaf yapar",
-      "menu": {
-        "opacity": {
-          "label": "Opaklık",
-          "submenu": {
-            "percent": "%{{opacity}}"
-          }
-        },
-        "type": {
-          "label": "Tür",
-          "submenu": {
-            "acrylic": "Akrilik",
-            "content": "İçerik",
-            "fullscreen-ui": "Tam Ekran Kullanıcı Arayüzü",
-            "mica": "Mika",
-            "none": "Hiçbiri",
-            "tabbed": "Sekmeli",
-            "under-page": "Sayfanın alt kısmı",
-            "under-window": "Pencerenin alt kısmı",
-            "window": "Pencere"
-          }
-        }
-      },
-      "name": "Şeffaf Oynatıcı"
-    },
-    "tuna-obs": {
-      "description": "OBS eklentisi Tuna ile entegrasyon sağlar",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Müzik oynatıcının şarkı çalarken saçmalamasını engeller",
-      "name": "Göze Batmayan Çalar"
-    },
-    "video-toggle": {
-      "description": "Video/Şarkı modu arasında geçiş yapmak için bir düğme ekler. ayrıca isteğe bağlı olarak tüm video sekmesini kaldırabilir",
-      "menu": {
-        "align": {
-          "label": "Hizalama",
-          "submenu": {
-            "left": "Sol",
-            "middle": "Orta",
-            "right": "Sağ"
-          }
-        },
-        "force-hide": "Video sekmesini kaldırmaya zorla",
-        "mode": {
-          "label": "Mod",
-          "submenu": {
-            "custom": "Özel Ayar",
-            "disabled": "Devre dışı",
-            "native": "Yerel geçiş"
-          }
-        }
-      },
-      "name": "Video Geçiş",
-      "templates": {
-        "button-song": "Şarkı",
-        "button-video": "Video"
-      }
     },
     "visualizer": {
       "description": "Oynatıcıya bir görselleştirici ekler",

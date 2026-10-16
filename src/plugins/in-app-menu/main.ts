@@ -51,7 +51,7 @@ export const onMainLoad = ({
     return target;
   };
 
-  ipcMain.handle('peard:menu-event', (event, commandId: number) => {
+  ipcMain.handle('watchdeck:menu-event', (event, commandId: number) => {
     const target = getMenuItemById(commandId);
     if (target)
       (

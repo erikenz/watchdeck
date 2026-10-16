@@ -35,13 +35,13 @@ declare module 'solid-js' {
       icon: Icons;
     }
 
-    interface PearTransProps {
+    interface WdTransProps {
       key?: string;
     }
 
     interface IntrinsicElements extends MDUIElements {
       'center': ComponentProps<'div'>;
-      'pear-trans': ComponentProps<'span'> & PearTransProps;
+      'wd-trans': ComponentProps<'span'> & WdTransProps;
       'yt-formatted-string': ComponentProps<'span'> & YtFormattedStringProps;
       'yt-button-renderer': ComponentProps<'button'> & YtButtonRendererProps;
       'yt-touch-feedback-shape': ComponentProps<'div'>;

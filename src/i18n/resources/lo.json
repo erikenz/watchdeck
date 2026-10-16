@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "ຖ້າຫາກມີໂຄສະນາຫຼິ້ນ ມັນຈະປິດສຽງ ແລະ ຕັ້ງຄ່າຄວາມໄວໃນການຫຼິ້ນເປັນ 16 ເທົ່າ",
-      "name": "ເລັ່ງໂຄສະນາ"
-    },
-    "album-actions": {
-      "description": "ເພີ່ມປຸ່ມ ຍົກເລີກການບໍ່ຖືກໃຈ, ບໍ່ຖືກໃຈ, ຖືກໃຈ ແລະ ຍົກເລີກການຖືກໃຈ ເພື່ອໃຊ້ກັບທຸກເພງໃນເພລຍ໌ລິດສ໌ ຫຼື ອັລບັ້ມ",
-      "name": "ການຈັດການອັລບັ້ມ"
-    },
-    "album-color-theme": {
-      "description": "ໃຊ້ຮູບແບບສີສັນແບບໄດນາມິກ ແລະ ເອັບເຟັກພາບຕາມສີຂອງປົກອັລບັ້ມ",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "ອັດຕາສ່ວນການປະສົມສີ",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "ເປີດໃຊ້ຮູບແບບສີສັນສຳລັບແຖບຄົ້ນຫາ (seekbar)"
-      },
-      "name": "ຮູບແບບສີສັນຕາມສີອັລບັ້ມ"
-    },
     "ambient-mode": {
       "description": "ໃຊ້ເອັບເຟັກແສງສີໂດຍການປ່ອຍສີທີ່ອ່ອນໂຍນຈາກວິດີໂອ ລົງໄປໃນພື້ນຫຼັງຂອງໜ້າຈໍທ່ານ",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "ໂໝດແສງສີຮອບຂ້າງ"
-    },
-    "amuse": {
-      "description": "ເພີ່ມການຮອງຮັບ {{applicationName}} ສຳລັບວິດເຈັດກຳລັງຫຼິ້ນຂອງ Amuse ໂດຍ 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "ເຊີເວີ Amuse API ກຳລັງເຮັດວຽກ. GET /query ເພື່ອຮັບຂໍ້ມູນເພງ."
-      }
     },
     "api-server": {
       "description": "ເພີ່ມເຊີເວີ API ເພື່ອຄວບຄຸມເຄື່ອງຫຼິ້ນ",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "ໃຊ້ການບີບອັດກັບສຽງ (ຫຼຸດລະດັບສຽງຂອງສ່ວນທີ່ດັງທີ່ສຸດ ແລະ ເພີ່ມລະດັບສຽງຂອງສ່ວນທີ່ຄ່ອຍທີ່ສຸດ)",
-      "name": "ເຄື່ອງບີບອັດສຽງ"
-    },
     "auth-proxy-adapter": {
       "description": "ຮອງຮັບການໃຊ້ບໍລິການພຣັອກຊີສຳລັບການຢືນຢັນຕົວຕົນ",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Proxy Port"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "ເຮັດໃຫ້ແຖບນຳທາງໂປ່ງໃສ ແລະ ມົວ",
-      "name": "ແຖບນຳທາງແບບມົວ"
-    },
-    "bypass-age-restrictions": {
-      "description": "ຂ້າມການຢືນຢັນອາຍຸຂອງເຄື່ອງຫຼິ້ນເພງ",
-      "name": "ຂ້າມການຈຳກັດອາຍຸ"
-    },
-    "captions-selector": {
-      "description": "ຕົວເລືອກຄຳບັນຍາຍສຳລັບແທຣັກສຽງຂອງ {{applicationName}}",
-      "menu": {
-        "autoload": "ເລືອກຄຳບັນຍາຍຫຼ້າສຸດທີ່ໃຊ້ໂດຍອັດຕະໂນມັດ",
-        "disable-captions": "ບໍ່ມີຄຳບັນຍາຍເປັນຄ່າເລີ່ມຕົ້ນ"
-      },
-      "name": "ຕົວເລືອກຄຳບັນຍາຍ",
-      "prompt": {
-        "selector": {
-          "label": "ພາສາຄຳບັນຍາຍປັດຈຸບັນ: {{language}}",
-          "none": "ບໍ່ມີ",
-          "title": "ເລືອກພາສາຄຳບັນຍາຍ"
-        }
-      },
-      "templates": {
-        "title": "ເປີດຕົວເລືອກຄຳບັນຍາຍ"
-      },
-      "toast": {
-        "caption-changed": "ປ່ຽນຄຳບັນຍາຍເປັນ {{language}} ແລ້ວ",
-        "caption-disabled": "ປິດການໃຊ້ງານຄຳບັນຍາຍແລ້ວ",
-        "no-captions": "ບໍ່ມີຄຳບັນຍາຍສຳລັບເພງນີ້"
-      }
-    },
-    "clock": {
-      "description": "ເພີ່ມໂມງໃສ່ແຖບນຳທາງ",
-      "menu": {
-        "format": {
-          "24-hour-format": "ຮູບແບບ 24 ຊົ່ວໂມງ",
-          "display-seconds": "ສະແດງວິນາທີ",
-          "label": "ຮູບແບບ"
-        }
-      },
-      "name": "ໂມງ"
-    },
-    "compact-sidebar": {
-      "description": "ຕັ້ງແຖບຂ້າງໃຫ້ເປັນໂໝດກະທັດຮັດສະເໝີ",
-      "name": "ແຖບຂ້າງແບບກະທັດຮັດ"
     },
     "crossfade": {
       "description": "ຫຼິ້ນສຽງເຊື່ອມຕໍ່ລະຫວ່າງເພງ",
@@ -600,66 +522,6 @@
       },
       "name": "ເມນູພາຍໃນແອັບ"
     },
-    "lumiastream": {
-      "description": "ເພີ່ມການຮອງຮັບ Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "ເພີ່ມການຮອງຮັບເນື້ອເພງສຳລັບເພງສ່ວນໃຫຍ່",
-      "menu": {
-        "romanized-lyrics": "ເນື້ອເພງແບບໂຣມັນໄນຊ໌ (Romanized)"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "ດຶງເນື້ອເພງຈາກ Genius ແລ້ວ"
-      }
-    },
-    "music-together": {
-      "description": "ແບ່ງປັນເພລຍ໌ລິດສ໌ກັບຜູ້ອື່ນ. ເມື່ອເຈົ້າຂອງຫ້ອງຫຼິ້ນເພງ, ທຸກຄົນຈະໄດ້ຍິນເພງດຽວກັນ",
-      "dialog": {
-        "enter-host": "ປ້ອນ ID ຂອງເຈົ້າຂອງຫ້ອງ"
-      },
-      "internal": {
-        "save": "ບັນທຶກ",
-        "track-source": "ແຫຼ່ງທີ່ມາຂອງເພງ",
-        "unknown-user": "ຜູ້ໃຊ້ທີ່ບໍ່ຮູ້ຈັກ"
-      },
-      "menu": {
-        "click-to-copy-id": "ຄັດລອກ ID ຂອງເຈົ້າຂອງຫ້ອງ",
-        "close": "ປິດ Music Together",
-        "connected-users": "ຜູ້ໃຊ້ທີ່ເຊື່ອມຕໍ່ຢູ່",
-        "disconnect": "ຕັດການເຊື່ອມຕໍ່ Music Together",
-        "empty-user": "ບໍ່ມີຜູ້ໃຊ້ທີ່ເຊື່ອມຕໍ່",
-        "host": "ເຈົ້າຂອງຫ້ອງ Music Together",
-        "join": "ເຂົ້າຮ່ວມ Music Together",
-        "permission": {
-          "all": "ອະນຸຍາດໃຫ້ແຂກຄວບຄຸມເພລຍ໌ລິດສ໌ ແລະ ເຄື່ອງຫຼິ້ນໄດ້",
-          "host-only": "ສະເພາະເຈົ້າຂອງຫ້ອງເທົ່ານັ້ນທີ່ຄວບຄຸມເພລຍ໌ລິດສ໌ ແລະ ເຄື່ອງຫຼິ້ນໄດ້",
-          "playlist": "ອະນຸຍາດໃຫ້ແຂກຄວບຄຸມເພລຍ໌ລິດສ໌ໄດ້"
-        },
-        "set-permission": "ປ່ຽນສິດການຄວບຄຸມ",
-        "status": {
-          "disconnected": "ຕັດການເຊື່ອມຕໍ່ແລ້ວ",
-          "guest": "ເຊື່ອມຕໍ່ໃນຖານະແຂກ",
-          "host": "ເຊື່ອມຕໍ່ໃນຖານະເຈົ້າຂອງຫ້ອງ"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "ເພີ່ມເພງບໍ່ສຳເລັດ",
-        "closed": "ປິດ Music Together ແລ້ວ",
-        "disconnected": "ຕັດການເຊື່ອມຕໍ່ Music Together ແລ້ວ",
-        "host-failed": "ບໍ່ສາມາດສ້າງຫ້ອງ Music Together ໄດ້",
-        "id-copied": "ຄັດລອກ Host ID ໄປທີ່ຄລິບບອດແລ້ວ",
-        "id-copy-failed": "ຄັດລອກ Host ID ບໍ່ສຳເລັດ",
-        "join-failed": "ເຂົ້າຮ່ວມ Music Together ບໍ່ສຳເລັດ",
-        "joined": "ເຂົ້າຮ່ວມ Music Together ແລ້ວ",
-        "permission-changed": "ປ່ຽນສິດ Music Together ເປັນ \"{{permission}}\" ແລ້ວ",
-        "remove-song-failed": "ເອົາເພງອອກບໍ່ສຳເລັດ",
-        "user-connected": "{{name}} ເຂົ້າຮ່ວມ Music Together ແລ້ວ",
-        "user-disconnected": "{{name}} ອອກຈາກ Music Together ແລ້ວ"
-      }
-    },
     "navigation": {
       "description": "ລູກສອນນຳທາງ ໄປໜ້າ/ກັບຄືນ ທີ່ລວມເຂົ້າໃນໜ້າຕ່າງແອັບໂດຍກົງ ເໝືອນກັບໃນບຣາວເຊີຂອງທ່ານ",
       "name": "ການນຳທາງ",
@@ -671,10 +533,6 @@
           "title": "ໄປໜ້າຕໍ່ໄປ"
         }
       }
-    },
-    "no-google-login": {
-      "description": "ເອົາປຸ່ມ ແລະ ລິ້ງການເຂົ້າສູ່ລະບົບ Google ອອກຈາກໜ້າຕ່າງແອັບ",
-      "name": "ບໍ່ມີການເຂົ້າສູ່ລະບົບ Google"
     },
     "notifications": {
       "description": "ສະແດງການແຈ້ງເຕືອນເມື່ອເພງເລີ່ມຫຼິ້ນ (ການແຈ້ງເຕືອນແບບໂຕ້ຕອບມີໃຫ້ໃຊ້ໃນ Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "ຄຸນນະພາບປັດຈຸບັນ: {{quality}}",
-            "message": "ເລືອກຄຸນນະພາບວິດີໂອ:",
-            "title": "ເລືອກຄຸນນະພາບວິດີໂອ"
-          }
-        }
-      },
-      "description": "ອະນຸຍາດໃຫ້ປ່ຽນຄຸນນະພາບວິດີໂອດ້ວຍປຸ່ມເທິງໜ້າວິດີໂອ",
-      "name": "ຕົວປ່ຽນຄວາມລະອຽດວິດີໂອ",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "ເປີດຕົວປ່ຽນຄຸນນະພາບເຄື່ອງຫຼິ້ນ"
-        }
-      }
-    },
     "scrobbler": {
       "description": "ເພີ່ມການຮອງຮັບການບັນທຶກປະຫວັດການຟັງ (ເຊັ່ນ last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "ຂ້າມເພງທີ່ບໍ່ຖືກໃຈ",
-      "name": "ຂ້າມເພງທີ່ບໍ່ຖືກໃຈ"
-    },
     "skip-silences": {
       "description": "ຂ້າມຊ່ວງທີ່ບໍ່ມີສຽງໃນເພງໂດຍອັດຕະໂນມັດ",
       "name": "ຂ້າມຊ່ວງທີ່ບໍ່ມີສຽງ"
@@ -835,93 +671,6 @@
       "description": "ຂ້າມສ່ວນທີ່ບໍ່ແມ່ນເພງໂດຍອັດຕະໂນມັດ ເັຊ່ນ ອິນໂທຣ/ເອົາໂທຣ ຫຼື ສ່ວນຂອງມິວສິກວິດີໂອທີ່ບໍ່ມີການຫຼິ້ນເພງ",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "ໃຫ້ບໍລິການເນື້ອເພງທີ່ກົງກັບສຽງ ໂດຍໃຊ້ຜູ້ໃຫ້ບໍລິການເຊັ່ນ LRClib.",
-      "errors": {
-        "fetch": "⚠️\tເກີດຂໍ້ຜິດພາດຂຶ້ນໃນຂະນະທີ່ດຶງເນື້ອເພງ.\n\tກະລຸນາລອງໃໝ່ໃນພາຍຫຼັງ.",
-        "not-found": "⚠️ ບໍ່ພົບເນື້ອເພງສຳລັບເພງນີ້."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "ແປງຕົວອັກສອນຈີນ",
-          "submenu": {
-            "disabled": {
-              "label": "ປິດໃຊ້ງານ",
-              "tooltip": "ປິດການແປງຕົວອັກສອນຈີນ"
-            },
-            "simplified-to-traditional": {
-              "label": "ຕົວຫຍໍ້ເປັນຕົວເຕັມ",
-              "tooltip": "ແປງຕົວອັກສອນຈີນຕົວຫຍໍ້ເປັນຕົວອັກສອນຈີນຕົວເຕັມ"
-            },
-            "traditional-to-simplified": {
-              "label": "ຕົວເຕັມເປັນຕົວຫຍໍ້",
-              "tooltip": "ແປງຕົວອັກສອນຈີນຕົວເຕັມເປັນຕົວອັກສອນຈີນຕົວຫຍໍ້"
-            }
-          },
-          "tooltip": "ແປງຕົວອັກສອນຈີນເປັນແບບຕົວເຕັມ ຫຼື ຕົວຫຍໍ້"
-        },
-        "default-text-string": {
-          "label": "ຕົວອັກສອນເລີ່ມຕົ້ນລະຫວ່າງເນື້ອເພງ",
-          "tooltip": "ເລືອກຕົວອັກສອນເລີ່ມຕົ້ນເພື່ອໃຊ້ສຳລັບຊ່ອງຫວ່າງລະຫວ່າງເນື້ອເພງ"
-        },
-        "line-effect": {
-          "label": "ເອັບເຟັກແຖວ",
-          "submenu": {
-            "fancy": {
-              "label": "ສວຍງາມ",
-              "tooltip": "ໃຊ້ເອັບເຟັກຂະໜາດໃຫຍ່ແບບແອັບໃນແຖວປັດຈຸບັນ"
-            },
-            "focus": {
-              "label": "ໂຟກັສ",
-              "tooltip": "ເຮັດໃຫ້ສະເພາະແຖວປັດຈຸບັນເປັນສີຂາວ"
-            },
-            "offset": {
-              "label": "ເຍື້ອງ",
-              "tooltip": "ເຍື້ອງແຖວປັດຈຸບັນໄປທາງຂວາ"
-            },
-            "scale": {
-              "label": "ປັບຂະໜາດ",
-              "tooltip": "ປັບຂະໜາດແຖວປັດຈຸບັນ"
-            }
-          },
-          "tooltip": "ເລືອກເອັບເຟັກທີ່ຈະໃຊ້ກັບແຖວປັດຈຸບັນ"
-        },
-        "precise-timing": {
-          "label": "ເຮັດໃຫ້ເນື້ອເພງກົງກັບສຽງຢ່າງສົມບູນ",
-          "tooltip": "ຄຳນວນການສະແດງຜົນຂອງແຖບຕໍ່ໄປເປັນມິລລິວິນາທີ (ອາດຈະມີຜົນກະທົບຕໍ່ປະສິດທິພາບເລັກໜ້ອຍ)"
-        },
-        "preferred-provider": {
-          "label": "ຜູ້ໃຫ້ບໍລິການທີ່ຕ້ອງການ",
-          "none": {
-            "label": "ບໍ່ມີ",
-            "tooltip": "ບໍ່ມີຜູ້ໃຫ້ບໍລິການທີ່ຕ້ອງການ"
-          },
-          "tooltip": "ເລືອກຜູ້ໃຫ້ບໍລິການເລີ່ມຕົ້ນທີ່ຕ້ອງການໃຊ້"
-        },
-        "romanization": {
-          "label": "ແປງເນື້ອເພງເປັນພາສາລາຕິນ (Romanize)",
-          "tooltip": "ຖ້າເນື້ອເພງເປັນພາສາອື່ນ, ພະຍາຍາມສະແດງເປັນເວີຊັນພາສາລາຕິນ."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "ສະແດງເນື້ອເພງເຖິງແມ່ນວ່າຈະບໍ່ຊັດເຈນ",
-          "tooltip": "ຖ້າບໍ່ພົບເພງ, ປລັກອິນຈະລອງໃໝ່ດ້ວຍຄຳຄົ້ນຫາອື່ນ.\nຜົນໄດ້ຮັບຈາກຄວາມພະຍາຍາມຄັ້ງທີສອງອາດຈະບໍ່ຊັດເຈນ."
-        },
-        "show-time-codes": {
-          "label": "ສະແດງລະຫັດເວລາ",
-          "tooltip": "ສະແດງລະຫັດເວລາຢູ່ຂ້າງເນື້ອເພງ"
-        }
-      },
-      "name": "ເນື້ອເພງທີ່ກົງກັບສຽງ",
-      "refetch-btn": {
-        "fetching": "ກຳລັງດຶງຂໍ້ມູນ...",
-        "normal": "ດຶງເນື້ອເພງຄືນໃໝ່"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - ເນື້ອເພງອາດຈະບໍ່ກົງກັນເນື່ອງຈາກໄລຍະເວລາບໍ່ກົງກັນ.",
-        "inexact": "⚠️ - ເນື້ອເພງສຳລັບເພງນີ້ອາດຈະບໍ່ຊັດເຈນ",
-        "instrumental": "⚠️ - ນີ້ແມ່ນເພງບັນເລງ"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "ຄວບຄຸມການຫຼິ້ນຈາກແຖບງານ (taskbar) ຂອງ Windows",
       "name": "ການຄວບຄຸມສື່ທີ່ແຖບງານ"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "ເພີ່ມວິດເຈັດ TouchBar ສຳລັບຜູ້ໃຊ້ macOS",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "ເຮັດໃຫ້ໜ້າຕ່າງແອັບໂປ່ງໃສ",
-      "menu": {
-        "opacity": {
-          "label": "ຄວາມໂປ່ງແສງ",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "ປະເພດ",
-          "submenu": {
-            "acrylic": "Acrylic",
-            "content": "ເນື້ອຫາ",
-            "fullscreen-ui": "Fullscreen UI",
-            "mica": "Mica",
-            "none": "ບໍ່ມີ",
-            "tabbed": "ແຖບ",
-            "under-page": "ໃຕ້ໜ້າ",
-            "under-window": "ໃຕ້ໜ້າຕ່າງ",
-            "window": "ໜ້າຕ່າງ"
-          }
-        }
-      },
-      "name": "ເຄື່ອງຫຼິ້ນແບບໂປ່ງໃສ"
-    },
-    "tuna-obs": {
-      "description": "ການເຊື່ອມໂຍງກັບປລັກອິນ Tuna ຂອງ OBS",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "ປ້ອງກັນບໍ່ໃຫ້ເຄື່ອງຫຼິ້ນປັອບອັບຂຶ້ນມາເມື່ອຫຼິ້ນເພງ",
-      "name": "ເຄື່ອງຫຼິ້ນແບບບໍ່ລົບກວນ"
-    },
-    "video-toggle": {
-      "description": "ເພີ່ມປຸ່ມເພື່ອສະລັບລະຫວ່າງໂໝດວິດີໂອ/ເພງ ແລະ ສາມາດເລືອກເອົາແຖບວິດີໂອທັງໝົດອອກໄດ້",
-      "menu": {
-        "align": {
-          "label": "ການຈັດວາງ",
-          "submenu": {
-            "left": "ຊ້າຍ",
-            "middle": "ກາງ",
-            "right": "ຂວາ"
-          }
-        },
-        "force-hide": "ບັງຄັບເອົາແຖບວິດີໂອອກ",
-        "mode": {
-          "label": "ໂໝດ",
-          "submenu": {
-            "custom": "ປຸ່ມສະລັບແບບກຳນົດເອງ",
-            "disabled": "ປິດໃຊ້ງານ",
-            "native": "ປຸ່ມສະລັບມາດຕະຖານ"
-          }
-        }
-      },
-      "name": "ປຸ່ມສະລັບວິດີໂອ",
-      "templates": {
-        "button-song": "ເພງ",
-        "button-video": "ວິດີໂອ"
-      }
     },
     "visualizer": {
       "description": "ເພີ່ມເຄື່ອງສະແດງຄື້ນສຽງ (visualizer) ໃສ່ເຄື່ອງຫຼິ້ນ",

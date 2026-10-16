@@ -234,7 +234,7 @@ export default createPlugin({
 
     onPlayerApiReady(_, { getConfig }) {
       document.addEventListener(
-        'peard:audio-can-play',
+        'watchdeck:audio-can-play',
         async (e) => {
           this.props.audioContext = e.detail.audioContext;
           this.props.audioSource = e.detail.audioSource;

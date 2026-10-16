@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Nëse luan një reklamë, e hesht zërin dhe e vendos shpejtësinë e luajtjes në 16x",
-      "name": "Përshpejtimi i reklamave"
-    },
-    "album-actions": {
-      "description": "Shton butonat \"Nuk më pëlqen\", \"Nuk e pëlqej\", \"Pëlqej\" dhe \"E pëlqej\" për t'i zbatuar këto në të gjitha këngët në një playlist ose album",
-      "name": "Veprimet e albumit"
-    },
-    "album-color-theme": {
-      "description": "Aplikon një temë dinamike dhe efekte vizuale bazuar në paletën e ngjyrave të albumit",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Raporti i përzierjes së ngjyrave",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Aktivizo tematizimin e shiritit"
-      },
-      "name": "Tema e ngjyrave të albumit"
-    },
     "ambient-mode": {
       "description": "Aplikon një efekt ndriçimi duke hedhur ngjyra të buta nga videoja, në sfondin e ekranit tuaj",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Modaliteti Ambient"
-    },
-    "amuse": {
-      "description": "Shton mbështetje për {{applicationName}} te widget-i \"Now Playing\" i Amuse nga 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Serveri API i Amuse është në punë. Përdor GET /query për të marrë informacionin e këngës."
-      }
     },
     "api-server": {
       "description": "Shton një server API për të kontrolluar luajtësin",

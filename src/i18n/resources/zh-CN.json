@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "使用静音以及 16 倍速播放跳过广告片段",
-      "name": "广告加速跳过"
-    },
-    "album-actions": {
-      "description": "添加作用于播放列表或专辑中所有歌曲的全局“点赞/取消点赞”与“喜欢/取消喜欢”按钮",
-      "name": "专辑操作"
-    },
-    "album-color-theme": {
-      "description": "根据专辑封面配色动态改变主题与视觉效果",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "颜色混合比例",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "启用进度条主题"
-      },
-      "name": "专辑配色主题"
-    },
     "ambient-mode": {
       "description": "将视频中的浅配色作为光效投射到背景中，以增加沉浸感",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "沉浸模式"
-    },
-    "amuse": {
-      "description": "为 6K Labs 的 Amuse 正在播放小部件添加 {{applicationName}} 支持",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API服务器已在运行。使用 /query 以获取歌曲信息。"
-      }
     },
     "api-server": {
       "description": "添加一个 API 服务器来控制播放器",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "对音频应用压缩（压低响亮部分，提升柔和部分）",
-      "name": "音频压缩器"
-    },
     "auth-proxy-adapter": {
       "description": "支持使用需要身份验证的代理",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "代理端口"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "让导航栏透明及模糊",
-      "name": "模糊导航栏"
-    },
-    "bypass-age-restrictions": {
-      "description": "绕过 Music Player 年龄验证",
-      "name": "绕过年龄验证"
-    },
-    "captions-selector": {
-      "description": "{{applicationName}} 音轨字幕选择器",
-      "menu": {
-        "autoload": "自动选择上次使用的字幕",
-        "disable-captions": "默认无字幕"
-      },
-      "name": "字幕选择器",
-      "prompt": {
-        "selector": {
-          "label": "当前字幕语言： {{language}}",
-          "none": "无",
-          "title": "选择字幕语言"
-        }
-      },
-      "templates": {
-        "title": "开启字幕选择器"
-      },
-      "toast": {
-        "caption-changed": "字幕语言更改为 {{language}}",
-        "caption-disabled": "停用了字幕",
-        "no-captions": "这首歌没有字幕"
-      }
-    },
-    "clock": {
-      "description": "添加时钟到导航栏",
-      "menu": {
-        "format": {
-          "24-hour-format": "24 小时格式",
-          "display-seconds": "显示秒数",
-          "label": "格式"
-        }
-      },
-      "name": "时钟"
-    },
-    "compact-sidebar": {
-      "description": "始终将侧边栏设为紧凑模式",
-      "name": "紧凑式侧边栏"
     },
     "crossfade": {
       "description": "在歌曲间启用交叉淡化效果",
@@ -600,66 +522,6 @@
       },
       "name": "应用内菜单"
     },
-    "lumiastream": {
-      "description": "添加 Lumia Stream 支持",
-      "name": "Lumia Stream [测试]"
-    },
-    "lyrics-genius": {
-      "description": "为大多数歌曲添加歌词支持",
-      "menu": {
-        "romanized-lyrics": "罗马化歌词"
-      },
-      "name": "Genius 歌词",
-      "renderer": {
-        "fetched-lyrics": "已从 Genius 获取歌词"
-      }
-    },
-    "music-together": {
-      "description": "与他人共享播放列表。当发起人播放歌曲时，其他人也会听到相同歌曲",
-      "dialog": {
-        "enter-host": "输入发起人 ID"
-      },
-      "internal": {
-        "save": "保存",
-        "track-source": "追踪来源",
-        "unknown-user": "未知用户"
-      },
-      "menu": {
-        "click-to-copy-id": "复制发起者 ID",
-        "close": "关闭一起听",
-        "connected-users": "已连接用户",
-        "disconnect": "断开一起听连接",
-        "empty-user": "没有已连接的用户",
-        "host": "一起听发起者",
-        "join": "加入一起听",
-        "permission": {
-          "all": "允许来宾控制播放列表与播放器",
-          "host-only": "仅发起人可以控制播放列表与播放器",
-          "playlist": "允许来宾控制播放列表"
-        },
-        "set-permission": "更改控制权限",
-        "status": {
-          "disconnected": "已断开连接",
-          "guest": "已作为来宾连接",
-          "host": "已作为发起人连接"
-        }
-      },
-      "name": "一起听 [测试]",
-      "toast": {
-        "add-song-failed": "添加歌曲失败",
-        "closed": "一起听已关闭",
-        "disconnected": "一起听已断开连接",
-        "host-failed": "发起一起听失败",
-        "id-copied": "已将发起者 ID 复制到剪切板",
-        "id-copy-failed": "复制发起者 ID 到剪贴板时失败",
-        "join-failed": "加入一起听失败",
-        "joined": "已加入一起听",
-        "permission-changed": "一起听权限已改为 \"{{permission}}\"",
-        "remove-song-failed": "移除歌曲失败",
-        "user-connected": "{{name}} 加入了一起听",
-        "user-disconnected": "{{name}} 离开了一起听"
-      }
-    },
     "navigation": {
       "description": "如同浏览器般，在应用界面内直接显示前进/后退导航按钮",
       "name": "导航",
@@ -671,10 +533,6 @@
           "title": "转到下一页"
         }
       }
-    },
-    "no-google-login": {
-      "description": "从界面内移除 Google 登录按钮和链接",
-      "name": "无 Google 登录"
     },
     "notifications": {
       "description": "歌曲开始时显示通知（交互式通知仅适用于 Windows）",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "当前质量： {{quality}}",
-            "message": "选择视频画质：",
-            "title": "选择视频画质"
-          }
-        }
-      },
-      "description": "允许在视频上显示切换画质按钮",
-      "name": "视频画质切换器",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "打开播放器音质更改程序"
-        }
-      }
-    },
     "scrobbler": {
       "description": "添加歌曲追踪支持（如 Last.fm 和 Listenbrainz）",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "自动跳过不喜欢的歌曲",
-      "name": "跳过不喜欢的歌曲"
-    },
     "skip-silences": {
       "description": "自动跳过音乐中的无声片段",
       "name": "跳过无声片段"
@@ -835,93 +671,6 @@
       "description": "自动跳过非音乐部分，如 MV 的介绍/结语以及歌曲未开始的部分",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "透过 LRClib 等服务提供滚动歌词显示。",
-      "errors": {
-        "fetch": "⚠️ 获取歌词时发生错误。\n 请稍后再试。",
-        "not-found": "⚠️ 未找到此歌曲的歌词。"
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "转换中文字符",
-          "submenu": {
-            "disabled": {
-              "label": "已停用",
-              "tooltip": "禁用中文字符转换"
-            },
-            "simplified-to-traditional": {
-              "label": "简体到繁体",
-              "tooltip": "转换简体中文到繁体中文"
-            },
-            "traditional-to-simplified": {
-              "label": "繁体到简体",
-              "tooltip": "转换繁体中文到简体中文"
-            }
-          },
-          "tooltip": "转换简繁体中文字符"
-        },
-        "default-text-string": {
-          "label": "默认的歌词行间字符",
-          "tooltip": "选择在歌词间隙期间默认显示的字符"
-        },
-        "line-effect": {
-          "label": "歌词行特效",
-          "submenu": {
-            "fancy": {
-              "label": "Fancy",
-              "tooltip": "在当前行上使用大的、类似应用的效果"
-            },
-            "focus": {
-              "label": "高亮",
-              "tooltip": "仅将当前歌词行显示为白色"
-            },
-            "offset": {
-              "label": "偏移",
-              "tooltip": "将当前歌词行向右偏移"
-            },
-            "scale": {
-              "label": "放大",
-              "tooltip": "放大当前歌词行"
-            }
-          },
-          "tooltip": "选择当前歌词行应用的特效"
-        },
-        "precise-timing": {
-          "label": "让滚动歌词完全同步",
-          "tooltip": "以毫秒精度估算下句歌词的显示时间（可能对性能有小幅影响）"
-        },
-        "preferred-provider": {
-          "label": "首选歌词源",
-          "none": {
-            "label": "无",
-            "tooltip": "没有首选的歌词源"
-          },
-          "tooltip": "选择默认要用的源"
-        },
-        "romanization": {
-          "label": "将歌词罗马化",
-          "tooltip": "如果歌词以不同语言显示，试着展示拉丁字母版本。"
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "即使时值不精确依然显示歌词",
-          "tooltip": "若首次搜索未找到该歌曲的歌词，插件将尝试用不同的查询方式重新获取。\n重试查询的结果可能不精确。"
-        },
-        "show-time-codes": {
-          "label": "显示时值",
-          "tooltip": "在歌词旁显示时值"
-        }
-      },
-      "name": "滚动歌词",
-      "refetch-btn": {
-        "fetching": "正在获取…",
-        "normal": "重新获取歌词"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - 由于持续时间不对应，滚动歌词可能不同步。",
-        "inexact": "⚠️ - 此曲目的歌词可能不准确",
-        "instrumental": "⚠️ - 此曲目为纯音乐"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "从 Windows 任务栏控制音乐回放",
       "name": "任务栏媒体控件"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "为 macOS 用户启用 TouchBar 支持",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "把应用窗口变透明",
-      "menu": {
-        "opacity": {
-          "label": "不透明",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "类型",
-          "submenu": {
-            "acrylic": "亚克力",
-            "content": "内容",
-            "fullscreen-ui": "全屏用户界面",
-            "mica": "云母",
-            "none": "无",
-            "tabbed": "标签",
-            "under-page": "页面下",
-            "under-window": "窗口下",
-            "window": "窗口"
-          }
-        }
-      },
-      "name": "透明播放器"
-    },
-    "tuna-obs": {
-      "description": "与 OBS 的 Tuna 插件集成",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "防止播放器在播放歌曲时弹出",
-      "name": "非侵扰式播放器"
-    },
-    "video-toggle": {
-      "description": "增加视频/音频模式间的切换按钮。兼具移除整个视频页面的功能",
-      "menu": {
-        "align": {
-          "label": "位置对齐",
-          "submenu": {
-            "left": "左对齐",
-            "middle": "居中",
-            "right": "右对齐"
-          }
-        },
-        "force-hide": "强制移除视频页",
-        "mode": {
-          "label": "模式",
-          "submenu": {
-            "custom": "自定义开关样式",
-            "disabled": "禁用",
-            "native": "原生开关样式"
-          }
-        }
-      },
-      "name": "视频切换开关",
-      "templates": {
-        "button-song": "歌曲",
-        "button-video": "视频"
-      }
     },
     "visualizer": {
       "description": "在播放器中添加可视化效果",

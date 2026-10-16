@@ -17,19 +17,19 @@ let songInfo: SongInfo = {} as SongInfo;
 export const getSongInfo = () => songInfo;
 
 window.ipcRenderer.on(
-  'peard:update-song-info',
+  'watchdeck:update-song-info',
   (_, extractedSongInfo: SongInfo) => {
     songInfo = extractedSongInfo;
   },
 );
 
-// Used because 'loadeddata' or 'loadedmetadata' weren't firing on song start for some users (https://github.com/pear-devs/pear-desktop/issues/473)
-const srcChangedEvent = new CustomEvent('peard:src-changed');
+// Used because 'loadeddata' or 'loadedmetadata' weren't firing on song start for some users (https://github.com/erikenz/watchdeck/issues/473)
+const srcChangedEvent = new CustomEvent('watchdeck:src-changed');
 
 export const setupSeekedListener = singleton(() => {
   document.querySelector('video')?.addEventListener('seeked', (v) => {
     if (v.target instanceof HTMLVideoElement) {
-      window.ipcRenderer.send('peard:seeked', v.target.currentTime);
+      window.ipcRenderer.send('watchdeck:seeked', v.target.currentTime);
     }
   });
 });
@@ -39,7 +39,7 @@ export const setupTimeChangedListener = singleton(() => {
     for (const mutation of mutations) {
       const target = mutation.target as Node & { value: string };
       const numberValue = Number(target.value);
-      window.ipcRenderer.send('peard:time-changed', numberValue);
+      window.ipcRenderer.send('watchdeck:time-changed', numberValue);
       songInfo.elapsedSeconds = numberValue;
     }
   });
@@ -53,7 +53,7 @@ export const setupRepeatChangedListener = singleton(() => {
   const repeatObserver = new MutationObserver((mutations) => {
     // provided by App
     window.ipcRenderer.send(
-      'peard:repeat-changed',
+      'watchdeck:repeat-changed',
       (
         mutations[0].target as Node & {
           __dataHost: {
@@ -70,7 +70,7 @@ export const setupRepeatChangedListener = singleton(() => {
   // Emit the initial value as well; as it's persistent between launches.
   // provided by App
   window.ipcRenderer.send(
-    'peard:repeat-changed',
+    'watchdeck:repeat-changed',
     document
       .querySelector<
         HTMLElement & {
@@ -91,7 +91,7 @@ const LIKE_STATUS_ATTRIBUTE = 'like-status';
 export const setupLikeChangedListener = singleton(() => {
   const likeDislikeObserver = new MutationObserver((mutations) => {
     window.ipcRenderer.send(
-      'peard:like-changed',
+      'watchdeck:like-changed',
       mapLikeStatus(
         (mutations[0].target as HTMLElement)?.getAttribute?.(
           LIKE_STATUS_ATTRIBUTE,
@@ -108,7 +108,7 @@ export const setupLikeChangedListener = singleton(() => {
 
     // Emit the initial value as well; as it's persistent between launches.
     window.ipcRenderer.send(
-      'peard:like-changed',
+      'watchdeck:like-changed',
       mapLikeStatus(likeButtonRenderer.getAttribute?.(LIKE_STATUS_ATTRIBUTE)),
     );
   }
@@ -116,14 +116,14 @@ export const setupLikeChangedListener = singleton(() => {
 
 export const setupVolumeChangedListener = singleton((api: MusicPlayer) => {
   document.querySelector('video')?.addEventListener('volumechange', () => {
-    window.ipcRenderer.send('peard:volume-changed', {
+    window.ipcRenderer.send('watchdeck:volume-changed', {
       state: api.getVolume(),
       isMuted: api.isMuted(),
     });
   });
 
   // Emit the initial value as well; as it's persistent between launches.
-  window.ipcRenderer.send('peard:volume-changed', {
+  window.ipcRenderer.send('watchdeck:volume-changed', {
     state: api.getVolume(),
     isMuted: api.isMuted(),
   });
@@ -133,13 +133,13 @@ export const setupShuffleChangedListener = singleton(() => {
   const playerBar = document.querySelector('ytmusic-player-bar');
 
   if (!playerBar) {
-    window.ipcRenderer.send('peard:shuffle-changed-supported', false);
+    window.ipcRenderer.send('watchdeck:shuffle-changed-supported', false);
     return;
   }
 
   const observer = new MutationObserver(() => {
     window.ipcRenderer.send(
-      'peard:shuffle-changed',
+      'watchdeck:shuffle-changed',
       (playerBar?.attributes.getNamedItem('shuffle-on') ?? null) !== null,
     );
   });
@@ -156,13 +156,13 @@ export const setupFullScreenChangedListener = singleton(() => {
   const playerBar = document.querySelector('ytmusic-player-bar');
 
   if (!playerBar) {
-    window.ipcRenderer.send('peard:fullscreen-changed-supported', false);
+    window.ipcRenderer.send('watchdeck:fullscreen-changed-supported', false);
     return;
   }
 
   const observer = new MutationObserver(() => {
     window.ipcRenderer.send(
-      'peard:fullscreen-changed',
+      'watchdeck:fullscreen-changed',
       (playerBar?.attributes.getNamedItem('player-fullscreened') ?? null) !==
         null,
     );
@@ -182,7 +182,7 @@ export const setupAutoPlayChangedListener = singleton(() => {
   );
 
   const observer = new MutationObserver(() => {
-    window.ipcRenderer.send('peard:autoplay-changed');
+    window.ipcRenderer.send('watchdeck:autoplay-changed');
   });
 
   observer.observe(autoplaySlider!, {
@@ -193,35 +193,35 @@ export const setupAutoPlayChangedListener = singleton(() => {
 });
 
 export const setupSongInfo = (api: MusicPlayer) => {
-  window.ipcRenderer.on('peard:setup-time-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-time-changed-listener', () => {
     setupTimeChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-like-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-like-changed-listener', () => {
     setupLikeChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-repeat-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-repeat-changed-listener', () => {
     setupRepeatChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-volume-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-volume-changed-listener', () => {
     setupVolumeChangedListener(api);
   });
 
-  window.ipcRenderer.on('peard:setup-shuffle-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-shuffle-changed-listener', () => {
     setupShuffleChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-fullscreen-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-fullscreen-changed-listener', () => {
     setupFullScreenChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-autoplay-changed-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-autoplay-changed-listener', () => {
     setupAutoPlayChangedListener();
   });
 
-  window.ipcRenderer.on('peard:setup-seeked-listener', () => {
+  window.ipcRenderer.on('watchdeck:setup-seeked-listener', () => {
     setupSeekedListener();
   });
 
@@ -230,7 +230,7 @@ export const setupSongInfo = (api: MusicPlayer) => {
       e.target instanceof HTMLVideoElement &&
       Math.round(e.target.currentTime) > 0
     ) {
-      window.ipcRenderer.send('peard:play-or-paused', {
+      window.ipcRenderer.send('watchdeck:play-or-paused', {
         isPaused: status === 'pause',
         elapsedSeconds: Math.floor(e.target.currentTime),
       });
@@ -325,7 +325,7 @@ export const setupSongInfo = (api: MusicPlayer) => {
         lengthSeconds: video.duration,
         loading: true,
 
-        ['\u0079\u0074\u006d\u0064WatchNextResponse']: watchNextResponse,
+        ['wdWatchNextResponse']: watchNextResponse,
       } satisfies VideoDataChangeValue);
     }
   }
@@ -335,7 +335,7 @@ export const setupSongInfo = (api: MusicPlayer) => {
 
     let playerOverlay: PlayerOverlays | undefined;
 
-    if (!videoData['\u0079\u0074\u006d\u0064WatchNextResponse']) {
+    if (!videoData['wdWatchNextResponse']) {
       playerOverlay = (
         Object.entries(videoData).find(
           ([, value]) => value && Object.hasOwn(value, 'playerOverlays'),
@@ -343,7 +343,7 @@ export const setupSongInfo = (api: MusicPlayer) => {
       )?.[1]?.playerOverlays;
     } else {
       playerOverlay =
-        videoData['\u0079\u0074\u006d\u0064WatchNextResponse']?.playerOverlays;
+        videoData['wdWatchNextResponse']?.playerOverlays;
     }
     data.videoDetails.album =
       playerOverlay?.playerOverlayRenderer?.browserMediaSession?.browserMediaSessionRenderer?.album?.runs?.at(
@@ -352,6 +352,6 @@ export const setupSongInfo = (api: MusicPlayer) => {
     data.videoDetails.elapsedSeconds = 0;
     data.videoDetails.isPaused = false;
 
-    window.ipcRenderer.send('peard:video-src-changed', data);
+    window.ipcRenderer.send('watchdeck:video-src-changed', data);
   }
 };

@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Jika iklan dimainkan, ia meredamkan audio dan menetapkan kelajuan main semula kepada 16x",
-      "name": "Kelajuan Iklan"
-    },
-    "album-actions": {
-      "description": "Menambah butang Suka dan Tidak Suka pada semua lagu dalam senarai main atau album",
-      "name": "Tindakan Album"
-    },
-    "album-color-theme": {
-      "description": "Menggunakan tema dinamik dan kesan visual berdasarkan palet warna album",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Nisbah campuran warna",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Benarkan penyesuaian tema bar carian"
-      },
-      "name": "Tema Warna Album"
-    },
     "ambient-mode": {
       "description": "Menggunakan kesan pencahayaan dengan menghantar warna lembut daripada video, ke latar belakang skrin anda",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Mod Sekitaran"
-    },
-    "amuse": {
-      "description": "Menambahkan sokongan {{applicationName}} untuk widget sedang dimain Amuse oleh 6K Labs",
-      "name": "Terhibur",
-      "response": {
-        "query": "API server Amuse telah berjalan. GET /query untuk mendapatkan maklumat lagu."
-      }
     },
     "api-server": {
       "description": "Perlukan server API untuk mengawal pemain",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Laksanakan pemampatan untuk audio (mengurangkan kelantangan bagi bahagian signal yang kuat dan menaikkan kelantangan untuk bahagian yang lembut)",
-      "name": "Pemampat Audio"
-    },
     "auth-proxy-adapter": {
       "description": "Sokongan untuk penggunaan perkhidmatan proksi pengesahan",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Port Proksi"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Menjadikan bar navigasi telus dan kabur",
-      "name": "Kaburkan Bar navigasi"
-    },
-    "bypass-age-restrictions": {
-      "description": "Pintas verifikasi umur Music Player",
-      "name": "Pintas Sekatan Umur"
-    },
-    "captions-selector": {
-      "description": "Pemilih kapsyen untuk trek audio {{applicationName}}",
-      "menu": {
-        "autoload": "Pilih kapsyen terakhir diguna secara automatik",
-        "disable-captions": "Tiada kapsyen secara lalai"
-      },
-      "name": "Pemilih kapsyen",
-      "prompt": {
-        "selector": {
-          "label": "Bahasa kapsyen sekarang: {{bahasa}}",
-          "none": "Tiada",
-          "title": "Pilih bahasa kapsyen"
-        }
-      },
-      "templates": {
-        "title": "Buka pemilih kapsyen"
-      },
-      "toast": {
-        "caption-changed": "Sarikata berubah kepada {{language}}",
-        "caption-disabled": "Sarikata dimatikan",
-        "no-captions": "Tiada sarikata untuk lagu ini"
-      }
-    },
-    "clock": {
-      "description": "Tambah jam pada bar navigasi",
-      "menu": {
-        "format": {
-          "24-hour-format": "Format 24 jam",
-          "display-seconds": "Paparkan saat",
-          "label": "Format"
-        }
-      },
-      "name": "Jam"
-    },
-    "compact-sidebar": {
-      "description": "Sentiasa tetapkan bar sisi dalam mod padat",
-      "name": "Bar Sisi Padat"
     },
     "crossfade": {
       "description": "Pudar silang antara lagu",
@@ -599,59 +521,6 @@
       },
       "name": "Menu Dalam Apl"
     },
-    "lumiastream": {
-      "description": "Menambah sokongan Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Menambahkan sokongan lirik untuk kebanyakan lagu",
-      "menu": {
-        "romanized-lyrics": "Lirik Romanized"
-      },
-      "name": "Lirik Genius",
-      "renderer": {
-        "fetched-lyrics": "Lirik yang diambil untuk Genius"
-      }
-    },
-    "music-together": {
-      "description": "Kongsi senarai main dengan orang lain. Apabila hos memainkan lagu, semua orang akan mendengar lagu yang sama",
-      "dialog": {
-        "enter-host": "Masukkan ID Hos"
-      },
-      "internal": {
-        "save": "Simpan",
-        "unknown-user": "Pengguna tidak diketahui"
-      },
-      "menu": {
-        "click-to-copy-id": "Salin ID Hos",
-        "close": "Tutup Music Together",
-        "connected-users": "Pengguna yang telah berhubung",
-        "disconnect": "Putuskan Sambungan Music Together",
-        "empty-user": "Tiada pengguna yang disambungkan",
-        "host": "Hos Music Together",
-        "join": "Sertai Music Together",
-        "permission": {
-          "all": "Benarkan tetamu mengawal senarai main dan pemain",
-          "host-only": "Hanya hos boleh mengawal senarai main dan pemain",
-          "playlist": "Benarkan tetamu mengawal senarai main"
-        },
-        "set-permission": "Tukar Kebenaran Kawalan",
-        "status": {
-          "disconnected": "Terputus",
-          "guest": "Disambungkan sebagai Tetamu",
-          "host": "Disambungkan sebagai Hos"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Gagal menambah lagu",
-        "closed": "Music Together ditutup",
-        "disconnected": "Music Together terputus",
-        "host-failed": "Gagal untuk menjadi hos Music Together",
-        "id-copied": "ID hos disalin ke papan keratan",
-        "id-copy-failed": "Gagal menyalin ID Hos ke papan keratan"
-      }
-    },
     "navigation": {
       "name": "Navigasi"
     },
@@ -673,43 +542,9 @@
         }
       }
     },
-    "synced-lyrics": {
-      "errors": {
-        "not-found": "⚠️ Tak ada liriks untuk lagu ini."
-      },
-      "menu": {
-        "show-lyrics-even-if-inexact": {
-          "label": "Tunjukkan lirik walaupun tidak tepat",
-          "tooltip": "Jika lagu tidak ditemui, plugin cuba lagi dengan pertanyaan carian yang berbeza. \nHasil dari percubaan kedua mungkin tidak tepat."
-        },
-        "show-time-codes": {
-          "tooltip": "Tunjukkan kod masa di sebelah lirik"
-        }
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Kawalan main balik dari bar tugas Windows anda",
       "name": "Kawalan Media Bar Tugas"
-    },
-    "video-toggle": {
-      "menu": {
-        "align": {
-          "submenu": {
-            "left": "Kiri",
-            "middle": "Tengah",
-            "right": "Kanan"
-          }
-        },
-        "force-hide": "Alih Keluar Tab Video",
-        "mode": {
-          "submenu": {
-            "disabled": "Tidak Aktif"
-          }
-        }
-      },
-      "templates": {
-        "button-song": "Lagu"
-      }
     }
   }
 }

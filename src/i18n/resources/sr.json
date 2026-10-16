@@ -214,27 +214,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Ukoliko dođe do prikaza reklame, zvuk se prigušuje i podešava se brzina na 16x",
-      "name": "Ubrzanje reklama"
-    },
-    "album-actions": {
-      "description": "Dodaje mogućnost primene opcija 'Sviđa mi se, ne sviđa mi se' kao i opciju njihovog poništenja na nivou plejliste ili albuma",
-      "name": "Akcije albuma"
-    },
-    "album-color-theme": {
-      "description": "Primenjuje dinamičku temu i vizuelne efekte na osnovu palete boja albuma",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Odnos mešavine boja",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Omogući postavljanje teme \"seekbar\"-a"
-      },
-      "name": "Paleta boja albuma"
-    },
     "ambient-mode": {
       "description": "Primenjuje svetlosne efekte na pozadini ekrana upotrebom blagih boja iz video snimka",
       "menu": {
@@ -279,13 +258,6 @@
         }
       },
       "name": "Ambijentalni režim"
-    },
-    "amuse": {
-      "description": "Dodaje podršku za 'Amuse now' vidžet (6K Labs) u {{applicationName}}",
-      "name": "Zabavi",
-      "response": {
-        "query": "Amuse API server je pokrenut. Koristite GET /query da biste dobili informacije o numeri."
-      }
     },
     "api-server": {
       "description": "Dodaje API server za kontrolu muzičkog plejera",
@@ -346,10 +318,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Primeni kompresiju audio trake (smanjuje jačinu zvuka na najglasnijim delovima signala, i povećava jačinu na najnižim)",
-      "name": "Kompresor zvuka"
-    },
     "auth-proxy-adapter": {
       "description": "Podrška za upotrebu proxy servisa za autentifikaciju",
       "menu": {
@@ -373,41 +341,6 @@
           "title": "Proxy Port"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Čini navigacioni meni prozirnim i zamućenim",
-      "name": "Zamuti navigacioni meni"
-    },
-    "bypass-age-restrictions": {
-      "description": "Preskoči starosnu verifikaciju za Music Player",
-      "name": "Preskoči starosna ograničenja"
-    },
-    "captions-selector": {
-      "description": "Odabir prevoda za numere/audio trake na {{applicationName}}",
-      "menu": {
-        "autoload": "Automatski odaberi prethodno odabrani prevod",
-        "disable-captions": "Podrazumevano bez prevoda"
-      },
-      "name": "Odabir prevoda",
-      "prompt": {
-        "selector": {
-          "label": "Trenutno odabrani jezik prevoda: {{language}}",
-          "none": "Ništa",
-          "title": "Odaberi jezik prevoda"
-        }
-      },
-      "templates": {
-        "title": "Otvori meni za izbor prevoda"
-      },
-      "toast": {
-        "caption-changed": "Prevod promenjen u {{language}}",
-        "caption-disabled": "Prevod onemogućen",
-        "no-captions": "Za ovu pesmu nisu dostupni prevodi"
-      }
-    },
-    "compact-sidebar": {
-      "description": "Uvek koristi kompaktni meni sa strane",
-      "name": "Kompaktni meni sa strane"
     },
     "crossfade": {
       "description": "Ublaženi prelaz između numera",
@@ -581,66 +514,6 @@
       },
       "name": "Izborni menu unutar aplikacije"
     },
-    "lumiastream": {
-      "description": "Dodaje podršku za Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Dodaje podršku za tekstove za većinu pesama",
-      "menu": {
-        "romanized-lyrics": "Romanizovani tekstovi"
-      },
-      "name": "Genius tekstovi",
-      "renderer": {
-        "fetched-lyrics": "Dobavljen tekst pesme sa Genius-a"
-      }
-    },
-    "music-together": {
-      "description": "Podeli plejlistu sa drugima. Kada domaćin (host) pusti pesmu, svi ostali će čuti istu pesmu",
-      "dialog": {
-        "enter-host": "Unesi ID host-a"
-      },
-      "internal": {
-        "save": "Sačuvaj",
-        "track-source": "Izvor pesme",
-        "unknown-user": "Nepoznat korisnik"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopiraj ID host-a",
-        "close": "Zatvori 'Music Together'",
-        "connected-users": "Spojeni korisnici",
-        "disconnect": "Prekini vezu sa 'Music Together'",
-        "empty-user": "Nema povezanih korisnika",
-        "host": "'Music Together' domaćin (host)",
-        "join": "Pridruži se 'Music Together'",
-        "permission": {
-          "all": "Dozvoli gostima da kontrolišu plejlistu i reprodukciju",
-          "host-only": "Samo domaćin (host) može da kontroliše plejlistu i reprodukciju",
-          "playlist": "Dozvoli gostima da kontrolišu plejlistu"
-        },
-        "set-permission": "Promeni dozvole za upravljanje",
-        "status": {
-          "disconnected": "Nije povezan",
-          "guest": "Povezan kao gost",
-          "host": "Povezan kao domaćin (host)"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Dodavanje pesme nije uspelo",
-        "closed": "'Music Together' je zatvorena",
-        "disconnected": "Veza sa 'Music Together' je prekinuta",
-        "host-failed": "Pokretanje 'Music Together' kao domaćin (host) nije uspelo",
-        "id-copied": "ID domaćina (host) kopiran u privremenu memoriju",
-        "id-copy-failed": "Kopiranje ID domaćina (host) u privremenu memoriju nije uspelo",
-        "join-failed": "Povezivanje na 'Music Together' neuspešno",
-        "joined": "Povezan na 'Music Together'",
-        "permission-changed": "Dozvola 'Music Together' promenjena na \"{{permission}}\"",
-        "remove-song-failed": "Uklanjanje pesme nije uspelo",
-        "user-connected": "{{name}} se pridružio na 'Music Together'",
-        "user-disconnected": "{{name}} je napustio 'Music Together'"
-      }
-    },
     "navigation": {
       "description": "Strelice za navigaciju napred/nazad su direktno integrisane u interfejs, kao i u tvom omiljenom pregledaču",
       "name": "Navigacija",
@@ -652,10 +525,6 @@
           "title": "Idi na sledeću stranicu"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Ukloni Google dugmad i linkove za prijavu sa interfejsa",
-      "name": "Bez Google prijave"
     },
     "notifications": {
       "description": "Prikaži obaveštenje kada numera krene sa reprodukcijom (interaktivna obaveštenja su dostupna na Windows-u)",
@@ -732,24 +601,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Trenutni kvalitet: {{quality}}",
-            "message": "Izaberi kvalitet videa:",
-            "title": "Izaberi kvalitet videa"
-          }
-        }
-      },
-      "description": "Dozvoljava promenu kvaliteta videa pomoću dugmeta na video preklapanju",
-      "name": "Promena kvaliteta videa",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Otvori meni za promenu kvaliteta plejera"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Dodaj podršku za 'četkanje' (poput last.fm, Listenbrainz)",
       "dialog": {
@@ -804,10 +655,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Preskače pesme koje vam se nisu svidele",
-      "name": "Preskočite pesme koje vam se nisu svidele"
-    },
     "skip-silences": {
       "description": "Automatski preskočite delove pesama gde nema zvuka",
       "name": "Preskoči tišine"
@@ -816,75 +663,6 @@
       "description": "Automatski preskače delove pesama koji nisu muzika poput uvod/odjava ili delove muzičkih spotova u kojima nema muzike",
       "name": "Blok sponzora"
     },
-    "synced-lyrics": {
-      "description": "Obezbeđuje sinhronizovane lirike pesama, korišćenjem dobavljača poput LRClib.",
-      "errors": {
-        "fetch": "⚠️\tDošlo je do greške prilikom dobavljanja stihova pesme.\n\tMolimo vas da pokušate ponovo kasnije.",
-        "not-found": "⚠️ Tekst za ovu pesmu nije pronađen."
-      },
-      "menu": {
-        "default-text-string": {
-          "label": "Podrazumevani karakteri između tekstova pesama",
-          "tooltip": "Izaberi podrazumevane karaktere koji će biti korišćeni za razmake između tekstova pesama"
-        },
-        "line-effect": {
-          "label": "Efekat linije",
-          "submenu": {
-            "fancy": {
-              "label": "Kitnjast",
-              "tooltip": "Koristi velike (kao iz aplikacije) efekte na trenutnu liniju"
-            },
-            "focus": {
-              "label": "Fokus",
-              "tooltip": "Učini samo trenutnu liniju belom"
-            },
-            "offset": {
-              "label": "Pomeraj",
-              "tooltip": "Pomeraj na trenutnoj liniji"
-            },
-            "scale": {
-              "label": "Razmera",
-              "tooltip": "Promeni razmeru trenutne linije"
-            }
-          },
-          "tooltip": "Izaberi efekat koji će biti primenjen na trenutnoj liniji"
-        },
-        "precise-timing": {
-          "label": "Učini da tekst pesme bude savršeno usklađen",
-          "tooltip": "Izračunaj do milisekunde prikaz sledeće linije teksta (može malo uticati na učinak)"
-        },
-        "preferred-provider": {
-          "label": "Preferirani dobavljač",
-          "none": {
-            "label": "Nijedan",
-            "tooltip": "Bez preferiranog dobavljača"
-          },
-          "tooltip": "Izaberite podrazumevanog dobavljača kog ćete koristiti"
-        },
-        "romanization": {
-          "label": "Romanizuj tekstove pesama",
-          "tooltip": "Ako je tekst pesme na drugom jeziku, pokušaj da ga prikažeš u latiničnoj varijanti."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Prikaži tekst pesme čak iako nije tačan",
-          "tooltip": "Ako pesma nije pronađena, produžetak će pokušati ponovo sa novim upitom za pretragu.\nRezultat iz drugog pokušaja možda neće biti tačan."
-        },
-        "show-time-codes": {
-          "label": "Prikaži vremenske oznake",
-          "tooltip": "Prikaži vremenske oznake pored teksta pesme"
-        }
-      },
-      "name": "Sinhronizovani tekstovi pesama",
-      "refetch-btn": {
-        "fetching": "Dobavljanje...",
-        "normal": "Ponovo dobavi tekst pesme"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Tekst pesme možda nije usklađen zbog neuklapanja u dužini trajanja.",
-        "inexact": "⚠️ - Tekst za ovu pesmu možda nije tačan",
-        "instrumental": "⚠️ - Ovo je instrumentalna pesma"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Upravljaj reprodukcijom iz Windows trake sa zadacima",
       "name": "Upravljanje medijima iz trake sa zadacima"
@@ -892,62 +670,6 @@
     "touchbar": {
       "description": "Dodaje dodatak dodirne trake za macOS korisnike",
       "name": "Dodirna Traka"
-    },
-    "transparent-player": {
-      "description": "Čini prozor aplikacije transparentnim",
-      "menu": {
-        "opacity": {
-          "label": "Neprozirnost",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Tip",
-          "submenu": {
-            "acrylic": "Akrilan",
-            "mica": "Mika",
-            "none": "Nijedan",
-            "tabbed": "Kartice"
-          }
-        }
-      },
-      "name": "Transparentni plejer"
-    },
-    "tuna-obs": {
-      "description": "Integracija sa OBS-ovim Tuna dodatkom",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Onemogućava plejeru da iskače u toku pokretanja pesme",
-      "name": "Nenametljivi plejer"
-    },
-    "video-toggle": {
-      "description": "Dodaje dugme za promenu između režima za video/numeru. Opciono, može da ukloni celu karticu sa videom",
-      "menu": {
-        "align": {
-          "label": "Poravnanje",
-          "submenu": {
-            "left": "Levo",
-            "middle": "Sredina",
-            "right": "Desno"
-          }
-        },
-        "force-hide": "Nasilno ukloni karticu sa videom",
-        "mode": {
-          "label": "Režim",
-          "submenu": {
-            "custom": "Prilagođeno prebacivanje",
-            "disabled": "Onemogućeno",
-            "native": "Izvorno prebacivanje"
-          }
-        }
-      },
-      "name": "Video prebacivanje",
-      "templates": {
-        "button-song": "Pesma",
-        "button-video": "Video"
-      }
     },
     "visualizer": {
       "description": "Dodaje vizualizaciju u plejer",

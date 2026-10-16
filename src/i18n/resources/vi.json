@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Nếu một quảng cáo được phát thì sẽ bị tắt tiếng và tăng tốc độ phát lên 16x",
-      "name": "Tăng tốc quảng cáo"
-    },
-    "album-actions": {
-      "description": "Thêm nút Hủy không thích, Không thích, Thích và Hủy thích để áp dụng cho tất cả bài hát trong danh sách phát hoặc album",
-      "name": "Tác vụ với album"
-    },
-    "album-color-theme": {
-      "description": "Áp dụng chủ đề động và hiệu ứng hình ảnh dựa trên bảng màu của album",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Tỉ lệ trộn màu",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Bật tùy chỉnh giao diện cho thanh trượt"
-      },
-      "name": "Màu nền album"
-    },
     "ambient-mode": {
       "description": "Áp dụng hiệu ứng ánh sáng bằng cách truyền các màu nhẹ từ video vào nền màn hình của bạn",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "Chế độ Môi trường xung quanh"
-    },
-    "amuse": {
-      "description": "Thêm hỗ trợ {{applicationName}} cho tiện ích hiển thị bài hát đang phát Amuse của 6K Labs",
-      "name": "Amuse",
-      "response": {
-        "query": "Máy chủ API của Amuse đang chạy. GET /query để lấy thông tin về bài hát."
-      }
     },
     "api-server": {
       "description": "Thêm máy chủ API để điều khiển trình phát",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Áp dụng tính năng nén cho âm thanh (giảm âm lượng của phần to nhất của tín hiệu và tăng âm lượng của phần nhỏ nhất)",
-      "name": "Bộ nén âm thanh"
-    },
     "auth-proxy-adapter": {
       "description": "Ủng hộ cho mục đích duy trì dịch vụ xác minh proxy",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Cổng máy chủ Proxy"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Làm thanh điều hướng mờ và trong suốt",
-      "name": "Làm mờ thanh điều hướng"
-    },
-    "bypass-age-restrictions": {
-      "description": "Bỏ qua xác minh độ tuổi của Music Player",
-      "name": "Bỏ qua hạn chế độ tuổi"
-    },
-    "captions-selector": {
-      "description": "Bộ lựa chọn phụ đề cho các bài hát trên {{applicationName}}",
-      "menu": {
-        "autoload": "Tự động chọn phụ đề vừa sử dụng",
-        "disable-captions": "Không có phụ đề làm mặc định"
-      },
-      "name": "Bộ lựa chọn phụ đề",
-      "prompt": {
-        "selector": {
-          "label": "Ngôn ngữ phụ đề hiện tại: {{language}}",
-          "none": "Không có",
-          "title": "Chọn ngôn ngữ phụ đề"
-        }
-      },
-      "templates": {
-        "title": "Mở lựa chọn phụ đề"
-      },
-      "toast": {
-        "caption-changed": "Phụ đề đã chuyển sang {{language}}",
-        "caption-disabled": "Tắt phụ đề",
-        "no-captions": "Không có phụ đề nào cho bài hát này"
-      }
-    },
-    "clock": {
-      "description": "Thêm đồng hồ vào thanh điều hướng",
-      "menu": {
-        "format": {
-          "24-hour-format": "Định dạng 24h",
-          "display-seconds": "Hiển thị giây",
-          "label": "Định dạng"
-        }
-      },
-      "name": "Đồng hồ"
-    },
-    "compact-sidebar": {
-      "description": "Luôn đặt thanh bên ở chế độ thu gọn",
-      "name": "Thanh bên thu gọn"
     },
     "crossfade": {
       "description": "Chuyển tiếp giữa các bài hát",
@@ -600,66 +522,6 @@
       },
       "name": "Menu trong ứng dụng"
     },
-    "lumiastream": {
-      "description": "Thêm hỗ trợ Lumia Stream",
-      "name": "Lumia Stream [Thử nghiệm]"
-    },
-    "lyrics-genius": {
-      "description": "Thêm hỗ trợ lời bài hát cho hầu hết các bài hát",
-      "menu": {
-        "romanized-lyrics": "Chuyển lời bài hát sang chữ Latin"
-      },
-      "name": "Lời bài hát từ Genius",
-      "renderer": {
-        "fetched-lyrics": "Lời bài hát được tìm nạp cho Genius"
-      }
-    },
-    "music-together": {
-      "description": "Chia sẻ danh sách phát với người khác. Khi máy chủ phát một bài hát, những người khác cũng sẽ nghe bài hát đó",
-      "dialog": {
-        "enter-host": "Nhập ID máy chủ"
-      },
-      "internal": {
-        "save": "Lưu",
-        "track-source": "Nguồn âm thanh",
-        "unknown-user": "Người dùng không rõ"
-      },
-      "menu": {
-        "click-to-copy-id": "Sao chép ID máy chủ",
-        "close": "Đóng Music Together",
-        "connected-users": "Người dùng đã kết nối",
-        "disconnect": "Ngắt kết nối Music Together",
-        "empty-user": "Không có người dùng đã kết nối",
-        "host": "Máy chủ Music Together",
-        "join": "Tham gia Music Together",
-        "permission": {
-          "all": "Cho phép người tham gia kiểm soát danh sách phát và trình phát",
-          "host-only": "Chỉ người tạo máy chủ có quyền điều khiển danh sách phát và trình phát",
-          "playlist": "Cho phép người tham gia điều khiển danh sách phát"
-        },
-        "set-permission": "Thay đổi quyền điều khiển",
-        "status": {
-          "disconnected": "Đã ngắt kết nối",
-          "guest": "Đã kết nối với tư cách Người tham gia",
-          "host": "Đã kết nối với tư cách Máy chủ"
-        }
-      },
-      "name": "Music Together [Thử nghiệm]",
-      "toast": {
-        "add-song-failed": "Thêm bài hát thất bại",
-        "closed": "Đã đóng Music Together",
-        "disconnected": "Đã ngắt kết nối Music Together",
-        "host-failed": "Không thể tổ chức Music Together",
-        "id-copied": "Đã sao chép ID máy chủ vào bộ nhớ tạm",
-        "id-copy-failed": "Sao chepd ID máy chủ vào bộ nhớ tạm không thành công",
-        "join-failed": "Không thể tham gia Music Together",
-        "joined": "Đã tham gia Music Together",
-        "permission-changed": "Quyền của Music Together đã thay đổi thành \"{{permission}}\"",
-        "remove-song-failed": "Không thể xoá bài hát",
-        "user-connected": "{{name}} đã tham gia Music Together",
-        "user-disconnected": "{{name}} đã rời khỏi Music Together"
-      }
-    },
     "navigation": {
       "description": "Mũi tên điều hướng Tiếp theo/Quay lại được tích hợp trực tiếp trong giao diện, giống như trong trình duyệt yêu thích của bạn",
       "name": "Điều hướng",
@@ -671,10 +533,6 @@
           "title": "Đi đến trang tiếp theo"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Xóa các nút và liên kết đăng nhập Google khỏi giao diện",
-      "name": "Không đăng nhập Google"
     },
     "notifications": {
       "description": "Hiển thị thông báo khi bài hát bắt đầu phát (thông báo tương tác có sẵn trên Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Chất lượng hiện tại: {{quality}}",
-            "message": "Chọn chất lượng video:",
-            "title": "Chọn chất lượng video"
-          }
-        }
-      },
-      "description": "Cho phép thay đổi chất lượng video bằng một nút trên lớp phủ video",
-      "name": "Thay đổi chất lượng video",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Mở trình thay đổi chất lượng"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Thêm hỗ trợ scrobbling (v.v. Last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Tự động bỏ qua những bài hát bạn nhấn không thích",
-      "name": "Bỏ qua bài hát không thích"
-    },
     "skip-silences": {
       "description": "Tự động bỏ qua các đoạn im lặng trong bài hát",
       "name": "Bỏ qua đoạn im lặng"
@@ -835,93 +671,6 @@
       "description": "Tự động bỏ qua các phần không phải âm nhạc như phần intro/outro hoặc các phần không được phát của video nhạc",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "Cung cấp lời được đồng bộ với bài hát, sử dụng các nhà cung cấp như LRClib.",
-      "errors": {
-        "fetch": "⚠️\t\tĐã xảy ra lỗi khi tìm lời bài hát.\n\tVui lòng thử lại sau.",
-        "not-found": "⚠️ Không tìm thấy lời cho bài hát này."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "Chuyển đổi kí tự tiếng Trung",
-          "submenu": {
-            "disabled": {
-              "label": "Vô hiệu hóa",
-              "tooltip": "Vô hiệu hóa chuyển đổi kí tự tiếng Trung"
-            },
-            "simplified-to-traditional": {
-              "label": "Giản thể sang Phồn thể",
-              "tooltip": "Chuyển đổi tiếng Trung Giản thể sang tiếng Trung Phồn thể"
-            },
-            "traditional-to-simplified": {
-              "label": "Phồn thể sang Giản thể",
-              "tooltip": "Chuyển đổi tiếng Trung Phồn thể sang tiếng Trung Giản thể"
-            }
-          },
-          "tooltip": "Chuyển đổi kí tự tiếng Trung sang Phồn thể hoặc Giản thể"
-        },
-        "default-text-string": {
-          "label": "Kí tự giữa các lời bài hát",
-          "tooltip": "Chọn kí tự mặc định cho khoảng trống giữa các lời bài hát"
-        },
-        "line-effect": {
-          "label": "Kiểu lời nhạc",
-          "submenu": {
-            "fancy": {
-              "label": "Màu mè",
-              "tooltip": "Làm đoạn lời nhạc đang nghe to hơn và nổi bật hơn"
-            },
-            "focus": {
-              "label": "Tập trung",
-              "tooltip": "Chỉ làm cho dòng hiện tại có màu trắng"
-            },
-            "offset": {
-              "label": "Lệch",
-              "tooltip": "Làm dòng hiện tại lệch sang bên phải"
-            },
-            "scale": {
-              "label": "Phóng to",
-              "tooltip": "Làm dòng hiện tại to hơn các dòng khác"
-            }
-          },
-          "tooltip": "Chọn kiểu để áp dụng cho dòng hiện tại"
-        },
-        "precise-timing": {
-          "label": "Làm cho lời bài hát được đồng bộ hoàn hảo",
-          "tooltip": "Tính toán chính xác đến mili giây thời gian hiển thị dòng tiếp theo (có thể có tác động nhỏ đến hiệu suất)"
-        },
-        "preferred-provider": {
-          "label": "Nhà cung cấp ưa thích",
-          "none": {
-            "label": "Không có",
-            "tooltip": "Không có nhà cung cấp ưu thích"
-          },
-          "tooltip": "Chọn nhà cung cấp lời bài hát mặc định để sử dụng"
-        },
-        "romanization": {
-          "label": "Chuyển lời bài hát sang chữ Latin",
-          "tooltip": "Nếu lời bài hát đang ở ngôn ngữ khác, thử hiển thị phiên bản bảng chữ cái La-tinh."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Hiển thị lời bài hát ngay cả khi không chính xác",
-          "tooltip": "Nếu không tìm thấy bài hát, plugin sẽ thử lại bằng truy vấn tìm kiếm khác.\nKết quả từ lần thử thứ hai có thể không chính xác."
-        },
-        "show-time-codes": {
-          "label": "Hiện mốc thời gian",
-          "tooltip": "Hiện mốc thời gian bên cạnh lời bài hát"
-        }
-      },
-      "name": "Lời bài hát được đồng bộ hoá",
-      "refetch-btn": {
-        "fetching": "Đang tìm nạp...",
-        "normal": "Tải lại lời bài hát"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Lời bài hát có thể không đồng bộ do thời lượng không khớp.",
-        "inexact": "⚠️ - Lời bài hát này có thể không chính xác",
-        "instrumental": "⚠️ - Đây là một bài hát không lời"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Điều khiển nhạc từ cửa sổ xem trước trên thanh tác vụ Windows của bạn",
       "name": "Điều khiển phương tiện trên thanh tác vụ"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "Thêm tiện ích TouchBar cho người dùng macOS",
       "name": "TouchBar"
-    },
-    "transparent-player": {
-      "description": "Làm cho cửa sổ ứng dụng có hiệu ứng trong suốt",
-      "menu": {
-        "opacity": {
-          "label": "Độ mờ",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "Kiểu nền",
-          "submenu": {
-            "acrylic": "Acrylic",
-            "content": "Nội dung",
-            "fullscreen-ui": "Giao diện toàn màn hình",
-            "mica": "Mica",
-            "none": "Không có",
-            "tabbed": "Tabbed",
-            "under-page": "Phía dưới trang",
-            "under-window": "Ở dưới cửa sổ",
-            "window": "Cửa sổ"
-          }
-        }
-      },
-      "name": "Trình phát trong suốt"
-    },
-    "tuna-obs": {
-      "description": "Tích hợp với plugin Tuna của OBS",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "Ngăn trình phát nhạc xuất hiện đột ngột khi phát một bài hát",
-      "name": "Không hiện trình phát nhạc khi phát"
-    },
-    "video-toggle": {
-      "description": "Thêm nút để chuyển giữa chế độ Video/Bài hát. Cũng có thể ẩn toàn bộ video",
-      "menu": {
-        "align": {
-          "label": "Căn chỉnh",
-          "submenu": {
-            "left": "Trái",
-            "middle": "Giữa",
-            "right": "Phải"
-          }
-        },
-        "force-hide": "Buộc ẩn video",
-        "mode": {
-          "label": "Chế độ",
-          "submenu": {
-            "custom": "Tùy chỉnh",
-            "disabled": "Vô hiệu hoá",
-            "native": "Gốc"
-          }
-        }
-      },
-      "name": "Chuyển đổi video",
-      "templates": {
-        "button-song": "Bài hát",
-        "button-video": "Video"
-      }
     },
     "visualizer": {
       "description": "Hiển thị sóng nhạc thay thế cho video (hay \"Music visualizer\")",

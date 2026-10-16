@@ -100,22 +100,5 @@
       }
     }
   },
-  "plugins": {
-    "video-toggle": {
-      "menu": {
-        "align": {
-          "label": "Порамнување",
-          "submenu": {
-            "left": "Лево",
-            "middle": "Средина",
-            "right": "Десно"
-          }
-        }
-      },
-      "templates": {
-        "button-song": "Песна",
-        "button-video": "Видео"
-      }
-    }
-  }
+  "plugins": {}
 }

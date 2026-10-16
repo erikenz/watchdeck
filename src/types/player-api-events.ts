@@ -258,7 +258,7 @@ export type VideoDataChangeValue = Record<string, unknown> & {
   /**
    * Internal variable (for album data)
    **/
-  ['\u0079\u0074\u006d\u0064WatchNextResponse']?: WatchNextResponse;
+  ['wdWatchNextResponse']?: WatchNextResponse;
 };
 
 export interface PlayerAPIEvents {

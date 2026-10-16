@@ -52,7 +52,7 @@ export const getImage = async (src: string): Promise<Electron.NativeImage> => {
     Buffer.from(await result.arrayBuffer()),
   );
   if (output.isEmpty() && !src.endsWith('.jpg') && src.includes('.jpg')) {
-    // Fix hidden webp files (https://github.com/pear-devs/pear-desktop/issues/315)
+    // Fix hidden webp files (https://github.com/erikenz/watchdeck/issues/315)
     return getImage(src.slice(0, src.lastIndexOf('.jpg') + 4));
   }
 
@@ -95,7 +95,7 @@ const handleData = async (
     songInfo.playlistId =
       URL.parse(microformat.urlCanonical)?.searchParams?.get('list') ?? '';
     if (microformat.pageOwnerDetails?.externalChannelId) {
-      songInfo.artistUrl = `https://music.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
+      songInfo.artistUrl = `https://www.youtube.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
     }
     // Used for options.resumeOnStart
     config.set('url', microformat.urlCanonical);
@@ -163,16 +163,16 @@ const handleData = async (
 
     if (songInfo.imageSrc) songInfo.image = await getImage(songInfo.imageSrc);
 
-    win.webContents.send('peard:update-song-info', songInfo);
+    win.webContents.send('watchdeck:update-song-info', songInfo);
   }
 
   return songInfo;
 };
 
 export enum SongInfoEvent {
-  VideoSrcChanged = 'peard:video-src-changed',
-  PlayOrPaused = 'peard:play-or-paused',
-  TimeChanged = 'peard:time-changed',
+  VideoSrcChanged = 'watchdeck:video-src-changed',
+  PlayOrPaused = 'watchdeck:play-or-paused',
+  TimeChanged = 'watchdeck:time-changed',
 }
 
 // This variable will be filled with the callbacks once they register
@@ -192,7 +192,7 @@ const registerProvider = (win: BrowserWindow) => {
   let songInfo: SongInfo | null = null;
 
   // This will be called when the song-info-front finds a new request with song data
-  ipcMain.on('peard:video-src-changed', async (_, data: GetPlayerResponse) => {
+  ipcMain.on('watchdeck:video-src-changed', async (_, data: GetPlayerResponse) => {
     const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(
       async () => {
         songInfo = await handleData(data, win);
@@ -207,7 +207,7 @@ const registerProvider = (win: BrowserWindow) => {
     }
   });
   ipcMain.on(
-    'peard:play-or-paused',
+    'watchdeck:play-or-paused',
     async (
       _,
       {
@@ -234,7 +234,7 @@ const registerProvider = (win: BrowserWindow) => {
     },
   );
 
-  ipcMain.on('peard:time-changed', async (_, seconds: number) => {
+  ipcMain.on('watchdeck:time-changed', async (_, seconds: number) => {
     const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(() => {
       if (!songInfo) {
         return null;

@@ -158,7 +158,7 @@ export const Panel = (props: PanelProps) => {
           <ul
             {...leftProps}
             class={panelStyle()}
-            data-ytmd-sub-panel={true}
+            data-wd-sub-panel={true}
             ref={setPanel}
             style={{
               '--offset-x': `${position.x}px`,

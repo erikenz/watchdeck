@@ -168,21 +168,5 @@
       }
     }
   },
-  "plugins": {
-    "video-toggle": {
-      "menu": {
-        "align": {
-          "label": "ക്രമപ്പെടുത്തൽ",
-          "submenu": {
-            "left": "ഇടത്",
-            "middle": "മധ്യഭാഗം",
-            "right": "വലത്"
-          }
-        }
-      },
-      "templates": {
-        "button-video": "വീഡിയോ"
-      }
-    }
-  }
+  "plugins": {}
 }

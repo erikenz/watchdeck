@@ -7,7 +7,7 @@ process.env.NODE_ENV = 'test';
 
 const appPath = path.resolve(import.meta.dirname, '..');
 
-test('Pear Desktop App - With default settings, app is launched and visible', async () => {
+test('Watchdeck App - With default settings, app is launched and visible', async () => {
   const app = await electron.launch({
     cwd: appPath,
     args: [
@@ -22,19 +22,19 @@ test('Pear Desktop App - With default settings, app is launched and visible', as
   const window = await app.firstWindow();
 
   const consentForm = await window.$(
-    "form[action='https://consent.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com/save']",
+    "form[action='https://consent.youtube.com/save']",
   );
   if (consentForm) {
     await consentForm.click('button');
   }
 
   // const title = await window.title();
-  // expect(title.replaceAll(/\s/g, ' ')).toEqual('Pear Desktop');
+  // expect(title.replaceAll(/\s/g, ' ')).toEqual('Watchdeck');
 
   const url = window.url();
   expect(
     url.startsWith(
-      'https://music.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+      'https://www.youtube.com',
     ),
   ).toBe(true);
 

@@ -14,7 +14,7 @@ declare global {
   }
 
   interface DocumentEventMap {
-    'peard:audio-can-play': CustomEvent<Compressor>;
+    'watchdeck:audio-can-play': CustomEvent<Compressor>;
     'videodatachange': CustomEvent<VideoDataChanged>;
   }
 

@@ -1,0 +1,21 @@
+Watchdeck
+=========
+
+Watchdeck is a fork-in-spirit of the YouTube Music Desktop App; its starting
+point was the `pear-desktop` fork of that project:
+
+  - https://github.com/th-ch/youtube-music
+  - https://github.com/pear-devs/pear-desktop
+
+Portions of this software (the Electron shell, the plugin framework, the config
+store, and the build tooling around them) are derived from those projects, which
+are distributed under the MIT License:
+
+  Copyright (c) th-ch <th-ch@users.noreply.github.com>
+  (https://github.com/pear-devs/pear-desktop)
+
+The MIT text that applies to those portions is reproduced in the `license` file.
+
+Watchdeck is not affiliated with, authorized by, endorsed by, or connected with
+Google LLC or YouTube. "Google" and "YouTube" are trademarks of their respective
+owners and are used here only to identify the service the application talks to.

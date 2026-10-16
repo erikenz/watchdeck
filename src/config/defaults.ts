@@ -50,11 +50,13 @@ export const defaultConfig: DefaultConfig = {
     x: -1,
     y: -1,
   },
-  'url': 'https://music.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+  'url': 'https://www.youtube.com',
   'options': {
     tray: false,
     appVisible: true,
-    autoUpdates: true,
+    // no update feed is configured yet (see docs/PRD.md §R8): the inherited
+    // updater pointed at the upstream project's releases
+    autoUpdates: false,
     alwaysOnTop: false,
     hideMenu: false,
     hideMenuWarned: false,

@@ -98,7 +98,7 @@ jobs:
 
             TASK 3 — Completeness (bug issues only; skip for feature requests).
             The bug form renders each field as a "### <label>" section header followed
-            by the answer. Required sections: "Pear Desktop (Application) Version",
+            by the answer. Required sections: "Watchdeck (Application) Version",
             "What operating system are you using?", "Operating System Version",
             "What CPU architecture are you using?", "Reproduction steps",
             "Expected Behavior", "Actual Behavior", "Enabled plugins".
@@ -112,10 +112,10 @@ jobs:
             TASK 4 — Area label.
             Add AT MOST the clearly-applicable labels from this EXACT allowlist (these
             already exist — never create new labels): electron-issue,
-            official-youtube-music-issue, documentation, plugin request, question.
+            upstream-youtube-issue, documentation, plugin request, question.
             Guidance: "electron-issue" = an Electron/runtime crash unrelated to app
-            code; "official-youtube-music-issue" = a bug reproducible on
-            music.youtube.com itself; "plugin request" = asks for a new plugin or new
+            code; "upstream-youtube-issue" = a bug reproducible on
+            www.youtube.com itself; "plugin request" = asks for a new plugin or new
             plugin functionality; "documentation" = docs/README; "question" = a support
             question, not a bug/request. Apply only when confident, else none:
               gh issue edit ${{ github.event.issue.number }} --add-label "<label>"

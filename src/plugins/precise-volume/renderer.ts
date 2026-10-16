@@ -45,7 +45,7 @@ export const onPlayerApiReady = async (
   }, 2500);
 
   /** Restore saved volume and setup tooltip */
-  async function firstRun() {
+  function firstRun() {
     if (typeof options.savedVolume === 'number') {
       // Set saved volume as tooltip
       setTooltip(options.savedVolume);
@@ -66,15 +66,12 @@ export const onPlayerApiReady = async (
     injectVolumeHud(noVid);
     if (!noVid) {
       setupVideoPlayerOnwheel();
-      if (!(await window.mainConfig.plugins.isEnabled('video-toggle'))) {
-        // Video-toggle handles hud positioning on its own
-        const videoMode = () =>
-          api.getPlayerResponse().videoDetails?.musicVideoType !==
-          'MUSIC_VIDEO_TYPE_ATV';
-        $('video')?.addEventListener('peard:src-changed', () =>
-          moveVolumeHud(videoMode()),
-        );
-      }
+      const videoMode = () =>
+        api.getPlayerResponse().videoDetails?.musicVideoType !==
+        'MUSIC_VIDEO_TYPE_ATV';
+      $('video')?.addEventListener('watchdeck:src-changed', () =>
+        moveVolumeHud(videoMode()),
+      );
     }
   }
 
@@ -280,7 +277,7 @@ export const onPlayerApiReady = async (
   );
   context.ipc.on('setVolume', (value: number) => setVolume(value));
 
-  await firstRun();
+  firstRun();
 };
 
 export const onConfigChange = (config: PreciseVolumePluginConfig) => {

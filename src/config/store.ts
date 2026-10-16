@@ -4,7 +4,6 @@ import { DefaultPresetList, type Preset } from '@/plugins/downloader/types';
 import { defaultConfig as defaults } from './defaults';
 
 import type { TrackerBlockerConfig } from '@/plugins/do-not-track';
-import type { SyncedLyricsPluginConfig } from '@/plugins/synced-lyrics/types';
 
 // HACK: electron-store is ESM, but rolldown has a bug that prevents it from being imported properly in CommonJS context, so we have to use require here
 /* oxlint-disable typescript/no-require-imports */
@@ -28,32 +27,6 @@ const migrations = {
       }
       store.set('plugins.do-not-track', blockerConfig);
       store.delete('plugins.adblocker');
-    }
-  },
-  '>=3.10.0'(store: IStore) {
-    const lyricGeniusConfig = store.get('plugins.lyrics-genius') as
-      | {
-          enabled?: boolean;
-          romanizedLyrics?: boolean;
-        }
-      | undefined;
-
-    if (lyricGeniusConfig) {
-      const syncedLyricsConfig = store.get('plugins.synced-lyrics') as
-        | SyncedLyricsPluginConfig
-        | undefined;
-
-      if (
-        !syncedLyricsConfig ||
-        syncedLyricsConfig?.enabled !== lyricGeniusConfig?.enabled
-      ) {
-        store.set('plugins.synced-lyrics', {
-          ...syncedLyricsConfig,
-          enabled: lyricGeniusConfig.enabled,
-        });
-      }
-
-      store.delete('plugins.lyrics-genius');
     }
   },
   '>=3.3.0'(store: IStore) {
@@ -132,7 +105,7 @@ const migrations = {
     const listenAlong = store.get('plugins.discord.listenAlong');
     if (listenAlong !== undefined) {
       store.set(
-        'plugins.discord.playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065\u004d\u0075\u0073\u0069\u0063',
+        'plugins.discord.playOnYouTubeMusic',
         listenAlong,
       );
       store.delete('plugins.discord.listenAlong');
@@ -180,10 +153,6 @@ const migrations = {
   },
   '>=1.17.0'(store: IStore) {
     store.delete('plugins.picture-in-picture'); // default value is now in the plugin
-
-    if (store.get('plugins.video-toggle.mode') === undefined) {
-      store.set('plugins.video-toggle.mode', 'custom');
-    }
   },
   '>=1.14.0'(store: IStore) {
     if (
@@ -192,10 +161,6 @@ const migrations = {
       store.set('plugins.precise-volume.globalShortcuts', {});
     }
 
-    if (store.get('plugins.hide-video-player.enabled')) {
-      store.delete('plugins.hide-video-player');
-      store.set('plugins.video-toggle.enabled', true);
-    }
   },
   '>=1.13.0'(store: IStore) {
     if (store.get('plugins.discord.listenAlong') === undefined) {

@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "Pag mag-play ng ad, I-mute ang audio at i-set ang bilis ng playback ng 16x",
-      "name": "Pagbilis ng Ad"
-    },
-    "album-actions": {
-      "description": "Idadagdag ang Undislike, Dislike, Like, at Unlike na button para ilapat ito sa lahat ng kanta sa isang playlist o album",
-      "name": "Mga aksyon sa Album"
-    },
-    "album-color-theme": {
-      "description": "Naglalapat ng dynamic na tema at visual effect batay sa color palette ng album",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "Ratio ng paghahalo ng kulay",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "Paganahin ang seekbar theming"
-      },
-      "name": "Tema ng Kulay ng Album"
-    },
     "ambient-mode": {
       "description": "Naglalapat ng lighting effect sa pamamagitan ng pag-cast ng mga magiliw na kulay mula sa video, sa background ng iyong screen",
       "menu": {
@@ -280,12 +259,6 @@
         }
       },
       "name": "Ambient Mode"
-    },
-    "amuse": {
-      "description": "Nagdaragdag ng suporta sa {{applicationName}} para sa Amuse now playing widget ng 6K Labs",
-      "response": {
-        "query": "Tumatakbo ang Amuse API server. Gamitin ang GET /query para makuha ang impo ng kanta."
-      }
     },
     "api-server": {
       "description": "Nagdadagdag ng API Server upang kontrolin ang player",
@@ -346,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "Ilapat ang compression sa audio (pinababa ang volume ng pinakamalakas na bahagi ng signal at pinapataas ang volume ng pinakamalambot na bahagi)",
-      "name": "Compressor ng Audio"
-    },
     "auth-proxy-adapter": {
       "description": "Suporta para sa paggamit ng authentication proxy services",
       "menu": {
@@ -370,52 +339,6 @@
           "title": "Port ng Proxy"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "Gawing transparent at malabo ang bar ng nabigasyon",
-      "name": "Palabuin ang Bar ng Nabigasyon"
-    },
-    "bypass-age-restrictions": {
-      "description": "I-bypass ang pag-verify ng edad ng Music Player",
-      "name": "I-bypass ang Restriksyon sa Edad"
-    },
-    "captions-selector": {
-      "description": "Tagapili ng caption para sa mga audio track ng {{applicationName}}",
-      "menu": {
-        "autoload": "Awtomatikong piliin ang huling ginamit na caption",
-        "disable-captions": "Walang mga caption bilang default"
-      },
-      "name": "Tagapili ng Caption",
-      "prompt": {
-        "selector": {
-          "label": "Kasalukuyang wika ng caption:{{language}}",
-          "none": "Wala",
-          "title": "Pumili ng wika ng caption"
-        }
-      },
-      "templates": {
-        "title": "Bumukas ng pagpilian ng caption"
-      },
-      "toast": {
-        "caption-changed": "Binago ang caption sa {{language}}",
-        "caption-disabled": "Di-napagana ang mga caption",
-        "no-captions": "Walang captions ay available para sa kantang ito"
-      }
-    },
-    "clock": {
-      "description": "Magdagdag ng orasan sa bar ng nabigasyon",
-      "menu": {
-        "format": {
-          "24-hour-format": "24-Oras na Format",
-          "display-seconds": "Ipakita ang Segundo",
-          "label": "Pormat"
-        }
-      },
-      "name": "Orasan"
-    },
-    "compact-sidebar": {
-      "description": "Laging i-set ang sidebar sa compact mode",
-      "name": "Pinaliit na Sidebar"
     },
     "crossfade": {
       "description": "I-crossfade kada kanta",
@@ -588,66 +511,6 @@
       },
       "name": "In-App na Menu"
     },
-    "lumiastream": {
-      "description": "Nabibigay suporta sa Lumia Stream",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "Nagdaragdag ng suporta sa lyrics para sa karamihan ng kanta",
-      "menu": {
-        "romanized-lyrics": "Romanized na mga Lyrics"
-      },
-      "name": "Lyrics Genius",
-      "renderer": {
-        "fetched-lyrics": "Kinuha ang lyrics para sa Genius"
-      }
-    },
-    "music-together": {
-      "description": "Magbahagi ng playlist sa iba. Kapag nagpatugtog ang host ng isang kanta, maririnig ng lahat ang parehong kanta",
-      "dialog": {
-        "enter-host": "Ilagay ang Host ID"
-      },
-      "internal": {
-        "save": "I-save",
-        "track-source": "Source ng Track",
-        "unknown-user": "Di-kilalang User"
-      },
-      "menu": {
-        "click-to-copy-id": "Kopyahin ang Host ID",
-        "close": "Isara ang Music Together",
-        "connected-users": "Nakakonektang (mga) User",
-        "disconnect": "Mag-diskonekta sa Music Together",
-        "empty-user": "Walang naka-konektang user",
-        "host": "Host ng Music Together",
-        "join": "Sumali sa Music Together",
-        "permission": {
-          "all": "Payagan ang mga guest na kontrolin ang playlist at player",
-          "host-only": "Ang host lamang ang maka-kontrol ng playlist at player",
-          "playlist": "Payagan ang mga guest na kontrolin ang playlist"
-        },
-        "set-permission": "Palitan ng permiso ng pag-control",
-        "status": {
-          "disconnected": "Nadiskonekta",
-          "guest": "Nakakonekta bilang Guest",
-          "host": "Nakakonekta bilang Host"
-        }
-      },
-      "name": "Music Together [Beta]",
-      "toast": {
-        "add-song-failed": "Nabigong magdagdag ng kanta",
-        "closed": "Nakasara ang Music Together",
-        "disconnected": "Nakadiskonekta ang Music Together",
-        "host-failed": "Nabigong mag-host ng Music Together",
-        "id-copied": "Nakopya na ang Host ID sa clipboard",
-        "id-copy-failed": "Nabigong nakopya ang Host ID sa clipboard",
-        "join-failed": "Nabigong sumali sa Music Together",
-        "joined": "Nakasali sa Music Together",
-        "permission-changed": "Ang permiso ng Music Together ay nabago sa \"{{permission}}\"",
-        "remove-song-failed": "Nabigong natanggal ang kanta",
-        "user-connected": "{{name}} ay sumali sa Music Together",
-        "user-disconnected": "{{name}} ay umalis sa Music Together"
-      }
-    },
     "navigation": {
       "description": "Ang Next/Back navigation na arrow ay direktang magamit sa interface, katulad sa iyong paboritong browser",
       "name": "Nabigasyon",
@@ -659,10 +522,6 @@
           "title": "Pumunta sa susunod na page"
         }
       }
-    },
-    "no-google-login": {
-      "description": "Tanggalin ang mga Google login na button at mga link mula sa interface",
-      "name": "Walang Google na Login"
     },
     "notifications": {
       "description": "Magpakita ng notification kapag nagsimulang tumugtog ang kanta (magagamit ang mga interactive na notification sa Windows)",
@@ -733,24 +592,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "Kasalukuyang Kalidad: {{quality}}",
-            "message": "Pumili ng Kalidad ng Video:",
-            "title": "Pumili ng Kalidad ng Video"
-          }
-        }
-      },
-      "description": "Payagang mapapalitan ang kalidad ng video na may button sa video overlay",
-      "name": "Taga-palit sa quality ng video",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "Buksan ang taga-palit ng quality"
-        }
-      }
-    },
     "scrobbler": {
       "description": "Idagdag ang scrobbling support (last.fm, Listenbrains, atbp.)",
       "dialog": {
@@ -804,10 +645,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "Laktawan ang na-dislike na kanta",
-      "name": "I-skip ang mga Na-dislike na Kanta"
-    },
     "skip-silences": {
       "description": "Automatikong laktawan ang mga tahimik na mga seksyon sa kanta",
       "name": "I-skip ang mga Katahimikan"
@@ -815,142 +652,11 @@
     "sponsorblock": {
       "description": "Automatikong Laktawan ang di part ng kanta tulad ng intro/outro o part ng mga music video na ang kanta ay di nagple-play"
     },
-    "synced-lyrics": {
-      "description": "Nagbibigay ng naka-sync na lyrics sa mga kanta, gamit ang mga provider tulad ng LRClib.",
-      "errors": {
-        "fetch": "⚠️\t Nagkaroon ng error habang kinukuha ang lyrics.\n\t Subukang muli mamaya.",
-        "not-found": "⚠️ Walang nakitang lyrics para sa kantang ito."
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "I-convert ang karakter na Chinese",
-          "submenu": {
-            "disabled": {
-              "label": "Di-napagana",
-              "tooltip": "Huwag paganahin ang conversion ng karakter na Chinese"
-            },
-            "simplified-to-traditional": {
-              "label": "Pinasimple sa Tradisyonal",
-              "tooltip": "I-convert ang Pinasimpleng Chinese patungong Tradisyunal na Chinese"
-            },
-            "traditional-to-simplified": {
-              "label": "Tradisyonal patungong Pinasimple",
-              "tooltip": "I-convert ang Tradisyunal na Chinese sa Pinasimpleng Chinese"
-            }
-          },
-          "tooltip": "I-convert ang karakter na Chinese sa Tradisyonal o Pinasimple"
-        },
-        "default-text-string": {
-          "label": "Default na character sa pagitan ng lyrics",
-          "tooltip": "Pumili ng default na character na gagamitin sa pagitan ng lyrics"
-        },
-        "line-effect": {
-          "label": "Effect ng Linya",
-          "submenu": {
-            "fancy": {
-              "label": "Magarbo",
-              "tooltip": "Gumamit ng malaki, mala-app na effect sa kasalukuyang linya"
-            },
-            "focus": {
-              "label": "Focus",
-              "tooltip": "Gawing puti lamang ang kasalukuyang linya"
-            },
-            "offset": {
-              "label": "Offset",
-              "tooltip": "I-offset sa kanan ang kasalukuyang linya"
-            },
-            "scale": {
-              "label": "Scale",
-              "tooltip": "I-scale ang kasalukuyang linya"
-            }
-          },
-          "tooltip": "Pumili ng effect na ilalapat sa kasalukuyang linya"
-        },
-        "precise-timing": {
-          "label": "Gawing perpektong naka-sync ang lyrics",
-          "tooltip": "Kalkulahin sa millisecond ang pagpapakita ng susunod na linya (maaaring magkaroon ng maliit na epekto sa performance)"
-        },
-        "preferred-provider": {
-          "label": "Napiling Provider",
-          "none": {
-            "label": "Wala",
-            "tooltip": "Walang napiling provider"
-          },
-          "tooltip": "Pumili ng default na provider para gagamitin"
-        },
-        "romanization": {
-          "label": "I-romanize ang lyrics",
-          "tooltip": "Kung ang lyrics ay nasa ibang wika, subukang magpakita ng latin na bersyon."
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "Ipakita ang lyrics kahit di-eksakto",
-          "tooltip": "Kung hindi matagpuan ang kanta, susubukan muli ng plugin gamit ang ibang query sa paghahanap.\nAng resulta mula sa pangalawang pagsubok ay maaaring hindi eksakto."
-        },
-        "show-time-codes": {
-          "label": "Ipakita ang mga time code",
-          "tooltip": "Ipakita ang mga time code kasunod sa lyrics"
-        }
-      },
-      "name": "Pag-sync ng Lyrics",
-      "refetch-btn": {
-        "fetching": "Nag-fe-fetch...",
-        "normal": "I-fetch muli ang lyrics"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️ - Maaaring hindi naka-sync ang lyrics dahil sa hindi pagkakatugma ng duration.",
-        "inexact": "⚠️ - Maaaring hindi eksakto ang lyrics para sa kantang ito",
-        "instrumental": "⚠️ - Ito ay isang instrumental na kanta"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "Kontrolin ang pag-play mula sa iyong taskbar ng Windows"
     },
     "touchbar": {
       "description": "Idaragdag ang TouchBar na widget para sa mga user ng macOS"
-    },
-    "transparent-player": {
-      "description": "Gawing transparent ang app window",
-      "menu": {
-        "type": {
-          "label": "Uri",
-          "submenu": {
-            "fullscreen-ui": "Fullscreen na UI",
-            "none": "Wala",
-            "tabbed": "Naka-tab"
-          }
-        }
-      },
-      "name": "Transparent na Player"
-    },
-    "tuna-obs": {
-      "description": "Integrasyon kasama ang Tuna na OBS plugin"
-    },
-    "unobtrusive-player": {
-      "description": "Pinipigilan ang player na mag-pop up kapag nagpe-play ng kanta",
-      "name": "Hindi mapanghimasok na Player"
-    },
-    "video-toggle": {
-      "description": "Idaragdag ng button na magpalit sa Video/Kanta na mode. maaari ding opsyonal na alisin ang tab ng video",
-      "menu": {
-        "align": {
-          "label": "Pag-align",
-          "submenu": {
-            "left": "Kaliwa",
-            "middle": "Gitna",
-            "right": "Kanan"
-          }
-        },
-        "force-hide": "Piliting tanggalin ang video tab",
-        "mode": {
-          "submenu": {
-            "disabled": "Di-napagana"
-          }
-        }
-      },
-      "name": "Pag-toggle ng Video",
-      "templates": {
-        "button-song": "Kanta"
-      }
     },
     "visualizer": {
       "description": "Idaragdag ng visualizer sa player",

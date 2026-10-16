@@ -215,27 +215,6 @@
     }
   },
   "plugins": {
-    "ad-speedup": {
-      "description": "使用 16 倍速播放及靜音來跳過廣告片段",
-      "name": "加速略過"
-    },
-    "album-actions": {
-      "description": "新增支援對整個播放清單或專輯\"喜歡／不喜歡\"\"取消喜歡／取消不喜歡\"的按鈕",
-      "name": "進階專輯操作"
-    },
-    "album-color-theme": {
-      "description": "根據專輯封面色調更改應用程式主題顏色",
-      "menu": {
-        "color-mix-ratio": {
-          "label": "顏色混合程度",
-          "submenu": {
-            "percent": "{{ratio}}%"
-          }
-        },
-        "enable-seekbar": "啟用進度條主題樣式"
-      },
-      "name": "隨歌曲色調變更主題"
-    },
     "ambient-mode": {
       "description": "影片周圍背景根據影片內容改變顏色，讓觀眾在觀賞影片時更有臨場感",
       "menu": {
@@ -280,13 +259,6 @@
         }
       },
       "name": "微光效果"
-    },
-    "amuse": {
-      "description": "加入支援 6K Labs 的 Amuse OBS 外掛以取得 {{applicationName}} 現正播放資訊",
-      "name": "Amuse",
-      "response": {
-        "query": "Amuse API 伺服器正在運作中，使用 /query 以取得歌曲資訊。"
-      }
     },
     "api-server": {
       "description": "新增伺服器以使用 API 控制播放器",
@@ -347,10 +319,6 @@
         }
       }
     },
-    "audio-compressor": {
-      "description": "使用音效壓縮 (大聲部份的音量降低，柔和部份的音量提高)",
-      "name": "音效壓縮器"
-    },
     "auth-proxy-adapter": {
       "description": "支援使用 Proxy 驗證服務",
       "menu": {
@@ -374,52 +342,6 @@
           "title": "Proxy 連接埠"
         }
       }
-    },
-    "blur-nav-bar": {
-      "description": "使導覽列透明及模糊",
-      "name": "模糊導覽列"
-    },
-    "bypass-age-restrictions": {
-      "description": "繞過年齡驗證",
-      "name": "繞過年齡驗證"
-    },
-    "captions-selector": {
-      "description": "{{applicationName}} 音軌字幕選項",
-      "menu": {
-        "autoload": "自動選擇上次使用的字幕",
-        "disable-captions": "預設無字幕"
-      },
-      "name": "字幕選項",
-      "prompt": {
-        "selector": {
-          "label": "目前字幕語言：{{language}}",
-          "none": "無",
-          "title": "選擇字幕語言"
-        }
-      },
-      "templates": {
-        "title": "開啟字幕選項"
-      },
-      "toast": {
-        "caption-changed": "字幕語言已更改至 {{language}}",
-        "caption-disabled": "字幕已停用",
-        "no-captions": "這首歌曲沒有可用的字幕"
-      }
-    },
-    "clock": {
-      "description": "新增時鐘至應用程式上方",
-      "menu": {
-        "format": {
-          "24-hour-format": "24 小時制",
-          "display-seconds": "顯示秒數",
-          "label": "時間格式"
-        }
-      },
-      "name": "時鐘"
-    },
-    "compact-sidebar": {
-      "description": "永遠讓側邊欄保持收合狀態",
-      "name": "收合側邊欄"
     },
     "crossfade": {
       "description": "在歌曲之間使用交叉淡化",
@@ -600,66 +522,6 @@
       },
       "name": "程式內選單列"
     },
-    "lumiastream": {
-      "description": "新增對 Lumia Stream 的支援",
-      "name": "Lumia Stream [Beta]"
-    },
-    "lyrics-genius": {
-      "description": "為更多歌曲新增字幕支援",
-      "menu": {
-        "romanized-lyrics": "羅馬拼音字幕"
-      },
-      "name": "第三方字幕",
-      "renderer": {
-        "fetched-lyrics": "為 Genius 取得字幕"
-      }
-    },
-    "music-together": {
-      "description": "與他人共享播放清單。當主持人播放歌曲時，其他成員也會同步收聽",
-      "dialog": {
-        "enter-host": "輸入主持人 ID"
-      },
-      "internal": {
-        "save": "儲存",
-        "track-source": "追蹤來源",
-        "unknown-user": "未知使用者"
-      },
-      "menu": {
-        "click-to-copy-id": "複製主持人 ID",
-        "close": "同步關閉音樂",
-        "connected-users": "已連線的使用者",
-        "disconnect": "斷開連線共享音樂",
-        "empty-user": "無已連線的使用者",
-        "host": "發起共享音樂",
-        "join": "加入共享音樂",
-        "permission": {
-          "all": "允許加入的使用者控制播放清單及播放控制",
-          "host-only": "不允許加入的使用者控制播放清單及播放控制",
-          "playlist": "只允許加入的使用者控制播放清單"
-        },
-        "set-permission": "切換共享音樂播放許可權",
-        "status": {
-          "disconnected": "已斷開連線",
-          "guest": "以訪客身份加入",
-          "host": "以主持人身份加入"
-        }
-      },
-      "name": "共享音樂 [Beta]",
-      "toast": {
-        "add-song-failed": "歌曲加入失敗",
-        "closed": "關閉共享音樂",
-        "disconnected": "共享音樂已斷開連線",
-        "host-failed": "發起共享音樂失敗",
-        "id-copied": "已複製主持人 ID",
-        "id-copy-failed": "複製主持人 ID 失敗",
-        "join-failed": "加入共享音樂失敗",
-        "joined": "已加入共享音樂",
-        "permission-changed": "共享音樂播放權限已切換至 \"{{permission}}\"",
-        "remove-song-failed": "歌曲移除失敗",
-        "user-connected": "{{name}} 已加入共享音樂",
-        "user-disconnected": "{{name}} 離開了共享音樂"
-      }
-    },
     "navigation": {
       "description": "允許應用程式上方顯示上一頁／下一頁按鈕",
       "name": "導覽列",
@@ -671,10 +533,6 @@
           "title": "前往下一頁"
         }
       }
-    },
-    "no-google-login": {
-      "description": "移除 Google 登入按鈕及連結",
-      "name": "停用 Google 登入"
     },
     "notifications": {
       "description": "在歌曲播放時傳送一個系統通知 (可互動通知僅限 Windows)",
@@ -751,24 +609,6 @@
         }
       }
     },
-    "quality-changer": {
-      "backend": {
-        "dialog": {
-          "quality-changer": {
-            "detail": "目前畫質：{{quality}}",
-            "message": "選擇影片畫質：",
-            "title": "選擇影片畫質"
-          }
-        }
-      },
-      "description": "允許在影片內進行畫質更改",
-      "name": "允許變更影片畫質",
-      "renderer": {
-        "quality-settings-button": {
-          "label": "開啟畫質調整器"
-        }
-      }
-    },
     "scrobbler": {
       "description": "額外新增 scrobbling 支援 (例如：last.fm, Listenbrainz)",
       "dialog": {
@@ -823,10 +663,6 @@
         }
       }
     },
-    "skip-disliked-songs": {
-      "description": "自動跳過不喜歡的歌曲",
-      "name": "自動跳過不喜歡的歌曲"
-    },
     "skip-silences": {
       "description": "自動跳過音樂無聲片段",
       "name": "自動跳過無聲片段"
@@ -835,93 +671,6 @@
       "description": "自動跳過贊助片段",
       "name": "SponsorBlock"
     },
-    "synced-lyrics": {
-      "description": "使用 LRClib 等管道提供歌詞同步顯示。",
-      "errors": {
-        "fetch": "⚠️\t擷取歌詞時發生錯誤\n請稍後再試。",
-        "not-found": "⚠️未找到該首歌曲的歌詞。"
-      },
-      "menu": {
-        "convert-chinese-character": {
-          "label": "繁簡轉換",
-          "submenu": {
-            "disabled": {
-              "label": "已停用",
-              "tooltip": "停用繁簡轉換"
-            },
-            "simplified-to-traditional": {
-              "label": "簡體轉繁體",
-              "tooltip": "轉換簡體中文至繁體中文"
-            },
-            "traditional-to-simplified": {
-              "label": "繁體轉簡體",
-              "tooltip": "轉換繁體中文至簡體中文"
-            }
-          },
-          "tooltip": "轉換中文字符至繁體或簡體"
-        },
-        "default-text-string": {
-          "label": "預設歌詞中間隔的符號",
-          "tooltip": "選擇歌詞中間隔要使用的符號"
-        },
-        "line-effect": {
-          "label": "歌詞顯示效果",
-          "submenu": {
-            "fancy": {
-              "label": "絢麗",
-              "tooltip": "使用較為接近原生樣式並且放大目前該行歌詞"
-            },
-            "focus": {
-              "label": "聚焦",
-              "tooltip": "聚焦目前的歌詞"
-            },
-            "offset": {
-              "label": "凸行",
-              "tooltip": "凸行目前的歌詞"
-            },
-            "scale": {
-              "label": "放大",
-              "tooltip": "放大目前的歌詞"
-            }
-          },
-          "tooltip": "選擇要使用的歌詞顯示效果"
-        },
-        "precise-timing": {
-          "label": "使歌詞完美同步",
-          "tooltip": "更精確的計算下一行歌詞的顯示 (將會降低些許效能)"
-        },
-        "preferred-provider": {
-          "label": "偏好提供者",
-          "none": {
-            "label": "無",
-            "tooltip": "沒有偏好的提供者"
-          },
-          "tooltip": "選擇預設的歌詞提供者"
-        },
-        "romanization": {
-          "label": "羅馬拼音化歌詞",
-          "tooltip": "如果歌詞使用不同語言，嘗試使用拉丁文顯示。"
-        },
-        "show-lyrics-even-if-inexact": {
-          "label": "即使不精確依然強制顯示歌詞",
-          "tooltip": "當找不到符合該歌曲的歌詞時，該功能會嘗試不同的搜尋方式。\n使用不同的搜尋方式會導致不精確的結果。"
-        },
-        "show-time-codes": {
-          "label": "顯示時間線",
-          "tooltip": "在歌詞旁顯示時間線"
-        }
-      },
-      "name": "歌詞同步",
-      "refetch-btn": {
-        "fetching": "擷取中...",
-        "normal": "重新擷取歌詞"
-      },
-      "warnings": {
-        "duration-mismatch": "⚠️歌詞可能會出現不同步的情況。",
-        "inexact": "⚠️該歌曲的歌詞可能並不精確",
-        "instrumental": "⚠️該首歌曲為純音樂"
-      }
-    },
     "taskbar-mediacontrol": {
       "description": "允許工作列應用程式預覽介面顯示媒體控制相關按鈕",
       "name": "工作列媒體控制"
@@ -929,67 +678,6 @@
     "touchbar": {
       "description": "為 macOS 使用者新增觸控列支援",
       "name": "觸控列 (Touchbar) 支援"
-    },
-    "transparent-player": {
-      "description": "讓視窗背景變為透明糢糊",
-      "menu": {
-        "opacity": {
-          "label": "不透明度",
-          "submenu": {
-            "percent": "{{opacity}}%"
-          }
-        },
-        "type": {
-          "label": "樣式",
-          "submenu": {
-            "acrylic": "壓克力(Acrylic)",
-            "content": "內容",
-            "fullscreen-ui": "全螢幕界面",
-            "mica": "雲母(Mica)",
-            "none": "無",
-            "tabbed": "分頁式(Tabbed)",
-            "under-page": "在頁面底下",
-            "under-window": "在視窗底下",
-            "window": "視窗"
-          }
-        }
-      },
-      "name": "透明糢糊效果"
-    },
-    "tuna-obs": {
-      "description": "與 OBS 的 Tuna 外掛連線",
-      "name": "Tuna OBS"
-    },
-    "unobtrusive-player": {
-      "description": "防止播放器介面在點選歌曲後彈出",
-      "name": "低干擾播放器介面"
-    },
-    "video-toggle": {
-      "description": "新增一個按鈕可以控制影片／歌曲切換和完全移除整個影片頁面的功能",
-      "menu": {
-        "align": {
-          "label": "按鈕位置",
-          "submenu": {
-            "left": "靠左",
-            "middle": "中間",
-            "right": "靠右"
-          }
-        },
-        "force-hide": "強制移除整個影片頁面",
-        "mode": {
-          "label": "模式",
-          "submenu": {
-            "custom": "自訂樣式",
-            "disabled": "停用",
-            "native": "原生樣式"
-          }
-        }
-      },
-      "name": "歌曲／影片切換",
-      "templates": {
-        "button-song": "歌曲",
-        "button-video": "影片"
-      }
     },
     "visualizer": {
       "description": "在播放器新增視覺化效果",

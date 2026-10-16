@@ -1,7 +1,10 @@
 # PRD — YouTube desktop wrapper (working title: **Watchdeck**)
 
-**Status:** draft for approval — **no implementation has started**.
-**Revision 3** — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
+**Status:** approved in outline — **P0 (repo reset) in progress**; P1–P4 not started.
+**Revision 4** — P0 work has begun: the project folder is renamed and the repository is published, the music-only plugin
+inventory is deleted, and the §R8 debrand gate passes. Decisions and open questions are unchanged; §8 and §15 list what
+is left in P0.
+**Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
 **Author:** Delta agent, for erikenz.
@@ -684,51 +687,27 @@ usable player; P2 is the requested core feature; P3 is independent and can be pa
 
 ## 11. Git state, and moving the project to `watchdeck`
 
-**Done in this thread** (so nothing here needs redoing):
+**Done, and verified in the P0 thread** (nothing here needs redoing):
 
-- `~/Projects/youtube-client` was re-initialised: upstream history and the `pear-devs/pear-desktop` remote are gone; one
-  commit on `main`, `6007aa4` "chore: initial commit" (416 files: the pear-desktop skeleton plus this PRD), followed by a
-  second commit that refreshes this document; **no remote** is configured yet.
-- The old `.git` was moved out of the repo (never committed) to `~/Projects/.youtube-client-git-backup-pear-desktop`
-  (25 MB). Delete it once you are satisfied: `rm -rf ~/Projects/.youtube-client-git-backup-pear-desktop`.
-- The prototype is already renamed: `~/Projects/watchdeck` → `~/Projects/watchdeck-old`.
-- Delta's checkout directory inside the repo (`/.delta/`) is excluded through `.git/info/exclude` so it cannot be staged.
+- The project folder was renamed: `~/Projects/youtube-client` → `~/Projects/watchdeck`; the primary checkout is on `main`
+  at `66345e8` with a clean tree, and Delta's per-thread checkout machinery (`.delta/`) is gone.
+- The repository is published: `origin` = `https://github.com/erikenz/watchdeck` (**private**, default branch `main`),
+  `main` pushed. The prototype's repository was renamed to `watchdeck-old` to free the name (§15).
+- History: `6007aa4` "chore: initial commit" and `66345e8` "docs: add thread provenance and handoff notes to the PRD".
+  Upstream history and the `pear-devs/pear-desktop` remote are gone.
+- The old `.git` is still backed up at `~/Projects/.youtube-client-git-backup-pear-desktop` (25 MB) — the only remaining
+  copy of the pear-desktop/YouTube-Music history that was deliberately dropped. Delete it once you are satisfied:
+  `rm -rf ~/Projects/.youtube-client-git-backup-pear-desktop`.
+- `~/Projects/watchdeck-old` is the reviewed prototype (read-only reference).
 
-**Remaining, in this order.** Run these only when this thread's work is finished — Delta keeps this thread's checkout
-and a clone inside `~/Projects/youtube-client/.delta/`, and their internal paths are absolute, so a rename while the thread
-is in use makes Delta show a checkout/preparation error (the conversation itself is safe — it lives in Delta's own storage,
-not in the folder).
+**Remaining:**
 
-```bash
-# 1. move the project to its final name
-cd ~/Projects
-mv youtube-client watchdeck
-
-# 2. remove Delta's per-thread checkout machinery (it is rebuilt for the next thread)
-rm -rf ~/Projects/watchdeck/.delta
-
-# 3. verify: one commit, clean tree, no remotes
-cd ~/Projects/watchdeck
-git log --oneline && git status --short && git remote -v
-```
-
-The new repository has **no remote on purpose** (the point was to drop pear-desktop's). Delta identifies a project by its
-Git remote and a project without one cannot be synced or joined, so add the real one as soon as the GitHub side exists:
-
-```bash
-# 4. free the name held by the prototype, then publish the new repo
-gh repo rename watchdeck-old -R erikenz/watchdeck --yes        # prototype repo keeps its code; GitHub redirects
-gh repo create erikenz/watchdeck --private --source=. --remote=origin --push
-#    (use --public when the debrand is done and the README is ready to be read by strangers)
-```
-
-If the history should not be published yet, `git remote add origin git@github.com:erikenz/watchdeck.git` alone is enough
-to make the project attachable in Delta; push later.
-
-Still part of the reset: keep upstream attribution (MIT) in the README/`license`, set your own copyright line, and delete
-inherited release artifacts (`changelog.md`, winget workflows, AUR/scoop references).
-
----
+- Flip the GitHub repository to public when the tree is ready to be read by strangers — the §R8 debrand gate passes as of
+  revision 4, but P1 has not started (§8).
+- Two stray leftovers in `~/Projects`, both safe to remove after a look: `youtube-client/` (only an empty `.git/objects`
+  skeleton) and `.youtube-client-git-backup-pear-desktop/` (above).
+- Keep the upstream MIT attribution (`license`, `NOTICE`), this repository's own copyright line, and the
+  `tools/identity-gate.sh` check when publishing.
 
 ## 12. Name recommendations (revised for your criteria)
 
@@ -828,8 +807,9 @@ conversation. The research behind it happened in one Delta thread, which was clo
 - **Where the code lived during research:** a Delta managed checkout inside the project folder
   (`~/Projects/youtube-client/.delta/worktrees/…/pear-desktop`). That is why §11 sequences the folder rename *after* this
   thread's work ends: the checkout and its clone are keyed by absolute paths.
-- **Repo state handed over:** branch `main`: the initial commit `6007aa4` "chore: initial commit" (416 files) plus a
-  follow-up commit that updates this document — **no git remote yet**. See §11 for the move and GitHub steps.
+- **Repo state handed over:** branch `main` at `66345e8` (initial commit `6007aa4` plus the commit that added this handoff
+  note), primary checkout `~/Projects/watchdeck`, `origin` = `https://github.com/erikenz/watchdeck` (private, default branch
+  `main`, pushed). See §11.
 - **Upstream history backup (safe to delete):** `~/Projects/.youtube-client-git-backup-pear-desktop` (25 MB) — the only
   remaining copy of the pear-desktop/YouTube-Music history that was deliberately dropped.
 - **Discarded prototype (read-only reference):** `~/Projects/watchdeck-old` (formerly `~/Projects/watchdeck`), reviewed in
@@ -845,7 +825,13 @@ conversation. The research behind it happened in one Delta thread, which was clo
   (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11).
 - **Still open:** §13 Q2–Q6, Q9, Q12 — plugin-inventory strategy, Watch Later UI surface, hover-button size/badge handling,
   thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
-- **Next step:** phase **P0** in §8 — debrand with the grep gate, delete the plugin inventory, `ultracite init`, version
-  sweep, plugin authoring guide, CI — then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
+- **Next step:** finish phase **P0** in §8, then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
+- **P0 progress (revision 4).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, placeholder icon
+  set, rewritten README/CI, `NOTICE` + MIT attribution kept) with `tools/identity-gate.sh` green; the music-only plugin
+  inventory deleted (R5 "delete outright" + the orphan `audio-compressor.ts`) together with its i18n blocks and the code that
+  referenced it; `.npmrc` with `save-exact=true`; `pnpm typecheck`, `pnpm build` and `pnpm test` (smoke test against
+  `www.youtube.com`) verified locally. Still to do in P0: `ultracite init` with the verified toolchain (§5.3), the package
+  version sweep (§R6), `docs/plugins.md`, the app URL/provider rework that P1 owns, and the Q2 answer that decides the fate of
+  the 24 plugins kept in-tree.
 
 When the project folder is renamed (§11), update the paths in §11 and §15 rather than leaving them stale.

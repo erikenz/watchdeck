@@ -181,7 +181,8 @@ interface ItemOverlays {
 export const parseItemOverlays = (item: unknown): ItemOverlays => {
   let percent: number | undefined;
   let watchedBadge = false;
-  const queue: unknown[] = [item];
+  const overlays = child(item, "thumbnailOverlays");
+  const queue: unknown[] = Array.isArray(overlays) ? [...overlays] : [];
 
   while (queue.length > 0) {
     const node = queue.shift();
@@ -197,7 +198,15 @@ export const parseItemOverlays = (item: unknown): ItemOverlays => {
     if (typeof value === "number") {
       percent = value;
     }
-    if ("thumbnailOverlayPlaybackStatusRenderer" in node) {
+    // Only the badge overlay, and only when it says so: the item subtree contains other
+    // nodes that mention playback status, and matching those marked plain videos watched.
+    const status = child(node, "thumbnailOverlayPlaybackStatusRenderer");
+    if (
+      status !== undefined &&
+      (textOf(child(status, "text")) ?? textOf(status) ?? "")
+        .toLowerCase()
+        .includes("watched")
+    ) {
       watchedBadge = true;
     }
     queue.push(...Object.values(node));
@@ -292,7 +301,9 @@ const parseLockupItem = (
   }
   const metadataViewModel = child(lockup, "metadata");
   const metadataParts = firstOfType(metadataViewModel, "metadataParts");
-  const overlays = parseItemOverlays(lockup);
+  const overlays = parseItemOverlays(
+    firstOfType(lockup, "thumbnailOverlays") === undefined ? lockup : lockup
+  );
   const badgeText =
     textOf(firstOfType(lockup, "thumbnailOverlayBadgeViewModel")) ?? "";
   const parts = Array.isArray(metadataParts)

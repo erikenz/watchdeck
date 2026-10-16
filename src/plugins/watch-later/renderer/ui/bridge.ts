@@ -13,6 +13,5 @@ export interface WatchLaterBridge {
   query: (query: WatchLaterQuery) => Promise<WatchLaterEntry[]>;
   remove: (videoId: string) => Promise<{ ok: boolean; error?: string }>;
   state: () => Promise<WatchLaterState>;
-  switchAccount: (accountId: string) => Promise<WatchLaterState>;
   sync: () => Promise<WatchLaterState>;
 }

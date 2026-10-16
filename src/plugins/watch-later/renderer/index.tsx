@@ -12,6 +12,7 @@ import type {
   WatchLaterSyncProgress,
 } from "../types";
 import {
+  alignButton,
   BUTTON_CLASS,
   createSaveButton,
   HOST_CLASS,
@@ -28,7 +29,7 @@ import {
   ROW_SELECTOR,
   rowVideoId,
   TOOLBAR_HOST_CLASS,
-  toolbarAnchor,
+  toolbarInsertionPoint,
 } from "./ui/rows";
 import Toolbar from "./ui/toolbar";
 
@@ -63,6 +64,8 @@ export const renderer = {
     this.reportSessionIndex(context);
     this.mountToolbar(context);
 
+    this.resizeListener = this.onResize.bind(this);
+    window.addEventListener("resize", this.resizeListener, { passive: true });
     this.observer = new MutationObserver(() => this.queueScan());
     this.observer.observe(document.body, {
       childList: true,
@@ -103,18 +106,24 @@ export const renderer = {
       return;
     }
 
-    const anchor = toolbarAnchor();
-    if (!anchor) {
+    const point = toolbarInsertionPoint();
+    if (!point) {
       return;
     }
-    if (this.toolbarHost && anchor.contains(this.toolbarHost)) {
+    if (this.toolbarHost?.isConnected) {
+      // The site renders its parts in whatever order it likes: if the header showed up after
+      // we mounted, move the toolbar to where it belongs instead of leaving it among the rows.
+      const expected = point.before ?? point.parent.lastElementChild;
+      if (this.toolbarHost.previousElementSibling !== expected) {
+        point.parent.insertBefore(this.toolbarHost, point.before);
+      }
       return;
     }
 
     const host = document.createElement("div");
     host.className = TOOLBAR_HOST_CLASS;
     this.toolbarHost = host;
-    anchor.prepend(host);
+    point.parent.insertBefore(host, point.before);
 
     const bridge: WatchLaterBridge = {
       add: (videoId) =>
@@ -134,8 +143,6 @@ export const renderer = {
       remove: (videoId) =>
         context.ipc.invoke("watchdeck:watch-later-remove", videoId),
       state: () => context.ipc.invoke("watchdeck:watch-later-state"),
-      switchAccount: (accountId) =>
-        context.ipc.invoke("watchdeck:watch-later-switch-account", accountId),
       sync: () => context.ipc.invoke("watchdeck:watch-later-sync"),
     };
 
@@ -155,6 +162,7 @@ export const renderer = {
   },
 
   navigateListener: null as ((event: Event) => void) | null,
+  resizeListener: null as ((event: Event) => void) | null,
 
   /** Enrich and (when a filter is on) show or hide each of the site's own rows. */
   applyRows() {
@@ -176,6 +184,10 @@ export const renderer = {
   },
 
   stop(context: RendererContext<WatchLaterPluginConfig>) {
+    if (this.resizeListener) {
+      window.removeEventListener("resize", this.resizeListener);
+      this.resizeListener = null;
+    }
     this.toolbarHost?.remove();
     this.toolbarHost = null;
     this.filter = null;
@@ -282,10 +294,16 @@ export const renderer = {
       if (!videoId) {
         continue;
       }
+      // A card and its inner thumbnail link both match the selector; the outermost hosts.
+      if (host.closest(`.${HOST_CLASS}`)) {
+        continue;
+      }
       const existing = host.querySelector<HTMLButtonElement>(
         `.${BUTTON_CLASS}`
       );
       if (existing) {
+        // The card may have swapped its thumbnail for the inline preview since last scan.
+        alignButton(existing, host);
         this.paint(existing);
         continue;
       }
@@ -293,11 +311,15 @@ export const renderer = {
         continue;
       }
       host.classList.add(HOST_CLASS);
-      host.append(
-        createSaveButton(videoId, (button) => {
-          this.toggle(button).catch(() => undefined);
-        })
-      );
+      const button = createSaveButton(videoId, (button_) => {
+        this.toggle(button_).catch(() => undefined);
+      });
+      host.append(button);
+      alignButton(button, host);
+      // Hovering can bring the preview in and move the video box; the button follows it.
+      host.addEventListener("mouseenter", () => alignButton(button, host), {
+        passive: true,
+      });
     }
   },
 
@@ -370,6 +392,17 @@ export const renderer = {
     } finally {
       this.pending.delete(videoId);
       this.repaint();
+    }
+  },
+
+  onResize() {
+    for (const button of document.querySelectorAll<HTMLButtonElement>(
+      `.${BUTTON_CLASS}`
+    )) {
+      const host = button.closest(`.${HOST_CLASS}`);
+      if (host) {
+        alignButton(button, host);
+      }
     }
   },
 

@@ -191,37 +191,41 @@ export const classifyEntry = (
     duration > 0 ? Math.max(localSeconds / duration, ytRatio) : ytRatio;
   const watchedSeconds = Math.max(localSeconds, ytRatio * duration);
 
-  const watchedSecondsRule = config.watched.minutes
-    ? config.watched.minutes * 60
-    : Number.POSITIVE_INFINITY;
-  const watchedPercentRule = config.watched.percent
-    ? config.watched.percent / 100
-    : Number.POSITIVE_INFINITY;
-  if (
-    entry.ytWatchedBadge ||
-    watchedSeconds >= watchedSecondsRule ||
-    ratio >= watchedPercentRule
-  ) {
+  const minutes = (value?: number) =>
+    value === undefined ? undefined : value * 60;
+  const ratioOf = (value?: number) =>
+    value === undefined ? undefined : value / 100;
+
+  const watchedPercent = ratioOf(config.watched.percent);
+  const watchedMinutes = minutes(config.watched.minutes);
+
+  // Watched: a threshold met, the site's own badge, or — when `max` is given in minutes —
+  // close enough to the end that only that many minutes are left.
+  const remainingSeconds = duration > 0 ? duration - watchedSeconds : undefined;
+  const maxRemaining = minutes(config.inProgress.max.minutes);
+  const watched =
+    entry.ytWatchedBadge === true ||
+    (watchedPercent !== undefined && ratio >= watchedPercent) ||
+    (watchedMinutes !== undefined && watchedSeconds >= watchedMinutes) ||
+    (maxRemaining !== undefined &&
+      remainingSeconds !== undefined &&
+      remainingSeconds <= maxRemaining);
+
+  if (watched) {
     return { bucket: "watched", ratio, watchedSeconds };
   }
 
-  const minSeconds = config.inProgress.minMinutes
-    ? config.inProgress.minMinutes * 60
-    : Number.POSITIVE_INFINITY;
-  const minRatio = config.inProgress.minPercent
-    ? config.inProgress.minPercent / 100
-    : Number.POSITIVE_INFINITY;
-  const configuredCeiling = config.inProgress.maxPercent
-    ? config.inProgress.maxPercent / 100
-    : 1;
-  // "Continue watching" has to reach up to the watched threshold: raising
-  // `watched.percent` above `inProgress.maxPercent` must not leave a band where a
-  // video counts as neither.
-  const ceiling = Math.max(
-    configuredCeiling,
-    Number.isFinite(watchedPercentRule) ? watchedPercentRule : 1
-  );
-  if ((watchedSeconds >= minSeconds || ratio >= minRatio) && ratio < ceiling) {
+  const minPercent = ratioOf(config.inProgress.min.percent);
+  const minMinutes = minutes(config.inProgress.min.minutes);
+  const maxPercent = ratioOf(config.inProgress.max.percent);
+  // "Continue watching" reaches up to the watched threshold, so raising it cannot leave a
+  // band where a video counts as neither.
+  const ceiling = Math.max(maxPercent ?? 1, watchedPercent ?? 1);
+  const started =
+    (minPercent !== undefined && ratio >= minPercent) ||
+    (minMinutes !== undefined && watchedSeconds >= minMinutes);
+
+  if (started && ratio < ceiling) {
     return { bucket: "in-progress", ratio, watchedSeconds };
   }
 
@@ -526,7 +530,9 @@ export class WatchLaterStore {
        VALUES (?, ?, ?, ?, ?, 'youtube')
        ON CONFLICT(account_id, video_id) DO UPDATE SET
          yt_percent_watched = excluded.yt_percent_watched,
-         yt_watched_badge = max(progress.yt_watched_badge, excluded.yt_watched_badge),
+         -- The freshest observation wins: a badge that is no longer there (or was read
+         -- wrongly by an older build) has to be able to clear.
+         yt_watched_badge = excluded.yt_watched_badge,
          yt_percent_seen_at = excluded.yt_percent_seen_at,
          progress_source = CASE
            WHEN progress.max_position_seconds > 0 THEN 'both'

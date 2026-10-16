@@ -36,6 +36,13 @@ const metaHost = (row: Element): Element =>
   row.querySelector("#content") ??
   row;
 
+/** The owner asked for this format rather than the ISO one the store keeps. */
+export const formatDate = (iso: string) => {
+  const [date] = iso.split("T");
+  const [year, month, day] = date.split("-");
+  return year && month && day ? `${year}/${month}/${day}` : date;
+};
+
 const bucketText = (entry: WatchLaterEntry) =>
   entry.bucket === "in-progress"
     ? t("plugins.watch-later.row.in-progress")
@@ -68,23 +75,16 @@ export const enhanceRow = (
   const percent = Math.round(entry.ratio * 100);
   const parts = [bucketText(entry)];
   if (percent > 0) {
-    parts.push(
-      t("plugins.watch-later.row.percent", {
-        percent,
-        source: entry.progressSource,
-      })
-    );
+    parts.push(t("plugins.watch-later.row.percent", { percent }));
   }
   if (entry.savedAt) {
     parts.push(
-      t("plugins.watch-later.row.saved", { date: entry.savedAt.slice(0, 10) })
+      t("plugins.watch-later.row.saved", { date: formatDate(entry.savedAt) })
     );
   }
 
   meta.dataset.bucket = entry.bucket;
-  meta.title = t("plugins.watch-later.row.title", {
-    source: entry.progressSource,
-  });
+  meta.title = t("plugins.watch-later.row.title");
   const text = meta.querySelector(".wd-wl-meta-text");
   if (text && text.textContent !== parts.join(" · ")) {
     text.textContent = parts.join(" · ");
@@ -105,14 +105,29 @@ export const applyRowVisibility = (
 
 export const rowVideoId = videoIdFromRow;
 
-/** The toolbar goes directly above the first row of the site's own list. */
-export const toolbarAnchor = (): Element | undefined => {
-  const list = document.querySelector(
-    "ytd-playlist-video-list-renderer #contents, ytd-playlist-video-list-renderer, #contents.ytd-playlist-video-list-renderer"
-  );
-  return (
-    list ??
-    document.querySelector("ytd-playlist-video-list-renderer") ??
-    undefined
-  );
+/**
+ * The toolbar goes above the site's own "Date added (newest)" select: before the sort
+ * header when there is one, and above the first row otherwise.
+ */
+/**
+ * Where the toolbar goes: as the first thing after the playlist header, which is above the
+ * site's own "Date added (newest)" chip and above the rows. The list renderer is the last
+ * resort, for the surfaces that render no header.
+ */
+export const toolbarInsertionPoint = ():
+  | { before: Element | null; parent: Element }
+  | undefined => {
+  const header = document.querySelector("ytd-playlist-header-renderer");
+  if (header?.parentElement) {
+    return { before: header.nextElementSibling, parent: header.parentElement };
+  }
+  const chip = document.querySelector("yt-sort-filter-sub-menu-renderer");
+  if (chip?.parentElement) {
+    return { before: chip, parent: chip.parentElement };
+  }
+  const list = document.querySelector("ytd-playlist-video-list-renderer");
+  if (list) {
+    return { before: list.firstElementChild, parent: list };
+  }
+  return undefined;
 };

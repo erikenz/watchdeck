@@ -1,7 +1,7 @@
 import { t } from "@/i18n";
 import type { MenuContext } from "@/types/contexts";
 
-import { listAccounts, syncNow, switchAccount } from "./backend";
+import { syncNow } from "./backend";
 import type { WatchLaterPluginConfig } from "./types";
 
 export const menu = async ({
@@ -9,7 +9,14 @@ export const menu = async ({
   setConfig,
 }: MenuContext<WatchLaterPluginConfig>) => {
   const config = await getConfig();
-  const accounts = listAccounts();
+
+  const intervals = [
+    [0, "off"],
+    [15, "15m"],
+    [60, "1h"],
+    [360, "6h"],
+    [1440, "24h"],
+  ] as const;
 
   return [
     {
@@ -18,23 +25,17 @@ export const menu = async ({
       },
       label: t("plugins.watch-later.menu.sync-now"),
     },
-    ...(accounts.length > 1
-      ? [
-          {
-            label: t("plugins.watch-later.menu.account"),
-            submenu: accounts.map((account) => ({
-              checked: config.activeAccountId === account.id,
-              click: () => {
-                switchAccount(account.id).catch(() => undefined);
-              },
-              label: account.handle
-                ? `${account.name} (${account.handle})`
-                : account.name,
-              type: "radio" as const,
-            })),
-          },
-        ]
-      : []),
+    {
+      label: t("plugins.watch-later.menu.sync-interval"),
+      submenu: intervals.map(([minutes, key]) => ({
+        checked: config.syncIntervalMinutes === minutes,
+        click: () => {
+          setConfig({ syncIntervalMinutes: minutes });
+        },
+        label: t(`plugins.watch-later.menu.interval.${key}`),
+        type: "radio" as const,
+      })),
+    },
     { type: "separator" as const },
     {
       checked: config.enhancePage,

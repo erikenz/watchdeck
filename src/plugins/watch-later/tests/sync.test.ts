@@ -192,6 +192,46 @@ test("parses a page: channel, duration from the overlay, resume percent", () => 
   expect(item.thumbnailUrl).toContain("mqdefault.jpg");
 });
 
+test("a nested playback-status node is not a watched badge", () => {
+  // The regression this guards: scanning the whole item subtree found "playback status"
+  // nodes inside menus and marked partially watched videos as watched.
+  const [item] = parseWatchLaterPage({
+    contents: {
+      playlistVideoListRenderer: {
+        contents: [
+          {
+            playlistVideoRenderer: {
+              menu: {
+                menuRenderer: {
+                  items: [
+                    {
+                      menuServiceItemRenderer: {
+                        thumbnailOverlayPlaybackStatusRenderer: {},
+                      },
+                    },
+                  ],
+                },
+              },
+              thumbnailOverlays: [
+                {
+                  thumbnailOverlayResumePlaybackRenderer: {
+                    percentDurationWatched: 10,
+                  },
+                },
+              ],
+              title: { runs: [{ text: "Partially watched" }] },
+              videoId: "partial00001",
+            },
+          },
+        ],
+      },
+    },
+  }).items;
+
+  expect(item.ytPercentWatched).toBe(10);
+  expect(item.watchedBadge).toBeUndefined();
+});
+
 test("paging walks to the end, captures progress and soft-deletes what is gone", async () => {
   const db = new WatchLaterStore(openNodeSqlite(":memory:"));
   db.upsertEntry({ accountId: "alpha", videoId: "stale000001" });

@@ -1,11 +1,4 @@
-import {
-  For,
-  Show,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { For, Show, createSignal, onCleanup, onMount } from "solid-js";
 
 import { t } from "@/i18n";
 
@@ -163,31 +156,6 @@ const Toolbar = (props: ToolbarProps) => {
         </For>
       </div>
       <div class="wd-wl-toolbar-right">
-        <Show when={(state()?.accounts.length ?? 0) > 1}>
-          <select
-            aria-label={t("plugins.watch-later.account.label")}
-            onChange={(event) =>
-              props.bridge
-                .switchAccount(event.currentTarget.value)
-                .then(refresh)
-                .catch(() => undefined)
-            }
-            ref={(element) =>
-              createEffect(() => {
-                element.value = state()?.activeAccountId ?? "";
-              })
-            }
-          >
-            <For each={state()?.accounts ?? []}>
-              {(account) => (
-                <option value={account.id}>
-                  {account.handle ?? account.name}
-                  {account.byline ? ` · ${account.byline}` : ""}
-                </option>
-              )}
-            </For>
-          </select>
-        </Show>
         <button
           class="wd-wl-chip wd-wl-sync"
           disabled={busy() || (state()?.syncing ?? false)}

@@ -8,6 +8,7 @@
 
 export const THUMBNAIL_HOST_SELECTOR = [
   "ytd-thumbnail",
+  "a#thumbnail",
   "yt-thumbnail-view-model",
   "ytThumbnailViewModelHost",
   "a.ytLockupViewModelContentImage",
@@ -43,6 +44,28 @@ export const videoIdFromHost = (host: Element): string | undefined => {
   } catch {
     return undefined;
   }
+};
+
+/**
+ * The element that actually paints the video for a card. Cards wrap their thumbnail (and,
+ * on hover, the inline preview) in boxes with their own padding, so anchoring the button to
+ * the card's corner puts it in the gap beside the video instead of on it.
+ */
+const mediaOf = (host: Element): Element | undefined =>
+  host.querySelector(
+    "#video-preview, ytd-video-preview, #inline-preview-player, #mouseover-overlay, img"
+  ) ?? undefined;
+
+/** Puts the button in the bottom-right corner of the video itself, 8px in. */
+export const alignButton = (button: HTMLButtonElement, host: Element) => {
+  const media = mediaOf(host) ?? host;
+  const hostRect = host.getBoundingClientRect();
+  const mediaRect = media.getBoundingClientRect();
+  if (mediaRect.width < 40 || mediaRect.height < 30) {
+    return;
+  }
+  button.style.right = `${Math.max(4, Math.round(hostRect.right - mediaRect.right) + 8)}px`;
+  button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - mediaRect.bottom) + 8)}px`;
 };
 
 const ICONS: Record<string, string> = {

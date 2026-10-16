@@ -687,9 +687,6 @@
       "name": "Visualizer"
     },
     "watch-later": {
-      "account": {
-        "label": "Account"
-      },
       "button": {
         "remove": "Remove from Watch Later",
         "save": "Save to Watch Later"
@@ -707,14 +704,21 @@
         "hover-button": "Show the save button on thumbnails",
         "sync-now": "Sync Watch Later now",
         "sync-on-start": "Sync when the app starts",
-        "account": "Account"
+        "sync-interval": "Sync every",
+        "interval": {
+          "off": "Manually only",
+          "15m": "15 minutes",
+          "1h": "1 hour",
+          "6h": "6 hours",
+          "24h": "24 hours"
+        }
       },
       "name": "Watch Later",
       "row": {
         "in-progress": "Continue watching",
-        "percent": "{{percent}}% watched ({{source}})",
+        "percent": "{{percent}}% watched",
         "saved": "saved {{date}}",
-        "title": "Watch progress comes from: {{source}}",
+        "title": "Watch progress from the app's own tracking and the site's resume bar",
         "unwatched": "Unwatched",
         "watched": "Watched"
       },

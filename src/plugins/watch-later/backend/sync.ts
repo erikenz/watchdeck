@@ -88,6 +88,11 @@ export interface SyncProgress {
 
 export interface SyncOptions {
   accountId: string;
+  /**
+   * Ids the user changed while this walk is running. The closing sweep that marks
+   * disappeared entries must not undo a change it read before the change happened.
+   */
+  protectVideoIds?: Set<string>;
   /** Continue the persisted cursor instead of starting from page one. */
   resume?: boolean;
   /** Stop after this many pages (used by tests and by "peek" syncs). */
@@ -204,8 +209,12 @@ export class WatchLaterSync {
         }
       }
 
-      // A full walk is the only moment we know what is *still* in the list.
-      this.#sink.softRemoveMissing(accountId, [...seen]);
+      // A full walk is the only moment we know what is *still* in the list - minus the ids
+      // the user touched while we were walking (see `protectVideoIds`).
+      this.#sink.softRemoveMissing(accountId, [
+        ...seen,
+        ...(options.protectVideoIds ?? []),
+      ]);
       this.#sink.clearCursor(accountId);
       this.#finish(runId, pages, items, "ok");
       return { completed: true, items, pages, status: "ok", totalItems };

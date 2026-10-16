@@ -100,25 +100,17 @@ const connect = async () => {
     return;
   }
 
-  const preferred = state.config?.activeAccountId
-    ? state.store.getAccount(state.config.activeAccountId)
-    : undefined;
-
   try {
-    state.session = await WatchLaterSession.create(
-      cookies,
-      preferred?.index ?? 0
-    );
+    state.session = await WatchLaterSession.create(cookies, 0);
     const accounts = await state.session.listAccounts();
     for (const account of accounts) {
       state.store.upsertAccount(account);
     }
     state.accounts = state.store.listAccounts();
 
-    // Default to the account the *page* is acting as: with two identities under one
-    // login, "the first one" is a coin flip and the wrong list looks like a bug.
+    // The session decides which identity we act as: the site's own avatar menu is where a
+    // user changes accounts, so we follow it instead of offering a second switcher.
     const active =
-      preferred ??
       state.accounts.find((account) => account.index === state.sessionIndex) ??
       state.accounts[0];
     if (active) {
@@ -131,11 +123,11 @@ const connect = async () => {
       error
     );
     state.accounts = state.store.listAccounts();
-    state.activeAccountId = preferred?.id ?? state.accounts[0]?.id ?? null;
+    state.activeAccountId = state.accounts[0]?.id ?? null;
   }
 };
 
-export const switchAccount = async (accountId: string) => {
+const switchAccount = async (accountId: string) => {
   const account = state.accounts.find((entry) => entry.id === accountId);
   if (!account) {
     throw new Error(`unknown account ${accountId}`);
@@ -145,7 +137,22 @@ export const switchAccount = async (accountId: string) => {
   log(`switched to ${account.name} (authuser ${account.index})`);
 };
 
+/**
+ * Ids the user changed while a walk was running. The walk's closing "these are gone from
+ * the list" pass must not undo a change it read before that change happened, and a video
+ * added mid-walk may not appear in the pages it saw. The next sync reconciles both; this set
+ * only stops a running walk from actively making things worse.
+ */
+const mutatedDuringWalk = new Set<string>();
+
+const noteMutation = (videoId: string) => {
+  if (state.syncing) {
+    mutatedDuringWalk.add(videoId);
+  }
+};
+
 const runSync = async (options: {
+  maxPages?: number;
   resume?: boolean;
   reason: string;
 }): Promise<void> => {
@@ -171,11 +178,13 @@ const runSync = async (options: {
   try {
     const result = await state.sync.pull(session, {
       accountId,
+      maxPages: options.maxPages,
       onProgress: (progress) =>
         state.window?.webContents.send("watchdeck:watch-later-sync-progress", {
           accountId,
           ...progress,
         }),
+      protectVideoIds: new Set(mutatedDuringWalk),
       resume: options.resume ?? true,
     });
     log(`sync ${options.reason}: ${result.status}`, result.items, "items");
@@ -196,41 +205,34 @@ const scheduleInterval = () => {
     clearInterval(state.interval);
     state.interval = undefined;
   }
-  const hours = state.config?.syncIntervalHours ?? 0;
-  if (hours > 0) {
+  const minutes = state.config?.syncIntervalMinutes ?? 0;
+  if (minutes > 0) {
     state.interval = setInterval(
       () => {
         runSync({ reason: "interval" }).catch(() => undefined);
       },
-      hours * 60 * 60 * 1000
+      minutes * 60 * 1000
     );
   }
 };
 
 let startupSyncPending = false;
 
-/**
- * Adopts the account the page is acting as, but only while the user has not picked one:
- * an explicit choice (config or menu) always wins.
- */
+/** Follows the identity the session is acting as, whichever one the site switched to. */
 const adoptSessionIndex = async (index: number) => {
   if (!Number.isFinite(index)) {
     return;
   }
   state.sessionIndex = index;
 
-  const active = state.activeAccountId
-    ? state.store.getAccount(state.activeAccountId)
-    : undefined;
-  if (!state.config?.activeAccountId && active && active.index !== index) {
-    const account = state.accounts.find((entry) => entry.index === index);
-    if (account) {
-      log(
-        `following the page's account: ${account.handle ?? account.name} (authuser ${index})`
-      );
-      await switchAccount(account.id);
-      state.store.clearCursor(account.id);
-    }
+  const account = state.accounts.find((entry) => entry.index === index);
+  if (account && state.activeAccountId !== account.id) {
+    log(
+      `session is acting as ${account.handle ?? account.name} (authuser ${index})`
+    );
+    await switchAccount(account.id);
+    // A half-synced list belongs to the account it was synced for.
+    state.store.clearCursor(account.id);
   }
 
   flushStartupSync("session-index");
@@ -248,7 +250,6 @@ export const onMainLoad = async ({
   window,
   ipc,
   getConfig,
-  setConfig,
 }: BackendContext<WatchLaterPluginConfig>) => {
   state.window = window;
   state.config = await getConfig();
@@ -279,31 +280,21 @@ export const onMainLoad = async ({
     return currentState();
   });
   ipc.handle(
-    "watchdeck:watch-later-switch-account",
-    async (accountId: string) => {
-      await switchAccount(accountId);
-      await setConfig({ activeAccountId: accountId });
-      if (state.config) {
-        state.config.activeAccountId = accountId;
-      }
-      // The list is per account; start over rather than showing a stale one.
-      if (state.activeAccountId) {
-        state.store.clearCursor(state.activeAccountId);
-      }
-      broadcast();
-      return currentState();
-    }
-  );
-
-  ipc.handle(
     "watchdeck:watch-later-add",
     async (videoId: string): Promise<{ ok: boolean; error?: string }> => {
       if (!state.session || !state.activeAccountId) {
         return { error: "not-signed-in", ok: false };
       }
       try {
+        noteMutation(videoId);
         await state.sync.add(state.session, state.activeAccountId, videoId);
         broadcast();
+        // One page is enough to learn the entry id and position we do not know yet.
+        setTimeout(() => {
+          runSync({ maxPages: 1, reason: "reconcile", resume: false }).catch(
+            () => undefined
+          );
+        }, 15_000);
         return { ok: true };
       } catch (error) {
         return {
@@ -321,6 +312,7 @@ export const onMainLoad = async ({
         return { error: "not-signed-in", ok: false };
       }
       try {
+        noteMutation(videoId);
         await state.sync.remove(state.session, state.activeAccountId, videoId);
         broadcast();
         return { ok: true };
@@ -356,14 +348,10 @@ export const onMainLoad = async ({
   scheduleInterval();
 
   if (state.config.syncOnStart) {
-    if (state.config.activeAccountId) {
-      void runSync({ reason: "start" });
-    } else {
-      // The page has not told us which account it is on yet; syncing now would pull
-      // whichever identity happens to answer first.
-      startupSyncPending = true;
-      setTimeout(() => flushStartupSync("timeout"), 20_000);
-    }
+    // The page has not said which identity the session acts as yet; syncing now would pull
+    // whichever account happens to answer first.
+    startupSyncPending = true;
+    setTimeout(() => flushStartupSync("timeout"), 20_000);
   }
 
   log(
@@ -374,8 +362,6 @@ export const onMainLoad = async ({
 };
 
 /** Used by the plugin menu; the state object is module-private on purpose. */
-export const listAccounts = (): WatchLaterAccount[] => state.accounts;
-
 export const syncNow = (): Promise<void> => runSync({ reason: "menu" });
 
 export const onConfigChange = async (config: WatchLaterPluginConfig) => {

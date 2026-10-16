@@ -3,6 +3,11 @@
  * lives here so the backend, the renderer and the tests agree on the shape.
  */
 
+/**
+ * A threshold in either unit. `percent` is a share of the duration, `minutes` an amount of
+ * video — for `inProgress.max` the minutes count *back from the end*, so a 1 minute maximum
+ * on a 10 minute video means "from minute 9 onwards it counts as watched".
+ */
 export interface WatchLaterThreshold {
   minutes?: number;
   percent?: number;
@@ -12,17 +17,15 @@ export interface WatchLaterPluginConfig {
   enabled: boolean;
   /** Sync on app start, when a session is available. */
   syncOnStart: boolean;
-  /** Hours between automatic syncs; 0 disables the interval. */
-  syncIntervalHours: number;
+  /** Minutes between automatic syncs; 0 disables the interval. */
+  syncIntervalMinutes: number;
   /** Requests per second while paging the list. */
   requestsPerSecond: number;
   /** Fetch title/description/tags for every entry (rate limited as well). */
   enrichMetadata: boolean;
-  /** Thresholds for the three buckets; percentages are 0-100. */
+  /** Thresholds for the three buckets; percentages are 0-100, minutes are video minutes. */
   watched: WatchLaterThreshold;
-  inProgress: { minMinutes?: number; minPercent?: number; maxPercent?: number };
-  /** Account the plugin acts as; empty means "whatever the session uses". */
-  activeAccountId: string;
+  inProgress: { min: WatchLaterThreshold; max: WatchLaterThreshold };
   /** Show the save button when hovering a thumbnail. */
   showHoverButton: boolean;
   /** Add the toolbar and the enriched rows to the site's own Watch Later page. */

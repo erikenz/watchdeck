@@ -13,7 +13,7 @@ import type {
   RendererPluginLifecycle,
 } from "@/types/plugins";
 
-export const LoggerPrefix = "[YTMusic]";
+export const LoggerPrefix = "[Watchdeck]";
 
 export const createPlugin = <
   BackendProperties,

@@ -8,6 +8,8 @@ is left in P0.
 and the upstream-shaped CI (including the winget workflows) are kept, and the README keeps the upstream section layout.
 **Revision 6** — Q2 answered (keep the neutral plugins in tree) and the Ultracite migration landed; the deviation list
 in `oxlint.config.ts` is measured, not guessed.
+**Revision 7** — **P0 is done**: the version sweep landed with four documented pins, `docs/plugins.md` is written, and the
+first real bug the reset caused (the store typing behind `config.get`) is fixed. Next is P1.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -838,7 +840,8 @@ conversation. The research behind it happened in one Delta thread, which was clo
   (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11).
 - **Still open:** §13 Q3–Q6, Q9, Q12 — Watch Later UI surface, hover-button size/badge handling,
   thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
-- **Next step:** finish phase **P0** in §8, then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
+- **Next step:** **P1 — YouTube base** in §8: rework the providers (`video-info` replacing the music-era `song-info`), the
+  autoplay plugin, the gesture controller and the minimal window/menu/tray, then a smoke test against the real site.
 - **P0 progress (revision 5).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, replaced icon
   set, `NOTICE` + MIT attribution kept) with `tools/identity-gate.sh` green; the music-only plugin inventory deleted
   (R5 "delete outright" + the orphan `audio-compressor.ts`) together with its i18n blocks and the code that referenced it;
@@ -846,7 +849,11 @@ conversation. The research behind it happened in one Delta thread, which was clo
   verified locally. After owner review the escapes were restored in code/metadata (§R8), `auto-changelog` and the
   upstream-shaped CI (matrix build + release job, `winget-*` workflows) came back, and the README follows the upstream
   section layout. The Ultracite migration is in as well (toolchain pinned to the set in §5.3, `ultracite fix` over the
-  tree, `oxlint.config.ts` keeps Ultracite's presets with a measured 117-rule deviation list). Still to do in P0: the
-  package version sweep (§R6) and `docs/plugins.md`.
+  tree, `oxlint.config.ts` keeps Ultracite's presets with a measured 117-rule deviation list). The version sweep (§R6) is
+  done — latest stable everywhere except four packages whose majors need the plugin rewrites P1/P2 do, each with its
+  reason in `TODO.md`, and `electron-vite`, where 6.0.0 stable cannot load the project tsconfig at all. `docs/plugins.md`
+  (the plugin authoring guide) is written, the dead config migrations are gone, and the logger prefix — the last piece of
+  the old identity, which the §R8 gate could not see because it is not hyphenated — is `[Watchdeck]`, with the gate now
+  matching that form too.
 
 When the project folder is renamed (§11), update the paths in §11 and §15 rather than leaving them stale.

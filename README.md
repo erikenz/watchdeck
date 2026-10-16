@@ -153,6 +153,9 @@ export default createPlugin({
 });
 ```
 
+The full guide — lifecycles, config, IPC, i18n, player API and the conventions a
+plugin here has to follow — lives in [`docs/plugins.md`](docs/plugins.md).
+
 ### Common use cases
 
 - injecting custom CSS: create a `style.css` file in the same folder then:

@@ -175,15 +175,26 @@ const ICONS: Record<string, string> = {
 
 export type ButtonState = "saved" | "unsaved" | "pending" | "error";
 
+/** What each button was last painted with, so a repaint that changes nothing can be skipped. */
+const painted = new WeakMap<HTMLButtonElement, { label: string; state: ButtonState }>();
+
 export const paintButton = (
   button: HTMLButtonElement,
   state: ButtonState,
   labels: { save: string; remove: string }
 ) => {
+  const label = state === "saved" ? labels.remove : labels.save;
+  const last = painted.get(button);
+  // Painting runs for every card on every scan. Rewriting the icon replaces the SVG, which is a
+  // child-list mutation, which is what tells this plugin to scan again - so a paint that would
+  // change nothing has to stay out of the document.
+  if (last?.state === state && last.label === label) {
+    return;
+  }
+  painted.set(button, { label, state });
   button.dataset.state = state;
   button.innerHTML =
     ICONS[state === "error" ? "unsaved" : state] ?? ICONS.unsaved;
-  const label = state === "saved" ? labels.remove : labels.save;
   button.setAttribute("aria-label", label);
   button.title = label;
   button.setAttribute("aria-pressed", String(state === "saved"));

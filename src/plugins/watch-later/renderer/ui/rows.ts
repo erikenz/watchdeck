@@ -83,8 +83,15 @@ export const enhanceRow = (
     );
   }
 
-  meta.dataset.bucket = entry.bucket;
-  meta.title = t("plugins.watch-later.row.title");
+  // These run on every scan, and a write that repeats itself is a mutation record either way:
+  // only touch the row when its line actually changes.
+  if (meta.dataset.bucket !== entry.bucket) {
+    meta.dataset.bucket = entry.bucket;
+  }
+  const title = t("plugins.watch-later.row.title");
+  if (meta.title !== title) {
+    meta.title = title;
+  }
   const text = meta.querySelector(".wd-wl-meta-text");
   if (text && text.textContent !== parts.join(" · ")) {
     text.textContent = parts.join(" · ");

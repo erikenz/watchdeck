@@ -135,13 +135,19 @@ export const renderer = {
     if (!point) {
       return;
     }
-    if (this.toolbarHost?.isConnected) {
-      // The site renders its parts in whatever order it likes: if the header showed up after
-      // we mounted, move the toolbar to where it belongs instead of leaving it among the rows.
-      const expected = point.before ?? point.parent.lastElementChild;
-      if (this.toolbarHost.previousElementSibling !== expected) {
-        point.parent.insertBefore(this.toolbarHost, point.before);
+    const placed = this.toolbarHost;
+    if (placed?.isConnected) {
+      // The site renders its parts in whatever order it likes, so a toolbar that is no longer
+      // against its anchor is put back - and only then. Moving an element that is already in
+      // place is a DOM mutation, not a no-op: it feeds this plugin's own observer, and it takes
+      // the element out from under a click whose press is already down on one of its buttons.
+      const anchored = point.before
+        ? placed.nextElementSibling === point.before
+        : placed === point.parent.lastElementChild;
+      if (placed.parentElement === point.parent && anchored) {
+        return;
       }
+      point.parent.insertBefore(placed, point.before);
       return;
     }
 

@@ -314,7 +314,7 @@ test("an interrupted walk resumes from the stored cursor", async () => {
   const first = await sync.pull(transport, {
     accountId: "alpha",
     maxPages: 1,
-    resume: false,
+    resume: true,
   });
   expect(first.status).toBe("partial");
   expect(db.loadCursor("alpha")?.continuation).toBe("page-2");
@@ -325,6 +325,91 @@ test("an interrupted walk resumes from the stored cursor", async () => {
   });
   expect(second.completed).toBe(true);
   expect(db.loadCursor("alpha")).toBeUndefined();
+  db.close();
+});
+
+test("a walk resumed from the middle does not declare the pages before it gone", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const secondPage = {
+    contents: {
+      itemSectionRenderer: {
+        contents: [
+          {
+            playlistVideoListRenderer: {
+              contents: Array.from({ length: 1 }, (_, index) => ({
+                playlistVideoRenderer: {
+                  lengthText: { simpleText: "3:00" },
+                  setVideoId: `set-b${index}`,
+                  title: { runs: [{ text: `Video b${index}` }] },
+                  videoId: `vidb${index.toString().padStart(8, "0")}`,
+                },
+              })),
+            },
+          },
+        ],
+      },
+    },
+  };
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: (continuation?: string) =>
+      Promise.resolve(
+        parseWatchLaterPage(continuation ? secondPage : legacyPage(2, "page-2"))
+      ),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  // An interrupted walk: page one is in, page two is where it stopped.
+  const first = await sync.pull(transport, {
+    accountId: "alpha",
+    maxPages: 1,
+    resume: true,
+  });
+  expect(first.status).toBe("partial");
+  const seenOnPageOne = db.membershipIds("alpha");
+  expect(seenOnPageOne).toHaveLength(2);
+
+  // The resume walks the tail and completes. Page one was never in this walk's sight, so nothing
+  // on it can be called gone.
+  const second = await sync.pull(transport, {
+    accountId: "alpha",
+    resume: true,
+  });
+  expect(second.completed).toBe(true);
+  for (const videoId of seenOnPageOne) {
+    expect(db.entryFor("alpha", videoId)?.removed_at).toBeNull();
+  }
+  expect(db.membershipIds("alpha")).toHaveLength(3);
+  db.close();
+});
+
+test("a one-page top-up leaves the interrupted walk's cursor alone", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: () =>
+      Promise.resolve(parseWatchLaterPage(legacyPage(1, "page-2"))),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  // Where a walk that was killed in the middle had got to.
+  db.saveCursor("alpha", "page-9", 9);
+
+  // The top-up an add schedules: one page, from the first page, not a continuation.
+  const topUp = await sync.pull(transport, {
+    accountId: "alpha",
+    maxPages: 1,
+    resume: false,
+  });
+  expect(topUp.status).toBe("partial");
+  expect(db.loadCursor("alpha")).toEqual({
+    continuation: "page-9",
+    page_index: 9,
+  });
   db.close();
 });
 

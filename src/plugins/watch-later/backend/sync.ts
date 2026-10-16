@@ -151,6 +151,10 @@ export class WatchLaterSync {
     let pageIndex = options.resume
       ? (this.#sink.loadCursor(accountId)?.page_index ?? 0)
       : 0;
+    // Only a walk that starts at the first page has seen the whole list by the time it runs out
+    // of pages. One resumed from the middle saw the tail, and the ids on the pages before it are
+    // not gone just because this walk never looked at them.
+    const coversWholeList = pageIndex === 0;
 
     try {
       for (;;) {
@@ -201,7 +205,11 @@ export class WatchLaterSync {
         }
 
         continuation = page.continuation;
-        this.#sink.saveCursor(accountId, continuation ?? null, pageIndex);
+        // The cursor exists to continue a walk. A top-up that deliberately starts from page one
+        // is not that walk, and must leave the interrupted one's position where it was.
+        if (options.resume) {
+          this.#sink.saveCursor(accountId, continuation ?? null, pageIndex);
+        }
         options.onProgress?.({ items, pages, totalItems });
 
         if (!continuation) {
@@ -211,10 +219,12 @@ export class WatchLaterSync {
 
       // A full walk is the only moment we know what is *still* in the list - minus the ids
       // the user touched while we were walking (see `protectVideoIds`).
-      this.#sink.softRemoveMissing(accountId, [
-        ...seen,
-        ...(options.protectVideoIds ?? []),
-      ]);
+      if (coversWholeList) {
+        this.#sink.softRemoveMissing(accountId, [
+          ...seen,
+          ...(options.protectVideoIds ?? []),
+        ]);
+      }
       this.#sink.clearCursor(accountId);
       this.#finish(runId, pages, items, "ok");
       return { completed: true, items, pages, status: "ok", totalItems };

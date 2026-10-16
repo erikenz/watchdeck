@@ -87,33 +87,6 @@ export const onMenu = async ({
 
   return [
     {
-      checked: Boolean(config.scrobbleOtherMedia),
-      click(item) {
-        config.scrobbleOtherMedia = item.checked;
-        setConfig(config);
-      },
-      label: t("plugins.scrobbler.menu.scrobble-other-media"),
-      type: "checkbox",
-    },
-    {
-      checked: Boolean(config.alternativeTitles),
-      click(item) {
-        config.alternativeTitles = item.checked;
-        setConfig(config);
-      },
-      label: t("plugins.scrobbler.menu.scrobble-alternative-title"),
-      type: "checkbox",
-    },
-    {
-      checked: Boolean(config.alternativeArtist),
-      click(item) {
-        config.alternativeArtist = item.checked;
-        setConfig(config);
-      },
-      label: t("plugins.scrobbler.menu.scrobble-alternative-artist"),
-      type: "checkbox",
-    },
-    {
       label: "Last.fm",
       submenu: [
         {

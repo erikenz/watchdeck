@@ -45,7 +45,7 @@ import {
   handleProtocol,
   setupProtocolHandler,
 } from "@/providers/protocol-handler";
-import { setupSongInfo } from "@/providers/song-info";
+import { setupVideoInfo } from "@/providers/video-info";
 import { setUpTray } from "@/tray";
 import type { PluginConfig } from "@/types/plugins";
 import { LoggerPrefix } from "@/utils";
@@ -565,7 +565,7 @@ app.once("browser-window-created", (_event, win) => {
     });
   }
 
-  setupSongInfo(win);
+  setupVideoInfo(win);
   setupAppControls();
 
   win.webContents.on(
@@ -605,6 +605,11 @@ app.once("browser-window-created", (_event, win) => {
 
       if (
         errorCode !== -3 &&
+        // A sub-frame that fails is not a failed page. YouTube loads its own
+        // cookie-rotation frame (accounts.youtube.com/RotateCookiesPage) on every
+        // visit, and it fails often enough that treating it as fatal replaced the
+        // whole app with the error screen.
+        isMainFrame &&
         // Workaround for #2435
         !URL.parse(validatedURL)?.hostname?.includes("doubleclick.net")
       ) {

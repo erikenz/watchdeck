@@ -3,7 +3,7 @@ import path from "node:path";
 import { app } from "electron";
 import type { BrowserWindow } from "electron";
 
-import { getSongControls } from "./song-controls";
+import { getVideoControls } from "./video-controls";
 
 export const APP_PROTOCOL = "watchdeck";
 
@@ -18,12 +18,12 @@ export function setupProtocolHandler(win: BrowserWindow) {
     app.setAsDefaultProtocolClient(APP_PROTOCOL);
   }
 
-  const songControls = getSongControls(win);
+  const videoControls = getVideoControls(win);
 
-  protocolHandler = ((cmd: keyof typeof songControls, ...args) => {
-    if (Object.keys(songControls).includes(cmd)) {
-      // @ts-expect-error: cmd is a key of songControls
-      songControls[cmd](...args);
+  protocolHandler = ((cmd: keyof typeof videoControls, ...args) => {
+    if (Object.keys(videoControls).includes(cmd)) {
+      // @ts-expect-error: cmd is a key of videoControls
+      videoControls[cmd](...args);
     }
   }) as (cmd: string, ...args: string[]) => void;
 }

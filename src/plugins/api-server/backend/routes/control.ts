@@ -1,77 +1,24 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { ipcMain } from "electron";
 import type { Context } from "hono";
 
-import { getSongControls } from "@/providers/song-controls";
-import type { SongInfo } from "@/providers/song-info";
+import { getVideoControls } from "@/providers/video-controls";
 import type { BackendContext } from "@/types/contexts";
-import { LikeType } from "@/types/datahost-get-state";
-import type { RepeatMode, VolumeState } from "@/types/datahost-get-state";
-import type { QueueResponse } from "@/types/music-player-desktop-internal";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { APIServerConfig } from "../../config";
 import { API_VERSION } from "../api-version";
 import {
-  AddSongToQueueSchema,
   GoBackSchema,
   GoForwardScheme,
-  MoveSongInQueueSchema,
-  QueueParamsSchema,
-  SearchSchema,
   SeekSchema,
   SetFullscreenSchema,
-  SetQueueIndexSchema,
   SetVolumeSchema,
-  SongInfoSchema,
-  SwitchRepeatSchema,
+  VideoInfoSchema,
 } from "../scheme";
-import type { ResponseSongInfo } from "../scheme";
+import type { ResponseVideoInfo } from "../scheme";
 import type { HonoApp } from "../types";
 
 const routes = {
-  addSongToQueue: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/queue`,
-    summary: "add song to queue",
-    description: "Add a song to the queue",
-    request: {
-      body: {
-        description: "video id of the song to add",
-        content: {
-          "application/json": {
-            schema: AddSongToQueueSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
-  clearQueue: createRoute({
-    method: "delete",
-    path: `/api/${API_VERSION}/queue`,
-    summary: "clear queue",
-    description: "Clear the queue",
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
-  dislike: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/dislike`,
-    summary: "dislike song",
-    description: "Set the current song as disliked",
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
   getFullscreenState: createRoute({
     method: "get",
     path: `/api/${API_VERSION}/fullscreen`,
@@ -84,42 +31,6 @@ const routes = {
           "application/json": {
             schema: z.object({
               state: z.boolean(),
-            }),
-          },
-        },
-      },
-    },
-  }),
-  getLikeState: createRoute({
-    method: "get",
-    path: `/api/${API_VERSION}/like-state`,
-    summary: "get like state",
-    description: "Get the current like state",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({
-              state: z.enum(LikeType).nullable(),
-            }),
-          },
-        },
-      },
-    },
-  }),
-  getShuffleState: createRoute({
-    method: "get",
-    path: `/api/${API_VERSION}/shuffle`,
-    summary: "get shuffle state",
-    description: "Get the current shuffle state",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({
-              state: z.boolean().nullable(),
             }),
           },
         },
@@ -187,39 +98,6 @@ const routes = {
       },
     },
   }),
-  like: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/like`,
-    summary: "like song",
-    description: "Set the current song as liked",
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
-  moveSongInQueue: createRoute({
-    method: "patch",
-    path: `/api/${API_VERSION}/queue/{index}`,
-    summary: "move song in queue",
-    description: "Move a song in the queue",
-    request: {
-      params: QueueParamsSchema,
-      body: {
-        description: "index to move the song to",
-        content: {
-          "application/json": {
-            schema: MoveSongInQueueSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
   next: createRoute({
     method: "post",
     path: `/api/${API_VERSION}/next`,
@@ -242,32 +120,12 @@ const routes = {
         description: "Success",
         content: {
           "application/json": {
-            schema: SongInfoSchema,
+            schema: VideoInfoSchema,
           },
         },
       },
       204: {
         description: "No next song in queue",
-      },
-    },
-  }),
-  oldQueueInfo: createRoute({
-    deprecated: true,
-    method: "get",
-    path: `/api/${API_VERSION}/queue-info`,
-    summary: "get current queue info",
-    description: "Get the current queue info",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({}),
-          },
-        },
-      },
-      204: {
-        description: "No queue info",
       },
     },
   }),
@@ -282,7 +140,7 @@ const routes = {
         description: "Success",
         content: {
           "application/json": {
-            schema: SongInfoSchema,
+            schema: VideoInfoSchema,
           },
         },
       },
@@ -321,83 +179,6 @@ const routes = {
     responses: {
       204: {
         description: "Success",
-      },
-    },
-  }),
-  queueInfo: createRoute({
-    method: "get",
-    path: `/api/${API_VERSION}/queue`,
-    summary: "get current queue info",
-    description: "Get the current queue info",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({}),
-          },
-        },
-      },
-      204: {
-        description: "No queue info",
-      },
-    },
-  }),
-  removeSongFromQueue: createRoute({
-    method: "delete",
-    path: `/api/${API_VERSION}/queue/{index}`,
-    summary: "remove song from queue",
-    description: "Remove a song from the queue",
-    request: {
-      params: QueueParamsSchema,
-    },
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
-  repeatMode: createRoute({
-    method: "get",
-    path: `/api/${API_VERSION}/repeat-mode`,
-    summary: "get current repeat mode",
-    description: "Get the current repeat mode (NONE, ALL, ONE)",
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({
-              mode: z.enum(["ONE", "NONE", "ALL"]).nullable(),
-            }),
-          },
-        },
-      },
-    },
-  }),
-  search: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/search`,
-    summary: "search for a song",
-    description: "search for a song",
-    request: {
-      body: {
-        description: "search query",
-        content: {
-          "application/json": {
-            schema: SearchSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: "Success",
-        content: {
-          "application/json": {
-            schema: z.object({}),
-          },
-        },
       },
     },
   }),
@@ -443,27 +224,6 @@ const routes = {
       },
     },
   }),
-  setQueueIndex: createRoute({
-    method: "patch",
-    path: `/api/${API_VERSION}/queue`,
-    summary: "set queue index",
-    description: "Set the current index of the queue",
-    request: {
-      body: {
-        description: "index to move the song to",
-        content: {
-          "application/json": {
-            schema: SetQueueIndexSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
   setVolume: createRoute({
     method: "post",
     path: `/api/${API_VERSION}/volume`,
@@ -485,17 +245,6 @@ const routes = {
       },
     },
   }),
-  shuffle: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/shuffle`,
-    summary: "shuffle",
-    description: "Shuffle the queue",
-    responses: {
-      204: {
-        description: "Success",
-      },
-    },
-  }),
   songInfo: createRoute({
     method: "get",
     path: `/api/${API_VERSION}/song`,
@@ -506,33 +255,12 @@ const routes = {
         description: "Success",
         content: {
           "application/json": {
-            schema: SongInfoSchema,
+            schema: VideoInfoSchema,
           },
         },
       },
       204: {
         description: "No song info",
-      },
-    },
-  }),
-  switchRepeat: createRoute({
-    method: "post",
-    path: `/api/${API_VERSION}/switch-repeat`,
-    summary: "switch repeat",
-    description: "Switch the repeat mode",
-    request: {
-      body: {
-        description: "number of times to click the repeat button",
-        content: {
-          "application/json": {
-            schema: SwitchRepeatSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      204: {
-        description: "Success",
       },
     },
   }),
@@ -566,12 +294,16 @@ type PromiseOrValue<T> = T | Promise<T>;
 export const register = (
   app: HonoApp,
   { window }: BackendContext<APIServerConfig>,
-  songInfoGetter: () => PromiseOrValue<SongInfo | undefined>,
-  repeatModeGetter: () => PromiseOrValue<RepeatMode | undefined>,
-  likeTypeGetter: () => PromiseOrValue<LikeType | undefined>,
-  volumeStateGetter: () => PromiseOrValue<VolumeState | undefined>
+  songInfoGetter: () => PromiseOrValue<VideoInfo | undefined>,
+  volumeStateGetter: () => PromiseOrValue<
+    | {
+        isMuted: boolean;
+        state: number;
+      }
+    | undefined
+  >
 ) => {
-  const controller = getSongControls(window);
+  const controller = getVideoControls(window);
 
   app.openapi(routes.previous, (ctx) => {
     controller.previous();
@@ -603,22 +335,6 @@ export const register = (
     ctx.status(204);
     return ctx.body(null);
   });
-  app.openapi(routes.getLikeState, async (ctx) => {
-    ctx.status(200);
-    return ctx.json({ state: (await likeTypeGetter()) ?? null });
-  });
-  app.openapi(routes.like, (ctx) => {
-    controller.like();
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.dislike, (ctx) => {
-    controller.dislike();
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
   app.openapi(routes.seekTo, (ctx) => {
     const { seconds } = ctx.req.valid("json");
     controller.seekTo(seconds);
@@ -641,42 +357,6 @@ export const register = (
     return ctx.body(null);
   });
 
-  app.openapi(routes.getShuffleState, async (ctx) => {
-    const stateResponsePromise = new Promise<boolean>((resolve) => {
-      ipcMain.once(
-        "watchdeck:get-shuffle-response",
-        (_, isShuffled: boolean | undefined) => {
-          resolve(!!isShuffled);
-        }
-      );
-
-      controller.requestShuffleInformation();
-    });
-
-    const isShuffled = await stateResponsePromise;
-
-    ctx.status(200);
-    return ctx.json({ state: isShuffled });
-  });
-
-  app.openapi(routes.shuffle, (ctx) => {
-    controller.shuffle();
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-
-  app.openapi(routes.repeatMode, async (ctx) => {
-    ctx.status(200);
-    return ctx.json({ mode: (await repeatModeGetter()) ?? null });
-  });
-  app.openapi(routes.switchRepeat, (ctx) => {
-    const { iteration } = ctx.req.valid("json");
-    controller.switchRepeat(iteration);
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
   app.openapi(routes.setVolume, (ctx) => {
     const { volume } = ctx.req.valid("json");
     controller.setVolume(volume);
@@ -692,7 +372,7 @@ export const register = (
   });
   app.openapi(routes.setFullscreen, (ctx) => {
     const { state } = ctx.req.valid("json");
-    controller.setFullscreen(state);
+    window.setFullScreen(state);
 
     ctx.status(204);
     return ctx.body(null);
@@ -704,22 +384,9 @@ export const register = (
     return ctx.body(null);
   });
 
-  app.openapi(routes.getFullscreenState, async (ctx) => {
-    const stateResponsePromise = new Promise<boolean>((resolve) => {
-      ipcMain.once(
-        "watchdeck:set-fullscreen",
-        (_, isFullscreen: boolean | undefined) => {
-          resolve(!!isFullscreen);
-        }
-      );
-
-      controller.requestFullscreenInformation();
-    });
-
-    const fullscreen = await stateResponsePromise;
-
+  app.openapi(routes.getFullscreenState, (ctx) => {
     ctx.status(200);
-    return ctx.json({ state: fullscreen });
+    return ctx.json({ state: window.isFullScreen() });
   });
 
   const songInfo = async (ctx: Context) => {
@@ -734,137 +401,8 @@ export const register = (
     delete body.image;
 
     ctx.status(200);
-    return ctx.json(body satisfies ResponseSongInfo);
+    return ctx.json(body satisfies ResponseVideoInfo);
   };
   app.openapi(routes.oldSongInfo, songInfo);
   app.openapi(routes.songInfo, songInfo);
-
-  // Queue
-  const queueInfo = async (ctx: Context) => {
-    const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
-      ipcMain.once(
-        "watchdeck:get-queue-response",
-        (_, queue: QueueResponse) => {
-          resolve(queue);
-        }
-      );
-
-      controller.requestQueueInformation();
-    });
-
-    const info = await queueResponsePromise;
-
-    if (!info) {
-      ctx.status(204);
-      return ctx.body(null);
-    }
-
-    ctx.status(200);
-    return ctx.json(info);
-  };
-  app.openapi(routes.oldQueueInfo, queueInfo);
-  app.openapi(routes.queueInfo, queueInfo);
-
-  app.openapi(routes.nextSongInfo, async (ctx) => {
-    const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
-      ipcMain.once(
-        "watchdeck:get-queue-response",
-        (_, queue: QueueResponse) => {
-          resolve(queue);
-        }
-      );
-
-      controller.requestQueueInformation();
-    });
-
-    const queue = await queueResponsePromise;
-
-    if (!queue?.items || queue.items.length === 0) {
-      ctx.status(204);
-      return ctx.body(null);
-    }
-
-    // Find the currently selected song
-    const currentIndex = queue.items.findIndex((item) => {
-      const renderer =
-        item.playlistPanelVideoRenderer ||
-        item.playlistPanelVideoWrapperRenderer?.primaryRenderer
-          ?.playlistPanelVideoRenderer;
-      return renderer?.selected === true;
-    });
-
-    // Get the next song (currentIndex + 1)
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= queue.items.length) {
-      // No next song available
-      ctx.status(204);
-      return ctx.body(null);
-    }
-
-    const nextItem = queue.items[nextIndex];
-    const nextRenderer =
-      nextItem.playlistPanelVideoRenderer ||
-      nextItem.playlistPanelVideoWrapperRenderer?.primaryRenderer
-        ?.playlistPanelVideoRenderer;
-
-    if (!nextRenderer) {
-      ctx.status(204);
-      return ctx.body(null);
-    }
-
-    // Extract relevant information similar to SongInfo format
-    const nextSongInfo = {
-      lengthText: nextRenderer.lengthText,
-      shortBylineText: nextRenderer.shortBylineText,
-      thumbnail: nextRenderer.thumbnail,
-      title: nextRenderer.title?.runs?.[0]?.text,
-      videoId: nextRenderer.videoId,
-    };
-
-    ctx.status(200);
-    return ctx.json(nextSongInfo);
-  });
-
-  app.openapi(routes.addSongToQueue, (ctx) => {
-    const { videoId, insertPosition } = ctx.req.valid("json");
-    controller.addSongToQueue(videoId, insertPosition);
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.moveSongInQueue, (ctx) => {
-    const index = Number(ctx.req.param("index"));
-    const { toIndex } = ctx.req.valid("json");
-    controller.moveSongInQueue(index, toIndex);
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.removeSongFromQueue, (ctx) => {
-    const index = Number(ctx.req.param("index"));
-    controller.removeSongFromQueue(index);
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.setQueueIndex, (ctx) => {
-    const { index } = ctx.req.valid("json");
-    controller.setQueueIndex(index);
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.clearQueue, (ctx) => {
-    controller.clearQueue();
-
-    ctx.status(204);
-    return ctx.body(null);
-  });
-  app.openapi(routes.search, async (ctx) => {
-    const { query, params, continuation } = ctx.req.valid("json");
-    const response = await controller.search(query, params, continuation);
-
-    ctx.status(200);
-    return ctx.json(response as object);
-  });
 };

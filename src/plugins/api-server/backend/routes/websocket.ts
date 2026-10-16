@@ -5,10 +5,10 @@ import type { Context, Next } from "hono";
 import { verify } from "hono/jwt";
 import type { WSContext } from "hono/ws";
 
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import type { BackendContext } from "@/types/contexts";
 import type { RepeatMode, VolumeState } from "@/types/datahost-get-state";
+import type { VideoInfo } from "@/types/video-info";
 import { LoggerPrefix } from "@/utils";
 
 import { AuthStrategy } from "../../config";
@@ -28,7 +28,7 @@ enum DataTypes {
 }
 
 interface PlayerState {
-  song?: SongInfo;
+  song?: VideoInfo;
   isPlaying: boolean;
   muted: boolean;
   position: number;
@@ -45,7 +45,7 @@ export const register = (
   let volumeState: VolumeState | undefined = undefined;
   let repeat: RepeatMode = "NONE";
   let shuffle = false;
-  let lastSongInfo: SongInfo | undefined = undefined;
+  let lastSongInfo: VideoInfo | undefined = undefined;
 
   const sockets = new Set<WSContext<WebSocketLike>>();
 
@@ -61,7 +61,7 @@ export const register = (
     repeat,
     shuffle,
   }: {
-    songInfo?: SongInfo;
+    songInfo?: VideoInfo;
     volumeState?: VolumeState;
     repeat: RepeatMode;
     shuffle: boolean;
@@ -83,18 +83,18 @@ export const register = (
   });
 
   registerCallback((songInfo, event) => {
-    if (event === SongInfoEvent.VideoSrcChanged) {
+    if (event === VideoInfoEvent.VideoChanged) {
       send(DataTypes.VideoChanged, { song: songInfo, position: 0 });
     }
 
-    if (event === SongInfoEvent.PlayOrPaused) {
+    if (event === VideoInfoEvent.PlayOrPaused) {
       send(DataTypes.PlayerStateChanged, {
         isPlaying: !(songInfo?.isPaused ?? true),
         position: songInfo.elapsedSeconds,
       });
     }
 
-    if (event === SongInfoEvent.TimeChanged) {
+    if (event === VideoInfoEvent.TimeChanged) {
       send(DataTypes.PositionChanged, { position: songInfo.elapsedSeconds });
     }
 

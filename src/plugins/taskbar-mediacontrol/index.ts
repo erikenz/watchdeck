@@ -10,17 +10,17 @@ import { nativeImage, nativeTheme } from "electron";
 import type { NativeImage } from "electron";
 
 import { t } from "@/i18n";
-import { getSongControls } from "@/providers/song-controls";
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+import { getVideoControls } from "@/providers/video-controls";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import { Platform } from "@/types/plugins";
+import type { VideoInfo } from "@/types/video-info";
 import { createPlugin } from "@/utils";
 
 export default createPlugin({
   backend({ window }) {
-    let currentSongInfo: SongInfo;
+    let currentSongInfo: VideoInfo;
 
-    const { playPause, next, previous } = getSongControls(window);
+    const { playPause, next, previous } = getVideoControls(window);
 
     const getImages = (): Record<
       "play" | "pause" | "next" | "previous",
@@ -49,7 +49,7 @@ export default createPlugin({
       setThumbar(currentSongInfo);
     });
 
-    const setThumbar = (songInfo: SongInfo) => {
+    const setThumbar = (songInfo: VideoInfo) => {
       // Wait for song to start before setting thumbar
       if (!songInfo?.title) {
         return;
@@ -83,7 +83,7 @@ export default createPlugin({
     };
 
     registerCallback((songInfo, event) => {
-      if (event !== SongInfoEvent.TimeChanged) {
+      if (event !== VideoInfoEvent.TimeChanged) {
         // Update currentsonginfo for win.on('show')
         currentSongInfo = songInfo;
         // Update thumbar

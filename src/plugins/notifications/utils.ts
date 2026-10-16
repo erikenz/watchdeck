@@ -5,7 +5,7 @@ import musicPlayerIcon from "@assets/icon.png?asset&asarUnpack";
 import { app } from "electron";
 import type { NativeImage } from "electron";
 
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { NotificationsPluginConfig } from "./index";
 
@@ -42,7 +42,7 @@ const nativeImageToLogo = (nativeImage: NativeImage) => {
 };
 
 export const notificationImage = (
-  songInfo: SongInfo,
+  songInfo: VideoInfo,
   config: NotificationsPluginConfig
 ) => {
   if (!songInfo.image) {

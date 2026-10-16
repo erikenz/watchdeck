@@ -6,24 +6,6 @@ import { onMenu } from "./menu";
 
 export interface ScrobblerPluginConfig {
   enabled: boolean;
-  /**
-   * Attempt to scrobble other video types (e.g. Podcasts, normal videos)
-   *
-   * @default true
-   */
-  scrobbleOtherMedia: boolean;
-  /**
-   * Use alternative titles for scrobbling (Useful for non-roman song titles, e.g. (Not) A Devil -> デビルじゃないもん)
-   *
-   * @default true
-   */
-  alternativeTitles: boolean;
-  /**
-   * Use alternative artist for scrobbling (e.g., DECO27 & (or) PinocchioP -> DECO27 / marasy -> まらしぃ)
-   *
-   * @default true
-   */
-  alternativeArtist: boolean;
   scrobblers: {
     lastfm: {
       /**
@@ -81,10 +63,7 @@ export interface ScrobblerPluginConfig {
 }
 
 export const defaultConfig: ScrobblerPluginConfig = {
-  alternativeArtist: true,
-  alternativeTitles: true,
   enabled: false,
-  scrobbleOtherMedia: true,
   scrobblers: {
     lastfm: {
       apiKey: "04d76faaac8726e60988e14c105d421a",

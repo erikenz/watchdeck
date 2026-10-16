@@ -4,7 +4,7 @@ import { ActivityType } from "discord-api-types/v10";
 import is from "electron-is";
 
 import { t } from "@/i18n";
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 import { LoggerPrefix } from "@/utils";
 
 import { clientId, PROGRESS_THROTTLE_MS, TimerKey } from "./constants";
@@ -34,7 +34,7 @@ export class DiscordService {
   /**
    * Cached song information from the last activity update.
    */
-  lastSongInfo?: SongInfo;
+  lastSongInfo?: VideoInfo;
   /**
    * Timestamp of the last progress update sent to Discord.
    */
@@ -108,23 +108,18 @@ export class DiscordService {
    * @returns The SetActivity object.
    */
   private buildActivityInfo(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: DiscordPluginConfig
   ): SetActivity {
     padHangulFields(songInfo);
 
     const activityInfo: SetActivity = {
       buttons: buildDiscordButtons(config, songInfo),
-      details: sanitizeActivityText(
-        songInfo.alternativeTitle ?? songInfo.title
-      ), // Song title
+      details: sanitizeActivityText(songInfo.title), // Video title
       detailsUrl: songInfo.url ?? undefined,
       largeImageKey: songInfo.imageSrc ?? undefined,
-      largeImageText: songInfo.album
-        ? sanitizeActivityText(songInfo.album)
-        : undefined,
-      state: sanitizeActivityText(songInfo.tags?.at(0) ?? songInfo.artist), // Artist name
-      stateUrl: songInfo.artistUrl,
+      state: sanitizeActivityText(songInfo.channel), // Channel name
+      stateUrl: songInfo.channelUrl,
       statusDisplayType: config.statusDisplayType,
       type: ActivityType.Listening,
     };
@@ -134,13 +129,13 @@ export class DiscordService {
       activityInfo.largeImageText = "⏸︎";
     } else if (
       !config.hideDurationLeft &&
-      songInfo.songDuration > 0 &&
+      songInfo.duration > 0 &&
       typeof songInfo.elapsedSeconds === "number"
     ) {
       const songStartTime = Date.now() - songInfo.elapsedSeconds * 1000;
       activityInfo.startTimestamp = Math.floor(songStartTime / 1000);
       activityInfo.endTimestamp = Math.floor(
-        (songStartTime + songInfo.songDuration * 1000) / 1000
+        (songStartTime + songInfo.duration * 1000) / 1000
       );
     }
 
@@ -290,12 +285,12 @@ export class DiscordService {
    * Detects changes in song, pause state, or seeks for immediate updates.
    * @param songInfo - The current song information.
    */
-  updateActivity(songInfo: SongInfo): void {
+  updateActivity(songInfo: VideoInfo): void {
     if (!this.config) {
       return;
     }
 
-    if (!songInfo.title && !songInfo.artist) {
+    if (!songInfo.title && !songInfo.channel) {
       if (this.lastSongInfo?.videoId) {
         this.clearActivity();
         this.lastSongInfo = undefined;

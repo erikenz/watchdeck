@@ -9,17 +9,17 @@ import {
   APP_PROTOCOL,
   changeProtocolHandler,
 } from "@/providers/protocol-handler";
-import { getSongControls } from "@/providers/song-controls";
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+import { getVideoControls } from "@/providers/video-controls";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import { setTrayOnClick, setTrayOnDoubleClick } from "@/tray";
 import type { BackendContext } from "@/types/contexts";
 import { mediaIcons } from "@/types/media-icons";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { NotificationsPluginConfig } from "./index";
 import { notificationImage, secondsToMinutes, ToastStyles } from "./utils";
 
-let songControls: ReturnType<typeof getSongControls>;
+let videoControls: ReturnType<typeof getVideoControls>;
 let savedNotification: Notification | undefined;
 
 type Accessor<T> = () => T;
@@ -29,7 +29,7 @@ export default (
   config: Accessor<NotificationsPluginConfig>,
   { ipc: { on, send } }: BackendContext<NotificationsPluginConfig>
 ) => {
-  const sendNotification = (songInfo: SongInfo) => {
+  const sendNotification = (songInfo: VideoInfo) => {
     const iconSrc = notificationImage(songInfo, config());
 
     savedNotification?.close();
@@ -43,7 +43,7 @@ export default (
 
     savedNotification = new Notification({
       title: songInfo.title || "Playing",
-      body: songInfo.artist,
+      body: songInfo.channel,
       icon: iconSrc,
       silent: true,
       // https://learn.microsoft.com/en-us/uwp/schemas/tiles/toastschema/schema-root
@@ -63,7 +63,7 @@ export default (
     savedNotification.show();
   };
 
-  const getXml = (songInfo: SongInfo, iconSrc: string) => {
+  const getXml = (songInfo: VideoInfo, iconSrc: string) => {
     switch (config().toastStyle) {
       default:
       case ToastStyles.logo:
@@ -154,7 +154,7 @@ export default (
 </toast>`;
 
   const xmlImage = (
-    { title, artist, isPaused }: SongInfo,
+    { title, channel, isPaused }: VideoInfo,
     imgSrc: string,
     placement: string
   ) =>
@@ -162,21 +162,21 @@ export default (
       `\
             <image id="1" src="${imgSrc}" name="Image" ${placement}/>
             <text id="1">${title}</text>
-            <text id="2">${artist}</text>\
+            <text id="2">${channel}</text>\
 `,
       isPaused ?? false
     );
 
-  const xmlLogo = (songInfo: SongInfo, imgSrc: string) =>
+  const xmlLogo = (songInfo: VideoInfo, imgSrc: string) =>
     xmlImage(songInfo, imgSrc, 'placement="appLogoOverride"');
 
-  const xmlHero = (songInfo: SongInfo, imgSrc: string) =>
+  const xmlHero = (songInfo: VideoInfo, imgSrc: string) =>
     xmlImage(songInfo, imgSrc, 'placement="hero"');
 
-  const xmlBannerBottom = (songInfo: SongInfo, imgSrc: string) =>
+  const xmlBannerBottom = (songInfo: VideoInfo, imgSrc: string) =>
     xmlImage(songInfo, imgSrc, "");
 
-  const xmlBannerTopCustom = (songInfo: SongInfo, imgSrc: string) =>
+  const xmlBannerTopCustom = (songInfo: VideoInfo, imgSrc: string) =>
     toast(
       `\
             <image id="1" src="${imgSrc}" name="Image" />
@@ -184,7 +184,7 @@ export default (
             <group>
                 <subgroup>
                     <text hint-style="body">${songInfo.title}</text>
-                    <text hint-style="captionSubtle">${songInfo.artist}</text>
+                    <text hint-style="captionSubtle">${songInfo.channel}</text>
                 </subgroup>
                 ${xmlMoreData(songInfo)}
             </group>\
@@ -192,21 +192,16 @@ export default (
       songInfo.isPaused ?? false
     );
 
-  const xmlMoreData = ({ album, elapsedSeconds, songDuration }: SongInfo) => `\
+  const xmlMoreData = ({ elapsedSeconds, duration }: VideoInfo) => `\
 <subgroup hint-textStacking="bottom">
-    ${
-      album
-        ? `<text hint-style="captionSubtle" hint-wrap="true" hint-align="right">${album}</text>`
-        : ""
-    }
     <text hint-style="captionSubtle" hint-wrap="true" hint-align="right">${secondsToMinutes(
       elapsedSeconds ?? 0
-    )} / ${secondsToMinutes(songDuration)}</text>
+    )} / ${secondsToMinutes(duration)}</text>
 </subgroup>\
 `;
 
   const xmlBannerCenteredBottom = (
-    { title, artist, isPaused }: SongInfo,
+    { title, channel, isPaused }: VideoInfo,
     imgSrc: string
   ) =>
     toast(
@@ -217,7 +212,7 @@ export default (
                     <text hint-align="center" hint-style="${titleFontPicker(
                       title
                     )}">${title}</text>
-                    <text hint-align="center" hint-style="SubtitleSubtle">${artist}</text>
+                    <text hint-align="center" hint-style="SubtitleSubtle">${channel}</text>
                 </subgroup>
             </group>
             <image id="1" src="${imgSrc}" name="Image"  hint-removeMargin="true" />\
@@ -226,7 +221,7 @@ export default (
     );
 
   const xmlBannerCenteredTop = (
-    { title, artist, isPaused }: SongInfo,
+    { title, channel, isPaused }: VideoInfo,
     imgSrc: string
   ) =>
     toast(
@@ -238,7 +233,7 @@ export default (
                     <text hint-align="center" hint-style="${titleFontPicker(
                       title
                     )}">${title}</text>
-                    <text hint-align="center" hint-style="SubtitleSubtle">${artist}</text>
+                    <text hint-align="center" hint-style="SubtitleSubtle">${channel}</text>
                 </subgroup>
             </group>\
 `,
@@ -261,22 +256,22 @@ export default (
     return "Subtitle";
   };
 
-  songControls = getSongControls(win);
+  videoControls = getVideoControls(win);
 
   let currentSeconds = 0;
   on("watchdeck:player-api-loaded", () => {
     send("watchdeck:setup-time-changed-listener");
   });
 
-  let savedSongInfo: SongInfo;
+  let savedSongInfo: VideoInfo;
   let lastUrl: string | undefined;
 
   // Register songInfoCallback
   registerCallback((songInfo, event) => {
-    if (event === SongInfoEvent.TimeChanged) {
+    if (event === VideoInfoEvent.TimeChanged) {
       currentSeconds = songInfo.elapsedSeconds ?? 0;
     }
-    if (!songInfo.artist && !songInfo.title) {
+    if (!songInfo.channel && !songInfo.title) {
       return;
     }
 
@@ -317,9 +312,9 @@ export default (
   });
 
   changeProtocolHandler((cmd, ...args) => {
-    if (Object.keys(songControls).includes(cmd)) {
-      // @ts-expect-error: cmd is a key of songControls
-      songControls[cmd as keyof typeof songControls](...args);
+    if (Object.keys(videoControls).includes(cmd)) {
+      // @ts-expect-error: cmd is a key of videoControls
+      videoControls[cmd as keyof typeof videoControls](...args);
       if (
         config().refreshOnPlayPause &&
         (cmd === "pause" || (cmd === "play" && !config().unpauseNotification))

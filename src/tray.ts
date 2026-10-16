@@ -10,8 +10,8 @@ import { APPLICATION_NAME, t } from "@/i18n";
 import * as config from "./config";
 import type { MenuTemplate } from "./menu";
 import { restart } from "./providers/app-controls";
-import { getSongControls } from "./providers/song-controls";
-import { registerCallback, SongInfoEvent } from "./providers/song-info";
+import { getVideoControls } from "./providers/video-controls";
+import { registerCallback, VideoInfoEvent } from "./providers/video-info";
 
 // Prevent tray being garbage collected
 let tray: Electron.Tray | undefined;
@@ -46,7 +46,7 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
     return;
   }
 
-  const { playPause, next, previous } = getSongControls(win);
+  const { playPause, next, previous } = getVideoControls(win);
 
   const pixelRatio = is.windows()
     ? screen.getPrimaryDisplay().scaleFactor || 1
@@ -129,13 +129,13 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
   const trayMenu = Menu.buildFromTemplate(template);
   tray.setContextMenu(trayMenu);
 
-  registerCallback((songInfo, event) => {
-    if (event === SongInfoEvent.TimeChanged) {
+  registerCallback((info, event) => {
+    if (event === VideoInfoEvent.TimeChanged) {
       return;
     }
 
     if (tray) {
-      if (songInfo.isPaused === undefined) {
+      if (info.videoId === "") {
         tray.setImage(defaultTrayIcon);
         return;
       }
@@ -143,12 +143,12 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
       tray.setToolTip(
         t("main.tray.tooltip.with-song-info", {
           applicationName: APPLICATION_NAME,
-          artist: songInfo.artist,
-          title: songInfo.title,
+          artist: info.channel,
+          title: info.title,
         })
       );
 
-      tray.setImage(songInfo.isPaused ? pausedTrayIcon : defaultTrayIcon);
+      tray.setImage(info.isPaused ? pausedTrayIcon : defaultTrayIcon);
     }
   });
 };

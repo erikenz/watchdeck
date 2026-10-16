@@ -1,9 +1,9 @@
 import { Notification } from "electron";
 import is from "electron-is";
 
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import type { BackendContext } from "@/types/contexts";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { NotificationsPluginConfig } from "./index";
 import interactive from "./interactive";
@@ -11,10 +11,10 @@ import { notificationImage } from "./utils";
 
 let config: NotificationsPluginConfig;
 
-const notify = (info: SongInfo) => {
+const notify = (info: VideoInfo) => {
   // Send the notification
   const currentNotification = new Notification({
-    body: info.artist,
+    body: info.channel,
     icon: notificationImage(info, config),
     silent: true,
     title: info.title || "Playing",
@@ -29,9 +29,9 @@ const setup = () => {
   let oldNotification: Notification;
   let currentUrl: string | undefined;
 
-  registerCallback((songInfo: SongInfo, event) => {
+  registerCallback((songInfo: VideoInfo, event) => {
     if (
-      event !== SongInfoEvent.TimeChanged &&
+      event !== VideoInfoEvent.TimeChanged &&
       !songInfo.isPaused &&
       (songInfo.url !== currentUrl || config.unpauseNotification)
     ) {

@@ -8,7 +8,7 @@ import {
   isMusicOrVideoTrack,
 } from "@/plugins/utils/renderer/check";
 import { getSongMenu } from "@/providers/dom-elements";
-import { getSongInfo } from "@/providers/song-info-front";
+import { getVideoInfo } from "@/providers/video-info-front";
 import type { RendererContext } from "@/types/contexts";
 
 import type { DownloaderPluginConfig } from "./index";
@@ -72,7 +72,7 @@ export const onRendererLoad = ({
         return;
       }
     } else {
-      videoUrl = getSongInfo().url || window.location.href;
+      videoUrl = getVideoInfo()?.url ?? window.location.href;
     }
 
     ipc.invoke("download-song", videoUrl);

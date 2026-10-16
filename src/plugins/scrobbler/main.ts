@@ -1,11 +1,7 @@
 import type { BrowserWindow } from "electron";
 
-import {
-  registerCallback,
-  MediaType,
-  SongInfoEvent,
-} from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
+import type { VideoInfo } from "@/types/video-info";
 import { createBackend } from "@/utils";
 
 import type { ScrobblerPluginConfig } from "./index";
@@ -79,26 +75,15 @@ export const backend = createBackend<
     await this.createSessions(config, setConfig);
     this.setConfig = setConfig;
 
-    registerCallback((songInfo: SongInfo, event) => {
-      if (event === SongInfoEvent.TimeChanged) return;
+    registerCallback((songInfo: VideoInfo, event) => {
+      if (event === VideoInfoEvent.TimeChanged) return;
       // Set remove the old scrobble timer
       clearTimeout(scrobbleTimer);
       if (!songInfo.isPaused) {
         const configNonnull = this.config!;
-        // Scrobblers normally have no trouble working with official music videos
-        if (
-          !configNonnull.scrobbleOtherMedia &&
-          songInfo.mediaType !== MediaType.Audio &&
-          songInfo.mediaType !== MediaType.OriginalMusicVideo
-        ) {
-          return;
-        }
 
         // Scrobble when the song is halfway through, or has passed the 4-minute mark
-        const scrobbleTime = Math.min(
-          Math.ceil(songInfo.songDuration / 2),
-          4 * 60
-        );
+        const scrobbleTime = Math.min(Math.ceil(songInfo.duration / 2), 4 * 60);
         if (scrobbleTime > (songInfo.elapsedSeconds ?? 0)) {
           // Scrobble still needs to happen
           const timeToWait =

@@ -3,8 +3,8 @@ import { nativeImage, TouchBar } from "electron";
 import type { NativeImage } from "electron";
 
 import { t } from "@/i18n";
-import { getSongControls } from "@/providers/song-controls";
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import { getVideoControls } from "@/providers/video-controls";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import { Platform } from "@/types/plugins";
 import { createPlugin } from "@/utils";
 
@@ -44,12 +44,6 @@ export default createPlugin({
         new TouchBarButton({
           label: "⏭",
         }),
-        new TouchBarButton({
-          label: "👎",
-        }),
-        new TouchBarButton({
-          label: "👍",
-        }),
       ],
       change: (i) => {
         controls[i]();
@@ -70,16 +64,15 @@ export default createPlugin({
       ],
     });
 
-    const { playPause, next, previous, dislike, like } =
-      getSongControls(window);
+    const { playPause, next, previous } = getVideoControls(window);
 
     // If the page is ready, register the callback
     window.once("ready-to-show", () => {
-      controls = [previous, playPause, next, dislike, like];
+      controls = [previous, playPause, next];
 
       // Register the callback
       registerCallback((songInfo, event) => {
-        if (event === SongInfoEvent.TimeChanged) return;
+        if (event === VideoInfoEvent.TimeChanged) return;
         // Song information changed, so lets update the touchBar
 
         // Set the song title

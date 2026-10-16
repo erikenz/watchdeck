@@ -1,6 +1,5 @@
 import MprisPlayer from "@jellybrick/mpris-service";
 import type {
-  LoopStatus,
   PlayBackStatus,
   PlayerOptions,
   Position,
@@ -11,11 +10,9 @@ import type { BrowserWindow } from "electron";
 
 import * as config from "@/config";
 import { APPLICATION_NAME } from "@/i18n";
-import { getSongControls } from "@/providers/song-controls";
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
-import type { RepeatMode, VolumeState } from "@/types/datahost-get-state";
-import type { QueueResponse } from "@/types/music-player-desktop-internal";
+import { getVideoControls } from "@/providers/video-controls";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
+import type { VideoInfo } from "@/types/video-info";
 import { LoggerPrefix } from "@/utils";
 
 class YTPlayer extends MprisPlayer {
@@ -24,7 +21,6 @@ class YTPlayer extends MprisPlayer {
    * @private
    */
   private currentPosition: number = 0;
-  canUsePlayerControls: boolean = false;
 
   constructor(opts: PlayerOptions) {
     super(opts);
@@ -36,10 +32,6 @@ class YTPlayer extends MprisPlayer {
 
   override getPosition(): number {
     return this.currentPosition;
-  }
-
-  setLoopStatus(status: LoopStatus) {
-    this.loopStatus = status;
   }
 
   isPlaying(): boolean {
@@ -69,28 +61,19 @@ function setupMPRIS() {
 
   instance.canRaise = true;
   instance.canQuit = false;
-  instance.canUsePlayerControls = true;
+  // There is no queue to ask about: the site decides what "next" means (its own
+  // playlist, or the recommendation it is already showing)
+  instance.canGoNext = true;
+  instance.canGoPrevious = true;
   instance.supportedUriSchemes = ["http", "https"];
   instance.desktopEntry = "watchdeck";
   return instance;
 }
-
 export function registerMPRIS(win: BrowserWindow) {
-  const songControls = getSongControls(win);
-  const {
-    playPause,
-    next,
-    previous,
-    setVolume,
-    shuffle,
-    switchRepeat,
-    setFullscreen,
-    requestShuffleInformation,
-    requestFullscreenInformation,
-    requestQueueInformation,
-  } = songControls;
+  const videoControls = getVideoControls(win);
+  const { playPause, next, previous, setVolume } = videoControls;
   try {
-    let currentSongInfo: SongInfo | null = null;
+    let currentSongInfo: VideoInfo | null = null;
     const secToMicro = (n: number) => Math.round(Number(n) * 1e6);
     const microToSec = (n: number) => Math.round(Number(n) / 1e6);
 
@@ -115,129 +98,6 @@ export function registerMPRIS(win: BrowserWindow) {
       player.setPosition(player.getPosition() + offset);
     };
 
-    ipcMain.on("watchdeck:player-api-loaded", () => {
-      win.webContents.send("watchdeck:setup-seeked-listener", "mpris");
-      win.webContents.send("watchdeck:setup-time-changed-listener", "mpris");
-      win.webContents.send("watchdeck:setup-repeat-changed-listener", "mpris");
-      win.webContents.send("watchdeck:setup-volume-changed-listener", "mpris");
-      win.webContents.send("watchdeck:setup-shuffle-changed-listener", "mpris");
-      win.webContents.send(
-        "watchdeck:setup-fullscreen-changed-listener",
-        "mpris"
-      );
-      win.webContents.send(
-        "watchdeck:setup-autoplay-changed-listener",
-        "mpris"
-      );
-      requestShuffleInformation();
-      requestFullscreenInformation();
-      requestQueueInformation();
-    });
-
-    ipcMain.on("watchdeck:seeked", (_, t: number) => {
-      player.setPosition(secToMicro(t));
-      player.seeked(secToMicro(t));
-    });
-
-    ipcMain.on("watchdeck:repeat-changed", (_, mode: RepeatMode) => {
-      switch (mode) {
-        case "NONE": {
-          player.setLoopStatus(MprisPlayer.LOOP_STATUS_NONE);
-          break;
-        }
-        case "ONE": {
-          player.setLoopStatus(MprisPlayer.LOOP_STATUS_TRACK);
-          break;
-        }
-        case "ALL": {
-          player.setLoopStatus(MprisPlayer.LOOP_STATUS_PLAYLIST);
-          // No default
-          break;
-        }
-      }
-      requestQueueInformation();
-    });
-
-    ipcMain.on("watchdeck:shuffle-changed", (_, shuffleEnabled: boolean) => {
-      if (player.shuffle === undefined || !player.canUsePlayerControls) {
-        return;
-      }
-
-      player.shuffle = shuffleEnabled ?? !player.shuffle;
-    });
-
-    ipcMain.on("watchdeck:fullscreen-changed", (_, changedTo: boolean) => {
-      if (player.fullscreen === undefined || !player.canUsePlayerControls) {
-        return;
-      }
-
-      player.fullscreen =
-        changedTo === undefined ? !player.fullscreen : changedTo;
-    });
-
-    ipcMain.on(
-      "watchdeck:set-fullscreen",
-      (_, isFullscreen: boolean | undefined) => {
-        if (!player.canUsePlayerControls || isFullscreen === undefined) {
-          return;
-        }
-
-        player.fullscreen = isFullscreen;
-      }
-    );
-
-    ipcMain.on(
-      "watchdeck:fullscreen-changed-supported",
-      (_, isFullscreenSupported: boolean) => {
-        player.canUsePlayerControls = isFullscreenSupported;
-      }
-    );
-    ipcMain.on("watchdeck:autoplay-changed", (_) => {
-      requestQueueInformation();
-    });
-
-    ipcMain.on("watchdeck:get-queue-response", (_, queue: QueueResponse) => {
-      if (!queue) {
-        return;
-      }
-
-      const currentPosition =
-        queue.items?.findIndex(
-          (it) =>
-            it?.playlistPanelVideoRenderer?.selected ||
-            it?.playlistPanelVideoWrapperRenderer?.primaryRenderer
-              ?.playlistPanelVideoRenderer?.selected
-        ) ?? 0;
-      player.canGoPrevious = currentPosition !== 0;
-
-      let hasNext: boolean;
-      if (queue.autoPlaying) {
-        hasNext = true;
-      } else if (player.loopStatus === MprisPlayer.LOOP_STATUS_PLAYLIST) {
-        hasNext = true;
-      } else {
-        // Example: currentPosition = 0, queue.items.length = 29 -> hasNext = true
-        hasNext = !!(currentPosition - (queue?.items?.length ?? 0 - 1));
-      }
-
-      player.canGoNext = hasNext;
-    });
-
-    player.on("loopStatus", (status: LoopStatus) => {
-      // SwitchRepeat cycles between states in that order
-      const switches = [
-        MprisPlayer.LOOP_STATUS_NONE,
-        MprisPlayer.LOOP_STATUS_PLAYLIST,
-        MprisPlayer.LOOP_STATUS_TRACK,
-      ];
-      const currentIndex = switches.indexOf(player.loopStatus);
-      const targetIndex = switches.indexOf(status);
-
-      // Get a delta in the range [0,2]
-      const delta = (targetIndex - currentIndex + 3) % 3;
-      switchRepeat(delta);
-    });
-
     player.on("raise", () => {
       if (!player.canRaise) {
         return;
@@ -247,9 +107,14 @@ export function registerMPRIS(win: BrowserWindow) {
       win.show();
     });
 
-    player.on("fullscreen", (fullscreenEnabled: boolean) => {
-      setFullscreen(fullscreenEnabled);
-    });
+    ipcMain.on(
+      "watchdeck:volume-changed",
+      (_, state: Pick<VideoInfo, "isMuted" | "volume">) => {
+        player.volume = state.isMuted
+          ? 0
+          : Number.parseFloat((state.volume / 100).toFixed(2));
+      }
+    );
 
     player.on("play", () => {
       if (!player.isPlaying()) {
@@ -283,33 +148,13 @@ export function registerMPRIS(win: BrowserWindow) {
     player.on("seek", seekBy);
     player.on("position", seekTo);
 
-    player.on("shuffle", (enableShuffle) => {
-      if (!player.canUsePlayerControls || enableShuffle === undefined) {
-        return;
-      }
-
-      player.shuffle = enableShuffle;
-
-      if (enableShuffle) {
-        shuffle();
-        requestQueueInformation();
-      }
-    });
     player.on("open", (args: { uri: string }) => {
-      win.loadURL(args.uri).then(() => {
-        requestQueueInformation();
-      });
+      void win.loadURL(args.uri);
     });
 
     player.on("error", (error: Error) => {
       console.error(LoggerPrefix, "Error in MPRIS");
       console.trace(error);
-    });
-
-    ipcMain.on("watchdeck:volume-changed", (_, newVolumeState: VolumeState) => {
-      player.volume = newVolumeState.isMuted
-        ? 0
-        : Number.parseFloat((newVolumeState.state / 100).toFixed(2));
     });
 
     player.on("volume", async (newVolume: number) => {
@@ -321,27 +166,24 @@ export function registerMPRIS(win: BrowserWindow) {
       }
     });
 
-    registerCallback((songInfo: SongInfo, event) => {
-      if (event === SongInfoEvent.TimeChanged) {
+    registerCallback((songInfo: VideoInfo, event) => {
+      if (event === VideoInfoEvent.TimeChanged) {
         player.setPosition(secToMicro(songInfo.elapsedSeconds ?? 0));
         return;
       }
       if (player) {
         const data: Track = {
-          "mpris:length": secToMicro(songInfo.songDuration),
+          "mpris:length": secToMicro(songInfo.duration),
           ...(songInfo.imageSrc
             ? { "mpris:artUrl": songInfo.imageSrc }
             : undefined),
           "xesam:title": songInfo.title,
           "xesam:url": songInfo.url,
-          "xesam:artist": [songInfo.artist],
+          "xesam:artist": [songInfo.channel],
           "mpris:trackid": player.objectPath(
             `Track/${correctId(songInfo.videoId)}`
           ),
         };
-        if (songInfo.album) {
-          data["xesam:album"] = songInfo.album;
-        }
         currentSongInfo = songInfo;
 
         player.metadata = data;
@@ -358,7 +200,6 @@ export function registerMPRIS(win: BrowserWindow) {
             : MprisPlayer.PLAYBACK_STATUS_PLAYING
         );
       }
-      requestQueueInformation();
     });
   } catch (error) {
     console.error(LoggerPrefix, "Error in MPRIS");

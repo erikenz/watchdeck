@@ -1,7 +1,7 @@
 import type { GatewayActivityButton } from "discord-api-types/v10";
 
 import { APPLICATION_NAME } from "@/i18n";
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 
 import { HANGUL_FILLER } from "./constants";
 import type { DiscordPluginConfig } from "./index";
@@ -51,7 +51,7 @@ export function sanitizeActivityText(
  */
 export const buildDiscordButtons = (
   config: DiscordPluginConfig,
-  songInfo: SongInfo
+  songInfo: VideoInfo
 ): GatewayActivityButton[] | undefined => {
   const buttons: GatewayActivityButton[] = [];
   if (config.playOnYouTubeMusic && songInfo.url) {
@@ -70,12 +70,12 @@ export const buildDiscordButtons = (
 };
 
 /**
- * Pads Hangul fields (title, artist, album) in SongInfo if they are less than 2 characters long.
+ * Pads Hangul fields (title, channel) in VideoInfo if they are less than 2 characters long.
  * Discord requires fields to be at least 2 characters.
- * @param songInfo - The song information object (will be mutated).
+ * @param songInfo - The video information object (will be mutated).
  */
-export const padHangulFields = (songInfo: SongInfo): void => {
-  (["title", "artist", "album"] as const).forEach((key) => {
+export const padHangulFields = (songInfo: VideoInfo): void => {
+  (["title", "channel"] as const).forEach((key) => {
     const value = songInfo[key];
     if (typeof value === "string" && value.length > 0 && value.length < 2) {
       songInfo[key] = value + HANGUL_FILLER.repeat(2 - value.length);

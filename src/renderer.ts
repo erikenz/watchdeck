@@ -1,3 +1,11 @@
+/**
+ * The page's entry point: this bundle is injected into the site's main world, where it
+ * wires the player providers to the plugin host.
+ *
+ * It is deliberately thin - everything this app knows about the site lives in
+ * `providers/youtube-dom` and the `video-info` / `video-controls` pairs. What is left
+ * here is the plugin lifecycle and the page-level styling hooks the plugins rely on.
+ */
 import i18next from "i18next";
 import { setTheme } from "mdui/functions/setTheme.js";
 
@@ -5,12 +13,12 @@ import "mdui/mdui.css";
 import "mdui";
 
 import { loadI18n, setLanguage, t as i18t } from "@/i18n";
+import { setupVideoControls } from "@/providers/video-controls-front";
+import { bindPlayer, setupVideoInfo } from "@/providers/video-info-front";
+import { getPlayer } from "@/providers/youtube-dom";
 import type { MusicPlayer } from "@/types/music-player";
-import type { MusicPlayerAppElement } from "@/types/music-player-app-element";
-import type { QueueResponse } from "@/types/music-player-desktop-internal";
 import type { PluginConfig } from "@/types/plugins";
-import type { QueueElement } from "@/types/queue";
-import type { SearchBoxElement } from "@/types/search-box-element";
+import type { YouTubePlayer } from "@/types/youtube-player";
 import {
   defaultTrustedTypePolicy,
   registerWindowDefaultTrustedTypePolicy,
@@ -24,30 +32,30 @@ import {
   getLoadedRendererPlugin,
   loadAllRendererPlugins,
 } from "./loader/renderer";
-import { startingPages } from "./providers/extracted-data";
-import { setupSongInfo } from "./providers/song-info-front";
 
 setTheme("dark");
+registerWindowDefaultTrustedTypePolicy();
 
 let api: (Element & MusicPlayer) | null = null;
 let isPluginLoaded = false;
-let isApiLoaded = false;
 let firstDataLoaded = false;
 
-registerWindowDefaultTrustedTypePolicy();
+/**
+ * The plugin API still hands plugins the wide, inherited `MusicPlayer` view of the
+ * player (docs/PRD.md §R5 reworks the plugins that use it). The element underneath is
+ * the same one this app's own providers drive.
+ */
+const onApiLoaded = async (player: Element & YouTubePlayer) => {
+  const pluginApi = player as unknown as Element & MusicPlayer;
+  api = pluginApi;
 
-async function listenForApiLoad() {
-  if (!isApiLoaded) {
-    api = document.querySelector("#movie_player");
-    if (api) {
-      await onApiLoaded();
-
-      return;
+  // A plugin enabled after this point gets a synthetic `dataloaded` below
+  player.addEventListener("videodatachange", (name) => {
+    if (name === "dataloaded") {
+      firstDataLoaded = true;
     }
-  }
-}
+  });
 
-async function onApiLoaded() {
   // Workaround for macOS traffic lights
   {
     let osType = "Unknown";
@@ -61,277 +69,11 @@ async function onApiLoaded() {
     document.documentElement.dataset.os = osType;
   }
 
-  // Workaround for #2459
-  document
-    .querySelector("button.video-button.ytmusic-av-toggle")
-    ?.addEventListener("click", () =>
-      window.dispatchEvent(new Event("resize"))
-    );
-
-  window.ipcRenderer.on("watchdeck:previous-video", () => {
-    document
-      .querySelector<HTMLElement>(".previous-button.ytmusic-player-bar")
-      ?.click();
-  });
-  window.ipcRenderer.on("watchdeck:next-video", () => {
-    document
-      .querySelector<HTMLElement>(".next-button.ytmusic-player-bar")
-      ?.click();
-  });
-  window.ipcRenderer.on("watchdeck:play", (_) => {
-    api?.playVideo();
-  });
-  window.ipcRenderer.on("watchdeck:pause", (_) => {
-    api?.pauseVideo();
-  });
-  window.ipcRenderer.on("watchdeck:toggle-play", (_) => {
-    if (api?.getPlayerState() === 2) {
-      api?.playVideo();
-    } else {
-      api?.pauseVideo();
-    }
-  });
-  window.ipcRenderer.on("watchdeck:seek-to", (_, t: number) => {
-    api!.seekTo(t);
-  });
-  window.ipcRenderer.on("watchdeck:seek-by", (_, t: number) => {
-    api!.seekBy(t);
-  });
-  window.ipcRenderer.on("watchdeck:shuffle", () => {
-    document
-      .querySelector<HTMLElement & { queue: { shuffle: () => void } }>(
-        "ytmusic-player-bar"
-      )
-      ?.queue.shuffle();
-  });
-
-  const isShuffled = () => {
-    const isShuffled =
-      document
-        .querySelector<HTMLElement>("ytmusic-player-bar")
-        ?.attributes.getNamedItem("shuffle-on") ?? null;
-
-    return isShuffled !== null;
-  };
-
-  window.ipcRenderer.on("watchdeck:get-shuffle", () => {
-    window.ipcRenderer.send("watchdeck:get-shuffle-response", isShuffled());
-  });
-
-  window.ipcRenderer.on(
-    "watchdeck:update-like",
-    (_, status: "LIKE" | "DISLIKE" = "LIKE") => {
-      document
-        .querySelector<
-          HTMLElement & { updateLikeStatus: (status: string) => void }
-        >("#like-button-renderer")
-        ?.updateLikeStatus(status);
-    }
-  );
-  window.ipcRenderer.on("watchdeck:switch-repeat", (_, repeat = 1) => {
-    for (let i = 0; i < repeat; i++) {
-      document
-        .querySelector<HTMLElement & { onRepeatButtonClick: () => void }>(
-          "ytmusic-player-bar"
-        )
-        ?.onRepeatButtonClick();
-    }
-  });
-  window.ipcRenderer.on("watchdeck:update-volume", (_, volume: number) => {
-    document
-      .querySelector<HTMLElement & { updateVolume: (volume: number) => void }>(
-        "ytmusic-player-bar"
-      )
-      ?.updateVolume(volume);
-  });
-
-  const isFullscreen = () => {
-    const isFullscreen =
-      document
-        .querySelector<HTMLElement>("ytmusic-player-bar")
-        ?.attributes.getNamedItem("player-fullscreened") ?? null;
-
-    return isFullscreen !== null;
-  };
-
-  const clickFullscreenButton = (isFullscreenValue: boolean) => {
-    const fullscreen = isFullscreen();
-    if (isFullscreenValue === fullscreen) {
-      return;
-    }
-
-    if (fullscreen) {
-      document.querySelector<HTMLElement>(".exit-fullscreen-button")?.click();
-    } else {
-      document.querySelector<HTMLElement>(".fullscreen-button")?.click();
-    }
-  };
-
-  window.ipcRenderer.on("watchdeck:get-fullscreen", () => {
-    window.ipcRenderer.send("watchdeck:set-fullscreen", isFullscreen());
-  });
-
-  window.ipcRenderer.on(
-    "watchdeck:click-fullscreen-button",
-    (_, fullscreen: boolean | undefined) => {
-      clickFullscreenButton(fullscreen ?? false);
-    }
-  );
-
-  window.ipcRenderer.on("watchdeck:toggle-mute", (_) => {
-    document
-      .querySelector<HTMLElement & { onVolumeClick: () => void }>(
-        "ytmusic-player-bar"
-      )
-      ?.onVolumeClick();
-  });
-
-  window.ipcRenderer.on("watchdeck:get-queue", () => {
-    const queue = document.querySelector<QueueElement>("#queue");
-    window.ipcRenderer.send("watchdeck:get-queue-response", {
-      autoPlaying: queue?.queue.autoPlaying,
-      continuation: queue?.queue.continuation,
-      items: queue?.queue.getItems(),
-    } satisfies QueueResponse);
-  });
-
-  window.ipcRenderer.on(
-    "watchdeck:add-to-queue",
-    (_, videoId: string, queueInsertPosition: string) => {
-      const queue = document.querySelector<QueueElement>("#queue");
-      const app = document.querySelector<MusicPlayerAppElement>("ytmusic-app");
-      if (!app) {
-        return;
-      }
-
-      const store = queue?.queue.store.store;
-      if (!store) {
-        return;
-      }
-
-      app.networkManager
-        .fetch("/music/get_queue", {
-          queueContextParams: store.getState().queue.queueContextParams,
-          queueInsertPosition,
-          videoIds: [videoId],
-        })
-        .then((result) => {
-          if (
-            result &&
-            typeof result === "object" &&
-            "queueDatas" in result &&
-            Array.isArray(result.queueDatas)
-          ) {
-            const queueItems = store.getState().queue.items;
-            const queueItemsLength = queueItems.length ?? 0;
-            queue?.dispatch({
-              payload: {
-                index:
-                  queueInsertPosition === "INSERT_AFTER_CURRENT_VIDEO"
-                    ? queueItems.findIndex(
-                        (it) =>
-                          (
-                            it.playlistPanelVideoRenderer ||
-                            it.playlistPanelVideoWrapperRenderer
-                              ?.primaryRenderer.playlistPanelVideoRenderer
-                          )?.selected
-                      ) + 1 || queueItemsLength
-                    : queueItemsLength,
-                items: result.queueDatas
-                  .map((it) =>
-                    typeof it === "object" && it && "content" in it
-                      ? it.content
-                      : null
-                  )
-                  .filter(Boolean),
-                nextQueueItemId: store.getState().queue.nextQueueItemId,
-                shouldAssignIds: true,
-                shuffleEnabled: false,
-              },
-              type: "ADD_ITEMS",
-            });
-          }
-        });
-    }
-  );
-  window.ipcRenderer.on(
-    "watchdeck:move-in-queue",
-    (_, fromIndex: number, toIndex: number) => {
-      const queue = document.querySelector<QueueElement>("#queue");
-      queue?.dispatch({
-        payload: {
-          fromIndex,
-          toIndex,
-        },
-        type: "MOVE_ITEM",
-      });
-    }
-  );
-  window.ipcRenderer.on("watchdeck:remove-from-queue", (_, index: number) => {
-    const queue = document.querySelector<QueueElement>("#queue");
-    queue?.dispatch({
-      payload: index,
-      type: "REMOVE_ITEM",
-    });
-  });
-  window.ipcRenderer.on("watchdeck:set-queue-index", (_, index: number) => {
-    const queue = document.querySelector<QueueElement>("#queue");
-    queue?.dispatch({
-      payload: index,
-      type: "SET_INDEX",
-    });
-  });
-  window.ipcRenderer.on("watchdeck:clear-queue", () => {
-    const queue = document.querySelector<QueueElement>("#queue");
-    queue?.queue.store.store.dispatch({
-      payload: { open: false },
-      type: "SET_PLAYER_PAGE_INFO",
-    });
-    queue?.dispatch({
-      type: "CLEAR",
-    });
-  });
-
-  window.ipcRenderer.on(
-    "watchdeck:search",
-    async (_, query: string, params?: string, continuation?: string) => {
-      const app = document.querySelector<MusicPlayerAppElement>("ytmusic-app");
-      const searchBox =
-        document.querySelector<SearchBoxElement>("ytmusic-search-box");
-
-      if (!app || !searchBox) {
-        return;
-      }
-
-      const result = await app.networkManager.fetch<
-        unknown,
-        {
-          query: string;
-          params?: string;
-          continuation?: string;
-          suggestStats?: unknown;
-        }
-      >("/search", {
-        continuation,
-        params,
-        query,
-        suggestStats: searchBox.getSearchboxStats(),
-      });
-
-      window.ipcRenderer.send("watchdeck:search-results", result);
-    }
-  );
-
-  const video = document.querySelector("video")!;
-  const audioContext = new AudioContext();
-  const audioSource = audioContext.createMediaElementSource(video);
-  audioSource.connect(audioContext.destination);
-
   for (const [id, plugin] of Object.entries(getAllLoadedRendererPlugins())) {
     if (typeof plugin.renderer !== "function") {
       await plugin.renderer?.onPlayerApiReady?.call(
         plugin.renderer,
-        api!,
+        pluginApi,
         createContext(id)
       );
     }
@@ -343,93 +85,8 @@ async function onApiLoaded() {
     );
   }
 
-  const audioCanPlayEventDispatcher = () => {
-    document.dispatchEvent(
-      new CustomEvent("watchdeck:audio-can-play", {
-        detail: {
-          audioContext,
-          audioSource,
-        },
-      })
-    );
-  };
-
-  const loadstartListener = () => {
-    // Emit "audioCanPlay" for each video
-    video.addEventListener("canplaythrough", audioCanPlayEventDispatcher, {
-      once: true,
-    });
-  };
-
-  if (video.readyState === 4 /* HAVE_ENOUGH_DATA (loaded) */) {
-    audioCanPlayEventDispatcher();
-  }
-
-  video.addEventListener("loadstart", loadstartListener, { passive: true });
-
   window.ipcRenderer.send("watchdeck:player-api-loaded");
-
-  // Navigate to "Starting page"
-  const startingPage: string = window.mainConfig.get("options.startingPage");
-  if (startingPage && startingPages[startingPage]) {
-    document
-      .querySelector<MusicPlayerAppElement>("ytmusic-app")
-      ?.navigate(startingPages[startingPage]);
-  }
-
-  // Remove upgrade button
-  if (window.mainConfig.get("options.removeUpgradeButton")) {
-    const itemsSelector = "ytmusic-guide-section-renderer #items";
-    let selector = "ytmusic-guide-entry-renderer:last-child";
-
-    const upgradeBtnIcon = document.querySelector<SVGGElement>(
-      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome'
-    );
-    if (upgradeBtnIcon) {
-      const path = upgradeBtnIcon.firstChild as SVGPathElement;
-      const data = path.getAttribute("d")!.slice(0, 15);
-      selector = `ytmusic-guide-entry-renderer:has(> tp-yt-paper-item > yt-icon path[d^="${data}"])`;
-    }
-
-    const styles = document.createElement("style");
-    styles.textContent = `${itemsSelector} ${selector} { display: none; }`;
-
-    document.head.append(styles);
-  }
-
-  // Hide / Force show like buttons
-  const likeButtonsOptions: string = window.mainConfig.get(
-    "options.likeButtons"
-  );
-  if (likeButtonsOptions) {
-    const style = document.createElement("style");
-    style.textContent = `
-      ytmusic-player-bar[is-mweb-player-bar-modernization-enabled] .middle-controls-buttons.ytmusic-player-bar, #like-button-renderer {
-        display: ${
-          likeButtonsOptions === "hide" ? "none" : "inherit"
-        } !important;
-      }
-      ytmusic-player-bar[is-mweb-player-bar-modernization-enabled] .middle-controls.ytmusic-player-bar {
-        justify-content: ${
-          likeButtonsOptions === "hide" ? "flex-start" : "space-between"
-        } !important;
-      }`;
-
-    document.head.append(style);
-  }
-
-  // Swap like button order
-  if (window.mainConfig.get("options.swapLikeButtonsOrder")) {
-    const style = document.createElement("style");
-    style.textContent = `
-      #like-button-renderer {
-        display: inline-flex;
-        flex-direction: row-reverse;
-      }`;
-
-    document.head.append(style);
-  }
-}
+};
 
 const defineWdTransElements = () => {
   customElements.define(
@@ -491,11 +148,8 @@ const main = async () => {
     }
   );
 
-  // Wait for complete load of the api
-  await listenForApiLoad();
-
-  // Blocks the "Are You Still There?" popup by setting the last active time to Date.now every 15min
-  setInterval(() => (window._lact = Date.now()), 900_000);
+  setupVideoInfo();
+  setupVideoControls();
 
   // Setup back to front logger
   if (window.electronIs.dev()) {
@@ -505,48 +159,43 @@ const main = async () => {
   }
 };
 
+/**
+ * Waits for the site to mount its player, then starts the plugins that need it.
+ *
+ * The site creates the player on the first video and keeps it afterwards, so this
+ * runs once; the `video-info` provider follows later replacements on its own.
+ */
 const initObserver = async () => {
-  // check document.documentElement is ready
   await new Promise<void>((resolve) => {
     if (document.readyState === "loading") {
-      document.addEventListener(
-        "DOMContentLoaded",
-        () => {
-          resolve();
-        },
-        {
-          once: true,
-        }
-      );
+      document.addEventListener("DOMContentLoaded", () => resolve(), {
+        once: true,
+      });
     } else {
       resolve();
     }
   });
 
   const observer = new MutationObserver(() => {
-    const playerApi = document.querySelector<Element & MusicPlayer>(
-      "#movie_player"
-    );
-    if (playerApi) {
+    if (api) {
       observer.disconnect();
-
-      // Inject song-info provider
-      setupSongInfo(playerApi);
-      const dataLoadedListener = (name: string) => {
-        if (!firstDataLoaded && name === "dataloaded") {
-          firstDataLoaded = true;
-          playerApi.removeEventListener("videodatachange", dataLoadedListener);
-        }
-      };
-      playerApi.addEventListener("videodatachange", dataLoadedListener);
-
-      if (isPluginLoaded && !isApiLoaded) {
-        api = playerApi;
-        isApiLoaded = true;
-
-        onApiLoaded();
-      }
+      return;
     }
+
+    const player = getPlayer();
+    if (!player) {
+      return;
+    }
+
+    bindPlayer();
+
+    if (!isPluginLoaded) {
+      // The plugins are still loading; keep watching and wire up after
+      return;
+    }
+
+    observer.disconnect();
+    void onApiLoaded(player);
   });
 
   observer.observe(document.documentElement, {

@@ -11,12 +11,7 @@ import { jwt } from "hono/jwt";
 import { WebSocketServer } from "ws";
 
 import { APPLICATION_NAME } from "@/i18n";
-import { registerCallback } from "@/providers/song-info";
-import type {
-  LikeType,
-  RepeatMode,
-  VolumeState,
-} from "@/types/datahost-get-state";
+import { registerCallback } from "@/providers/video-info";
 import { createBackend } from "@/utils";
 
 import { AuthStrategy } from "../config";
@@ -35,23 +30,10 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.songInfo = songInfo;
     });
 
-    ctx.ipc.on("watchdeck:player-api-loaded", () => {
-      ctx.ipc.send("watchdeck:setup-seeked-listener");
-      ctx.ipc.send("watchdeck:setup-time-changed-listener");
-      ctx.ipc.send("watchdeck:setup-repeat-changed-listener");
-      ctx.ipc.send("watchdeck:setup-like-changed-listener");
-      ctx.ipc.send("watchdeck:setup-volume-changed-listener");
-      ctx.ipc.send("watchdeck:setup-shuffle-changed-listener");
-    });
-
-    ctx.ipc.on(
-      "watchdeck:repeat-changed",
-      (mode: RepeatMode) => (this.currentRepeatMode = mode)
-    );
-
     ctx.ipc.on(
       "watchdeck:volume-changed",
-      (newVolumeState: VolumeState) => (this.volumeState = newVolumeState)
+      (state: { isMuted: boolean; volume: number }) =>
+        (this.volumeState = { isMuted: state.isMuted, state: state.volume })
     );
 
     this.run(config);
@@ -130,11 +112,6 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.app,
       backendCtx,
       () => this.songInfo,
-      () => this.currentRepeatMode,
-      () =>
-        backendCtx.window.webContents.executeJavaScript(
-          'document.querySelector("#like-button-renderer")?.likeStatus'
-        ) as Promise<LikeType>,
       () => this.volumeState
     );
     registerAuth(this.app, backendCtx);

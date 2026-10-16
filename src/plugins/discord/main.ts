@@ -1,6 +1,6 @@
 import { app } from "electron";
 
-import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import { createBackend } from "@/utils";
 
 import { TIME_UPDATE_DEBOUNCE_MS } from "./constants";
@@ -41,7 +41,7 @@ export const backend = createBackend<
         registerCallback((songInfo, event) => {
           if (!discordService?.isConnected()) return;
 
-          if (event !== SongInfoEvent.TimeChanged) {
+          if (event !== VideoInfoEvent.TimeChanged) {
             discordService?.updateActivity(songInfo);
             this.lastTimeUpdateSent = Date.now();
           } else {

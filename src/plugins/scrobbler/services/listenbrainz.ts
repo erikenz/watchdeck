@@ -1,7 +1,7 @@
 import { net } from "electron";
 
 import { APPLICATION_NAME } from "@/i18n";
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { ScrobblerPluginConfig } from "../index";
 import type { SetConfType } from "../main";
@@ -38,7 +38,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
   }
 
   override setNowPlaying(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     _setConfig: SetConfType
   ): void {
@@ -49,12 +49,12 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody("playing_now", songInfo, config);
+    const body = createRequestBody("playing_now", songInfo);
     submitListen(body, config);
   }
 
   override addScrobble(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     _setConfig: SetConfType
   ): void {
@@ -65,7 +65,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody("single", songInfo, config);
+    const body = createRequestBody("single", songInfo);
     body.payload[0].listened_at = Math.trunc(Date.now() / 1000);
 
     submitListen(body, config);
@@ -74,29 +74,17 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
 
 function createRequestBody(
   listenType: string,
-  songInfo: SongInfo,
-  config: ScrobblerPluginConfig
+  songInfo: VideoInfo
 ): ListenbrainzRequestBody {
-  const title =
-    config.alternativeTitles && songInfo.alternativeTitle !== undefined
-      ? songInfo.alternativeTitle
-      : songInfo.title;
-
-  const artist =
-    config.alternativeArtist && songInfo.tags?.at(0) !== undefined
-      ? songInfo.tags?.at(0)
-      : songInfo.artist;
-
   const trackMetadata = {
     additional_info: {
-      duration: songInfo.songDuration,
+      duration: songInfo.duration,
       media_player: `${APPLICATION_NAME} Desktop App`,
       origin_url: songInfo.url,
       submission_client: `${APPLICATION_NAME} Desktop App - Scrobbler Plugin`,
     },
-    artist_name: artist,
-    release_name: songInfo.album ?? undefined,
-    track_name: title,
+    artist_name: songInfo.channel,
+    track_name: songInfo.title,
   };
 
   return {

@@ -24,14 +24,12 @@ import { t } from "@/i18n";
 import { getNetFetchAsFetch } from "@/plugins/utils/main";
 import {
   registerCallback,
-  cleanupName,
-  getImage,
-  MediaType,
-  SongInfoEvent,
-} from "@/providers/song-info";
-import type { SongInfo } from "@/providers/song-info";
+  getThumbnailImage,
+  VideoInfoEvent,
+} from "@/providers/video-info";
 import type { BackendContext } from "@/types/contexts";
 import type { GetPlayerResponse } from "@/types/get-player-response";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { DownloaderPluginConfig } from "../index";
 import { DefaultPresetList, VideoFormatList } from "../types";
@@ -43,7 +41,11 @@ import {
   setBadge,
 } from "./utils";
 
-type CustomSongInfo = SongInfo & { trackId?: string };
+/** The metadata a download writes into its file name and its tags. */
+type CustomSongInfo = Pick<
+  VideoInfo,
+  "channel" | "duration" | "imageSrc" | "title" | "videoId" | "views"
+> & { trackId?: string };
 
 const ffmpeg = lazyVar.lazy(async () =>
   (await import("@ffmpeg.wasm/main")).createFFmpeg({
@@ -282,8 +284,8 @@ function downloadSongOnFinishSetup({
 
   const defaultDownloadFolder = app.getPath("downloads");
 
-  registerCallback((songInfo: SongInfo, event) => {
-    if (event === SongInfoEvent.TimeChanged) {
+  registerCallback((songInfo: VideoInfo, event) => {
+    if (event === VideoInfoEvent.TimeChanged) {
       const elapsedSeconds = songInfo.elapsedSeconds ?? 0;
       if (elapsedSeconds > time) {
         time = elapsedSeconds;
@@ -320,7 +322,7 @@ function downloadSongOnFinishSetup({
       }
 
       currentUrl = songInfo.url;
-      duration = songInfo.songDuration;
+      duration = songInfo.duration;
       time = 0;
     }
   });
@@ -370,15 +372,11 @@ async function downloadSongUnsafe(
   }
 
   const metadata = getMetadata(info);
-  if (metadata.album === "N/A") {
-    metadata.album = "";
-  }
-
   metadata.trackId = trackId;
 
   const dir =
     playlistFolder || config.downloadFolder || app.getPath("downloads");
-  const name = `${metadata.artist ? `${metadata.artist} - ` : ""}${
+  const name = `${metadata.channel ? `${metadata.channel} - ` : ""}${
     metadata.title
   }`;
   setName(name);
@@ -451,7 +449,7 @@ async function downloadSongUnsafe(
 
   console.info(
     t("plugins.downloader.backend.feedback.download-info", {
-      artist: metadata.artist,
+      artist: metadata.channel,
       title: metadata.title,
       videoId: metadata.videoId,
     })
@@ -593,7 +591,12 @@ async function iterableStreamToProcessedUint8Array(
 }
 
 const getCoverBuffer = async (url: string) => {
-  const nativeImage = cropMaxWidth(await getImage(url));
+  const thumbnail = await getThumbnailImage(url);
+  if (!thumbnail) {
+    return null;
+  }
+
+  const nativeImage = cropMaxWidth(thumbnail);
   return nativeImage && !nativeImage.isEmpty() ? nativeImage.toPNG() : null;
 };
 
@@ -608,11 +611,7 @@ async function writeID3(
 
     // Create the metadata tags
     tags.title = metadata.title;
-    tags.artist = metadata.artist;
-
-    if (metadata.album) {
-      tags.album = metadata.album;
-    }
+    tags.artist = metadata.channel;
 
     const coverBuffer = await getCoverBuffer(metadata.imageSrc ?? "");
     if (coverBuffer) {
@@ -632,7 +631,7 @@ async function writeID3(
 
     return NodeID3.write(tags, buffer);
   } catch (error: unknown) {
-    sendError(error as Error, `${metadata.artist} - ${metadata.title}`);
+    sendError(error as Error, `${metadata.channel} - ${metadata.title}`);
     return null;
   }
 }
@@ -838,8 +837,7 @@ function getFFmpegMetadataArgs(metadata: CustomSongInfo) {
 
   return [
     ...(metadata.title ? ["-metadata", `title=${metadata.title}`] : []),
-    ...(metadata.artist ? ["-metadata", `artist=${metadata.artist}`] : []),
-    ...(metadata.album ? ["-metadata", `album=${metadata.album}`] : []),
+    ...(metadata.channel ? ["-metadata", `artist=${metadata.channel}`] : []),
     ...(metadata.trackId ? ["-metadata", `track=${metadata.trackId}`] : []),
   ];
 }
@@ -866,15 +864,11 @@ const getVideoId = (url: URL | string): string | null => {
 };
 
 const getMetadata = (info: YTMusic.TrackInfo): CustomSongInfo => ({
-  album: info.player_overlays?.browser_media_session?.as(
-    YTNodes.BrowserMediaSession
-  ).album?.text,
-  artist: cleanupName(info.basic_info.author!),
+  channel: info.basic_info.author!,
+  duration: info.basic_info.duration!,
   imageSrc: info.basic_info.thumbnail?.find((t) => !t.url.endsWith(".webp"))
     ?.url,
-  mediaType: MediaType.Audio,
-  songDuration: info.basic_info.duration!,
-  title: cleanupName(info.basic_info.title!),
+  title: info.basic_info.title!,
   videoId: info.basic_info.id!,
   views: info.basic_info.view_count!,
 });

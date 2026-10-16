@@ -1,4 +1,4 @@
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { ScrobblerPluginConfig } from "../index";
 import type { SetConfType } from "../main";
@@ -12,13 +12,13 @@ export abstract class ScrobblerBase {
   ): Promise<ScrobblerPluginConfig>;
 
   public abstract setNowPlaying(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     setConfig: SetConfType
   ): void;
 
   public abstract addScrobble(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     setConfig: SetConfType
   ): void;

@@ -9,6 +9,46 @@ Ultracite's presets are on and the deviation list is deliberately temporary. Two
 - [ ] **Review every `oxlint-disable` comment.** Each one is a scoped exception with a written reason. Re-check whether the disable is still needed, or whether the code can be fixed to satisfy the rule. Find them with `grep -rn 'oxlint-disable' src tools vite-plugins *.ts`.
 - [ ] **Review the deviation list in `oxlint.config.ts`.** It carries 117 rules that Ultracite enables and this tree currently violates (~2000 findings), because the plugins kept for reference (§R5/Q2) are still music-era code. An entry should disappear when the code it covers is reworked: fix the findings, then delete the entry. Re-measure by flipping the value back to `'error'` and running `pnpm exec ultracite check`.
 
+## P1 — the player bridge (what it left behind)
+
+`video-info` / `video-controls` retired the music-era providers. Each of these was watched during
+the rework and deliberately left for the plugin or phase that owns it:
+
+- [ ] **The page's audio graph is gone.** The inherited entry built an `AudioContext` +
+  `MediaElementSource` for the page's `<video>` on every session and announced it as
+  `watchdeck:audio-can-play`. Routing cross-origin media through Web Audio is a good way to
+  silence playback, and the four plugins that listened (`visualizer`, `equalizer`,
+  `custom-output-device`, `skip-silences`) are dormant, so nothing is created any more. Rebuild it
+  as a per-plugin opt-in when the first of those is reworked.
+- [ ] **`MusicPlayer` (`src/types/music-player.ts`) still backs the plugin API**
+  (`onPlayerApiReady`): twelve plugins implement that hook against the wide inherited type, while
+  the app's own code now uses `YouTubePlayer` (`src/types/youtube-player.ts`). Shrink the
+  plugin-facing type as each plugin is reworked (§R5), and delete the type files that nothing
+  imports any more with it: `datahost-get-state.ts`, `queue.ts`, `search-box-element.ts`,
+  `music-player-app-element.ts`, `yt-web-components.d.ts`.
+- [ ] **`providers/dom-elements.ts` is YouTube Music's menu-popup selector** (`getSongMenu`), used
+  by the downloader / picture-in-picture / playback-speed renderers to add buttons to the site's
+  menu. Delete it with the rework that re-hosts those buttons.
+- [ ] **Scrobbler**: `scrobbleOtherMedia` / `alternativeTitles` / `alternativeArtist` went away with
+  the metadata that fed them (YouTube Music's `musicVideoType`, `alternativeTitle`, `tags`), so
+  scrobbles now always use the video's own title and channel. Re-establish a classification filter
+  from YouTube data (`videoDetails.musicVideoType` exists on watch pages) if music scrobbling is
+  wanted. The three i18n labels are still in the 41 locale files.
+- [ ] **Downloader**: titles and channels are no longer run through `cleanupName` (the music
+  suffix stripper), and `CustomSongInfo` is now a `Pick<VideoInfo, ...>` instead of the old song
+  shape. Its YouTube rework (§R5) owns the rest.
+- [ ] **api-server**: routes for features YouTube has no equivalent for (queue manipulation,
+  shuffle, repeat, like/dislike, the player's fullscreen button, the site's search box) are gone,
+  and `/fullscreen` now means the *window*. The paths that remain keep their historical
+  `/api/v1/song-info` names; rename them with the plugin's rework if it ships.
+- [ ] **The idle-timer hack is gone.** The inherited entry set `window._lact` every 15 minutes to
+  suppress YouTube Music's "are you still there?" prompt. It was never verified against
+  youtube.com's own "Video paused. Continue watching?" dialog; if that dialog turns up in use, the
+  fix belongs next to the autoplay guard.
+- [ ] **MPRIS absolute seek** (`playerctl position <µs>`) does nothing: `shortcuts/mpris.ts` guards
+  it on a track-id match that playerctl's `SetPosition` does not satisfy, while relative seek and
+  play/pause/volume work. The plugin's rework owns it.
+
 ## Dependencies pinned behind an API change
 
 These four are held at the version the current code is written against. Each one belongs to a plugin that P1/P2 rebuilds, so the migration is deliberately not done yet — the entry goes away with the rewrite:

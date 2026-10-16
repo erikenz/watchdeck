@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { BrowserWindow, dialog, net } from "electron";
 
 import { t } from "@/i18n";
-import type { SongInfo } from "@/providers/song-info";
+import type { VideoInfo } from "@/types/video-info";
 
 import type { ScrobblerPluginConfig } from "../index";
 import type { SetConfType } from "../main";
@@ -81,7 +81,7 @@ export class LastFmScrobbler extends ScrobblerBase {
   }
 
   override setNowPlaying(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     setConfig: SetConfType
   ): void {
@@ -97,7 +97,7 @@ export class LastFmScrobbler extends ScrobblerBase {
   }
 
   override addScrobble(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     setConfig: SetConfType
   ): void {
@@ -116,7 +116,7 @@ export class LastFmScrobbler extends ScrobblerBase {
   }
 
   private async postSongDataToAPI(
-    songInfo: SongInfo,
+    songInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     data: LastFmData,
     setConfig: SetConfType
@@ -126,21 +126,10 @@ export class LastFmScrobbler extends ScrobblerBase {
       await this.createSession(config, setConfig);
     }
 
-    const title =
-      config.alternativeTitles && songInfo.alternativeTitle !== undefined
-        ? songInfo.alternativeTitle
-        : songInfo.title;
-
-    const artist =
-      config.alternativeArtist && songInfo.tags?.at(0) !== undefined
-        ? songInfo.tags?.at(0)
-        : songInfo.artist;
-
     const postData: LastFmSongData = {
-      track: title,
-      duration: songInfo.songDuration,
-      artist,
-      ...(songInfo.album ? { album: songInfo.album } : undefined), // Will be undefined if current song is a video
+      track: songInfo.title,
+      duration: songInfo.duration,
+      artist: songInfo.channel,
       api_key: config.scrobblers.lastfm.apiKey,
       sk: config.scrobblers.lastfm.sessionKey,
       format: "json",

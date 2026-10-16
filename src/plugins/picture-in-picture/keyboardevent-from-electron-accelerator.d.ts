@@ -1,4 +1,4 @@
-declare module 'keyboardevent-from-electron-accelerator' {
+declare module "keyboardevent-from-electron-accelerator" {
   interface KeyboardEvent {
     key?: string;
     code?: string;

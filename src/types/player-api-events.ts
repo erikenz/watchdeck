@@ -1,4 +1,4 @@
-import type { WatchNextResponse } from '@/types/music-player-desktop-internal';
+import type { WatchNextResponse } from "@/types/music-player-desktop-internal";
 
 export interface AlbumDetails {
   responseContext: ResponseContext;
@@ -258,13 +258,13 @@ export type VideoDataChangeValue = Record<string, unknown> & {
   /**
    * Internal variable (for album data)
    **/
-  ['wdWatchNextResponse']?: WatchNextResponse;
+  ["wdWatchNextResponse"]?: WatchNextResponse;
 };
 
 export interface PlayerAPIEvents {
   videodatachange: {
     value: VideoDataChangeValue;
-    name: 'dataloaded' | 'dataupdated';
+    name: "dataloaded" | "dataupdated";
   };
   onStateChange: number;
 }

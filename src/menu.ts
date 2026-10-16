@@ -1,32 +1,32 @@
-import prompt from 'custom-electron-prompt';
-import { app, clipboard, dialog, Menu, shell } from 'electron';
-import type { BrowserWindow, MenuItem } from 'electron';
-import is from 'electron-is';
-import { satisfies } from 'semver';
-import { languageResources } from 'virtual:i18n';
-import { allPlugins } from 'virtual:plugins';
+import prompt from "custom-electron-prompt";
+import { app, clipboard, dialog, Menu, shell } from "electron";
+import type { BrowserWindow, MenuItem } from "electron";
+import is from "electron-is";
+import { satisfies } from "semver";
+import { languageResources } from "virtual:i18n";
+import { allPlugins } from "virtual:plugins";
 
-import { APPLICATION_NAME, setLanguage, t } from '@/i18n';
+import { APPLICATION_NAME, setLanguage, t } from "@/i18n";
 
-import packageJson from '../package.json';
-import * as config from './config';
-import { getAllMenuTemplate, loadAllMenuPlugins } from './loader/menu';
-import { restart } from './providers/app-controls';
-import { startingPages } from './providers/extracted-data';
-import promptOptions from './providers/prompt-options';
+import packageJson from "../package.json";
+import * as config from "./config";
+import { getAllMenuTemplate, loadAllMenuPlugins } from "./loader/menu";
+import { restart } from "./providers/app-controls";
+import { startingPages } from "./providers/extracted-data";
+import promptOptions from "./providers/prompt-options";
 
 export type MenuTemplate = Electron.MenuItemConstructorOptions[];
 
 // True only if in-app-menu was loaded on launch
-const inAppMenuActive = await config.plugins.isEnabled('in-app-menu');
+const inAppMenuActive = await config.plugins.isEnabled("in-app-menu");
 
 const pluginEnabledMenu = async (
   plugin: string,
-  label = '',
+  label = "",
   description?: string,
   isNew = false,
   hasSubmenu = false,
-  refreshMenu?: () => void,
+  refreshMenu?: () => void
 ): Promise<Electron.MenuItemConstructorOptions> => ({
   checked: await config.plugins.isEnabled(plugin),
   click(item: Electron.MenuItem) {
@@ -41,20 +41,20 @@ const pluginEnabledMenu = async (
     }
   },
   label: label || plugin,
-  sublabel: isNew ? t('main.menu.plugins.new') : undefined,
+  sublabel: isNew ? t("main.menu.plugins.new") : undefined,
   toolTip: description,
-  type: 'checkbox',
+  type: "checkbox",
 });
 
 export const refreshMenu = async (win: BrowserWindow) => {
   await setApplicationMenu(win);
   if (inAppMenuActive) {
-    win.webContents.send('refresh-in-app-menu');
+    win.webContents.send("refresh-in-app-menu");
   }
 };
 
 export const mainMenuTemplate = async (
-  win: BrowserWindow,
+  win: BrowserWindow
 ): Promise<MenuTemplate> => {
   const innerRefreshMenu = async () => refreshMenu(win);
   const { navigationHistory } = win.webContents;
@@ -80,7 +80,7 @@ export const mainMenuTemplate = async (
             pluginDescription,
             isNew,
             true,
-            innerRefreshMenu,
+            innerRefreshMenu
           ),
         ] as const;
       }
@@ -89,23 +89,23 @@ export const mainMenuTemplate = async (
         id,
         {
           label: pluginLabel,
-          sublabel: isNew ? t('main.menu.plugins.new') : undefined,
+          sublabel: isNew ? t("main.menu.plugins.new") : undefined,
           submenu: [
             await pluginEnabledMenu(
               id,
-              t('main.menu.plugins.enabled'),
+              t("main.menu.plugins.enabled"),
               undefined,
               false,
               true,
-              innerRefreshMenu,
+              innerRefreshMenu
             ),
-            { type: 'separator' },
+            { type: "separator" },
             ...template,
           ],
           toolTip: pluginDescription,
         } satisfies Electron.MenuItemConstructorOptions,
       ] as const;
-    }),
+    })
   );
 
   const availablePlugins = Object.keys(await allPlugins());
@@ -136,9 +136,9 @@ export const mainMenuTemplate = async (
           pluginDescription,
           isNew,
           true,
-          innerRefreshMenu,
+          innerRefreshMenu
         );
-      }),
+      })
   );
 
   const langResources = await languageResources();
@@ -146,216 +146,216 @@ export const mainMenuTemplate = async (
 
   return [
     {
-      label: t('main.menu.plugins.label'),
+      label: t("main.menu.plugins.label"),
       submenu: pluginMenus,
     },
     {
-      label: t('main.menu.options.label'),
+      label: t("main.menu.options.label"),
       submenu: [
         {
-          checked: config.get('options.autoUpdates'),
+          checked: config.get("options.autoUpdates"),
           click(item: MenuItem) {
-            config.setMenuOption('options.autoUpdates', item.checked);
+            config.setMenuOption("options.autoUpdates", item.checked);
           },
-          label: t('main.menu.options.submenu.auto-update'),
-          type: 'checkbox',
+          label: t("main.menu.options.submenu.auto-update"),
+          type: "checkbox",
         },
         {
-          checked: config.get('options.resumeOnStart'),
+          checked: config.get("options.resumeOnStart"),
           click(item: MenuItem) {
-            config.setMenuOption('options.resumeOnStart', item.checked);
+            config.setMenuOption("options.resumeOnStart", item.checked);
           },
-          label: t('main.menu.options.submenu.resume-on-start'),
-          type: 'checkbox',
+          label: t("main.menu.options.submenu.resume-on-start"),
+          type: "checkbox",
         },
         {
-          label: t('main.menu.options.submenu.starting-page.label'),
+          label: t("main.menu.options.submenu.starting-page.label"),
           submenu: (() => {
             const subMenuArray: Electron.MenuItemConstructorOptions[] =
               Object.keys(startingPages).map((name) => ({
-                checked: config.get('options.startingPage') === name,
+                checked: config.get("options.startingPage") === name,
                 click() {
-                  config.set('options.startingPage', name);
+                  config.set("options.startingPage", name);
                 },
                 label: name,
-                type: 'radio',
+                type: "radio",
               }));
             subMenuArray.unshift({
-              checked: config.get('options.startingPage') === '',
+              checked: config.get("options.startingPage") === "",
               click() {
-                config.set('options.startingPage', '');
+                config.set("options.startingPage", "");
               },
-              label: t('main.menu.options.submenu.starting-page.unset'),
-              type: 'radio',
+              label: t("main.menu.options.submenu.starting-page.unset"),
+              type: "radio",
             });
             return subMenuArray;
           })(),
         },
         {
-          label: t('main.menu.options.submenu.visual-tweaks.label'),
+          label: t("main.menu.options.submenu.visual-tweaks.label"),
           submenu: [
             {
-              checked: config.get('options.removeUpgradeButton'),
+              checked: config.get("options.removeUpgradeButton"),
               click(item: MenuItem) {
                 config.setMenuOption(
-                  'options.removeUpgradeButton',
-                  item.checked,
+                  "options.removeUpgradeButton",
+                  item.checked
                 );
               },
               label: t(
-                'main.menu.options.submenu.visual-tweaks.submenu.remove-upgrade-button',
+                "main.menu.options.submenu.visual-tweaks.submenu.remove-upgrade-button"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
             {
               async click() {
                 const output = await prompt(
                   {
                     title: t(
-                      'main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.label',
+                      "main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.label"
                     ),
                     label: t(
-                      'main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.prompt.label',
+                      "main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.prompt.label"
                     ),
-                    value: config.get('options.customWindowTitle') || '',
-                    type: 'input',
+                    value: config.get("options.customWindowTitle") || "",
+                    type: "input",
                     inputAttrs: {
-                      type: 'text',
+                      type: "text",
                       placeholder: t(
-                        'main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.prompt.placeholder',
+                        "main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.prompt.placeholder",
                         {
                           applicationName: APPLICATION_NAME,
-                        },
+                        }
                       ),
                     },
                     width: 500,
                     ...promptOptions(),
                   },
-                  win,
+                  win
                 );
-                if (typeof output === 'string') {
-                  config.setMenuOption('options.customWindowTitle', output);
+                if (typeof output === "string") {
+                  config.setMenuOption("options.customWindowTitle", output);
                 }
               },
               label: t(
-                'main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.label',
+                "main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.label"
               ),
             },
             {
               label: t(
-                'main.menu.options.submenu.visual-tweaks.submenu.like-buttons.label',
+                "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.label"
               ),
               submenu: [
                 {
-                  checked: !config.get('options.likeButtons'),
+                  checked: !config.get("options.likeButtons"),
                   click() {
-                    config.set('options.likeButtons', '');
+                    config.set("options.likeButtons", "");
                   },
                   label: t(
-                    'main.menu.options.submenu.visual-tweaks.submenu.like-buttons.default',
+                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.default"
                   ),
-                  type: 'radio',
+                  type: "radio",
                 },
                 {
-                  checked: config.get('options.likeButtons') === 'force',
+                  checked: config.get("options.likeButtons") === "force",
                   click() {
-                    config.set('options.likeButtons', 'force');
+                    config.set("options.likeButtons", "force");
                   },
                   label: t(
-                    'main.menu.options.submenu.visual-tweaks.submenu.like-buttons.force-show',
+                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.force-show"
                   ),
-                  type: 'radio',
+                  type: "radio",
                 },
                 {
-                  checked: config.get('options.likeButtons') === 'hide',
+                  checked: config.get("options.likeButtons") === "hide",
                   click() {
-                    config.set('options.likeButtons', 'hide');
+                    config.set("options.likeButtons", "hide");
                   },
                   label: t(
-                    'main.menu.options.submenu.visual-tweaks.submenu.like-buttons.hide',
+                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.hide"
                   ),
-                  type: 'radio',
+                  type: "radio",
                 },
                 {
-                  checked: config.get('options.swapLikeButtonsOrder'),
+                  checked: config.get("options.swapLikeButtonsOrder"),
                   click(item: MenuItem) {
                     config.setMenuOption(
-                      'options.swapLikeButtonsOrder',
-                      item.checked,
+                      "options.swapLikeButtonsOrder",
+                      item.checked
                     );
                   },
                   label: t(
-                    'main.menu.options.submenu.visual-tweaks.submenu.like-buttons.swap',
+                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.swap"
                   ),
-                  type: 'checkbox',
+                  type: "checkbox",
                 },
               ],
             },
             {
               label: t(
-                'main.menu.options.submenu.visual-tweaks.submenu.theme.label',
+                "main.menu.options.submenu.visual-tweaks.submenu.theme.label"
               ),
               submenu: [
-                ...((config.get('options.themes')?.length ?? 0) === 0
+                ...((config.get("options.themes")?.length ?? 0) === 0
                   ? [
                       {
                         label: t(
-                          'main.menu.options.submenu.visual-tweaks.submenu.theme.submenu.no-theme',
+                          "main.menu.options.submenu.visual-tweaks.submenu.theme.submenu.no-theme"
                         ),
                       },
                     ]
                   : []),
-                ...(config.get('options.themes')?.map((theme: string) => ({
+                ...(config.get("options.themes")?.map((theme: string) => ({
                   async click() {
                     const { response } = await dialog.showMessageBox(win, {
-                      type: 'question',
+                      type: "question",
                       defaultId: 1,
                       title: t(
-                        'main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.remove-theme',
+                        "main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.remove-theme"
                       ),
                       message: t(
-                        'main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.remove-theme-message',
-                        { theme },
+                        "main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.remove-theme-message",
+                        { theme }
                       ),
                       buttons: [
                         t(
-                          'main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.button.cancel',
+                          "main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.button.cancel"
                         ),
                         t(
-                          'main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.button.remove',
+                          "main.menu.options.submenu.visual-tweaks.submenu.theme.dialog.button.remove"
                         ),
                       ],
                     });
 
                     if (response === 1) {
                       config.set(
-                        'options.themes',
+                        "options.themes",
                         config
-                          .get('options.themes')
-                          ?.filter((t) => t !== theme) ?? [],
+                          .get("options.themes")
+                          ?.filter((t) => t !== theme) ?? []
                       );
                       innerRefreshMenu();
                     }
                   },
                   label: theme,
-                  type: 'normal' as const,
+                  type: "normal" as const,
                 })) ?? []),
-                { type: 'separator' },
+                { type: "separator" },
                 {
                   async click() {
                     const { filePaths } = await dialog.showOpenDialog({
-                      filters: [{ name: 'CSS Files', extensions: ['css'] }],
-                      properties: ['openFile', 'multiSelections'],
+                      filters: [{ name: "CSS Files", extensions: ["css"] }],
+                      properties: ["openFile", "multiSelections"],
                     });
                     if (filePaths) {
-                      config.set('options.themes', filePaths);
+                      config.set("options.themes", filePaths);
                       innerRefreshMenu();
                     }
                   },
                   label: t(
-                    'main.menu.options.submenu.visual-tweaks.submenu.theme.submenu.import-css-file',
+                    "main.menu.options.submenu.visual-tweaks.submenu.theme.submenu.import-css-file"
                   ),
-                  type: 'normal',
+                  type: "normal",
                 },
               ],
             },
@@ -370,38 +370,38 @@ export const mainMenuTemplate = async (
               app.requestSingleInstanceLock();
             }
           },
-          label: t('main.menu.options.submenu.single-instance-lock'),
-          type: 'checkbox',
+          label: t("main.menu.options.submenu.single-instance-lock"),
+          type: "checkbox",
         },
         {
-          checked: config.get('options.alwaysOnTop'),
+          checked: config.get("options.alwaysOnTop"),
           click(item: MenuItem) {
-            config.setMenuOption('options.alwaysOnTop', item.checked);
+            config.setMenuOption("options.alwaysOnTop", item.checked);
             win.setAlwaysOnTop(item.checked);
           },
-          label: t('main.menu.options.submenu.always-on-top'),
-          type: 'checkbox',
+          label: t("main.menu.options.submenu.always-on-top"),
+          type: "checkbox",
         },
         ...((is.windows() || is.linux()
           ? [
               {
-                checked: config.get('options.hideMenu'),
+                checked: config.get("options.hideMenu"),
                 click(item) {
-                  config.setMenuOption('options.hideMenu', item.checked);
-                  if (item.checked && !config.get('options.hideMenuWarned')) {
+                  config.setMenuOption("options.hideMenu", item.checked);
+                  if (item.checked && !config.get("options.hideMenuWarned")) {
                     dialog.showMessageBox(win, {
-                      type: 'info',
+                      type: "info",
                       title: t(
-                        'main.menu.options.submenu.hide-menu.dialog.title',
+                        "main.menu.options.submenu.hide-menu.dialog.title"
                       ),
                       message: t(
-                        'main.menu.options.submenu.hide-menu.dialog.message',
+                        "main.menu.options.submenu.hide-menu.dialog.message"
                       ),
                     });
                   }
                 },
-                label: t('main.menu.options.submenu.hide-menu.label'),
-                type: 'checkbox',
+                label: t("main.menu.options.submenu.hide-menu.label"),
+                type: "checkbox",
               },
             ]
           : []) satisfies Electron.MenuItemConstructorOptions[]),
@@ -410,165 +410,165 @@ export const mainMenuTemplate = async (
             // https://www.electronjs.org/docs/api/app#appsetloginitemsettingssettings-macos-windows
             [
               {
-                checked: config.get('options.startAtLogin'),
+                checked: config.get("options.startAtLogin"),
                 click(item) {
-                  config.setMenuOption('options.startAtLogin', item.checked);
+                  config.setMenuOption("options.startAtLogin", item.checked);
                 },
-                label: t('main.menu.options.submenu.start-at-login'),
-                type: 'checkbox',
+                label: t("main.menu.options.submenu.start-at-login"),
+                type: "checkbox",
               },
             ]
           : []) satisfies Electron.MenuItemConstructorOptions[]),
         {
-          label: t('main.menu.options.submenu.tray.label'),
+          label: t("main.menu.options.submenu.tray.label"),
           submenu: [
             {
-              checked: !config.get('options.tray'),
+              checked: !config.get("options.tray"),
               click() {
-                config.setMenuOption('options.tray', false);
-                config.setMenuOption('options.appVisible', true);
+                config.setMenuOption("options.tray", false);
+                config.setMenuOption("options.appVisible", true);
               },
-              label: t('main.menu.options.submenu.tray.submenu.disabled'),
-              type: 'radio',
+              label: t("main.menu.options.submenu.tray.submenu.disabled"),
+              type: "radio",
             },
             {
               checked:
-                config.get('options.tray') && config.get('options.appVisible'),
+                config.get("options.tray") && config.get("options.appVisible"),
               click() {
-                config.setMenuOption('options.tray', true);
-                config.setMenuOption('options.appVisible', true);
+                config.setMenuOption("options.tray", true);
+                config.setMenuOption("options.appVisible", true);
               },
               label: t(
-                'main.menu.options.submenu.tray.submenu.enabled-and-show-app',
+                "main.menu.options.submenu.tray.submenu.enabled-and-show-app"
               ),
-              type: 'radio',
+              type: "radio",
             },
             {
               checked:
-                config.get('options.tray') && !config.get('options.appVisible'),
+                config.get("options.tray") && !config.get("options.appVisible"),
               click() {
-                config.setMenuOption('options.tray', true);
-                config.setMenuOption('options.appVisible', false);
+                config.setMenuOption("options.tray", true);
+                config.setMenuOption("options.appVisible", false);
               },
               label: t(
-                'main.menu.options.submenu.tray.submenu.enabled-and-hide-app',
+                "main.menu.options.submenu.tray.submenu.enabled-and-hide-app"
               ),
-              type: 'radio',
+              type: "radio",
             },
-            { type: 'separator' },
+            { type: "separator" },
             {
-              checked: config.get('options.trayClickPlayPause'),
+              checked: config.get("options.trayClickPlayPause"),
               click(item: MenuItem) {
                 config.setMenuOption(
-                  'options.trayClickPlayPause',
-                  item.checked,
+                  "options.trayClickPlayPause",
+                  item.checked
                 );
               },
               label: t(
-                'main.menu.options.submenu.tray.submenu.play-pause-on-click',
+                "main.menu.options.submenu.tray.submenu.play-pause-on-click"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
           ],
         },
         {
-          label: `${t('main.menu.options.submenu.language.label')} (Language)`,
+          label: `${t("main.menu.options.submenu.language.label")} (Language)`,
           submenu: [
             {
               click() {
-                const url = 'https://bit.ly/48n5YF7';
+                const url = "https://bit.ly/48n5YF7";
                 shell.openExternal(url);
               },
               label: t(
-                'main.menu.options.submenu.language.submenu.to-help-translate',
+                "main.menu.options.submenu.language.submenu.to-help-translate"
               ),
-              type: 'normal',
+              type: "normal",
             } as Electron.MenuItemConstructorOptions,
           ].concat(
             availableLanguages
               .map((lang): Electron.MenuItemConstructorOptions => ({
-                checked: (config.get('options.language') ?? 'en') === lang,
+                checked: (config.get("options.language") ?? "en") === lang,
                 click() {
-                  config.setMenuOption('options.language', lang);
+                  config.setMenuOption("options.language", lang);
                   refreshMenu(win);
                   setLanguage(lang);
                   dialog.showMessageBox(win, {
-                    title: t('main.menu.options.submenu.language.dialog.title'),
+                    title: t("main.menu.options.submenu.language.dialog.title"),
                     message: t(
-                      'main.menu.options.submenu.language.dialog.message',
+                      "main.menu.options.submenu.language.dialog.message"
                     ),
                   });
                 },
-                label: `${langResources[lang].translation.language?.name ?? 'Unknown'} (${langResources[lang].translation.language?.['local-name'] ?? 'Unknown'})`,
-                type: 'checkbox',
+                label: `${langResources[lang].translation.language?.name ?? "Unknown"} (${langResources[lang].translation.language?.["local-name"] ?? "Unknown"})`,
+                type: "checkbox",
               }))
-              .sort((a, b) => a.label!.localeCompare(b.label!)),
+              .sort((a, b) => a.label!.localeCompare(b.label!))
           ),
         },
-        { type: 'separator' },
+        { type: "separator" },
         {
-          label: t('main.menu.options.submenu.advanced-options.label'),
+          label: t("main.menu.options.submenu.advanced-options.label"),
           submenu: [
             {
               async click(item: MenuItem) {
                 await setProxy(item, win);
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.set-proxy.label',
+                "main.menu.options.submenu.advanced-options.submenu.set-proxy.label"
               ),
-              type: 'normal',
+              type: "normal",
             },
             {
-              checked: config.get('options.overrideUserAgent'),
+              checked: config.get("options.overrideUserAgent"),
               click(item: MenuItem) {
-                config.setMenuOption('options.overrideUserAgent', item.checked);
+                config.setMenuOption("options.overrideUserAgent", item.checked);
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.override-user-agent',
+                "main.menu.options.submenu.advanced-options.submenu.override-user-agent"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
             {
-              checked: config.get('options.disableHardwareAcceleration'),
+              checked: config.get("options.disableHardwareAcceleration"),
               click(item: MenuItem) {
                 config.setMenuOption(
-                  'options.disableHardwareAcceleration',
-                  item.checked,
+                  "options.disableHardwareAcceleration",
+                  item.checked
                 );
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.disable-hardware-acceleration',
+                "main.menu.options.submenu.advanced-options.submenu.disable-hardware-acceleration"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
             {
-              checked: config.get('options.restartOnConfigChanges'),
+              checked: config.get("options.restartOnConfigChanges"),
               click(item: MenuItem) {
                 config.setMenuOption(
-                  'options.restartOnConfigChanges',
-                  item.checked,
+                  "options.restartOnConfigChanges",
+                  item.checked
                 );
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.restart-on-config-changes',
+                "main.menu.options.submenu.advanced-options.submenu.restart-on-config-changes"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
             {
-              checked: config.get('options.autoResetAppCache'),
+              checked: config.get("options.autoResetAppCache"),
               click(item: MenuItem) {
-                config.setMenuOption('options.autoResetAppCache', item.checked);
+                config.setMenuOption("options.autoResetAppCache", item.checked);
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.auto-reset-app-cache',
+                "main.menu.options.submenu.advanced-options.submenu.auto-reset-app-cache"
               ),
-              type: 'checkbox',
+              type: "checkbox",
             },
-            { type: 'separator' },
+            { type: "separator" },
             is.macOS()
               ? {
                   label: t(
-                    'main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools',
+                    "main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools"
                   ),
                   // Cannot use "toggleDevTools" role in macOS
                   click() {
@@ -582,16 +582,16 @@ export const mainMenuTemplate = async (
                 }
               : {
                   label: t(
-                    'main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools',
+                    "main.menu.options.submenu.advanced-options.submenu.toggle-dev-tools"
                   ),
-                  role: 'toggleDevTools',
+                  role: "toggleDevTools",
                 },
             {
               click() {
                 config.edit();
               },
               label: t(
-                'main.menu.options.submenu.advanced-options.submenu.edit-config-json',
+                "main.menu.options.submenu.advanced-options.submenu.edit-config-json"
               ),
             },
           ],
@@ -599,52 +599,52 @@ export const mainMenuTemplate = async (
       ],
     },
     {
-      label: t('main.menu.view.label'),
+      label: t("main.menu.view.label"),
       submenu: [
         {
-          label: t('main.menu.view.submenu.reload'),
-          role: 'reload',
+          label: t("main.menu.view.submenu.reload"),
+          role: "reload",
         },
         {
-          label: t('main.menu.view.submenu.force-reload'),
-          role: 'forceReload',
+          label: t("main.menu.view.submenu.force-reload"),
+          role: "forceReload",
         },
-        { type: 'separator' },
+        { type: "separator" },
         {
-          accelerator: 'CmdOrCtrl+=',
-          label: t('main.menu.view.submenu.zoom-in'),
-          role: 'zoomIn',
+          accelerator: "CmdOrCtrl+=",
+          label: t("main.menu.view.submenu.zoom-in"),
+          role: "zoomIn",
           visible: false,
         },
         {
-          accelerator: 'CmdOrCtrl+Plus',
-          label: t('main.menu.view.submenu.zoom-in'),
-          role: 'zoomIn',
+          accelerator: "CmdOrCtrl+Plus",
+          label: t("main.menu.view.submenu.zoom-in"),
+          role: "zoomIn",
         },
         {
-          accelerator: 'CmdOrCtrl+-',
-          label: t('main.menu.view.submenu.zoom-out'),
-          role: 'zoomOut',
+          accelerator: "CmdOrCtrl+-",
+          label: t("main.menu.view.submenu.zoom-out"),
+          role: "zoomOut",
         },
         {
-          accelerator: 'CmdOrCtrl+Shift+-',
-          label: t('main.menu.view.submenu.zoom-out'),
-          role: 'zoomOut',
+          accelerator: "CmdOrCtrl+Shift+-",
+          label: t("main.menu.view.submenu.zoom-out"),
+          role: "zoomOut",
           visible: false,
         },
         {
-          label: t('main.menu.view.submenu.reset-zoom'),
-          role: 'resetZoom',
+          label: t("main.menu.view.submenu.reset-zoom"),
+          role: "resetZoom",
         },
-        { type: 'separator' },
+        { type: "separator" },
         {
-          label: t('main.menu.view.submenu.toggle-fullscreen'),
-          role: 'togglefullscreen',
+          label: t("main.menu.view.submenu.toggle-fullscreen"),
+          role: "togglefullscreen",
         },
       ],
     },
     {
-      label: t('main.menu.navigation.label'),
+      label: t("main.menu.navigation.label"),
       submenu: [
         {
           click() {
@@ -652,7 +652,7 @@ export const mainMenuTemplate = async (
               navigationHistory.goBack();
             }
           },
-          label: t('main.menu.navigation.submenu.go-back'),
+          label: t("main.menu.navigation.submenu.go-back"),
         },
         {
           click() {
@@ -660,52 +660,52 @@ export const mainMenuTemplate = async (
               navigationHistory.goForward();
             }
           },
-          label: t('main.menu.navigation.submenu.go-forward'),
+          label: t("main.menu.navigation.submenu.go-forward"),
         },
         {
           click() {
             const currentURL = win.webContents.getURL();
             clipboard.writeText(currentURL);
           },
-          label: t('main.menu.navigation.submenu.copy-current-url'),
+          label: t("main.menu.navigation.submenu.copy-current-url"),
         },
         {
           click: restart,
-          label: t('main.menu.navigation.submenu.restart'),
+          label: t("main.menu.navigation.submenu.restart"),
         },
         {
-          label: t('main.menu.navigation.submenu.quit'),
-          role: 'quit',
+          label: t("main.menu.navigation.submenu.quit"),
+          role: "quit",
         },
       ],
     },
     {
-      label: t('main.menu.about'),
-      submenu: [{ role: 'about' }],
+      label: t("main.menu.about"),
+      submenu: [{ role: "about" }],
     },
   ];
 };
 export const setApplicationMenu = async (win: Electron.BrowserWindow) => {
   const menuTemplate: MenuTemplate = [...(await mainMenuTemplate(win))];
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     const { name } = app;
     menuTemplate.unshift({
       label: name,
       submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'selectAll' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { type: 'separator' },
-        { role: 'minimize' },
-        { role: 'close' },
-        { role: 'quit' },
+        { role: "about" },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideOthers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { role: "selectAll" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { type: "separator" },
+        { role: "minimize" },
+        { role: "close" },
+        { role: "quit" },
       ],
     });
   }
@@ -719,27 +719,27 @@ async function setProxy(item: Electron.MenuItem, win: BrowserWindow) {
     {
       inputAttrs: {
         placeholder: t(
-          'main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.placeholder',
+          "main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.placeholder"
         ),
-        type: 'url',
+        type: "url",
       },
       label: t(
-        'main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.label',
+        "main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.label"
       ),
       title: t(
-        'main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.title',
+        "main.menu.options.submenu.advanced-options.submenu.set-proxy.prompt.title"
       ),
-      type: 'input',
-      value: config.get('options.proxy'),
+      type: "input",
+      value: config.get("options.proxy"),
       width: 450,
       ...promptOptions(),
     },
-    win,
+    win
   );
 
-  if (typeof output === 'string') {
-    config.setMenuOption('options.proxy', output);
-    item.checked = output !== '';
+  if (typeof output === "string") {
+    config.setMenuOption("options.proxy", output);
+    item.checked = output !== "";
   } else {
     // User pressed cancel
     item.checked = !item.checked; // Reset checkbox

@@ -1,14 +1,14 @@
-import { autoUpdate, offset, size } from '@floating-ui/dom';
-import { useFloating } from 'solid-floating-ui';
-import { createSignal, Match, Show, Switch } from 'solid-js';
-import type { JSX } from 'solid-js/jsx-runtime';
-import { Portal } from 'solid-js/web';
-import { css } from 'solid-styled-components';
-import { Transition } from 'solid-transition-group';
+import { autoUpdate, offset, size } from "@floating-ui/dom";
+import { useFloating } from "solid-floating-ui";
+import { createSignal, Match, Show, Switch } from "solid-js";
+import type { JSX } from "solid-js/jsx-runtime";
+import { Portal } from "solid-js/web";
+import { css } from "solid-styled-components";
+import { Transition } from "solid-transition-group";
 
-import { cacheNoArgs } from '@/providers/decorators';
+import { cacheNoArgs } from "@/providers/decorators";
 
-import { Panel } from './Panel';
+import { Panel } from "./Panel";
 
 const itemStyle = cacheNoArgs(
   () => css`
@@ -39,14 +39,14 @@ const itemStyle = cacheNoArgs(
       background-color: rgba(255, 255, 255, 0.2);
     }
 
-    &[data-selected='true'] {
+    &[data-selected="true"] {
       background-color: rgba(255, 255, 255, 0.2);
     }
 
     & * {
       box-sizing: border-box;
     }
-  `,
+  `
 );
 
 const itemIconStyle = cacheNoArgs(
@@ -54,14 +54,14 @@ const itemIconStyle = cacheNoArgs(
     height: 32px;
     padding: 4px;
     color: white;
-  `,
+  `
 );
 
 const itemLabelStyle = cacheNoArgs(
   () => css`
     font-size: 12px;
     color: white;
-  `,
+  `
 );
 
 const itemChipStyle = cacheNoArgs(
@@ -81,7 +81,7 @@ const itemChipStyle = cacheNoArgs(
     font-size: 10px;
     font-weight: 500;
     line-height: 1;
-  `,
+  `
 );
 
 const toolTipStyle = cacheNoArgs(
@@ -99,7 +99,7 @@ const toolTipStyle = cacheNoArgs(
     background-color: rgba(25, 25, 25, 0.8);
     color: #f1f1f1;
     font-size: 10px;
-  `,
+  `
 );
 
 const popupStyle = cacheNoArgs(
@@ -113,7 +113,7 @@ const popupStyle = cacheNoArgs(
 
     z-index: 100000000;
     pointer-events: none;
-  `,
+  `
 );
 
 const animationStyle = cacheNoArgs(() => ({
@@ -157,21 +157,21 @@ interface BasePanelItemProps {
   commandId?: number;
 }
 type NormalPanelItemProps = BasePanelItemProps & {
-  type: 'normal';
+  type: "normal";
   onClick?: () => void;
 };
 type SubmenuItemProps = BasePanelItemProps & {
-  type: 'submenu';
+  type: "submenu";
   level: number[];
   children: JSX.Element;
 };
 type RadioPanelItemProps = BasePanelItemProps & {
-  type: 'radio';
+  type: "radio";
   checked: boolean;
   onChange?: (checked: boolean) => void;
 };
 type CheckboxPanelItemProps = BasePanelItemProps & {
-  type: 'checkbox';
+  type: "checkbox";
   checked: boolean;
   onChange?: (checked: boolean) => void;
 };
@@ -193,28 +193,28 @@ export const PanelItem = (props: PanelItemProps) => {
       size({
         apply({ rects, elements }) {
           elements.floating.style.setProperty(
-            '--max-width',
-            `${rects.reference.width}px`,
+            "--max-width",
+            `${rects.reference.width}px`
           );
         },
       }),
     ],
-    placement: 'bottom-start',
-    strategy: 'fixed',
+    placement: "bottom-start",
+    strategy: "fixed",
     whileElementsMounted: autoUpdate,
   });
 
   const handleHover = (event: MouseEvent) => {
     setToolTipOpen(true);
     event.target?.addEventListener(
-      'mouseleave',
+      "mouseleave",
       () => {
         setToolTipOpen(false);
       },
-      { once: true },
+      { once: true }
     );
 
-    if (props.type === 'submenu') {
+    if (props.type === "submenu") {
       const timer = setTimeout(() => {
         setOpen(true);
 
@@ -224,15 +224,15 @@ export const PanelItem = (props: PanelItemProps) => {
           mouseX = event.clientX;
           mouseY = event.clientY;
         };
-        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener("mousemove", onMouseMove);
 
         event.target?.addEventListener(
-          'mouseleave',
+          "mouseleave",
           () => {
             setTimeout(() => {
-              document.removeEventListener('mousemove', onMouseMove);
+              document.removeEventListener("mousemove", onMouseMove);
               const parents = getParents(
-                document.elementFromPoint(mouseX, mouseY),
+                document.elementFromPoint(mouseX, mouseY)
               );
 
               if (parents.includes(child())) {
@@ -240,50 +240,50 @@ export const PanelItem = (props: PanelItemProps) => {
                   const parents = getParents(event.target as HTMLElement);
                   const closestLevel =
                     parents.find((it) => it?.dataset?.level)?.dataset.level ??
-                    '';
+                    "";
                   const path = event.composedPath();
 
                   const isOtherItem = path.some(
                     (it) =>
                       it instanceof HTMLElement &&
-                      it.classList.contains(itemStyle()),
+                      it.classList.contains(itemStyle())
                   );
                   const isChild = closestLevel.startsWith(
-                    props.level.join('/'),
+                    props.level.join("/")
                   );
 
                   if (isOtherItem && !isChild) {
                     setOpen(false);
-                    document.removeEventListener('mousemove', onOtherHover);
+                    document.removeEventListener("mousemove", onOtherHover);
                   }
                 };
-                document.addEventListener('mousemove', onOtherHover);
+                document.addEventListener("mousemove", onOtherHover);
               } else {
                 setOpen(false);
               }
             }, 225);
           },
-          { once: true },
+          { once: true }
         );
       }, 225);
 
       event.target?.addEventListener(
-        'mouseleave',
+        "mouseleave",
         () => {
           clearTimeout(timer);
         },
-        { once: true },
+        { once: true }
       );
     }
   };
 
   const handleClick = async () => {
-    await window.ipcRenderer.invoke('watchdeck:menu-event', props.commandId);
-    if (props.type === 'radio') {
+    await window.ipcRenderer.invoke("watchdeck:menu-event", props.commandId);
+    if (props.type === "radio") {
       props.onChange?.(!props.checked);
-    } else if (props.type === 'checkbox') {
+    } else if (props.type === "checkbox") {
       props.onChange?.(!props.checked);
-    } else if (props.type === 'normal') {
+    } else if (props.type === "normal") {
       props.onClick?.();
     }
   };
@@ -297,7 +297,7 @@ export const PanelItem = (props: PanelItemProps) => {
       ref={setAnchor}
     >
       <Switch fallback={<div class={itemIconStyle()} />}>
-        <Match when={props.type === 'checkbox' && props.checked}>
+        <Match when={props.type === "checkbox" && props.checked}>
           <svg
             class={itemIconStyle()}
             fill="none"
@@ -312,10 +312,10 @@ export const PanelItem = (props: PanelItemProps) => {
             <path d="M5 12l5 5l10 -10" />
           </svg>
         </Match>
-        <Match when={props.type === 'radio' && props.checked}>
+        <Match when={props.type === "radio" && props.checked}>
           <svg
             class={itemIconStyle()}
-            style={{ padding: '6px' }}
+            style={{ padding: "6px" }}
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -325,10 +325,10 @@ export const PanelItem = (props: PanelItemProps) => {
             />
           </svg>
         </Match>
-        <Match when={props.type === 'radio' && !props.checked}>
+        <Match when={props.type === "radio" && !props.checked}>
           <svg
             class={itemIconStyle()}
-            style={{ padding: '6px' }}
+            style={{ padding: "6px" }}
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -343,7 +343,7 @@ export const PanelItem = (props: PanelItemProps) => {
       <Show fallback={<div />} when={props.chip}>
         <span class={itemChipStyle()}>{props.chip}</span>
       </Show>
-      <Show when={props.type === 'submenu'}>
+      <Show when={props.type === "submenu"}>
         <svg
           class={itemIconStyle()}
           fill="none"
@@ -359,13 +359,13 @@ export const PanelItem = (props: PanelItemProps) => {
         </svg>
         <Panel
           anchor={anchor()}
-          data-level={props.type === 'submenu' && props.level.join('/')}
+          data-level={props.type === "submenu" && props.level.join("/")}
           offset={{ mainAxis: 8 }}
           open={open()}
-          placement={'right-start'}
+          placement={"right-start"}
           ref={setChild}
         >
-          {props.type === 'submenu' && props.children}
+          {props.type === "submenu" && props.children}
         </Panel>
       </Show>
       <Show when={props.toolTip}>
@@ -374,8 +374,8 @@ export const PanelItem = (props: PanelItemProps) => {
             class={popupStyle()}
             ref={setToolTip}
             style={{
-              '--offset-x': `${position.x}px`,
-              '--offset-y': `${position.y}px`,
+              "--offset-x": `${position.x}px`,
+              "--offset-y": `${position.y}px`,
             }}
           >
             <Transition

@@ -1,30 +1,30 @@
-import type { WebSocketLike, upgradeWebSocket } from '@hono/node-server';
-import { createRoute, z } from '@hono/zod-openapi';
-import { app as electronApp } from 'electron';
-import type { Context, Next } from 'hono';
-import { verify } from 'hono/jwt';
-import type { WSContext } from 'hono/ws';
+import type { WebSocketLike, upgradeWebSocket } from "@hono/node-server";
+import { createRoute, z } from "@hono/zod-openapi";
+import { app as electronApp } from "electron";
+import type { Context, Next } from "hono";
+import { verify } from "hono/jwt";
+import type { WSContext } from "hono/ws";
 
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import type { BackendContext } from '@/types/contexts';
-import type { RepeatMode, VolumeState } from '@/types/datahost-get-state';
-import { LoggerPrefix } from '@/utils';
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import type { BackendContext } from "@/types/contexts";
+import type { RepeatMode, VolumeState } from "@/types/datahost-get-state";
+import { LoggerPrefix } from "@/utils";
 
-import { AuthStrategy } from '../../config';
-import type { APIServerConfig } from '../../config';
-import { API_VERSION } from '../api-version';
-import { JWTPayloadSchema } from '../scheme';
-import type { HonoApp } from '../types';
+import { AuthStrategy } from "../../config";
+import type { APIServerConfig } from "../../config";
+import { API_VERSION } from "../api-version";
+import { JWTPayloadSchema } from "../scheme";
+import type { HonoApp } from "../types";
 
 enum DataTypes {
-  PlayerInfo = 'PLAYER_INFO',
-  VideoChanged = 'VIDEO_CHANGED',
-  PlayerStateChanged = 'PLAYER_STATE_CHANGED',
-  PositionChanged = 'POSITION_CHANGED',
-  VolumeChanged = 'VOLUME_CHANGED',
-  RepeatChanged = 'REPEAT_CHANGED',
-  ShuffleChanged = 'SHUFFLE_CHANGED',
+  PlayerInfo = "PLAYER_INFO",
+  VideoChanged = "VIDEO_CHANGED",
+  PlayerStateChanged = "PLAYER_STATE_CHANGED",
+  PositionChanged = "POSITION_CHANGED",
+  VolumeChanged = "VOLUME_CHANGED",
+  RepeatChanged = "REPEAT_CHANGED",
+  ShuffleChanged = "SHUFFLE_CHANGED",
 }
 
 interface PlayerState {
@@ -40,10 +40,10 @@ interface PlayerState {
 export const register = (
   app: HonoApp,
   { getConfig, ipc }: BackendContext<APIServerConfig>,
-  uws: typeof upgradeWebSocket,
+  uws: typeof upgradeWebSocket
 ) => {
   let volumeState: VolumeState | undefined = undefined;
-  let repeat: RepeatMode = 'NONE';
+  let repeat: RepeatMode = "NONE";
   let shuffle = false;
   let lastSongInfo: SongInfo | undefined = undefined;
 
@@ -51,7 +51,7 @@ export const register = (
 
   const send = (type: DataTypes, state: Partial<PlayerState>) => {
     sockets.forEach((socket) =>
-      socket.send(JSON.stringify({ type, ...state })),
+      socket.send(JSON.stringify({ type, ...state }))
     );
   };
 
@@ -75,7 +75,7 @@ export const register = (
     shuffle,
   });
 
-  electronApp.once('before-quit', () => {
+  electronApp.once("before-quit", () => {
     send(DataTypes.PlayerStateChanged, {
       isPlaying: false,
       position: lastSongInfo?.elapsedSeconds ?? 0,
@@ -101,7 +101,7 @@ export const register = (
     lastSongInfo = { ...songInfo };
   });
 
-  ipc.on('watchdeck:volume-changed', (newVolumeState: VolumeState) => {
+  ipc.on("watchdeck:volume-changed", (newVolumeState: VolumeState) => {
     volumeState = newVolumeState;
     send(DataTypes.VolumeChanged, {
       volume: volumeState.state,
@@ -109,40 +109,40 @@ export const register = (
     });
   });
 
-  ipc.on('watchdeck:repeat-changed', (mode: RepeatMode) => {
+  ipc.on("watchdeck:repeat-changed", (mode: RepeatMode) => {
     repeat = mode;
     send(DataTypes.RepeatChanged, { repeat });
   });
 
-  ipc.on('watchdeck:seeked', (t: number) => {
+  ipc.on("watchdeck:seeked", (t: number) => {
     send(DataTypes.PositionChanged, { position: t });
   });
 
-  ipc.on('watchdeck:shuffle-changed', (newShuffle: boolean) => {
+  ipc.on("watchdeck:shuffle-changed", (newShuffle: boolean) => {
     shuffle = newShuffle;
     send(DataTypes.ShuffleChanged, { shuffle });
   });
 
   app.openapi(
     createRoute({
-      method: 'get',
+      method: "get",
       path: `/api/${API_VERSION}/ws`,
-      summary: 'websocket endpoint',
-      description: 'WebSocket endpoint for real-time updates',
+      summary: "websocket endpoint",
+      description: "WebSocket endpoint for real-time updates",
       request: {
         query: z.object({
           token: z
             .string()
             .openapi({
               description:
-                'Authentication token. Required when the API server authStrategy is not NONE; optional otherwise.',
+                "Authentication token. Required when the API server authStrategy is not NONE; optional otherwise.",
             })
             .optional(),
         }),
       },
       responses: {
         101: {
-          description: 'Switching Protocols',
+          description: "Switching Protocols",
         },
       },
     }),
@@ -151,15 +151,15 @@ export const register = (
         const config = await getConfig();
 
         if (config.authStrategy !== AuthStrategy.NONE) {
-          const token = ctx.req.query('token');
+          const token = ctx.req.query("token");
 
           if (!token) {
-            ws.close(1008, 'Unauthorized');
+            ws.close(1008, "Unauthorized");
             return;
           }
 
           try {
-            const payload = await verify(token, config.secret, 'HS256');
+            const payload = await verify(token, config.secret, "HS256");
             const parsedPayload =
               await JWTPayloadSchema.safeParseAsync(payload);
 
@@ -167,16 +167,16 @@ export const register = (
               !parsedPayload.success ||
               !config.authorizedClients.includes(parsedPayload.data.id)
             ) {
-              ws.close(1008, 'Unauthorized');
+              ws.close(1008, "Unauthorized");
               return;
             }
           } catch (err) {
             console.error(
               LoggerPrefix,
-              'WebSocket authentication failed:',
-              err,
+              "WebSocket authentication failed:",
+              err
             );
-            ws.close(1008, 'Unauthorized');
+            ws.close(1008, "Unauthorized");
             return;
           }
         }
@@ -192,13 +192,13 @@ export const register = (
               repeat,
               shuffle,
             }),
-          }),
+          })
         );
       },
 
       onClose(_, ws) {
         sockets.delete(ws);
       },
-    })) as (ctx: Context, next: Next) => Promise<Response>,
+    })) as (ctx: Context, next: Next) => Promise<Response>
   );
 };

@@ -1,11 +1,12 @@
-import '@total-typescript/ts-reset';
+import "@total-typescript/ts-reset";
+import type { ipcRenderer as electronIpcRenderer } from "electron";
+import type is from "electron-is";
+import type { trustedTypes } from "trusted-types";
 
-import type * as config from './config';
-import type { t } from '@/i18n';
-import type { VideoDataChanged } from '@/types/video-data-changed';
-import type { ipcRenderer as electronIpcRenderer } from 'electron';
-import type is from 'electron-is';
-import type { trustedTypes } from 'trusted-types';
+import type { t } from "@/i18n";
+import type { VideoDataChanged } from "@/types/video-data-changed";
+
+import type * as config from "./config";
 
 declare global {
   interface Compressor {
@@ -14,8 +15,8 @@ declare global {
   }
 
   interface DocumentEventMap {
-    'watchdeck:audio-can-play': CustomEvent<Compressor>;
-    'videodatachange': CustomEvent<VideoDataChanged>;
+    "watchdeck:audio-can-play": CustomEvent<Compressor>;
+    videodatachange: CustomEvent<VideoDataChanged>;
   }
 
   interface Window {
@@ -39,7 +40,7 @@ declare global {
 }
 
 // import { Howl as _Howl } from 'howler';
-declare module 'howler' {
+declare module "howler" {
   interface Howl {
     _sounds: {
       _paused: boolean;

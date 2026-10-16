@@ -13,10 +13,10 @@ export const DownloadButton = (props: {
         class="style-scope yt-icon"
         preserveAspectRatio="xMidYMid meet"
         style={{
-          'display': 'block',
-          'height': '100%',
-          'pointer-events': 'none',
-          'width': '100%',
+          display: "block",
+          height: "100%",
+          "pointer-events": "none",
+          width: "100%",
         }}
         viewBox="0 0 24 24"
       >

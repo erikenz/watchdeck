@@ -1,12 +1,12 @@
-import prompt from 'custom-electron-prompt';
+import prompt from "custom-electron-prompt";
 
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import promptOptions from '@/providers/prompt-options';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import promptOptions from "@/providers/prompt-options";
+import type { MenuContext } from "@/types/contexts";
 
-import { defaultAuthProxyConfig } from './config';
-import type { AuthProxyConfig } from './config';
+import { defaultAuthProxyConfig } from "./config";
+import type { AuthProxyConfig } from "./config";
 
 export const onMenu = async ({
   getConfig,
@@ -22,22 +22,22 @@ export const onMenu = async ({
         const newHostname =
           (await prompt(
             {
-              title: t('plugins.auth-proxy-adapter.prompt.hostname.title'),
-              label: t('plugins.auth-proxy-adapter.prompt.hostname.label'),
+              title: t("plugins.auth-proxy-adapter.prompt.hostname.title"),
+              label: t("plugins.auth-proxy-adapter.prompt.hostname.label"),
               value: config.hostname,
-              type: 'input',
+              type: "input",
               width: 380,
               ...promptOptions(),
             },
-            window,
+            window
           )) ??
           config.hostname ??
           defaultAuthProxyConfig.hostname;
 
         setConfig({ ...config, hostname: newHostname });
       },
-      label: t('plugins.auth-proxy-adapter.menu.hostname.label'),
-      type: 'normal',
+      label: t("plugins.auth-proxy-adapter.menu.hostname.label"),
+      type: "normal",
     },
     {
       async click() {
@@ -46,23 +46,23 @@ export const onMenu = async ({
         const newPort =
           (await prompt(
             {
-              title: t('plugins.auth-proxy-adapter.prompt.port.title'),
-              label: t('plugins.auth-proxy-adapter.prompt.port.label'),
+              title: t("plugins.auth-proxy-adapter.prompt.port.title"),
+              label: t("plugins.auth-proxy-adapter.prompt.port.label"),
               value: config.port,
-              type: 'counter',
+              type: "counter",
               counterOptions: { minimum: 0, maximum: 65535 },
               width: 380,
               ...promptOptions(),
             },
-            window,
+            window
           )) ??
           config.port ??
           defaultAuthProxyConfig.port;
 
         setConfig({ ...config, port: newPort });
       },
-      label: t('plugins.auth-proxy-adapter.menu.port.label'),
-      type: 'normal',
+      label: t("plugins.auth-proxy-adapter.menu.port.label"),
+      type: "normal",
     },
   ];
 };

@@ -1,9 +1,9 @@
-import { t } from '@/i18n';
+import { t } from "@/i18n";
 import type {
   BackendContext,
   PreloadContext,
   RendererContext,
-} from '@/types/contexts';
+} from "@/types/contexts";
 import type {
   PluginDef,
   PluginConfig,
@@ -11,9 +11,9 @@ import type {
   PluginLifecycleSimple,
   PluginLifecycle,
   RendererPluginLifecycle,
-} from '@/types/plugins';
+} from "@/types/plugins";
 
-export const LoggerPrefix = '[YTMusic]';
+export const LoggerPrefix = "[YTMusic]";
 
 export const createPlugin = <
   BackendProperties,
@@ -27,10 +27,10 @@ export const createPlugin = <
     RendererProperties,
     Config
   > & {
-    config?: Omit<Config, 'enabled'> & {
+    config?: Omit<Config, "enabled"> & {
       enabled: boolean;
     };
-  },
+  }
 ) => def;
 
 export const createBackend = <
@@ -39,7 +39,7 @@ export const createBackend = <
 >(
   back: {
     [Key in keyof BackendProperties]: BackendProperties[Key];
-  } & PluginLifecycle<Config, BackendContext<Config>, BackendProperties>,
+  } & PluginLifecycle<Config, BackendContext<Config>, BackendProperties>
 ) => back;
 
 export const createPreload = <
@@ -48,7 +48,7 @@ export const createPreload = <
 >(
   preload: {
     [Key in keyof PreloadProperties]: PreloadProperties[Key];
-  } & PluginLifecycle<Config, PreloadContext<Config>, PreloadProperties>,
+  } & PluginLifecycle<Config, PreloadContext<Config>, PreloadProperties>
 ) => preload;
 
 export const createRenderer = <
@@ -61,21 +61,21 @@ export const createRenderer = <
     Config,
     RendererContext<Config>,
     RendererProperties
-  >,
+  >
 ) => renderer;
 
 type Options<Config extends PluginConfig> =
-  | { ctx: 'backend'; context: BackendContext<Config> }
-  | { ctx: 'preload'; context: PreloadContext<Config> }
-  | { ctx: 'renderer'; context: RendererContext<Config> };
+  | { ctx: "backend"; context: BackendContext<Config> }
+  | { ctx: "preload"; context: PreloadContext<Config> }
+  | { ctx: "renderer"; context: RendererContext<Config> };
 
 export const startPlugin = async <Config extends PluginConfig>(
   id: string,
   def: PluginDef<unknown, unknown, unknown, Config>,
-  options: Options<Config>,
+  options: Options<Config>
 ) => {
   const lifecycle =
-    typeof def[options.ctx] === 'function'
+    typeof def[options.ctx] === "function"
       ? (def[options.ctx] as PluginLifecycleSimple<Config, unknown>)
       : (
           def[options.ctx] as PluginLifecycleExtra<
@@ -88,9 +88,9 @@ export const startPlugin = async <Config extends PluginConfig>(
   try {
     // HACK: for bind 'this' to context
     const defContext = def[options.ctx];
-    if (defContext && typeof defContext !== 'function') {
+    if (defContext && typeof defContext !== "function") {
       Object.entries(defContext).forEach(([key, value]) => {
-        if (typeof value === 'function') {
+        if (typeof value === "function") {
           // oxlint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-call,typescript/no-unsafe-member-access
           defContext[key as keyof typeof defContext] = value.bind(defContext);
         }
@@ -101,26 +101,26 @@ export const startPlugin = async <Config extends PluginConfig>(
 
     await lifecycle?.call(
       defContext,
-      options.context as Config & typeof options.context,
+      options.context as Config & typeof options.context
     );
 
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.executed-at-ms', {
+      t("common.console.plugins.executed-at-ms", {
         contextName: options.ctx,
         ms: (performance.now() - start).toFixed(2),
         pluginName: id,
-      }),
+      })
     );
 
     return lifecycle ? true : null;
   } catch (error) {
     console.error(
       LoggerPrefix,
-      t('common.console.plugins.execute-failed', {
+      t("common.console.plugins.execute-failed", {
         pluginName: id,
         contextName: options.ctx,
-      }),
+      })
     );
     console.trace(error);
     return false;
@@ -130,12 +130,12 @@ export const startPlugin = async <Config extends PluginConfig>(
 export const stopPlugin = async <Config extends PluginConfig>(
   id: string,
   def: PluginDef<unknown, unknown, unknown, Config>,
-  options: Options<Config>,
+  options: Options<Config>
 ) => {
   if (!def || !def[options.ctx]) {
     return false;
   }
-  if (typeof def[options.ctx] === 'function') {
+  if (typeof def[options.ctx] === "function") {
     return false;
   }
 
@@ -151,26 +151,26 @@ export const stopPlugin = async <Config extends PluginConfig>(
     const start = performance.now();
     await stop.call(
       def[options.ctx],
-      options.context as Config & typeof options.context,
+      options.context as Config & typeof options.context
     );
 
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.executed-at-ms', {
+      t("common.console.plugins.executed-at-ms", {
         contextName: options.ctx,
         ms: performance.now() - start,
         pluginName: id,
-      }),
+      })
     );
 
     return true;
   } catch (error) {
     console.error(
       LoggerPrefix,
-      t('common.console.plugins.execute-failed', {
+      t("common.console.plugins.execute-failed", {
         pluginName: id,
         contextName: options.ctx,
-      }),
+      })
     );
     console.trace(error);
     return false;

@@ -3,7 +3,7 @@
  * identifies that app in Discord's UI — register a Watchdeck application
  * and replace this before shipping the plugin to users.
  */
-export const clientId = '1177081335727267940';
+export const clientId = "1177081335727267940";
 /**
  * Throttle time for progress updates in milliseconds
  */
@@ -15,13 +15,13 @@ export const TIME_UPDATE_DEBOUNCE_MS = 5000;
 /**
  * Filler character for padding short Hangul strings (Discord requires min 2 chars)
  */
-export const HANGUL_FILLER = '\u3164';
+export const HANGUL_FILLER = "\u3164";
 
 /**
  * Enum for keys used in TimerManager.
  */
 export enum TimerKey {
-  ClearActivity = 'clearActivity', // Timer to clear activity when paused
-  UpdateTimeout = 'updateTimeout', // Timer for throttled activity updates
-  DiscordConnectRetry = 'discordConnectRetry', // Timer for Discord connection retries
+  ClearActivity = "clearActivity", // Timer to clear activity when paused
+  UpdateTimeout = "updateTimeout", // Timer for throttled activity updates
+  DiscordConnectRetry = "discordConnectRetry", // Timer for Discord connection retries
 }

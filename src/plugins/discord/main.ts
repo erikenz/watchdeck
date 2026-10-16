@@ -1,11 +1,11 @@
-import { app } from 'electron';
+import { app } from "electron";
 
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import { createBackend } from '@/utils';
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import { createBackend } from "@/utils";
 
-import { TIME_UPDATE_DEBOUNCE_MS } from './constants';
-import { DiscordService } from './discord-service';
-import type { DiscordPluginConfig } from './index';
+import { TIME_UPDATE_DEBOUNCE_MS } from "./constants";
+import { DiscordService } from "./discord-service";
+import type { DiscordPluginConfig } from "./index";
 
 export let discordService = null as DiscordService | null;
 
@@ -35,7 +35,7 @@ export const backend = createBackend<
     discordService = new DiscordService(ctx.window, config);
 
     if (config.enabled) {
-      ctx.window.once('ready-to-show', () => {
+      ctx.window.once("ready-to-show", () => {
         discordService?.connect(!config.autoReconnect);
 
         registerCallback((songInfo, event) => {
@@ -55,11 +55,11 @@ export const backend = createBackend<
       });
     }
 
-    ctx.ipc.on('watchdeck:player-api-loaded', () => {
-      ctx.ipc.send('watchdeck:setup-time-changed-listener');
+    ctx.ipc.on("watchdeck:player-api-loaded", () => {
+      ctx.ipc.send("watchdeck:setup-time-changed-listener");
     });
 
-    app.on('before-quit', () => {
+    app.on("before-quit", () => {
       discordService?.cleanup();
     });
   },

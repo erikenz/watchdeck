@@ -1,17 +1,17 @@
-import { contextBridge, webFrame } from 'electron';
-import type { BrowserWindow } from 'electron';
+import { contextBridge, webFrame } from "electron";
+import type { BrowserWindow } from "electron";
 
-import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { createPlugin } from "@/utils";
 
 import {
   isBlockerEnabled,
   loadTrackerBlockerEngine,
   unloadTrackerBlockerEngine,
-} from './blocker';
-import { inject, isInjected } from './injectors/inject';
-import injectCliqzPreload from './injectors/inject-cliqz-preload';
-import { blockers } from './types';
+} from "./blocker";
+import { inject, isInjected } from "./injectors/inject";
+import injectCliqzPreload from "./injectors/inject-cliqz-preload";
+import { blockers } from "./types";
 
 export interface TrackerBlockerConfig {
   /**
@@ -43,8 +43,8 @@ export interface TrackerBlockerConfig {
 }
 
 export default createPlugin({
-  name: () => t('plugins.do-not-track.name'),
-  description: () => t('plugins.do-not-track.description'),
+  name: () => t("plugins.do-not-track.name"),
+  description: () => t("plugins.do-not-track.description"),
   restartNeeded: false,
   // The assertion below widens this object's literals to the plugin config
   // type (without it TS narrows e.g. `blocker` to the literal).
@@ -61,10 +61,10 @@ export default createPlugin({
 
     return [
       {
-        label: t('plugins.do-not-track.menu.blocker'),
+        label: t("plugins.do-not-track.menu.blocker"),
         submenu: Object.values(blockers).map((blocker) => ({
           label: blocker,
-          type: 'radio',
+          type: "radio",
           checked: (config.blocker || blockers.WithBlocklists) === blocker,
           click() {
             setConfig({ blocker });
@@ -84,7 +84,7 @@ export default createPlugin({
           window.webContents.session,
           config.cache,
           config.additionalBlockLists,
-          config.disableDefaultLists,
+          config.disableDefaultLists
         );
       }
     },
@@ -103,7 +103,7 @@ export default createPlugin({
             this.mainWindow.webContents.session,
             newConfig.cache,
             newConfig.additionalBlockLists,
-            newConfig.disableDefaultLists,
+            newConfig.disableDefaultLists
           );
         }
       }

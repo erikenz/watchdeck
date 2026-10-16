@@ -6,7 +6,7 @@ const domParser = new DOMParser();
  * @returns The DOM element
  */
 export const ElementFromHtml = (html: string): HTMLElement =>
-  domParser.parseFromString(html, 'text/html').body
+  domParser.parseFromString(html, "text/html").body
     .firstElementChild as HTMLElement;
 
 /**
@@ -15,7 +15,7 @@ export const ElementFromHtml = (html: string): HTMLElement =>
  * @returns The image element
  */
 export const ImageElementFromSrc = (src: string): HTMLImageElement => {
-  const image = document.createElement('img');
+  const image = document.createElement("img");
   image.src = src;
   return image;
 };

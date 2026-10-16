@@ -1,23 +1,23 @@
-import nextIcon from '@assets/media-icons-black/next.png?asset&asarUnpack';
-import pauseIcon from '@assets/media-icons-black/pause.png?asset&asarUnpack';
-import playIcon from '@assets/media-icons-black/play.png?asset&asarUnpack';
-import previousIcon from '@assets/media-icons-black/previous.png?asset&asarUnpack';
-import { app, Notification } from 'electron';
-import type { BrowserWindow } from 'electron';
+import nextIcon from "@assets/media-icons-black/next.png?asset&asarUnpack";
+import pauseIcon from "@assets/media-icons-black/pause.png?asset&asarUnpack";
+import playIcon from "@assets/media-icons-black/play.png?asset&asarUnpack";
+import previousIcon from "@assets/media-icons-black/previous.png?asset&asarUnpack";
+import { app, Notification } from "electron";
+import type { BrowserWindow } from "electron";
 
 import {
   APP_PROTOCOL,
   changeProtocolHandler,
-} from '@/providers/protocol-handler';
-import { getSongControls } from '@/providers/song-controls';
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import { setTrayOnClick, setTrayOnDoubleClick } from '@/tray';
-import type { BackendContext } from '@/types/contexts';
-import { mediaIcons } from '@/types/media-icons';
+} from "@/providers/protocol-handler";
+import { getSongControls } from "@/providers/song-controls";
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import { setTrayOnClick, setTrayOnDoubleClick } from "@/tray";
+import type { BackendContext } from "@/types/contexts";
+import { mediaIcons } from "@/types/media-icons";
 
-import type { NotificationsPluginConfig } from './index';
-import { notificationImage, secondsToMinutes, ToastStyles } from './utils';
+import type { NotificationsPluginConfig } from "./index";
+import { notificationImage, secondsToMinutes, ToastStyles } from "./utils";
 
 let songControls: ReturnType<typeof getSongControls>;
 let savedNotification: Notification | undefined;
@@ -27,7 +27,7 @@ type Accessor<T> = () => T;
 export default (
   win: BrowserWindow,
   config: Accessor<NotificationsPluginConfig>,
-  { ipc: { on, send } }: BackendContext<NotificationsPluginConfig>,
+  { ipc: { on, send } }: BackendContext<NotificationsPluginConfig>
 ) => {
   const sendNotification = (songInfo: SongInfo) => {
     const iconSrc = notificationImage(songInfo, config());
@@ -35,14 +35,14 @@ export default (
     savedNotification?.close();
 
     let icon: string;
-    if (typeof iconSrc === 'object') {
+    if (typeof iconSrc === "object") {
       icon = iconSrc.toDataURL();
     } else {
       icon = iconSrc;
     }
 
     savedNotification = new Notification({
-      title: songInfo.title || 'Playing',
+      title: songInfo.title || "Playing",
       body: songInfo.artist,
       icon: iconSrc,
       silent: true,
@@ -56,7 +56,7 @@ export default (
     // To fix the notification not closing
     setTimeout(() => savedNotification?.close(), 5000);
 
-    savedNotification.on('close', () => {
+    savedNotification.on("close", () => {
       savedNotification = undefined;
     });
 
@@ -95,20 +95,20 @@ export default (
 
   const selectIcon = (kind: keyof typeof mediaIcons): string => {
     switch (kind) {
-      case 'play': {
+      case "play": {
         return playIcon;
       }
-      case 'pause': {
+      case "pause": {
         return pauseIcon;
       }
-      case 'next': {
+      case "next": {
         return nextIcon;
       }
-      case 'previous': {
+      case "previous": {
         return previousIcon;
       }
       default: {
-        return '';
+        return "";
       }
     }
   };
@@ -121,7 +121,7 @@ export default (
     return `\
             content="${
               config().toastStyle
-                ? ''
+                ? ""
                 : kind.charAt(0).toUpperCase() + kind.slice(1)
             }"\
             imageUri="file:///${selectIcon(kind)}"
@@ -130,14 +130,14 @@ export default (
 
   const getButton = (kind: keyof typeof mediaIcons) =>
     `<action ${display(
-      kind,
+      kind
     )} activationType="protocol" arguments="${APP_PROTOCOL}://${kind}"/>`;
 
   const getButtons = (isPaused: boolean) => `\
     <actions>
-        ${getButton('previous')}
-        ${isPaused ? getButton('play') : getButton('pause')}
-        ${getButton('next')}
+        ${getButton("previous")}
+        ${isPaused ? getButton("play") : getButton("pause")}
+        ${getButton("next")}
     </actions>\
 `;
 
@@ -156,7 +156,7 @@ export default (
   const xmlImage = (
     { title, artist, isPaused }: SongInfo,
     imgSrc: string,
-    placement: string,
+    placement: string
   ) =>
     toast(
       `\
@@ -164,7 +164,7 @@ export default (
             <text id="1">${title}</text>
             <text id="2">${artist}</text>\
 `,
-      isPaused ?? false,
+      isPaused ?? false
     );
 
   const xmlLogo = (songInfo: SongInfo, imgSrc: string) =>
@@ -174,7 +174,7 @@ export default (
     xmlImage(songInfo, imgSrc, 'placement="hero"');
 
   const xmlBannerBottom = (songInfo: SongInfo, imgSrc: string) =>
-    xmlImage(songInfo, imgSrc, '');
+    xmlImage(songInfo, imgSrc, "");
 
   const xmlBannerTopCustom = (songInfo: SongInfo, imgSrc: string) =>
     toast(
@@ -189,7 +189,7 @@ export default (
                 ${xmlMoreData(songInfo)}
             </group>\
 `,
-      songInfo.isPaused ?? false,
+      songInfo.isPaused ?? false
     );
 
   const xmlMoreData = ({ album, elapsedSeconds, songDuration }: SongInfo) => `\
@@ -197,17 +197,17 @@ export default (
     ${
       album
         ? `<text hint-style="captionSubtle" hint-wrap="true" hint-align="right">${album}</text>`
-        : ''
+        : ""
     }
     <text hint-style="captionSubtle" hint-wrap="true" hint-align="right">${secondsToMinutes(
-      elapsedSeconds ?? 0,
+      elapsedSeconds ?? 0
     )} / ${secondsToMinutes(songDuration)}</text>
 </subgroup>\
 `;
 
   const xmlBannerCenteredBottom = (
     { title, artist, isPaused }: SongInfo,
-    imgSrc: string,
+    imgSrc: string
   ) =>
     toast(
       `\
@@ -215,19 +215,19 @@ export default (
             <group>
                 <subgroup hint-weight="1" hint-textStacking="center">
                     <text hint-align="center" hint-style="${titleFontPicker(
-                      title,
+                      title
                     )}">${title}</text>
                     <text hint-align="center" hint-style="SubtitleSubtle">${artist}</text>
                 </subgroup>
             </group>
             <image id="1" src="${imgSrc}" name="Image"  hint-removeMargin="true" />\
 `,
-      isPaused ?? false,
+      isPaused ?? false
     );
 
   const xmlBannerCenteredTop = (
     { title, artist, isPaused }: SongInfo,
-    imgSrc: string,
+    imgSrc: string
   ) =>
     toast(
       `\
@@ -236,36 +236,36 @@ export default (
             <group>
                 <subgroup hint-weight="1" hint-textStacking="center">
                     <text hint-align="center" hint-style="${titleFontPicker(
-                      title,
+                      title
                     )}">${title}</text>
                     <text hint-align="center" hint-style="SubtitleSubtle">${artist}</text>
                 </subgroup>
             </group>\
 `,
-      isPaused ?? false,
+      isPaused ?? false
     );
 
   const titleFontPicker = (title: string) => {
     if (title.length <= 13) {
-      return 'Header';
+      return "Header";
     }
 
     if (title.length <= 22) {
-      return 'Subheader';
+      return "Subheader";
     }
 
     if (title.length <= 26) {
-      return 'Title';
+      return "Title";
     }
 
-    return 'Subtitle';
+    return "Subtitle";
   };
 
   songControls = getSongControls(win);
 
   let currentSeconds = 0;
-  on('watchdeck:player-api-loaded', () => {
-    send('watchdeck:setup-time-changed-listener');
+  on("watchdeck:player-api-loaded", () => {
+    send("watchdeck:setup-time-changed-listener");
   });
 
   let savedSongInfo: SongInfo;
@@ -312,7 +312,7 @@ export default (
     });
   }
 
-  app.once('before-quit', () => {
+  app.once("before-quit", () => {
     savedNotification?.close();
   });
 
@@ -322,13 +322,13 @@ export default (
       songControls[cmd as keyof typeof songControls](...args);
       if (
         config().refreshOnPlayPause &&
-        (cmd === 'pause' || (cmd === 'play' && !config().unpauseNotification))
+        (cmd === "pause" || (cmd === "play" && !config().unpauseNotification))
       ) {
         setImmediate(() => {
           sendNotification({
             ...savedSongInfo,
             elapsedSeconds: currentSeconds,
-            isPaused: cmd === 'pause',
+            isPaused: cmd === "pause",
           });
         });
       }

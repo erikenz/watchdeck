@@ -1,11 +1,11 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import url from 'node:url';
+import fs from "node:fs";
+import path from "node:path";
+import url from "node:url";
 
-import ErrorHtmlAsset from '@assets/error.html?asset';
-import { enhanceWebRequest } from '@jellybrick/electron-better-web-request';
-import type { BetterSession } from '@jellybrick/electron-better-web-request';
-import { deepmerge } from 'deepmerge-ts';
+import ErrorHtmlAsset from "@assets/error.html?asset";
+import { enhanceWebRequest } from "@jellybrick/electron-better-web-request";
+import type { BetterSession } from "@jellybrick/electron-better-web-request";
+import { deepmerge } from "deepmerge-ts";
 import {
   BrowserWindow,
   app,
@@ -16,40 +16,40 @@ import {
   dialog,
   ipcMain,
   protocol,
-} from 'electron';
-import type { BrowserWindowConstructorOptions } from 'electron';
-import electronDebug from 'electron-debug';
-import is from 'electron-is';
-import unhandled from 'electron-unhandled';
-import { deepEqual } from 'fast-equals';
-import { parse } from 'node-html-parser';
-import { languageResources } from 'virtual:i18n';
-import { allPlugins, mainPlugins } from 'virtual:plugins';
+} from "electron";
+import type { BrowserWindowConstructorOptions } from "electron";
+import electronDebug from "electron-debug";
+import is from "electron-is";
+import unhandled from "electron-unhandled";
+import { deepEqual } from "fast-equals";
+import { parse } from "node-html-parser";
+import { languageResources } from "virtual:i18n";
+import { allPlugins, mainPlugins } from "virtual:plugins";
 
-import * as config from '@/config';
-import { APPLICATION_NAME, loadI18n, setLanguage, t } from '@/i18n';
+import * as config from "@/config";
+import { APPLICATION_NAME, loadI18n, setLanguage, t } from "@/i18n";
 import {
   forceLoadMainPlugin,
   forceUnloadMainPlugin,
   getAllLoadedMainPlugins,
   loadAllMainPlugins,
-} from '@/loader/main';
-import { refreshMenu, setApplicationMenu } from '@/menu';
-import { defaultAuthProxyConfig } from '@/plugins/auth-proxy-adapter/config';
-import { fileExists, injectCSS, injectCSSAsFile } from '@/plugins/utils/main';
-import { restart, setupAppControls } from '@/providers/app-controls';
+} from "@/loader/main";
+import { refreshMenu, setApplicationMenu } from "@/menu";
+import { defaultAuthProxyConfig } from "@/plugins/auth-proxy-adapter/config";
+import { fileExists, injectCSS, injectCSSAsFile } from "@/plugins/utils/main";
+import { restart, setupAppControls } from "@/providers/app-controls";
 import {
   APP_PROTOCOL,
   handleProtocol,
   setupProtocolHandler,
-} from '@/providers/protocol-handler';
-import { setupSongInfo } from '@/providers/song-info';
-import { setUpTray } from '@/tray';
-import type { PluginConfig } from '@/types/plugins';
-import { LoggerPrefix } from '@/utils';
-import { isTesting } from '@/utils/testing';
+} from "@/providers/protocol-handler";
+import { setupSongInfo } from "@/providers/song-info";
+import { setUpTray } from "@/tray";
+import type { PluginConfig } from "@/types/plugins";
+import { LoggerPrefix } from "@/utils";
+import { isTesting } from "@/utils/testing";
 
-import musicPlayerCss from '@/music-player.css?inline';
+import musicPlayerCss from "@/music-player.css?inline";
 
 // Catch errors and log them
 unhandled({
@@ -76,7 +76,7 @@ protocol.registerSchemesAsPrivileged([
       stream: true,
       supportFetchAPI: true,
     },
-    scheme: 'http',
+    scheme: "http",
   },
   {
     privileges: {
@@ -88,71 +88,71 @@ protocol.registerSchemesAsPrivileged([
       stream: true,
       supportFetchAPI: true,
     },
-    scheme: 'https',
+    scheme: "https",
   },
-  { privileges: { standard: true }, scheme: 'mailto' },
+  { privileges: { standard: true }, scheme: "mailto" },
 ]);
 
 // Ozone platform hint: Required for Wayland support
-app.commandLine.appendSwitch('ozone-platform-hint', 'auto');
+app.commandLine.appendSwitch("ozone-platform-hint", "auto");
 
 // SharedArrayBuffer: Required for downloader (@ffmpeg/core-mt)
 // OverlayScrollbar: Required for overlay scrollbars
 // UseOzonePlatform: Required for Wayland support
 // WaylandWindowDecorations: Required for Wayland decorations
 app.commandLine.appendSwitch(
-  'enable-features',
-  'OverlayScrollbar,SharedArrayBuffer,UseOzonePlatform,WaylandWindowDecorations',
+  "enable-features",
+  "OverlayScrollbar,SharedArrayBuffer,UseOzonePlatform,WaylandWindowDecorations"
 );
 
 // Disable Fluent Scrollbar (for OverlayScrollbar)
-const disabledFeatures = ['FluentScrollbar'];
+const disabledFeatures = ["FluentScrollbar"];
 const disableHardwareAcceleration = config.get(
-  'options.disableHardwareAcceleration',
+  "options.disableHardwareAcceleration"
 );
 
 // Linux specific fixes
 if (is.linux()) {
   // Stops chromium from launching its own MPRIS service
-  if (await config.plugins.isEnabled('shortcuts')) {
-    disabledFeatures.push('MediaSessionService');
+  if (await config.plugins.isEnabled("shortcuts")) {
+    disabledFeatures.push("MediaSessionService");
   }
 
   // Overrides WM_CLASS for X11 to correspond to icon filename
-  app.setName('com.github.erikenz.watchdeck');
+  app.setName("com.github.erikenz.watchdeck");
   // for wayland
-  app.commandLine.appendSwitch('class', 'com.github.erikenz.watchdeck');
+  app.commandLine.appendSwitch("class", "com.github.erikenz.watchdeck");
 }
 
 if (disableHardwareAcceleration) {
   if (is.dev()) {
-    console.log('Disabling hardware acceleration');
+    console.log("Disabling hardware acceleration");
   }
   app.disableHardwareAcceleration();
 }
 
 // Apply disabled features
-app.commandLine.appendSwitch('disable-features', disabledFeatures.join(','));
+app.commandLine.appendSwitch("disable-features", disabledFeatures.join(","));
 
-if (config.get('options.proxy')) {
-  const authProxyEnabled = await config.plugins.isEnabled('auth-proxy-adapter');
+if (config.get("options.proxy")) {
+  const authProxyEnabled = await config.plugins.isEnabled("auth-proxy-adapter");
 
-  let proxyToUse = '';
+  let proxyToUse = "";
   if (authProxyEnabled) {
     // Use proxy from Auth-Proxy-Adapter plugin
     const authProxyConfig = deepmerge(
       defaultAuthProxyConfig,
-      config.get('plugins.auth-proxy-adapter') ?? {},
+      config.get("plugins.auth-proxy-adapter") ?? {}
     ) as typeof defaultAuthProxyConfig;
 
     const { hostname, port } = authProxyConfig;
     proxyToUse = `socks5://${hostname}:${port}`;
-  } else if (config.get('options.proxy')) {
+  } else if (config.get("options.proxy")) {
     // Use global proxy settings
-    proxyToUse = config.get('options.proxy');
+    proxyToUse = config.get("options.proxy");
   }
   console.log(LoggerPrefix, `Using proxy: ${proxyToUse}`);
-  app.commandLine.appendSwitch('proxy-server', proxyToUse);
+  app.commandLine.appendSwitch("proxy-server", proxyToUse);
 }
 
 // Adds debug features like hotkeys for triggering dev tools and reload
@@ -160,11 +160,11 @@ electronDebug({
   showDevTools: false, // Disable automatic devTools on new window
 });
 
-let icon = 'assets/icon.png';
-if (process.platform === 'win32') {
-  icon = 'assets/generated/icons/win/icon.ico';
-} else if (process.platform === 'darwin') {
-  icon = 'assets/generated/icons/mac/icon.icns';
+let icon = "assets/icon.png";
+if (process.platform === "win32") {
+  icon = "assets/generated/icons/win/icon.ico";
+} else if (process.platform === "darwin") {
+  icon = "assets/generated/icons/mac/icon.icns";
 }
 
 function onClosed() {
@@ -173,22 +173,22 @@ function onClosed() {
   mainWindow = null;
 }
 
-ipcMain.handle('watchdeck:get-main-plugin-names', async () =>
-  Object.keys(await mainPlugins()),
+ipcMain.handle("watchdeck:get-main-plugin-names", async () =>
+  Object.keys(await mainPlugins())
 );
 
 const initHook = async (win: BrowserWindow) => {
   const allPluginStubs = await allPlugins();
 
   ipcMain.handle(
-    'watchdeck:get-config',
+    "watchdeck:get-config",
     (_, id: string) =>
       deepmerge(
         allPluginStubs[id].config ?? { enabled: false },
-        config.get(`plugins.${id}`) ?? {},
-      ) as PluginConfig,
+        config.get(`plugins.${id}`) ?? {}
+      ) as PluginConfig
   );
-  ipcMain.handle('watchdeck:set-config', (_, name: string, obj: object) => {
+  ipcMain.handle("watchdeck:set-config", (_, name: string, obj: object) => {
     config.setPartial(`plugins.${name}`, obj, allPluginStubs[name].config);
   });
 
@@ -209,17 +209,17 @@ const initHook = async (win: BrowserWindow) => {
         const oldConfig = oldPluginConfigList[id] as PluginConfig;
         const config = deepmerge(
           allPluginStubs[id].config ?? { enabled: false },
-          newPluginConfig ?? {},
+          newPluginConfig ?? {}
         ) as PluginConfig;
 
         if (config.enabled !== oldConfig?.enabled) {
           if (config.enabled) {
-            win.webContents.send('plugin:enable', id);
-            ipcMain.emit('plugin:enable', id);
+            win.webContents.send("plugin:enable", id);
+            ipcMain.emit("plugin:enable", id);
             forceLoadMainPlugin(id, win);
           } else {
-            win.webContents.send('plugin:unload', id);
-            ipcMain.emit('plugin:unload', id);
+            win.webContents.send("plugin:unload", id);
+            ipcMain.emit("plugin:unload", id);
             forceUnloadMainPlugin(id, win);
           }
 
@@ -230,15 +230,15 @@ const initHook = async (win: BrowserWindow) => {
 
         const mainPlugin = getAllLoadedMainPlugins()[id];
         if (mainPlugin) {
-          if (config.enabled && typeof mainPlugin.backend !== 'function') {
+          if (config.enabled && typeof mainPlugin.backend !== "function") {
             mainPlugin.backend?.onConfigChange?.call(
               mainPlugin.backend,
-              config,
+              config
             );
           }
         }
 
-        win.webContents.send('config-changed', id, config);
+        win.webContents.send("config-changed", id, config);
       }
     });
   });
@@ -249,19 +249,19 @@ const showNeedToRestartDialog = async (id: string) => {
 
   const dialogOptions: Electron.MessageBoxOptions = {
     buttons: [
-      t('main.dialog.need-to-restart.buttons.restart-now'),
-      t('main.dialog.need-to-restart.buttons.later'),
+      t("main.dialog.need-to-restart.buttons.restart-now"),
+      t("main.dialog.need-to-restart.buttons.later"),
     ],
     cancelId: 1,
     defaultId: 0,
-    detail: t('main.dialog.need-to-restart.detail', {
+    detail: t("main.dialog.need-to-restart.detail", {
       pluginName: plugin?.name?.() ?? id,
     }),
-    message: t('main.dialog.need-to-restart.message', {
+    message: t("main.dialog.need-to-restart.message", {
       pluginName: plugin?.name?.() ?? id,
     }),
-    title: t('main.dialog.need-to-restart.title'),
-    type: 'info',
+    title: t("main.dialog.need-to-restart.title"),
+    type: "info",
   };
 
   let dialogPromise: Promise<Electron.MessageBoxReturnValue>;
@@ -289,7 +289,7 @@ const showNeedToRestartDialog = async (id: string) => {
 function initTheme(win: BrowserWindow) {
   injectCSS(win.webContents, musicPlayerCss);
   // Load user CSS
-  const themes: string[] = config.get('options.themes');
+  const themes: string[] = config.get("options.themes");
   if (Array.isArray(themes)) {
     for (const cssFile of themes) {
       fileExists(
@@ -300,42 +300,42 @@ function initTheme(win: BrowserWindow) {
         () => {
           console.warn(
             LoggerPrefix,
-            t('main.console.theme.css-file-not-found', { cssFile }),
+            t("main.console.theme.css-file-not-found", { cssFile })
           );
-        },
+        }
       );
     }
   }
 
-  win.webContents.once('did-finish-load', () => {
+  win.webContents.once("did-finish-load", () => {
     if (is.dev()) {
-      console.debug(LoggerPrefix, t('main.console.did-finish-load.dev-tools'));
+      console.debug(LoggerPrefix, t("main.console.did-finish-load.dev-tools"));
       win.webContents.openDevTools();
     }
   });
 }
 
 async function createMainWindow() {
-  const windowSize = config.get('window-size');
-  const windowMaximized = config.get('window-maximized');
-  const windowPosition: Electron.Point = config.get('window-position');
-  const useInlineMenu = await config.plugins.isEnabled('in-app-menu');
+  const windowSize = config.get("window-size");
+  const windowMaximized = config.get("window-maximized");
+  const windowPosition: Electron.Point = config.get("window-position");
+  const useInlineMenu = await config.plugins.isEnabled("in-app-menu");
 
   const defaultTitleBarOverlayOptions: Electron.TitleBarOverlay = {
-    color: '#00000000',
+    color: "#00000000",
     height: 32,
-    symbolColor: '#ffffff',
+    symbolColor: "#ffffff",
   };
 
   const decorations: Partial<BrowserWindowConstructorOptions> = {
-    autoHideMenuBar: config.get('options.hideMenu'),
+    autoHideMenuBar: config.get("options.hideMenu"),
     frame: !is.macOS() && !useInlineMenu,
     titleBarOverlay: defaultTitleBarOverlayOptions,
     titleBarStyle: useInlineMenu
-      ? 'hidden'
+      ? "hidden"
       : is.macOS()
-        ? 'hiddenInset'
-        : 'default',
+        ? "hiddenInset"
+        : "default",
   };
 
   // Note: on linux, for some weird reason, having these extra properties with 'frame: false' does not work
@@ -345,7 +345,7 @@ async function createMainWindow() {
   }
 
   const electronWindowSettings: Electron.BrowserWindowConstructorOptions = {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     height: windowSize.height,
     icon,
     minHeight: 425,
@@ -353,7 +353,7 @@ async function createMainWindow() {
     show: false,
     webPreferences: {
       contextIsolation: true,
-      preload: path.join(__dirname, '..', 'preload', 'preload.cjs'),
+      preload: path.join(__dirname, "..", "preload", "preload.cjs"),
       ...(isTesting()
         ? undefined
         : {
@@ -398,11 +398,11 @@ async function createMainWindow() {
       if (is.dev()) {
         console.warn(
           LoggerPrefix,
-          t('main.console.window.tried-to-render-offscreen', {
+          t("main.console.window.tried-to-render-offscreen", {
             displaySize: JSON.stringify(display.bounds),
             position: JSON.stringify(windowPosition),
             windowSize: String(winSize),
-          }),
+          })
         );
       }
     } else {
@@ -415,40 +415,40 @@ async function createMainWindow() {
     win.maximize();
   }
 
-  if (config.get('options.alwaysOnTop')) {
+  if (config.get("options.alwaysOnTop")) {
     win.setAlwaysOnTop(true);
   }
 
-  const urlToLoad = config.get('options.resumeOnStart')
-    ? config.get('url')
+  const urlToLoad = config.get("options.resumeOnStart")
+    ? config.get("url")
     : config.defaultConfig.url;
-  win.on('closed', onClosed);
+  win.on("closed", onClosed);
 
-  win.on('move', () => {
+  win.on("move", () => {
     if (win.isMaximized()) {
       return;
     }
 
     const [x, y] = win.getPosition();
-    lateSave('window-position', { x, y });
+    lateSave("window-position", { x, y });
   });
 
   let winWasMaximized: boolean;
 
-  win.on('resize', () => {
+  win.on("resize", () => {
     const [width, height] = win.getSize();
     const isMaximized = win.isMaximized();
 
     if (winWasMaximized !== isMaximized) {
       winWasMaximized = isMaximized;
-      config.set('window-maximized', isMaximized);
+      config.set("window-maximized", isMaximized);
     }
 
     if (isMaximized) {
       return;
     }
 
-    lateSave('window-size', {
+    lateSave("window-size", {
       height,
       width,
     });
@@ -459,7 +459,7 @@ async function createMainWindow() {
   function lateSave(
     key: string,
     value: unknown,
-    fn: (key: string, value: unknown) => void = config.set,
+    fn: (key: string, value: unknown) => void = config.set
   ) {
     if (savedTimeouts[key]) {
       clearTimeout(savedTimeouts[key]);
@@ -471,43 +471,43 @@ async function createMainWindow() {
     }, 600);
   }
 
-  app.on('render-process-gone', (_event, _webContents, details) => {
+  app.on("render-process-gone", (_event, _webContents, details) => {
     showUnresponsiveDialog(win, details);
   });
 
-  win.once('ready-to-show', () => {
-    if (config.get('options.appVisible')) {
+  win.once("ready-to-show", () => {
+    if (config.get("options.appVisible")) {
       win.show();
     }
   });
 
   removeContentSecurityPolicy();
 
-  win.webContents.on('dom-ready', () => {
+  win.webContents.on("dom-ready", () => {
     if (useInlineMenu && is.windows()) {
       win.setTitleBarOverlay({
         ...defaultTitleBarOverlayOptions,
         height: Math.floor(
           defaultTitleBarOverlayOptions.height! *
-            win.webContents.getZoomFactor(),
+            win.webContents.getZoomFactor()
         ),
       });
     }
   });
-  win.webContents.on('will-redirect', (event) => {
+  win.webContents.on("will-redirect", (event) => {
     const url = URL.parse(event.url);
 
     // Workaround for the regional "/premium" redirect: send the user to the
     // Google sign-in page instead of the paywall. Inherited; revisit in P1.
     if (
       url &&
-      url.hostname.endsWith('\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com') &&
-      url.pathname === '/premium'
+      url.hostname.endsWith("\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com") &&
+      url.pathname === "/premium"
     ) {
       event.preventDefault();
 
       win.webContents.loadURL(
-        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006F\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%252F',
+        "https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006F\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%252F"
       );
     }
   });
@@ -517,16 +517,16 @@ async function createMainWindow() {
   return win;
 }
 
-app.once('browser-window-created', (_event, win) => {
-  if (config.get('options.overrideUserAgent')) {
+app.once("browser-window-created", (_event, win) => {
+  if (config.get("options.overrideUserAgent")) {
     // User agents are from https://developers.whatismybrowser.com/useragents/explore/
     const originalUserAgent = win.webContents.userAgent;
     const userAgents = {
       linux:
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
-      mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36",
+      mac: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36",
       windows:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36",
     };
 
     const updatedUserAgent = is.macOS()
@@ -541,10 +541,10 @@ app.once('browser-window-created', (_event, win) => {
     win.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
       // This will only happen if login failed, and "retry" was pressed
       if (
-        win.webContents.getURL().startsWith('https://accounts.google.com') &&
-        details.url.startsWith('https://accounts.google.com')
+        win.webContents.getURL().startsWith("https://accounts.google.com") &&
+        details.url.startsWith("https://accounts.google.com")
       ) {
-        details.requestHeaders['User-Agent'] = originalUserAgent;
+        details.requestHeaders["User-Agent"] = originalUserAgent;
       }
 
       cb({ requestHeaders: details.requestHeaders });
@@ -555,7 +555,7 @@ app.once('browser-window-created', (_event, win) => {
   setupAppControls();
 
   win.webContents.on(
-    'did-fail-load',
+    "did-fail-load",
     (
       _event,
       errorCode,
@@ -563,11 +563,11 @@ app.once('browser-window-created', (_event, win) => {
       validatedURL,
       isMainFrame,
       frameProcessId,
-      frameRoutingId,
+      frameRoutingId
     ) => {
       const log = JSON.stringify(
         {
-          error: 'did-fail-load',
+          error: "did-fail-load",
           errorCode,
           errorDescription,
           frameProcessId,
@@ -576,7 +576,7 @@ app.once('browser-window-created', (_event, win) => {
           validatedURL,
         },
         null,
-        '\t',
+        "\t"
       );
       if (is.dev()) {
         console.log(log);
@@ -585,31 +585,31 @@ app.once('browser-window-created', (_event, win) => {
       if (
         errorCode !== -3 &&
         // Workaround for #2435
-        !URL.parse(validatedURL)?.hostname?.includes('doubleclick.net')
+        !URL.parse(validatedURL)?.hostname?.includes("doubleclick.net")
       ) {
         // -3 is a false positive
-        win.webContents.send('log', log);
+        win.webContents.send("log", log);
         win.webContents.loadFile(ErrorHtmlAsset);
       }
-    },
+    }
   );
 
-  win.webContents.on('will-prevent-unload', (event) => {
+  win.webContents.on("will-prevent-unload", (event) => {
     event.preventDefault();
   });
 
-  const customWindowTitle = config.get('options.customWindowTitle');
+  const customWindowTitle = config.get("options.customWindowTitle");
 
   if (customWindowTitle) {
-    win.on('page-title-updated', (event) => {
+    win.on("page-title-updated", (event) => {
       event.preventDefault();
       win.setTitle(customWindowTitle);
     });
   }
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 
@@ -617,7 +617,7 @@ app.on('window-all-closed', () => {
   globalShortcut.unregisterAll();
 });
 
-app.on('activate', async () => {
+app.on("activate", async () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
@@ -631,25 +631,25 @@ const getDefaultLocale = async (locale: string) =>
   Object.keys(await languageResources()).includes(locale) ? locale : null;
 
 app.whenReady().then(async () => {
-  if (!config.get('options.language')) {
+  if (!config.get("options.language")) {
     const locale = await getDefaultLocale(app.getLocale());
     if (locale) {
-      config.set('options.language', locale);
+      config.set("options.language", locale);
     }
   }
 
   await loadI18n().then(async () => {
-    await setLanguage(config.get('options.language') ?? 'en');
-    console.log(LoggerPrefix, t('main.console.i18n.loaded'));
+    await setLanguage(config.get("options.language") ?? "en");
+    console.log(LoggerPrefix, t("main.console.i18n.loaded"));
   });
 
-  if (config.get('options.autoResetAppCache')) {
+  if (config.get("options.autoResetAppCache")) {
     // Clear cache after 20s
     const clearCacheTimeout = setTimeout(() => {
       if (is.dev()) {
         console.log(
           LoggerPrefix,
-          t('main.console.when-ready.clearing-cache-after-20s'),
+          t("main.console.when-ready.clearing-cache-after-20s")
         );
       }
 
@@ -660,22 +660,22 @@ app.whenReady().then(async () => {
 
   // Register appID on windows
   if (is.windows()) {
-    const appID = 'com.github.erikenz.watchdeck';
+    const appID = "com.github.erikenz.watchdeck";
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
-    const appData = app.getPath('appData');
+    const appData = app.getPath("appData");
     // Check shortcut validity if not in dev mode / running portable app
     if (
       !is.dev() &&
-      !appLocation.startsWith(path.join(appData, '..', 'Local', 'Temp'))
+      !appLocation.startsWith(path.join(appData, "..", "Local", "Temp"))
     ) {
       const shortcutPath = path.join(
         appData,
-        'Microsoft',
-        'Windows',
-        'Start Menu',
-        'Programs',
-        `${APPLICATION_NAME}.lnk`,
+        "Microsoft",
+        "Windows",
+        "Start Menu",
+        "Programs",
+        `${APPLICATION_NAME}.lnk`
       );
       try {
         // Check if shortcut is registered and valid
@@ -685,25 +685,25 @@ app.whenReady().then(async () => {
           shortcutDetails.appUserModelId !== appID
         ) {
           // oxlint-disable-next-line typescript/only-throw-error
-          throw 'needUpdate';
+          throw "needUpdate";
         }
       } catch (error) {
         // If not valid -> Register shortcut
         shell.writeShortcutLink(
           shortcutPath,
-          error === 'needUpdate' ? 'update' : 'create',
+          error === "needUpdate" ? "update" : "create",
           {
             appUserModelId: appID,
             cwd: path.dirname(appLocation),
             description: `${APPLICATION_NAME} Desktop App - including custom plugins`,
             target: appLocation,
-          },
+          }
         );
       }
     }
   }
 
-  ipcMain.on('get-renderer-script', (event) => {
+  ipcMain.on("get-renderer-script", (event) => {
     // Inject index.html file as string using insertAdjacentHTML
     // In dev mode, get string from process.env.VITE_DEV_SERVER_URL, else use fs.readFileSync
     if (is.dev() && process.env.ELECTRON_RENDERER_URL) {
@@ -734,16 +734,16 @@ app.whenReady().then(async () => {
       `,
       ];
     } else {
-      const rendererPath = path.join(__dirname, '..', 'renderer');
+      const rendererPath = path.join(__dirname, "..", "renderer");
       const indexHTML = parse(
-        fs.readFileSync(path.join(rendererPath, 'index.html'), 'utf-8'),
+        fs.readFileSync(path.join(rendererPath, "index.html"), "utf-8")
       );
-      const scriptSrc = indexHTML.querySelector('script')!;
+      const scriptSrc = indexHTML.querySelector("script")!;
       const scriptPath = path.join(
         rendererPath,
-        scriptSrc.getAttribute('src')!,
+        scriptSrc.getAttribute("src")!
       );
-      const scriptString = fs.readFileSync(scriptPath, 'utf-8');
+      const scriptString = fs.readFileSync(scriptPath, "utf-8");
       event.returnValue = [
         url.pathToFileURL(scriptPath).toString(),
         `${scriptString};0`,
@@ -758,20 +758,20 @@ app.whenReady().then(async () => {
 
   setupProtocolHandler(mainWindow);
 
-  app.on('second-instance', (_, commandLine) => {
+  app.on("second-instance", (_, commandLine) => {
     const uri = `${APP_PROTOCOL}://`;
     const protocolArgv = commandLine.find((arg) => arg.startsWith(uri));
     if (protocolArgv) {
-      const lastIndex = protocolArgv.endsWith('/') ? -1 : undefined;
+      const lastIndex = protocolArgv.endsWith("/") ? -1 : undefined;
       const command = protocolArgv.slice(uri.length, lastIndex);
       if (is.dev()) {
         console.debug(
           LoggerPrefix,
-          t('main.console.second-instance.receive-command', { command }),
+          t("main.console.second-instance.receive-command", { command })
         );
       }
 
-      const splited = decodeURIComponent(command).split(' ');
+      const splited = decodeURIComponent(command).split(" ");
 
       handleProtocol(splited.shift()!, ...splited);
       return;
@@ -794,34 +794,34 @@ app.whenReady().then(async () => {
 
   // Autostart at login
   app.setLoginItemSettings({
-    openAtLogin: config.get('options.startAtLogin'),
+    openAtLogin: config.get("options.startAtLogin"),
   });
 
   // No update feed: the inherited auto-updater pointed at the upstream project's
   // GitHub releases and was removed in the P0 reset (docs/PRD.md §R8). Updates come
   // back once Watchdeck owns a signed feed — `options.autoUpdates` stays in the
   // config for that day.
-  if (config.get('options.hideMenu') && !config.get('options.hideMenuWarned')) {
+  if (config.get("options.hideMenu") && !config.get("options.hideMenuWarned")) {
     dialog.showMessageBox(mainWindow, {
-      message: t('main.dialog.hide-menu-enabled.message'),
-      title: t('main.dialog.hide-menu-enabled.title'),
-      type: 'info',
+      message: t("main.dialog.hide-menu-enabled.message"),
+      title: t("main.dialog.hide-menu-enabled.title"),
+      type: "info",
     });
-    config.set('options.hideMenuWarned', true);
+    config.set("options.hideMenuWarned", true);
   }
 
   // Optimized for Mac OS X
-  if (is.macOS() && !config.get('options.appVisible')) {
+  if (is.macOS() && !config.get("options.appVisible")) {
     app.dock?.hide();
   }
 
   let forceQuit = false;
-  app.on('before-quit', () => {
+  app.on("before-quit", () => {
     forceQuit = true;
   });
 
-  if (is.macOS() || config.get('options.tray')) {
-    mainWindow.on('close', (event) => {
+  if (is.macOS() || config.get("options.tray")) {
+    mainWindow.on("close", (event) => {
       // Hide the window instead of quitting (quit is available in tray options)
       if (!forceQuit) {
         event.preventDefault();
@@ -833,29 +833,29 @@ app.whenReady().then(async () => {
 
 function showUnresponsiveDialog(
   win: BrowserWindow,
-  details: Electron.RenderProcessGoneDetails,
+  details: Electron.RenderProcessGoneDetails
 ) {
   if (details) {
     console.error(
       LoggerPrefix,
-      t('main.console.unresponsive.details', {
-        error: JSON.stringify(details, null, '\t'),
-      }),
+      t("main.console.unresponsive.details", {
+        error: JSON.stringify(details, null, "\t"),
+      })
     );
   }
 
   dialog
     .showMessageBox(win, {
       buttons: [
-        t('main.dialog.unresponsive.buttons.wait'),
-        t('main.dialog.unresponsive.buttons.relaunch'),
-        t('main.dialog.unresponsive.buttons.quit'),
+        t("main.dialog.unresponsive.buttons.wait"),
+        t("main.dialog.unresponsive.buttons.relaunch"),
+        t("main.dialog.unresponsive.buttons.quit"),
       ],
       cancelId: 0,
-      detail: t('main.dialog.unresponsive.detail'),
-      message: t('main.dialog.unresponsive.message'),
-      title: t('main.dialog.unresponsive.title'),
-      type: 'error',
+      detail: t("main.dialog.unresponsive.detail"),
+      message: t("main.dialog.unresponsive.message"),
+      title: t("main.dialog.unresponsive.title"),
+      type: "error",
     })
     .then((result) => {
       switch (result.response) {
@@ -873,7 +873,7 @@ function showUnresponsiveDialog(
 }
 
 function removeContentSecurityPolicy(
-  betterSession: BetterSession = session.defaultSession as BetterSession,
+  betterSession: BetterSession = session.defaultSession as BetterSession
 ) {
   // Allows defining multiple "onHeadersReceived" listeners
   // by enhancing the session.
@@ -905,7 +905,7 @@ function removeContentSecurityPolicy(
 
   // When multiple listeners are defined, apply them all
   betterSession.webRequest.setResolver(
-    'onHeadersReceived',
+    "onHeadersReceived",
     async (listeners) =>
       await listeners.reduce(
         async (accumulator, listener) => {
@@ -917,7 +917,7 @@ function removeContentSecurityPolicy(
           const result = await listener.apply();
           return { ...acc, ...result };
         },
-        Promise.resolve({ cancel: false }),
-      ),
+        Promise.resolve({ cancel: false })
+      )
   );
 }

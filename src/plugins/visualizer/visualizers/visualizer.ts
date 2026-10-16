@@ -4,7 +4,7 @@ export abstract class Visualizer {
 
   protected constructor(
     _audioSource: MediaElementAudioSourceNode,
-    _audioNode: GainNode,
+    _audioNode: GainNode
   ) {
     this.audioNode = _audioNode;
     this.audioSource = _audioSource;

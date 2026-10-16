@@ -1,4 +1,4 @@
-export const defaultPresets = ['bass-booster'] as const;
+export const defaultPresets = ["bass-booster"] as const;
 export type Preset = (typeof defaultPresets)[number];
 
 export interface FilterConfig {
@@ -9,10 +9,10 @@ export interface FilterConfig {
 }
 
 export const presetConfigs: Record<Preset, FilterConfig> = {
-  'bass-booster': {
+  "bass-booster": {
     Q: 100,
     frequency: 80,
     gain: 12.0,
-    type: 'lowshelf',
+    type: "lowshelf",
   },
 };

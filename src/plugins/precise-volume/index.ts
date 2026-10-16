@@ -1,16 +1,16 @@
-import prompt from 'custom-electron-prompt';
-import type { KeybindOptions } from 'custom-electron-prompt';
-import { globalShortcut } from 'electron';
-import type { MenuItem } from 'electron';
+import prompt from "custom-electron-prompt";
+import type { KeybindOptions } from "custom-electron-prompt";
+import { globalShortcut } from "electron";
+import type { MenuItem } from "electron";
 
-import { t } from '@/i18n';
-import promptOptions from '@/providers/prompt-options';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import promptOptions from "@/providers/prompt-options";
+import { createPlugin } from "@/utils";
 
-import { overrideListener } from './override';
-import { onConfigChange, onPlayerApiReady } from './renderer';
+import { overrideListener } from "./override";
+import { onConfigChange, onPlayerApiReady } from "./renderer";
 
-import hudStyle from './volume-hud.css?inline';
+import hudStyle from "./volume-hud.css?inline";
 
 export interface PreciseVolumePluginConfig {
   enabled: boolean;
@@ -33,8 +33,8 @@ export interface PreciseVolumePluginConfig {
 }
 
 export default createPlugin({
-  name: () => t('plugins.precise-volume.name'),
-  description: () => t('plugins.precise-volume.description'),
+  name: () => t("plugins.precise-volume.name"),
+  description: () => t("plugins.precise-volume.description"),
   restartNeeded: true,
   // The assertion below widens this object's literals to the plugin config
   // type (without it TS narrows e.g. `blocker` to the literal).
@@ -44,8 +44,8 @@ export default createPlugin({
     steps: 1,
     arrowsShortcut: true,
     globalShortcuts: {
-      volumeUp: '',
-      volumeDown: '',
+      volumeUp: "",
+      volumeDown: "",
     },
     savedVolume: undefined,
   } as PreciseVolumePluginConfig,
@@ -55,7 +55,7 @@ export default createPlugin({
 
     function changeOptions(
       changedOptions: Partial<PreciseVolumePluginConfig>,
-      options: PreciseVolumePluginConfig,
+      options: PreciseVolumePluginConfig
     ) {
       for (const option in changedOptions) {
         // HACK: Weird TypeScript error - the config is an interface, so it needs
@@ -72,7 +72,7 @@ export default createPlugin({
     const kb = (
       label_: string,
       value_: string,
-      default_: string,
+      default_: string
     ): KeybindOptions => ({
       value: value_,
       label: label_,
@@ -82,15 +82,15 @@ export default createPlugin({
     async function promptVolumeSteps(options: PreciseVolumePluginConfig) {
       const output = await prompt(
         {
-          title: t('plugins.precise-volume.prompt.volume-steps.title'),
-          label: t('plugins.precise-volume.prompt.volume-steps.label'),
+          title: t("plugins.precise-volume.prompt.volume-steps.title"),
+          label: t("plugins.precise-volume.prompt.volume-steps.label"),
           value: options.steps || 1,
-          type: 'counter',
+          type: "counter",
           counterOptions: { minimum: 0, maximum: 100, multiFire: true },
           width: 380,
           ...promptOptions(),
         },
-        window,
+        window
       );
 
       if (output || output === 0) {
@@ -101,39 +101,39 @@ export default createPlugin({
 
     async function promptGlobalShortcuts(
       options: PreciseVolumePluginConfig,
-      item: MenuItem,
+      item: MenuItem
     ) {
       const output = await prompt(
         {
-          title: t('plugins.precise-volume.prompt.global-shortcuts.title'),
-          label: t('plugins.precise-volume.prompt.global-shortcuts.label'),
-          type: 'keybind',
+          title: t("plugins.precise-volume.prompt.global-shortcuts.title"),
+          label: t("plugins.precise-volume.prompt.global-shortcuts.label"),
+          type: "keybind",
           keybindOptions: [
             kb(
               t(
-                'plugins.precise-volume.prompt.global-shortcuts.keybind-options.increase',
+                "plugins.precise-volume.prompt.global-shortcuts.keybind-options.increase"
               ),
-              'volumeUp',
-              options.globalShortcuts?.volumeUp,
+              "volumeUp",
+              options.globalShortcuts?.volumeUp
             ),
             kb(
               t(
-                'plugins.precise-volume.prompt.global-shortcuts.keybind-options.decrease',
+                "plugins.precise-volume.prompt.global-shortcuts.keybind-options.decrease"
               ),
-              'volumeDown',
-              options.globalShortcuts?.volumeDown,
+              "volumeDown",
+              options.globalShortcuts?.volumeDown
             ),
           ],
           ...promptOptions(),
         },
-        window,
+        window
       );
 
       if (output) {
         const newGlobalShortcuts: {
           volumeUp: string;
           volumeDown: string;
-        } = { volumeUp: '', volumeDown: '' };
+        } = { volumeUp: "", volumeDown: "" };
         for (const { value, accelerator } of output) {
           newGlobalShortcuts[value as keyof typeof newGlobalShortcuts] =
             accelerator;
@@ -152,24 +152,23 @@ export default createPlugin({
 
     return [
       {
-        label: t('plugins.precise-volume.menu.arrows-shortcuts'),
-        type: 'checkbox',
+        label: t("plugins.precise-volume.menu.arrows-shortcuts"),
+        type: "checkbox",
         checked: Boolean(config.arrowsShortcut),
         click(item) {
           changeOptions({ arrowsShortcut: item.checked }, config);
         },
       },
       {
-        label: t('plugins.precise-volume.menu.global-shortcuts'),
-        type: 'checkbox',
+        label: t("plugins.precise-volume.menu.global-shortcuts"),
+        type: "checkbox",
         checked: Boolean(
-          config.globalShortcuts?.volumeUp ??
-          config.globalShortcuts?.volumeDown,
+          config.globalShortcuts?.volumeUp ?? config.globalShortcuts?.volumeDown
         ),
         click: (item) => promptGlobalShortcuts(config, item),
       },
       {
-        label: t('plugins.precise-volume.menu.custom-volume-steps'),
+        label: t("plugins.precise-volume.menu.custom-volume-steps"),
         click: () => promptVolumeSteps(config),
       },
     ];
@@ -180,13 +179,13 @@ export default createPlugin({
 
     if (config.globalShortcuts?.volumeUp) {
       globalShortcut.register(config.globalShortcuts.volumeUp, () =>
-        ipc.send('changeVolume', true),
+        ipc.send("changeVolume", true)
       );
     }
 
     if (config.globalShortcuts?.volumeDown) {
       globalShortcut.register(config.globalShortcuts.volumeDown, () =>
-        ipc.send('changeVolume', false),
+        ipc.send("changeVolume", false)
       );
     }
   },

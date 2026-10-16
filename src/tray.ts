@@ -1,24 +1,24 @@
-import PausedTrayIconWhite from '@assets/tray-paused-white.png?asset&asarUnpack';
-import PausedTrayIcon from '@assets/tray-paused.png?asset&asarUnpack';
-import TrayIconWhite from '@assets/tray-white.png?asset&asarUnpack';
-import TrayIcon from '@assets/tray.png?asset&asarUnpack';
-import { Menu, nativeImage, screen, Tray } from 'electron';
-import is from 'electron-is';
+import PausedTrayIconWhite from "@assets/tray-paused-white.png?asset&asarUnpack";
+import PausedTrayIcon from "@assets/tray-paused.png?asset&asarUnpack";
+import TrayIconWhite from "@assets/tray-white.png?asset&asarUnpack";
+import TrayIcon from "@assets/tray.png?asset&asarUnpack";
+import { Menu, nativeImage, screen, Tray } from "electron";
+import is from "electron-is";
 
-import { APPLICATION_NAME, t } from '@/i18n';
+import { APPLICATION_NAME, t } from "@/i18n";
 
-import * as config from './config';
-import type { MenuTemplate } from './menu';
-import { restart } from './providers/app-controls';
-import { getSongControls } from './providers/song-controls';
-import { registerCallback, SongInfoEvent } from './providers/song-info';
+import * as config from "./config";
+import type { MenuTemplate } from "./menu";
+import { restart } from "./providers/app-controls";
+import { getSongControls } from "./providers/song-controls";
+import { registerCallback, SongInfoEvent } from "./providers/song-info";
 
 // Prevent tray being garbage collected
 let tray: Electron.Tray | undefined;
 
 type TrayEvent = (
   event: Electron.KeyboardEvent,
-  bounds: Electron.Rectangle,
+  bounds: Electron.Rectangle
 ) => void;
 
 export const setTrayOnClick = (fn: TrayEvent) => {
@@ -26,8 +26,8 @@ export const setTrayOnClick = (fn: TrayEvent) => {
     return;
   }
 
-  tray.removeAllListeners('click');
-  tray.on('click', fn);
+  tray.removeAllListeners("click");
+  tray.on("click", fn);
 };
 
 // Won't do anything on macOS since its disabled
@@ -36,12 +36,12 @@ export const setTrayOnDoubleClick = (fn: TrayEvent) => {
     return;
   }
 
-  tray.removeAllListeners('double-click');
-  tray.on('double-click', fn);
+  tray.removeAllListeners("double-click");
+  tray.on("double-click", fn);
 };
 
 export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
-  if (!config.get('options.tray')) {
+  if (!config.get("options.tray")) {
     tray = undefined;
     return;
   }
@@ -68,16 +68,16 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
   tray = new Tray(defaultTrayIcon);
 
   tray.setToolTip(
-    t('main.tray.tooltip.default', {
+    t("main.tray.tooltip.default", {
       applicationName: APPLICATION_NAME,
-    }),
+    })
   );
 
   // MacOS only
   tray.setIgnoreDoubleClickEvents(true);
 
-  tray.on('click', () => {
-    if (config.get('options.trayClickPlayPause')) {
+  tray.on("click", () => {
+    if (config.get("options.trayClickPlayPause")) {
       playPause();
     } else if (win.isVisible()) {
       win.hide();
@@ -93,36 +93,36 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
       click() {
         playPause();
       },
-      label: t('main.tray.play-pause'),
+      label: t("main.tray.play-pause"),
     },
     {
       click() {
         next();
       },
-      label: t('main.tray.next'),
+      label: t("main.tray.next"),
     },
     {
       click() {
         previous();
       },
-      label: t('main.tray.previous'),
+      label: t("main.tray.previous"),
     },
     {
       click() {
         win.show();
         app.dock?.show();
       },
-      label: t('main.tray.show'),
+      label: t("main.tray.show"),
     },
-    { type: 'separator' },
+    { type: "separator" },
     {
       click: restart,
-      label: t('main.tray.restart'),
+      label: t("main.tray.restart"),
     },
-    { type: 'separator' },
+    { type: "separator" },
     {
-      label: t('main.tray.quit'),
-      role: 'quit',
+      label: t("main.tray.quit"),
+      role: "quit",
     },
   ];
 
@@ -141,11 +141,11 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
       }
 
       tray.setToolTip(
-        t('main.tray.tooltip.with-song-info', {
+        t("main.tray.tooltip.with-song-info", {
           applicationName: APPLICATION_NAME,
           artist: songInfo.artist,
           title: songInfo.title,
-        }),
+        })
       );
 
       tray.setImage(songInfo.isPaused ? pausedTrayIcon : defaultTrayIcon);

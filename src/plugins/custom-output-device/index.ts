@@ -1,10 +1,10 @@
-import prompt from 'custom-electron-prompt';
+import prompt from "custom-electron-prompt";
 
-import { t } from '@/i18n';
-import promptOptions from '@/providers/prompt-options';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import promptOptions from "@/providers/prompt-options";
+import { createPlugin } from "@/utils";
 
-import { renderer } from './renderer';
+import { renderer } from "./renderer";
 
 export interface CustomOutputPluginConfig {
   enabled: boolean;
@@ -15,25 +15,25 @@ export interface CustomOutputPluginConfig {
 export default createPlugin({
   config: {
     enabled: false,
-    output: 'default',
+    output: "default",
     devices: {},
   },
-  description: () => t('plugins.custom-output-device.description'),
+  description: () => t("plugins.custom-output-device.description"),
   menu: ({ setConfig, getConfig, window }) => {
     const promptDeviceSelector = async () => {
       const options = await getConfig();
 
       const response = await prompt(
         {
-          title: t('plugins.custom-output-device.prompt.device-selector.title'),
-          label: t('plugins.custom-output-device.prompt.device-selector.label'),
-          value: options.output || 'default',
-          type: 'select',
+          title: t("plugins.custom-output-device.prompt.device-selector.title"),
+          label: t("plugins.custom-output-device.prompt.device-selector.label"),
+          value: options.output || "default",
+          type: "select",
           selectOptions: options.devices,
           width: 500,
           ...promptOptions(),
         },
-        window,
+        window
       ).catch(console.error);
 
       if (!response) return;
@@ -43,12 +43,12 @@ export default createPlugin({
 
     return [
       {
-        label: t('plugins.custom-output-device.menu.device-selector'),
+        label: t("plugins.custom-output-device.menu.device-selector"),
         click: promptDeviceSelector,
       },
     ];
   },
-  name: () => t('plugins.custom-output-device.name'),
+  name: () => t("plugins.custom-output-device.name"),
   renderer,
   restartNeeded: true,
 });

@@ -1,10 +1,10 @@
 // TODO: fully type definitions for music-player
 
-import type { WatchNextResponse } from '@/types/music-player-desktop-internal';
+import type { WatchNextResponse } from "@/types/music-player-desktop-internal";
 
-import type { GetPlayerResponse } from './get-player-response';
-import type { PlayerAPIEvents } from './player-api-events';
-import type { VideoDetails } from './video-details';
+import type { GetPlayerResponse } from "./get-player-response";
+import type { PlayerAPIEvents } from "./player-api-events";
+import type { VideoDetails } from "./video-details";
 
 export interface MusicPlayer {
   getInternalApiInterface: <Parameters extends unknown[], Return>(
@@ -301,24 +301,24 @@ export interface MusicPlayer {
   cueVideoById: (
     videoId: string,
     startSeconds: number,
-    suggestedQuality: string,
+    suggestedQuality: string
   ) => void;
   loadVideoById: (
     videoId: string,
     startSeconds: number,
-    suggestedQuality: string,
+    suggestedQuality: string
   ) => void;
   cueVideoByUrl: (
     mediaContentUrl: string,
     startSeconds: number,
     suggestedQuality: string,
-    playerType: string,
+    playerType: string
   ) => void;
   loadVideoByUrl: (
     mediaContentUrl: string,
     startSeconds: number,
     suggestedQuality: string,
-    playerType: string,
+    playerType: string
   ) => void;
   /**
    * Note: This doesn't resume playback, it plays from the start.
@@ -377,19 +377,19 @@ export interface MusicPlayer {
     type: K,
     listener: (
       this: Document,
-      name: K extends 'videodatachange' ? PlayerAPIEvents[K]['name'] : never,
-      data: K extends 'videodatachange' ? PlayerAPIEvents[K]['value'] : never,
+      name: K extends "videodatachange" ? PlayerAPIEvents[K]["name"] : never,
+      data: K extends "videodatachange" ? PlayerAPIEvents[K]["value"] : never
     ) => void,
-    options?: boolean | AddEventListenerOptions,
+    options?: boolean | AddEventListenerOptions
   ) => void;
   removeEventListener: <K extends keyof PlayerAPIEvents>(
     type: K,
     listener: (
       this: Document,
-      name: K extends 'videodatachange' ? PlayerAPIEvents[K]['name'] : never,
-      data: K extends 'videodatachange' ? PlayerAPIEvents[K]['value'] : never,
+      name: K extends "videodatachange" ? PlayerAPIEvents[K]["name"] : never,
+      data: K extends "videodatachange" ? PlayerAPIEvents[K]["value"] : never
     ) => void,
-    options?: boolean | EventListenerOptions,
+    options?: boolean | EventListenerOptions
   ) => void;
   getDebugText: () => string;
   addCueRange: <Parameters extends unknown[], Return>(
@@ -417,7 +417,7 @@ export interface MusicPlayer {
   preloadVideoById: (
     videoId: string,
     startSeconds: number,
-    suggestedQuality: string,
+    suggestedQuality: string
   ) => void;
   setAccountLinkState: <Parameters extends unknown[], Return>(
     ...params: Parameters

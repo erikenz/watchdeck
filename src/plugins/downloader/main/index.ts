@@ -1,62 +1,62 @@
-import { randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { randomBytes } from "node:crypto";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
-import { Mutex } from 'async-mutex';
-import { BG } from 'bgutils-js';
-import type { BgConfig } from 'bgutils-js';
-import { app, dialog, ipcMain } from 'electron';
-import type { BrowserWindow } from 'electron';
-import is from 'electron-is';
-import filenamify from 'filenamify';
-import lazyVar from 'lazy-var';
-import NodeID3 from 'node-id3';
+import { Mutex } from "async-mutex";
+import { BG } from "bgutils-js";
+import type { BgConfig } from "bgutils-js";
+import { app, dialog, ipcMain } from "electron";
+import type { BrowserWindow } from "electron";
+import is from "electron-is";
+import filenamify from "filenamify";
+import lazyVar from "lazy-var";
+import NodeID3 from "node-id3";
 import {
   Innertube,
   UniversalCache,
   Utils,
   YTNodes,
   Platform,
-} from 'youtubei.js';
-import type { YT, YTMusic, Types } from 'youtubei.js';
+} from "youtubei.js";
+import type { YT, YTMusic, Types } from "youtubei.js";
 
-import { t } from '@/i18n';
-import { getNetFetchAsFetch } from '@/plugins/utils/main';
+import { t } from "@/i18n";
+import { getNetFetchAsFetch } from "@/plugins/utils/main";
 import {
   registerCallback,
   cleanupName,
   getImage,
   MediaType,
   SongInfoEvent,
-} from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import type { BackendContext } from '@/types/contexts';
-import type { GetPlayerResponse } from '@/types/get-player-response';
+} from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import type { BackendContext } from "@/types/contexts";
+import type { GetPlayerResponse } from "@/types/get-player-response";
 
-import type { DownloaderPluginConfig } from '../index';
-import { DefaultPresetList, VideoFormatList } from '../types';
-import type { Preset } from '../types';
+import type { DownloaderPluginConfig } from "../index";
+import { DefaultPresetList, VideoFormatList } from "../types";
+import type { Preset } from "../types";
 import {
   cropMaxWidth,
   getFolder,
   sendFeedback as sendFeedback_,
   setBadge,
-} from './utils';
+} from "./utils";
 
 type CustomSongInfo = SongInfo & { trackId?: string };
 
 const ffmpeg = lazyVar.lazy(async () =>
-  (await import('@ffmpeg.wasm/main')).createFFmpeg({
+  (await import("@ffmpeg.wasm/main")).createFFmpeg({
     log: false,
     logger() {}, // Console.log,
     progress() {}, // Console.log,
-  }),
+  })
 );
 const ffmpegMutex = new Mutex();
 
 Platform.shim.eval = (
   data: Types.BuildScriptResult,
-  env: Record<string, Types.VMPrimative>,
+  env: Record<string, Types.VMPrimative>
 ) => {
   const properties = [];
 
@@ -68,7 +68,7 @@ Platform.shim.eval = (
     properties.push(`sig: exportedVars.sigFunction("${env.sig}")`);
   }
 
-  const code = `${data.output}\nreturn { ${properties.join(', ')} }`;
+  const code = `${data.output}\nreturn { ${properties.join(", ")} }`;
 
   // oxlint-disable-next-line typescript/no-unsafe-return,typescript/no-implied-eval,typescript/no-unsafe-call
   return new Function(code)();
@@ -81,7 +81,7 @@ let playingUrl: string;
 const isPremium = async () => {
   // If signed out, it is understood as non-premium
   const isSignedIn = (await win.webContents.executeJavaScript(
-    '!!yt.config_.LOGGED_IN',
+    "!!yt.config_.LOGGED_IN"
   )) as boolean;
 
   if (!isSignedIn) {
@@ -90,7 +90,7 @@ const isPremium = async () => {
 
   // If signed in, check if the upgrade button is present
   const upgradeBtnIconPathData = (await win.webContents.executeJavaScript(
-    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
+    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)'
   )) as string | null;
 
   // Fallback to non-premium if the icon is not found
@@ -101,7 +101,7 @@ const isPremium = async () => {
   const upgradeButton = `ytmusic-guide-entry-renderer:has(> tp-yt-paper-item > yt-icon path[d^="${upgradeBtnIconPathData}"])`;
 
   return (await win.webContents.executeJavaScript(
-    `!document.querySelector('${upgradeButton}')`,
+    `!document.querySelector('${upgradeButton}')`
   )) as boolean;
 };
 
@@ -110,34 +110,34 @@ const sendError = (error: Error, source?: string) => {
   setBadge(0); // Close badge
   sendFeedback_(win); // Reset feedback
 
-  const songNameMessage = source ? `\nin ${source}` : '';
+  const songNameMessage = source ? `\nin ${source}` : "";
   const cause = error.cause
     ? `\n\n${
         // oxlint-disable-next-line typescript/no-base-to-string,typescript/restrict-template-expressions
         error.cause instanceof Error ? error.cause.toString() : error.cause
       }`
-    : '';
+    : "";
   const message = `${error.toString()}${songNameMessage}${cause}`;
 
   console.error(message);
   console.trace(error);
   dialog.showMessageBox(win, {
-    buttons: [t('plugins.downloader.backend.dialog.error.buttons.ok')],
+    buttons: [t("plugins.downloader.backend.dialog.error.buttons.ok")],
     detail: message,
-    message: t('plugins.downloader.backend.dialog.error.message'),
-    title: t('plugins.downloader.backend.dialog.error.title'),
-    type: 'info',
+    message: t("plugins.downloader.backend.dialog.error.message"),
+    title: t("plugins.downloader.backend.dialog.error.title"),
+    type: "info",
   });
 };
 
 export const getCookieFromWindow = async (win: BrowserWindow) =>
   (
     await win.webContents.session.cookies.get({
-      url: 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+      url: "https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com",
     })
   )
-    .map((it) => it.name + '=' + it.value)
-    .join(';');
+    .map((it) => it.name + "=" + it.value)
+    .join(";");
 
 let config: DownloaderPluginConfig;
 
@@ -156,7 +156,7 @@ export const onMainLoad = async ({
     generate_session_locally: true,
   });
 
-  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+  const requestKey = "O43z0dpjhgX20SCx4KAo";
   const { visitorData } = yt.session.context.client;
 
   if (visitorData) {
@@ -168,7 +168,7 @@ export const onMainLoad = async ({
     try {
       const [width, height] = win.getSize();
       // emulate jsdom using linkedom
-      const window = new (await import('happy-dom')).Window({
+      const window = new (await import("happy-dom")).Window({
         console,
         height,
         width,
@@ -215,13 +215,13 @@ export const onMainLoad = async ({
     }
   }
 
-  ipc.handle('download-song', async (url: string) => downloadSong(url));
-  ipc.on('watchdeck:video-src-changed', (data: GetPlayerResponse) => {
+  ipc.handle("download-song", async (url: string) => downloadSong(url));
+  ipc.on("watchdeck:video-src-changed", (data: GetPlayerResponse) => {
     playingUrl = data.microformat.microformatDataRenderer.urlCanonical;
   });
   ipc.handle(
-    'download-playlist-request',
-    async (url: string) => await downloadPlaylist(url),
+    "download-playlist-request",
+    async (url: string) => await downloadPlaylist(url)
   );
 
   downloadSongOnFinishSetup({ getConfig, ipc });
@@ -235,7 +235,7 @@ export async function downloadSong(
   url: string,
   playlistFolder?: string,
   trackId?: string,
-  increasePlaylistProgress: (value: number) => void = () => {},
+  increasePlaylistProgress: (value: number) => void = () => {}
 ) {
   let resolvedName;
   try {
@@ -245,7 +245,7 @@ export async function downloadSong(
       (name: string) => (resolvedName = name),
       playlistFolder,
       trackId,
-      increasePlaylistProgress,
+      increasePlaylistProgress
     );
   } catch (error: unknown) {
     sendError(error as Error, resolvedName || url);
@@ -256,7 +256,7 @@ export async function downloadSongFromId(
   id: string,
   playlistFolder?: string,
   trackId?: string,
-  increasePlaylistProgress: (value: number) => void = () => {},
+  increasePlaylistProgress: (value: number) => void = () => {}
 ) {
   let resolvedName;
   try {
@@ -266,7 +266,7 @@ export async function downloadSongFromId(
       (name: string) => (resolvedName = name),
       playlistFolder,
       trackId,
-      increasePlaylistProgress,
+      increasePlaylistProgress
     );
   } catch (error: unknown) {
     sendError(error as Error, resolvedName || id);
@@ -275,12 +275,12 @@ export async function downloadSongFromId(
 
 function downloadSongOnFinishSetup({
   ipc,
-}: Pick<BackendContext<DownloaderPluginConfig>, 'ipc' | 'getConfig'>) {
+}: Pick<BackendContext<DownloaderPluginConfig>, "ipc" | "getConfig">) {
   let currentUrl: string | undefined;
   let duration: number | undefined;
   let time = 0;
 
-  const defaultDownloadFolder = app.getPath('downloads');
+  const defaultDownloadFolder = app.getPath("downloads");
 
   registerCallback((songInfo: SongInfo, event) => {
     if (event === SongInfoEvent.TimeChanged) {
@@ -295,26 +295,26 @@ function downloadSongOnFinishSetup({
       songInfo.url !== currentUrl &&
       config.downloadOnFinish?.enabled
     ) {
-      if (typeof currentUrl === 'string' && duration && duration > 0) {
+      if (typeof currentUrl === "string" && duration && duration > 0) {
         if (
-          config.downloadOnFinish.mode === 'seconds' &&
+          config.downloadOnFinish.mode === "seconds" &&
           duration - time <= config.downloadOnFinish.seconds
         ) {
           downloadSong(
             currentUrl,
             config.downloadOnFinish.folder ??
               config.downloadFolder ??
-              defaultDownloadFolder,
+              defaultDownloadFolder
           );
         } else if (
-          config.downloadOnFinish.mode === 'percent' &&
+          config.downloadOnFinish.mode === "percent" &&
           time >= duration * (config.downloadOnFinish.percent / 100)
         ) {
           downloadSong(
             currentUrl,
             config.downloadOnFinish.folder ??
               config.downloadFolder ??
-              defaultDownloadFolder,
+              defaultDownloadFolder
           );
         }
       }
@@ -325,8 +325,8 @@ function downloadSongOnFinishSetup({
     }
   });
 
-  ipcMain.on('watchdeck:player-api-loaded', () => {
-    ipc.send('watchdeck:setup-time-changed-listener');
+  ipcMain.on("watchdeck:player-api-loaded", () => {
+    ipc.send("watchdeck:setup-time-changed-listener");
   });
 }
 
@@ -336,7 +336,7 @@ async function downloadSongUnsafe(
   setName: (name: string) => void,
   playlistFolder?: string,
   trackId?: string,
-  increasePlaylistProgress: (value: number) => void = () => {},
+  increasePlaylistProgress: (value: number) => void = () => {}
 ) {
   const sendFeedback = (message: unknown, progress?: number) => {
     if (!playlistFolder) {
@@ -347,16 +347,16 @@ async function downloadSongUnsafe(
     }
   };
 
-  sendFeedback(t('plugins.downloader.backend.feedback.downloading'), 2);
+  sendFeedback(t("plugins.downloader.backend.feedback.downloading"), 2);
 
   let id: string | null;
   if (isId) {
     id = idOrUrl;
   } else {
     id = getVideoId(idOrUrl);
-    if (typeof id !== 'string') {
+    if (typeof id !== "string") {
       throw new Error(
-        t('plugins.downloader.backend.feedback.video-id-not-found'),
+        t("plugins.downloader.backend.feedback.video-id-not-found")
       );
     }
   }
@@ -365,80 +365,80 @@ async function downloadSongUnsafe(
 
   if (!info) {
     throw new Error(
-      t('plugins.downloader.backend.feedback.video-id-not-found'),
+      t("plugins.downloader.backend.feedback.video-id-not-found")
     );
   }
 
   const metadata = getMetadata(info);
-  if (metadata.album === 'N/A') {
-    metadata.album = '';
+  if (metadata.album === "N/A") {
+    metadata.album = "";
   }
 
   metadata.trackId = trackId;
 
   const dir =
-    playlistFolder || config.downloadFolder || app.getPath('downloads');
-  const name = `${metadata.artist ? `${metadata.artist} - ` : ''}${
+    playlistFolder || config.downloadFolder || app.getPath("downloads");
+  const name = `${metadata.artist ? `${metadata.artist} - ` : ""}${
     metadata.title
   }`;
   setName(name);
 
   let playabilityStatus = info.playability_status;
   let bypassedResult: YT.VideoInfo;
-  if (playabilityStatus?.status === 'LOGIN_REQUIRED') {
+  if (playabilityStatus?.status === "LOGIN_REQUIRED") {
     // Try to bypass the age restriction
     bypassedResult = await getAndroidTvInfo(id);
     playabilityStatus = bypassedResult.playability_status;
 
-    if (playabilityStatus?.status === 'LOGIN_REQUIRED') {
+    if (playabilityStatus?.status === "LOGIN_REQUIRED") {
       throw new Error(
-        `[${playabilityStatus.status}] ${playabilityStatus.reason}`,
+        `[${playabilityStatus.status}] ${playabilityStatus.reason}`
       );
     }
 
     info = bypassedResult;
   }
 
-  if (playabilityStatus?.status === 'UNPLAYABLE') {
+  if (playabilityStatus?.status === "UNPLAYABLE") {
     const errorScreen =
       playabilityStatus.error_screen as YTNodes.PlayerErrorMessage | null;
     throw new Error(
-      `[${playabilityStatus.status}] ${errorScreen?.reason.text}: ${errorScreen?.subreason.text}`,
+      `[${playabilityStatus.status}] ${errorScreen?.reason.text}: ${errorScreen?.subreason.text}`
     );
   }
 
-  const selectedPreset = config.selectedPreset ?? 'mp3 (256kbps)';
+  const selectedPreset = config.selectedPreset ?? "mp3 (256kbps)";
   let presetSetting: Preset;
-  if (selectedPreset === 'Custom') {
+  if (selectedPreset === "Custom") {
     presetSetting = config.customPresetSetting ?? DefaultPresetList.Custom;
-  } else if (selectedPreset === 'Source') {
+  } else if (selectedPreset === "Source") {
     presetSetting = DefaultPresetList.Source;
   } else {
-    presetSetting = DefaultPresetList['mp3 (256kbps)'];
+    presetSetting = DefaultPresetList["mp3 (256kbps)"];
   }
 
   const downloadOptions: Types.FormatOptions = {
-    format: 'any', // Media container format
-    quality: 'best', // Best, bestefficiency, 144p, 240p, 480p, 720p and so on.
-    type: (await isPremium()) ? 'audio' : 'video+audio', // Audio, video or video+audio
+    format: "any", // Media container format
+    quality: "best", // Best, bestefficiency, 144p, 240p, 480p, 720p and so on.
+    type: (await isPremium()) ? "audio" : "video+audio", // Audio, video or video+audio
   };
 
   const format = info.chooseFormat(downloadOptions);
 
   let targetFileExtension: string;
   if (presetSetting?.extension) {
-    targetFileExtension = presetSetting?.extension ?? 'mp3';
+    targetFileExtension = presetSetting?.extension ?? "mp3";
   } else {
     targetFileExtension =
-      VideoFormatList.find((it) => it.itag === format.itag)?.container ?? 'mp3';
+      VideoFormatList.find((it) => it.itag === format.itag)?.container ?? "mp3";
   }
 
   let filename = filenamify(`${name}.${targetFileExtension}`, {
     maxLength: 255,
-    replacement: '_',
+    replacement: "_",
   });
   if (!is.macOS()) {
-    filename = filename.normalize('NFC');
+    filename = filename.normalize("NFC");
   }
   const filePath = join(dir, filename);
 
@@ -450,11 +450,11 @@ async function downloadSongUnsafe(
   const stream = await info.download(downloadOptions);
 
   console.info(
-    t('plugins.downloader.backend.feedback.download-info', {
+    t("plugins.downloader.backend.feedback.download-info", {
       artist: metadata.artist,
       title: metadata.title,
       videoId: metadata.videoId,
-    }),
+    })
   );
 
   const iterableStream = Utils.streamToIterable(stream);
@@ -470,14 +470,14 @@ async function downloadSongUnsafe(
     presetSetting?.ffmpegArgs ?? [],
     format.content_length ?? 0,
     sendFeedback,
-    increasePlaylistProgress,
+    increasePlaylistProgress
   );
 
-  if (fileBuffer && targetFileExtension === 'mp3') {
+  if (fileBuffer && targetFileExtension === "mp3") {
     fileBuffer = await writeID3(
       Buffer.from(fileBuffer),
       metadata,
-      sendFeedback,
+      sendFeedback
     );
   }
 
@@ -487,9 +487,9 @@ async function downloadSongUnsafe(
 
   sendFeedback(null, -1);
   console.info(
-    t('plugins.downloader.backend.feedback.done', {
+    t("plugins.downloader.backend.feedback.done", {
       filePath,
-    }),
+    })
   );
 }
 
@@ -497,7 +497,7 @@ async function downloadChunks(
   stream: AsyncGenerator<Uint8Array, void>,
   contentLength: number,
   sendFeedback: (str: string, value?: number) => void,
-  increasePlaylistProgress: (value: number) => void = () => {},
+  increasePlaylistProgress: (value: number) => void = () => {}
 ) {
   const chunks = [];
   let downloaded = 0;
@@ -507,10 +507,10 @@ async function downloadChunks(
     const ratio = downloaded / contentLength;
     const progress = Math.floor(ratio * 100);
     sendFeedback(
-      t('plugins.downloader.backend.feedback.download-progress', {
+      t("plugins.downloader.backend.feedback.download-progress", {
         percent: progress,
       }),
-      ratio,
+      ratio
     );
     // 15% for download, 85% for conversion
     // This is a very rough estimate, trying to make the progress bar look nice
@@ -526,11 +526,11 @@ async function iterableStreamToProcessedUint8Array(
   presetFfmpegArgs: string[],
   contentLength: number,
   sendFeedback: (str: string, value?: number) => void,
-  increasePlaylistProgress: (value: number) => void = () => {},
+  increasePlaylistProgress: (value: number) => void = () => {}
 ): Promise<Uint8Array | null> {
-  sendFeedback(t('plugins.downloader.backend.feedback.loading'), 2); // Indefinite progress bar after download
+  sendFeedback(t("plugins.downloader.backend.feedback.loading"), 2); // Indefinite progress bar after download
 
-  const safeVideoName = randomBytes(32).toString('hex');
+  const safeVideoName = randomBytes(32).toString("hex");
 
   return await ffmpegMutex.runExclusive(async () => {
     try {
@@ -539,28 +539,28 @@ async function iterableStreamToProcessedUint8Array(
         await ffmpegInstance.load();
       }
 
-      sendFeedback(t('plugins.downloader.backend.feedback.preparing-file'));
+      sendFeedback(t("plugins.downloader.backend.feedback.preparing-file"));
       ffmpegInstance.FS(
-        'writeFile',
+        "writeFile",
         safeVideoName,
         Buffer.concat(
           await downloadChunks(
             stream,
             contentLength,
             sendFeedback,
-            increasePlaylistProgress,
-          ),
-        ),
+            increasePlaylistProgress
+          )
+        )
       );
 
-      sendFeedback(t('plugins.downloader.backend.feedback.converting'));
+      sendFeedback(t("plugins.downloader.backend.feedback.converting"));
 
       ffmpegInstance.setProgress(({ ratio }) => {
         sendFeedback(
-          t('plugins.downloader.backend.feedback.conversion-progress', {
+          t("plugins.downloader.backend.feedback.conversion-progress", {
             percent: Math.floor(ratio * 100),
           }),
-          ratio,
+          ratio
         );
         increasePlaylistProgress(0.15 + ratio * 0.85);
       });
@@ -568,22 +568,22 @@ async function iterableStreamToProcessedUint8Array(
       const safeVideoNameWithExtension = `${safeVideoName}.${extension}`;
       try {
         await ffmpegInstance.run(
-          '-i',
+          "-i",
           safeVideoName,
           ...presetFfmpegArgs,
           ...getFFmpegMetadataArgs(metadata),
-          safeVideoNameWithExtension,
+          safeVideoNameWithExtension
         );
       } finally {
-        ffmpegInstance.FS('unlink', safeVideoName);
+        ffmpegInstance.FS("unlink", safeVideoName);
       }
 
-      sendFeedback(t('plugins.downloader.backend.feedback.saving'));
+      sendFeedback(t("plugins.downloader.backend.feedback.saving"));
 
       try {
-        return ffmpegInstance.FS('readFile', safeVideoNameWithExtension);
+        return ffmpegInstance.FS("readFile", safeVideoNameWithExtension);
       } finally {
-        ffmpegInstance.FS('unlink', safeVideoNameWithExtension);
+        ffmpegInstance.FS("unlink", safeVideoNameWithExtension);
       }
     } catch (error: unknown) {
       sendError(error as Error, safeVideoName);
@@ -600,10 +600,10 @@ const getCoverBuffer = async (url: string) => {
 async function writeID3(
   buffer: Buffer,
   metadata: CustomSongInfo,
-  sendFeedback: (str: string, value?: number) => void,
+  sendFeedback: (str: string, value?: number) => void
 ) {
   try {
-    sendFeedback(t('plugins.downloader.backend.feedback.writing-id3'));
+    sendFeedback(t("plugins.downloader.backend.feedback.writing-id3"));
     const tags: NodeID3.Tags = {};
 
     // Create the metadata tags
@@ -614,12 +614,12 @@ async function writeID3(
       tags.album = metadata.album;
     }
 
-    const coverBuffer = await getCoverBuffer(metadata.imageSrc ?? '');
+    const coverBuffer = await getCoverBuffer(metadata.imageSrc ?? "");
     if (coverBuffer) {
       tags.image = {
-        description: 'thumbnail',
+        description: "thumbnail",
         imageBuffer: coverBuffer,
-        mime: 'image/png',
+        mime: "image/png",
         type: {
           id: NodeID3.TagConstants.AttachedPicture.PictureType.FRONT_COVER,
         },
@@ -639,7 +639,7 @@ async function writeID3(
 
 export async function downloadPlaylist(givenUrl?: string | URL) {
   try {
-    givenUrl = new URL(givenUrl ?? '');
+    givenUrl = new URL(givenUrl ?? "");
   } catch {
     givenUrl = new URL(win.webContents.getURL());
   }
@@ -649,7 +649,7 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
 
   if (!playlistId) {
     sendError(
-      new Error(t('plugins.downloader.backend.feedback.playlist-id-not-found')),
+      new Error(t("plugins.downloader.backend.feedback.playlist-id-not-found"))
     );
     return;
   }
@@ -659,11 +659,11 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
   };
 
   console.log(
-    t('plugins.downloader.backend.feedback.trying-to-get-playlist-id', {
+    t("plugins.downloader.backend.feedback.trying-to-get-playlist-id", {
       playlistId,
-    }),
+    })
   );
-  sendFeedback(t('plugins.downloader.backend.feedback.getting-playlist-info'));
+  sendFeedback(t("plugins.downloader.backend.feedback.getting-playlist-info"));
   let playlist: YTMusic.Playlist;
   const items: YTNodes.MusicResponsiveListItem[] = [];
   try {
@@ -671,7 +671,7 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     if (playlist?.items) {
       const filteredItems = playlist.items.filter(
         (item): item is YTNodes.MusicResponsiveListItem =>
-          item instanceof YTNodes.MusicResponsiveListItem,
+          item instanceof YTNodes.MusicResponsiveListItem
       );
 
       items.push(...filteredItems);
@@ -679,32 +679,32 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
   } catch (error: unknown) {
     sendError(
       new Error(
-        t('plugins.downloader.backend.feedback.playlist-is-mix-or-private', {
+        t("plugins.downloader.backend.feedback.playlist-is-mix-or-private", {
           error: String(error),
-        }),
-      ),
+        })
+      )
     );
     return;
   }
 
   if (!playlist || !playlist.items || playlist.items.length === 0) {
     sendError(
-      new Error(t('plugins.downloader.backend.feedback.playlist-is-empty')),
+      new Error(t("plugins.downloader.backend.feedback.playlist-is-empty"))
     );
     return;
   }
 
   const normalPlaylistTitle =
-    playlist.header && 'title' in playlist.header
+    playlist.header && "title" in playlist.header
       ? playlist.header?.title?.text
       : undefined;
   const playlistTitle =
     normalPlaylistTitle ??
     playlist.page.contents_memo
-      ?.get('MusicResponsiveListItemFlexColumn')
+      ?.get("MusicResponsiveListItemFlexColumn")
       ?.at(2)
       ?.as(YTNodes.MusicResponsiveListItemFlexColumn)?.title?.text ??
-    'NO_TITLE';
+    "NO_TITLE";
   const isAlbum = !normalPlaylistTitle;
 
   while (playlist.has_continuation) {
@@ -712,7 +712,7 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
 
     const filteredItems = playlist.items.filter(
       (item): item is YTNodes.MusicResponsiveListItem =>
-        item instanceof YTNodes.MusicResponsiveListItem,
+        item instanceof YTNodes.MusicResponsiveListItem
     );
 
     items.push(...filteredItems);
@@ -720,27 +720,27 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
 
   if (items.length === 1) {
     sendFeedback(
-      t('plugins.downloader.backend.feedback.playlist-has-only-one-song'),
+      t("plugins.downloader.backend.feedback.playlist-has-only-one-song")
     );
     await downloadSongFromId(items.at(0)!.id!);
     return;
   }
 
-  let safePlaylistTitle = filenamify(playlistTitle, { replacement: ' ' });
+  let safePlaylistTitle = filenamify(playlistTitle, { replacement: " " });
   if (!is.macOS()) {
-    safePlaylistTitle = safePlaylistTitle.normalize('NFC');
+    safePlaylistTitle = safePlaylistTitle.normalize("NFC");
   }
 
-  const folder = getFolder(config.downloadFolder ?? '');
+  const folder = getFolder(config.downloadFolder ?? "");
   const playlistFolder = join(folder, safePlaylistTitle);
   if (existsSync(playlistFolder)) {
     if (!config.skipExisting) {
       sendError(
         new Error(
-          t('plugins.downloader.backend.feedback.folder-already-exists', {
+          t("plugins.downloader.backend.feedback.folder-already-exists", {
             playlistFolder,
-          }),
-        ),
+          })
+        )
       );
       return;
     }
@@ -750,31 +750,31 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
 
   dialog.showMessageBox(win, {
     buttons: [
-      t('plugins.downloader.backend.dialog.start-download-playlist.buttons.ok'),
+      t("plugins.downloader.backend.dialog.start-download-playlist.buttons.ok"),
     ],
     detail: t(
-      'plugins.downloader.backend.dialog.start-download-playlist.detail',
+      "plugins.downloader.backend.dialog.start-download-playlist.detail",
       {
         playlistSize: items.length,
-      },
+      }
     ),
     message: t(
-      'plugins.downloader.backend.dialog.start-download-playlist.message',
+      "plugins.downloader.backend.dialog.start-download-playlist.message",
       {
         playlistTitle,
-      },
+      }
     ),
-    title: t('plugins.downloader.backend.dialog.start-download-playlist.title'),
-    type: 'info',
+    title: t("plugins.downloader.backend.dialog.start-download-playlist.title"),
+    type: "info",
   });
 
   if (is.dev()) {
     console.log(
-      t('plugins.downloader.backend.feedback.downloading-playlist', {
+      t("plugins.downloader.backend.feedback.downloading-playlist", {
         playlistId,
         playlistSize: items.length,
         playlistTitle,
-      }),
+      })
     );
   }
 
@@ -795,26 +795,26 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
   try {
     for (const song of items) {
       sendFeedback(
-        t('plugins.downloader.backend.feedback.downloading-counter', {
+        t("plugins.downloader.backend.feedback.downloading-counter", {
           current: counter,
           total: items.length,
-        }),
+        })
       );
       const trackId = isAlbum ? counter : undefined;
       await downloadSongFromId(
         song.id!,
         playlistFolder,
         trackId?.toString(),
-        increaseProgress,
+        increaseProgress
       ).catch((error) => {
         sendError(
           new Error(
-            t('plugins.downloader.backend.feedback.error-while-downloading', {
+            t("plugins.downloader.backend.feedback.error-while-downloading", {
               author: song.author!.name,
               error: String(error),
               title: song.title!,
-            }),
-          ),
+            })
+          )
         );
       });
 
@@ -837,19 +837,19 @@ function getFFmpegMetadataArgs(metadata: CustomSongInfo) {
   }
 
   return [
-    ...(metadata.title ? ['-metadata', `title=${metadata.title}`] : []),
-    ...(metadata.artist ? ['-metadata', `artist=${metadata.artist}`] : []),
-    ...(metadata.album ? ['-metadata', `album=${metadata.album}`] : []),
-    ...(metadata.trackId ? ['-metadata', `track=${metadata.trackId}`] : []),
+    ...(metadata.title ? ["-metadata", `title=${metadata.title}`] : []),
+    ...(metadata.artist ? ["-metadata", `artist=${metadata.artist}`] : []),
+    ...(metadata.album ? ["-metadata", `album=${metadata.album}`] : []),
+    ...(metadata.trackId ? ["-metadata", `track=${metadata.trackId}`] : []),
   ];
 }
 
 // Playlist radio modifier needs to be cut from playlist ID
-const INVALID_PLAYLIST_MODIFIER = 'RDAMPL';
+const INVALID_PLAYLIST_MODIFIER = "RDAMPL";
 
 const getPlaylistID = (aURL?: URL): string | null | undefined => {
   const result =
-    aURL?.searchParams.get('list') || aURL?.searchParams.get('playlist');
+    aURL?.searchParams.get("list") || aURL?.searchParams.get("playlist");
   if (result?.startsWith(INVALID_PLAYLIST_MODIFIER)) {
     return result.slice(INVALID_PLAYLIST_MODIFIER.length);
   }
@@ -862,15 +862,15 @@ const getVideoId = (url: URL | string): string | null => {
   if (!parsedUrl) {
     return null;
   }
-  return parsedUrl.searchParams.get('v');
+  return parsedUrl.searchParams.get("v");
 };
 
 const getMetadata = (info: YTMusic.TrackInfo): CustomSongInfo => ({
   album: info.player_overlays?.browser_media_session?.as(
-    YTNodes.BrowserMediaSession,
+    YTNodes.BrowserMediaSession
   ).album?.text,
   artist: cleanupName(info.basic_info.author!),
-  imageSrc: info.basic_info.thumbnail?.find((t) => !t.url.endsWith('.webp'))
+  imageSrc: info.basic_info.thumbnail?.find((t) => !t.url.endsWith(".webp"))
     ?.url,
   mediaType: MediaType.Audio,
   songDuration: info.basic_info.duration!,
@@ -884,5 +884,5 @@ const getAndroidTvInfo = async (id: string): Promise<YT.VideoInfo> =>
   // GetInfo 404s with the bypass, so we use getBasicInfo instead
   // that's fine as we only need the streaming data
   await yt.getBasicInfo(id, {
-    client: 'TV_EMBEDDED',
+    client: "TV_EMBEDDED",
   });

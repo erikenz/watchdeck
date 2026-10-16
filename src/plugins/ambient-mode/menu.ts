@@ -1,19 +1,19 @@
-import type { MenuItemConstructorOptions } from 'electron';
+import type { MenuItemConstructorOptions } from "electron";
 
-import { t } from '@/i18n';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuContext } from "@/types/contexts";
 
-import type { AmbientModePluginConfig } from './types';
+import type { AmbientModePluginConfig } from "./types";
 
 export interface menuParameters {
   getConfig: () => AmbientModePluginConfig | Promise<AmbientModePluginConfig>;
   setConfig: (
-    conf: Partial<Omit<AmbientModePluginConfig, 'enabled'>>,
+    conf: Partial<Omit<AmbientModePluginConfig, "enabled">>
   ) => void | Promise<void>;
 }
 
 export const menu: (
-  ctx: MenuContext<AmbientModePluginConfig>,
+  ctx: MenuContext<AmbientModePluginConfig>
 ) =>
   | MenuItemConstructorOptions[]
   | Promise<MenuItemConstructorOptions[]> = async ({
@@ -31,82 +31,82 @@ export const menu: (
 
   return [
     {
-      label: t('plugins.ambient-mode.menu.smoothness-transition.label'),
+      label: t("plugins.ambient-mode.menu.smoothness-transition.label"),
       submenu: interpolationTimeList.map((interpolationTime) => ({
         checked: config.interpolationTime === interpolationTime,
         click() {
           setConfig({ interpolationTime });
         },
         label: t(
-          'plugins.ambient-mode.menu.smoothness-transition.submenu.during',
+          "plugins.ambient-mode.menu.smoothness-transition.submenu.during",
           {
             interpolationTime: interpolationTime / 1000,
-          },
+          }
         ),
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
-      label: t('plugins.ambient-mode.menu.quality.label'),
+      label: t("plugins.ambient-mode.menu.quality.label"),
       submenu: qualityList.map((quality) => ({
         checked: config.quality === quality,
         click() {
           setConfig({ quality });
         },
-        label: t('plugins.ambient-mode.menu.quality.submenu.pixels', {
+        label: t("plugins.ambient-mode.menu.quality.submenu.pixels", {
           quality,
         }),
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
-      label: t('plugins.ambient-mode.menu.size.label'),
+      label: t("plugins.ambient-mode.menu.size.label"),
       submenu: sizeList.map((size) => ({
         checked: config.size === size,
         click() {
           setConfig({ size });
         },
-        label: t('plugins.ambient-mode.menu.size.submenu.percent', { size }),
-        type: 'radio',
+        label: t("plugins.ambient-mode.menu.size.submenu.percent", { size }),
+        type: "radio",
       })),
     },
     {
-      label: t('plugins.ambient-mode.menu.buffer.label'),
+      label: t("plugins.ambient-mode.menu.buffer.label"),
       submenu: bufferList.map((buffer) => ({
         checked: config.buffer === buffer,
         click() {
           setConfig({ buffer });
         },
-        label: t('plugins.ambient-mode.menu.buffer.submenu.buffer', {
+        label: t("plugins.ambient-mode.menu.buffer.submenu.buffer", {
           buffer,
         }),
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
-      label: t('plugins.ambient-mode.menu.opacity.label'),
+      label: t("plugins.ambient-mode.menu.opacity.label"),
       submenu: opacityList.map((opacity) => ({
         checked: config.opacity === opacity,
         click() {
           setConfig({ opacity });
         },
-        label: t('plugins.ambient-mode.menu.opacity.submenu.percent', {
+        label: t("plugins.ambient-mode.menu.opacity.submenu.percent", {
           opacity: opacity * 100,
         }),
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
-      label: t('plugins.ambient-mode.menu.blur-amount.label'),
+      label: t("plugins.ambient-mode.menu.blur-amount.label"),
       submenu: blurAmountList.map((blur) => ({
         checked: config.blur === blur,
         click() {
           setConfig({ blur });
         },
-        label: t('plugins.ambient-mode.menu.blur-amount.submenu.pixels', {
+        label: t("plugins.ambient-mode.menu.blur-amount.submenu.pixels", {
           blurAmount: blur,
         }),
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
@@ -114,8 +114,8 @@ export const menu: (
       click(item: Electron.MenuItem) {
         setConfig({ fullscreen: item.checked });
       },
-      label: t('plugins.ambient-mode.menu.use-fullscreen.label'),
-      type: 'checkbox',
+      label: t("plugins.ambient-mode.menu.use-fullscreen.label"),
+      type: "checkbox",
     },
   ];
 };

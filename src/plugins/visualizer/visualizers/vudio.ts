@@ -1,7 +1,7 @@
-import Vudio from 'vudio/umd/vudio';
+import Vudio from "vudio/umd/vudio";
 
-import type { VisualizerPluginConfig } from '../index';
-import { Visualizer } from './visualizer';
+import type { VisualizerPluginConfig } from "../index";
+import { Visualizer } from "./visualizer";
 
 class VudioVisualizer extends Visualizer {
   private readonly visualizer: Vudio;
@@ -12,7 +12,7 @@ class VudioVisualizer extends Visualizer {
     canvas: HTMLCanvasElement,
     audioNode: GainNode,
     stream: MediaStream,
-    config: VisualizerPluginConfig,
+    config: VisualizerPluginConfig
   ) {
     super(audioSource, audioNode);
 

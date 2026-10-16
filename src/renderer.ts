@@ -1,20 +1,20 @@
-import i18next from 'i18next';
-import { setTheme } from 'mdui/functions/setTheme.js';
+import i18next from "i18next";
+import { setTheme } from "mdui/functions/setTheme.js";
 
-import 'mdui/mdui.css';
-import 'mdui';
+import "mdui/mdui.css";
+import "mdui";
 
-import { loadI18n, setLanguage, t as i18t } from '@/i18n';
-import type { MusicPlayer } from '@/types/music-player';
-import type { MusicPlayerAppElement } from '@/types/music-player-app-element';
-import type { QueueResponse } from '@/types/music-player-desktop-internal';
-import type { PluginConfig } from '@/types/plugins';
-import type { QueueElement } from '@/types/queue';
-import type { SearchBoxElement } from '@/types/search-box-element';
+import { loadI18n, setLanguage, t as i18t } from "@/i18n";
+import type { MusicPlayer } from "@/types/music-player";
+import type { MusicPlayerAppElement } from "@/types/music-player-app-element";
+import type { QueueResponse } from "@/types/music-player-desktop-internal";
+import type { PluginConfig } from "@/types/plugins";
+import type { QueueElement } from "@/types/queue";
+import type { SearchBoxElement } from "@/types/search-box-element";
 import {
   defaultTrustedTypePolicy,
   registerWindowDefaultTrustedTypePolicy,
-} from '@/utils/trusted-types';
+} from "@/utils/trusted-types";
 
 import {
   createContext,
@@ -23,11 +23,11 @@ import {
   getAllLoadedRendererPlugins,
   getLoadedRendererPlugin,
   loadAllRendererPlugins,
-} from './loader/renderer';
-import { startingPages } from './providers/extracted-data';
-import { setupSongInfo } from './providers/song-info-front';
+} from "./loader/renderer";
+import { startingPages } from "./providers/extracted-data";
+import { setupSongInfo } from "./providers/song-info-front";
 
-setTheme('dark');
+setTheme("dark");
 
 let api: (Element & MusicPlayer) | null = null;
 let isPluginLoaded = false;
@@ -38,7 +38,7 @@ registerWindowDefaultTrustedTypePolicy();
 
 async function listenForApiLoad() {
   if (!isApiLoaded) {
-    api = document.querySelector('#movie_player');
+    api = document.querySelector("#movie_player");
     if (api) {
       await onApiLoaded();
 
@@ -50,57 +50,57 @@ async function listenForApiLoad() {
 async function onApiLoaded() {
   // Workaround for macOS traffic lights
   {
-    let osType = 'Unknown';
+    let osType = "Unknown";
     if (window.electronIs.osx()) {
-      osType = 'Macintosh';
+      osType = "Macintosh";
     } else if (window.electronIs.windows()) {
-      osType = 'Windows';
+      osType = "Windows";
     } else if (window.electronIs.linux()) {
-      osType = 'Linux';
+      osType = "Linux";
     }
     document.documentElement.dataset.os = osType;
   }
 
   // Workaround for #2459
   document
-    .querySelector('button.video-button.ytmusic-av-toggle')
-    ?.addEventListener('click', () =>
-      window.dispatchEvent(new Event('resize')),
+    .querySelector("button.video-button.ytmusic-av-toggle")
+    ?.addEventListener("click", () =>
+      window.dispatchEvent(new Event("resize"))
     );
 
-  window.ipcRenderer.on('watchdeck:previous-video', () => {
+  window.ipcRenderer.on("watchdeck:previous-video", () => {
     document
-      .querySelector<HTMLElement>('.previous-button.ytmusic-player-bar')
+      .querySelector<HTMLElement>(".previous-button.ytmusic-player-bar")
       ?.click();
   });
-  window.ipcRenderer.on('watchdeck:next-video', () => {
+  window.ipcRenderer.on("watchdeck:next-video", () => {
     document
-      .querySelector<HTMLElement>('.next-button.ytmusic-player-bar')
+      .querySelector<HTMLElement>(".next-button.ytmusic-player-bar")
       ?.click();
   });
-  window.ipcRenderer.on('watchdeck:play', (_) => {
+  window.ipcRenderer.on("watchdeck:play", (_) => {
     api?.playVideo();
   });
-  window.ipcRenderer.on('watchdeck:pause', (_) => {
+  window.ipcRenderer.on("watchdeck:pause", (_) => {
     api?.pauseVideo();
   });
-  window.ipcRenderer.on('watchdeck:toggle-play', (_) => {
+  window.ipcRenderer.on("watchdeck:toggle-play", (_) => {
     if (api?.getPlayerState() === 2) {
       api?.playVideo();
     } else {
       api?.pauseVideo();
     }
   });
-  window.ipcRenderer.on('watchdeck:seek-to', (_, t: number) => {
+  window.ipcRenderer.on("watchdeck:seek-to", (_, t: number) => {
     api!.seekTo(t);
   });
-  window.ipcRenderer.on('watchdeck:seek-by', (_, t: number) => {
+  window.ipcRenderer.on("watchdeck:seek-by", (_, t: number) => {
     api!.seekBy(t);
   });
-  window.ipcRenderer.on('watchdeck:shuffle', () => {
+  window.ipcRenderer.on("watchdeck:shuffle", () => {
     document
       .querySelector<HTMLElement & { queue: { shuffle: () => void } }>(
-        'ytmusic-player-bar',
+        "ytmusic-player-bar"
       )
       ?.queue.shuffle();
   });
@@ -108,39 +108,39 @@ async function onApiLoaded() {
   const isShuffled = () => {
     const isShuffled =
       document
-        .querySelector<HTMLElement>('ytmusic-player-bar')
-        ?.attributes.getNamedItem('shuffle-on') ?? null;
+        .querySelector<HTMLElement>("ytmusic-player-bar")
+        ?.attributes.getNamedItem("shuffle-on") ?? null;
 
     return isShuffled !== null;
   };
 
-  window.ipcRenderer.on('watchdeck:get-shuffle', () => {
-    window.ipcRenderer.send('watchdeck:get-shuffle-response', isShuffled());
+  window.ipcRenderer.on("watchdeck:get-shuffle", () => {
+    window.ipcRenderer.send("watchdeck:get-shuffle-response", isShuffled());
   });
 
   window.ipcRenderer.on(
-    'watchdeck:update-like',
-    (_, status: 'LIKE' | 'DISLIKE' = 'LIKE') => {
+    "watchdeck:update-like",
+    (_, status: "LIKE" | "DISLIKE" = "LIKE") => {
       document
         .querySelector<
           HTMLElement & { updateLikeStatus: (status: string) => void }
-        >('#like-button-renderer')
+        >("#like-button-renderer")
         ?.updateLikeStatus(status);
-    },
+    }
   );
-  window.ipcRenderer.on('watchdeck:switch-repeat', (_, repeat = 1) => {
+  window.ipcRenderer.on("watchdeck:switch-repeat", (_, repeat = 1) => {
     for (let i = 0; i < repeat; i++) {
       document
         .querySelector<HTMLElement & { onRepeatButtonClick: () => void }>(
-          'ytmusic-player-bar',
+          "ytmusic-player-bar"
         )
         ?.onRepeatButtonClick();
     }
   });
-  window.ipcRenderer.on('watchdeck:update-volume', (_, volume: number) => {
+  window.ipcRenderer.on("watchdeck:update-volume", (_, volume: number) => {
     document
       .querySelector<HTMLElement & { updateVolume: (volume: number) => void }>(
-        'ytmusic-player-bar',
+        "ytmusic-player-bar"
       )
       ?.updateVolume(volume);
   });
@@ -148,8 +148,8 @@ async function onApiLoaded() {
   const isFullscreen = () => {
     const isFullscreen =
       document
-        .querySelector<HTMLElement>('ytmusic-player-bar')
-        ?.attributes.getNamedItem('player-fullscreened') ?? null;
+        .querySelector<HTMLElement>("ytmusic-player-bar")
+        ?.attributes.getNamedItem("player-fullscreened") ?? null;
 
     return isFullscreen !== null;
   };
@@ -161,34 +161,34 @@ async function onApiLoaded() {
     }
 
     if (fullscreen) {
-      document.querySelector<HTMLElement>('.exit-fullscreen-button')?.click();
+      document.querySelector<HTMLElement>(".exit-fullscreen-button")?.click();
     } else {
-      document.querySelector<HTMLElement>('.fullscreen-button')?.click();
+      document.querySelector<HTMLElement>(".fullscreen-button")?.click();
     }
   };
 
-  window.ipcRenderer.on('watchdeck:get-fullscreen', () => {
-    window.ipcRenderer.send('watchdeck:set-fullscreen', isFullscreen());
+  window.ipcRenderer.on("watchdeck:get-fullscreen", () => {
+    window.ipcRenderer.send("watchdeck:set-fullscreen", isFullscreen());
   });
 
   window.ipcRenderer.on(
-    'watchdeck:click-fullscreen-button',
+    "watchdeck:click-fullscreen-button",
     (_, fullscreen: boolean | undefined) => {
       clickFullscreenButton(fullscreen ?? false);
-    },
+    }
   );
 
-  window.ipcRenderer.on('watchdeck:toggle-mute', (_) => {
+  window.ipcRenderer.on("watchdeck:toggle-mute", (_) => {
     document
       .querySelector<HTMLElement & { onVolumeClick: () => void }>(
-        'ytmusic-player-bar',
+        "ytmusic-player-bar"
       )
       ?.onVolumeClick();
   });
 
-  window.ipcRenderer.on('watchdeck:get-queue', () => {
-    const queue = document.querySelector<QueueElement>('#queue');
-    window.ipcRenderer.send('watchdeck:get-queue-response', {
+  window.ipcRenderer.on("watchdeck:get-queue", () => {
+    const queue = document.querySelector<QueueElement>("#queue");
+    window.ipcRenderer.send("watchdeck:get-queue-response", {
       autoPlaying: queue?.queue.autoPlaying,
       continuation: queue?.queue.continuation,
       items: queue?.queue.getItems(),
@@ -196,10 +196,10 @@ async function onApiLoaded() {
   });
 
   window.ipcRenderer.on(
-    'watchdeck:add-to-queue',
+    "watchdeck:add-to-queue",
     (_, videoId: string, queueInsertPosition: string) => {
-      const queue = document.querySelector<QueueElement>('#queue');
-      const app = document.querySelector<MusicPlayerAppElement>('ytmusic-app');
+      const queue = document.querySelector<QueueElement>("#queue");
+      const app = document.querySelector<MusicPlayerAppElement>("ytmusic-app");
       if (!app) {
         return;
       }
@@ -210,7 +210,7 @@ async function onApiLoaded() {
       }
 
       app.networkManager
-        .fetch('/music/get_queue', {
+        .fetch("/music/get_queue", {
           queueContextParams: store.getState().queue.queueContextParams,
           queueInsertPosition,
           videoIds: [videoId],
@@ -218,8 +218,8 @@ async function onApiLoaded() {
         .then((result) => {
           if (
             result &&
-            typeof result === 'object' &&
-            'queueDatas' in result &&
+            typeof result === "object" &&
+            "queueDatas" in result &&
             Array.isArray(result.queueDatas)
           ) {
             const queueItems = store.getState().queue.items;
@@ -227,77 +227,77 @@ async function onApiLoaded() {
             queue?.dispatch({
               payload: {
                 index:
-                  queueInsertPosition === 'INSERT_AFTER_CURRENT_VIDEO'
+                  queueInsertPosition === "INSERT_AFTER_CURRENT_VIDEO"
                     ? queueItems.findIndex(
                         (it) =>
                           (
                             it.playlistPanelVideoRenderer ||
                             it.playlistPanelVideoWrapperRenderer
                               ?.primaryRenderer.playlistPanelVideoRenderer
-                          )?.selected,
+                          )?.selected
                       ) + 1 || queueItemsLength
                     : queueItemsLength,
                 items: result.queueDatas
                   .map((it) =>
-                    typeof it === 'object' && it && 'content' in it
+                    typeof it === "object" && it && "content" in it
                       ? it.content
-                      : null,
+                      : null
                   )
                   .filter(Boolean),
                 nextQueueItemId: store.getState().queue.nextQueueItemId,
                 shouldAssignIds: true,
                 shuffleEnabled: false,
               },
-              type: 'ADD_ITEMS',
+              type: "ADD_ITEMS",
             });
           }
         });
-    },
+    }
   );
   window.ipcRenderer.on(
-    'watchdeck:move-in-queue',
+    "watchdeck:move-in-queue",
     (_, fromIndex: number, toIndex: number) => {
-      const queue = document.querySelector<QueueElement>('#queue');
+      const queue = document.querySelector<QueueElement>("#queue");
       queue?.dispatch({
         payload: {
           fromIndex,
           toIndex,
         },
-        type: 'MOVE_ITEM',
+        type: "MOVE_ITEM",
       });
-    },
+    }
   );
-  window.ipcRenderer.on('watchdeck:remove-from-queue', (_, index: number) => {
-    const queue = document.querySelector<QueueElement>('#queue');
+  window.ipcRenderer.on("watchdeck:remove-from-queue", (_, index: number) => {
+    const queue = document.querySelector<QueueElement>("#queue");
     queue?.dispatch({
       payload: index,
-      type: 'REMOVE_ITEM',
+      type: "REMOVE_ITEM",
     });
   });
-  window.ipcRenderer.on('watchdeck:set-queue-index', (_, index: number) => {
-    const queue = document.querySelector<QueueElement>('#queue');
+  window.ipcRenderer.on("watchdeck:set-queue-index", (_, index: number) => {
+    const queue = document.querySelector<QueueElement>("#queue");
     queue?.dispatch({
       payload: index,
-      type: 'SET_INDEX',
+      type: "SET_INDEX",
     });
   });
-  window.ipcRenderer.on('watchdeck:clear-queue', () => {
-    const queue = document.querySelector<QueueElement>('#queue');
+  window.ipcRenderer.on("watchdeck:clear-queue", () => {
+    const queue = document.querySelector<QueueElement>("#queue");
     queue?.queue.store.store.dispatch({
       payload: { open: false },
-      type: 'SET_PLAYER_PAGE_INFO',
+      type: "SET_PLAYER_PAGE_INFO",
     });
     queue?.dispatch({
-      type: 'CLEAR',
+      type: "CLEAR",
     });
   });
 
   window.ipcRenderer.on(
-    'watchdeck:search',
+    "watchdeck:search",
     async (_, query: string, params?: string, continuation?: string) => {
-      const app = document.querySelector<MusicPlayerAppElement>('ytmusic-app');
+      const app = document.querySelector<MusicPlayerAppElement>("ytmusic-app");
       const searchBox =
-        document.querySelector<SearchBoxElement>('ytmusic-search-box');
+        document.querySelector<SearchBoxElement>("ytmusic-search-box");
 
       if (!app || !searchBox) {
         return;
@@ -311,52 +311,52 @@ async function onApiLoaded() {
           continuation?: string;
           suggestStats?: unknown;
         }
-      >('/search', {
+      >("/search", {
         continuation,
         params,
         query,
         suggestStats: searchBox.getSearchboxStats(),
       });
 
-      window.ipcRenderer.send('watchdeck:search-results', result);
-    },
+      window.ipcRenderer.send("watchdeck:search-results", result);
+    }
   );
 
-  const video = document.querySelector('video')!;
+  const video = document.querySelector("video")!;
   const audioContext = new AudioContext();
   const audioSource = audioContext.createMediaElementSource(video);
   audioSource.connect(audioContext.destination);
 
   for (const [id, plugin] of Object.entries(getAllLoadedRendererPlugins())) {
-    if (typeof plugin.renderer !== 'function') {
+    if (typeof plugin.renderer !== "function") {
       await plugin.renderer?.onPlayerApiReady?.call(
         plugin.renderer,
         api!,
-        createContext(id),
+        createContext(id)
       );
     }
   }
 
   if (firstDataLoaded) {
     document.dispatchEvent(
-      new CustomEvent('videodatachange', { detail: { name: 'dataloaded' } }),
+      new CustomEvent("videodatachange", { detail: { name: "dataloaded" } })
     );
   }
 
   const audioCanPlayEventDispatcher = () => {
     document.dispatchEvent(
-      new CustomEvent('watchdeck:audio-can-play', {
+      new CustomEvent("watchdeck:audio-can-play", {
         detail: {
           audioContext,
           audioSource,
         },
-      }),
+      })
     );
   };
 
   const loadstartListener = () => {
     // Emit "audioCanPlay" for each video
-    video.addEventListener('canplaythrough', audioCanPlayEventDispatcher, {
+    video.addEventListener("canplaythrough", audioCanPlayEventDispatcher, {
       once: true,
     });
   };
@@ -365,33 +365,33 @@ async function onApiLoaded() {
     audioCanPlayEventDispatcher();
   }
 
-  video.addEventListener('loadstart', loadstartListener, { passive: true });
+  video.addEventListener("loadstart", loadstartListener, { passive: true });
 
-  window.ipcRenderer.send('watchdeck:player-api-loaded');
+  window.ipcRenderer.send("watchdeck:player-api-loaded");
 
   // Navigate to "Starting page"
-  const startingPage: string = window.mainConfig.get('options.startingPage');
+  const startingPage: string = window.mainConfig.get("options.startingPage");
   if (startingPage && startingPages[startingPage]) {
     document
-      .querySelector<MusicPlayerAppElement>('ytmusic-app')
+      .querySelector<MusicPlayerAppElement>("ytmusic-app")
       ?.navigate(startingPages[startingPage]);
   }
 
   // Remove upgrade button
-  if (window.mainConfig.get('options.removeUpgradeButton')) {
-    const itemsSelector = 'ytmusic-guide-section-renderer #items';
-    let selector = 'ytmusic-guide-entry-renderer:last-child';
+  if (window.mainConfig.get("options.removeUpgradeButton")) {
+    const itemsSelector = "ytmusic-guide-section-renderer #items";
+    let selector = "ytmusic-guide-entry-renderer:last-child";
 
     const upgradeBtnIcon = document.querySelector<SVGGElement>(
-      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome',
+      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006F\u0075\u0074\u0075\u0062\u0065_music_monochrome'
     );
     if (upgradeBtnIcon) {
       const path = upgradeBtnIcon.firstChild as SVGPathElement;
-      const data = path.getAttribute('d')!.slice(0, 15);
+      const data = path.getAttribute("d")!.slice(0, 15);
       selector = `ytmusic-guide-entry-renderer:has(> tp-yt-paper-item > yt-icon path[d^="${data}"])`;
     }
 
-    const styles = document.createElement('style');
+    const styles = document.createElement("style");
     styles.textContent = `${itemsSelector} ${selector} { display: none; }`;
 
     document.head.append(styles);
@@ -399,19 +399,19 @@ async function onApiLoaded() {
 
   // Hide / Force show like buttons
   const likeButtonsOptions: string = window.mainConfig.get(
-    'options.likeButtons',
+    "options.likeButtons"
   );
   if (likeButtonsOptions) {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       ytmusic-player-bar[is-mweb-player-bar-modernization-enabled] .middle-controls-buttons.ytmusic-player-bar, #like-button-renderer {
         display: ${
-          likeButtonsOptions === 'hide' ? 'none' : 'inherit'
+          likeButtonsOptions === "hide" ? "none" : "inherit"
         } !important;
       }
       ytmusic-player-bar[is-mweb-player-bar-modernization-enabled] .middle-controls.ytmusic-player-bar {
         justify-content: ${
-          likeButtonsOptions === 'hide' ? 'flex-start' : 'space-between'
+          likeButtonsOptions === "hide" ? "flex-start" : "space-between"
         } !important;
       }`;
 
@@ -419,8 +419,8 @@ async function onApiLoaded() {
   }
 
   // Swap like button order
-  if (window.mainConfig.get('options.swapLikeButtonsOrder')) {
-    const style = document.createElement('style');
+  if (window.mainConfig.get("options.swapLikeButtonsOrder")) {
+    const style = document.createElement("style");
     style.textContent = `
       #like-button-renderer {
         display: inline-flex;
@@ -433,10 +433,10 @@ async function onApiLoaded() {
 
 const defineWdTransElements = () => {
   customElements.define(
-    'wd-trans',
+    "wd-trans",
     class extends HTMLElement {
       connectedCallback() {
-        const key = this.getAttribute('key');
+        const key = this.getAttribute("key");
         if (key) {
           const targetHtml = i18t(key);
           (this.innerHTML as string | TrustedHTML) = defaultTrustedTypePolicy
@@ -444,13 +444,13 @@ const defineWdTransElements = () => {
             : targetHtml;
         }
       }
-    },
+    }
   );
 };
 
 const preload = async () => {
   await loadI18n();
-  await setLanguage(window.mainConfig.get('options.language') ?? 'en');
+  await setLanguage(window.mainConfig.get("options.language") ?? "en");
   window.i18n = {
     t: i18t.bind(i18next),
   };
@@ -464,31 +464,31 @@ const main = async () => {
   await loadAllRendererPlugins();
   isPluginLoaded = true;
 
-  window.ipcRenderer.on('plugin:unload', async (_event, id: string) => {
+  window.ipcRenderer.on("plugin:unload", async (_event, id: string) => {
     await forceUnloadRendererPlugin(id);
   });
-  window.ipcRenderer.on('plugin:enable', async (_event, id: string) => {
+  window.ipcRenderer.on("plugin:enable", async (_event, id: string) => {
     await forceLoadRendererPlugin(id);
     if (api) {
       const plugin = getLoadedRendererPlugin(id);
-      if (plugin && typeof plugin.renderer !== 'function') {
+      if (plugin && typeof plugin.renderer !== "function") {
         await plugin.renderer?.onPlayerApiReady?.call(
           plugin.renderer,
           api,
-          createContext(id),
+          createContext(id)
         );
       }
     }
   });
 
   window.ipcRenderer.on(
-    'config-changed',
+    "config-changed",
     (_event, id: string, newConfig: PluginConfig) => {
       const plugin = getAllLoadedRendererPlugins()[id];
-      if (plugin && typeof plugin.renderer !== 'function') {
+      if (plugin && typeof plugin.renderer !== "function") {
         plugin.renderer?.onConfigChange?.call(plugin.renderer, newConfig);
       }
-    },
+    }
   );
 
   // Wait for complete load of the api
@@ -499,7 +499,7 @@ const main = async () => {
 
   // Setup back to front logger
   if (window.electronIs.dev()) {
-    window.ipcRenderer.on('log', (_event, log: string) => {
+    window.ipcRenderer.on("log", (_event, log: string) => {
       console.log(JSON.parse(log));
     });
   }
@@ -508,15 +508,15 @@ const main = async () => {
 const initObserver = async () => {
   // check document.documentElement is ready
   await new Promise<void>((resolve) => {
-    if (document.readyState === 'loading') {
+    if (document.readyState === "loading") {
       document.addEventListener(
-        'DOMContentLoaded',
+        "DOMContentLoaded",
         () => {
           resolve();
         },
         {
           once: true,
-        },
+        }
       );
     } else {
       resolve();
@@ -525,7 +525,7 @@ const initObserver = async () => {
 
   const observer = new MutationObserver(() => {
     const playerApi = document.querySelector<Element & MusicPlayer>(
-      '#movie_player',
+      "#movie_player"
     );
     if (playerApi) {
       observer.disconnect();
@@ -533,12 +533,12 @@ const initObserver = async () => {
       // Inject song-info provider
       setupSongInfo(playerApi);
       const dataLoadedListener = (name: string) => {
-        if (!firstDataLoaded && name === 'dataloaded') {
+        if (!firstDataLoaded && name === "dataloaded") {
           firstDataLoaded = true;
-          playerApi.removeEventListener('videodatachange', dataLoadedListener);
+          playerApi.removeEventListener("videodatachange", dataLoadedListener);
         }
       };
-      playerApi.addEventListener('videodatachange', dataLoadedListener);
+      playerApi.addEventListener("videodatachange", dataLoadedListener);
 
       if (isPluginLoaded && !isApiLoaded) {
         api = playerApi;

@@ -1,4 +1,4 @@
-declare module 'keyboardevents-areequal' {
+declare module "keyboardevents-areequal" {
   interface KeyboardEvent {
     key?: string;
     code?: string;

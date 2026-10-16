@@ -1,11 +1,11 @@
-import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
-import { waitForElement } from '@/utils/wait-for-element';
+import { t } from "@/i18n";
+import { createPlugin } from "@/utils";
+import { waitForElement } from "@/utils/wait-for-element";
 
-import { menu } from './menu';
-import type { AmbientModePluginConfig } from './types';
+import { menu } from "./menu";
+import type { AmbientModePluginConfig } from "./types";
 
-import style from './style.css?inline';
+import style from "./style.css?inline";
 
 const defaultConfig: AmbientModePluginConfig = {
   blur: 100,
@@ -20,9 +20,9 @@ const defaultConfig: AmbientModePluginConfig = {
 
 export default createPlugin({
   config: defaultConfig,
-  description: () => t('plugins.ambient-mode.description'),
+  description: () => t("plugins.ambient-mode.description"),
   menu: menu,
-  name: () => t('plugins.ambient-mode.name'),
+  name: () => t("plugins.ambient-mode.name"),
   renderer: {
     blur: defaultConfig.blur,
     buffer: defaultConfig.buffer,
@@ -30,7 +30,7 @@ export default createPlugin({
     interval: null as NodeJS.Timeout | null,
     isFullscreen: defaultConfig.fullscreen,
     lastImageSource: null as string | null,
-    lastMediaType: null as 'video' | 'image' | null,
+    lastMediaType: null as "video" | "image" | null,
     lastVideoSource: null as string | null,
     onConfigChange(newConfig) {
       this.interpolationTime = newConfig.interpolationTime;
@@ -56,17 +56,17 @@ export default createPlugin({
       this.opacity = config.opacity;
       this.isFullscreen = config.fullscreen;
 
-      const songImage = document.querySelector<HTMLImageElement>('#song-image');
-      const songVideo = document.querySelector<HTMLDivElement>('#song-video');
+      const songImage = document.querySelector<HTMLImageElement>("#song-image");
+      const songVideo = document.querySelector<HTMLDivElement>("#song-video");
       const image = songImage?.querySelector<HTMLImageElement>(
-        'yt-img-shadow > img',
+        "yt-img-shadow > img"
       );
       const video = await waitForElement<HTMLVideoElement>(
-        '.html5-video-container > video',
+        ".html5-video-container > video"
       );
 
       const videoWrapper = document.querySelector(
-        '#song-video > .player-wrapper',
+        "#song-video > .player-wrapper"
       );
 
       const injectBlurImage = () => {
@@ -74,18 +74,18 @@ export default createPlugin({
 
         this.lastImageSource = image.src;
 
-        const blurImage = document.createElement('img');
-        blurImage.classList.add('html5-blur-image');
+        const blurImage = document.createElement("img");
+        blurImage.classList.add("html5-blur-image");
         blurImage.src = image.src;
 
         this.update = () => {
-          if (this.isFullscreen) blurImage.classList.add('fullscreen');
-          else blurImage.classList.remove('fullscreen');
+          if (this.isFullscreen) blurImage.classList.add("fullscreen");
+          else blurImage.classList.remove("fullscreen");
 
-          blurImage.style.setProperty('--width', `${this.size}%`);
-          blurImage.style.setProperty('--height', `${this.size}%`);
-          blurImage.style.setProperty('--blur', `${this.blur}px`);
-          blurImage.style.setProperty('--opacity', `${this.opacity}`);
+          blurImage.style.setProperty("--width", `${this.size}%`);
+          blurImage.style.setProperty("--height", `${this.size}%`);
+          blurImage.style.setProperty("--blur", `${this.blur}px`);
+          blurImage.style.setProperty("--opacity", `${this.opacity}`);
         };
         this.update();
 
@@ -103,10 +103,10 @@ export default createPlugin({
 
         this.lastVideoSource = video.src;
 
-        const blurCanvas = document.createElement('canvas');
-        blurCanvas.classList.add('html5-blur-canvas');
+        const blurCanvas = document.createElement("canvas");
+        blurCanvas.classList.add("html5-blur-canvas");
 
-        const context = blurCanvas.getContext('2d', {
+        const context = blurCanvas.getContext("2d", {
           willReadFrequently: true,
         });
 
@@ -115,7 +115,7 @@ export default createPlugin({
         let lastImageData: ImageData | null = null;
 
         const onSync = () => {
-          if (typeof lastEffectWorkId === 'number')
+          if (typeof lastEffectWorkId === "number")
             cancelAnimationFrame(lastEffectWorkId);
 
           lastEffectWorkId = requestAnimationFrame(() => {
@@ -124,7 +124,7 @@ export default createPlugin({
             const width = this.qualityRatio;
             let height = Math.max(
               Math.floor((blurCanvas.height / blurCanvas.width) * width),
-              1,
+              1
             );
             if (!Number.isFinite(height)) height = width;
             if (!height) return;
@@ -155,16 +155,16 @@ export default createPlugin({
 
           blurCanvas.width = this.qualityRatio;
           blurCanvas.height = Math.floor(
-            (newHeight / newWidth) * this.qualityRatio,
+            (newHeight / newWidth) * this.qualityRatio
           );
 
-          if (this.isFullscreen) blurCanvas.classList.add('fullscreen');
-          else blurCanvas.classList.remove('fullscreen');
+          if (this.isFullscreen) blurCanvas.classList.add("fullscreen");
+          else blurCanvas.classList.remove("fullscreen");
 
-          blurCanvas.style.setProperty('--width', `${this.size}%`);
-          blurCanvas.style.setProperty('--height', `${this.size}%`);
-          blurCanvas.style.setProperty('--blur', `${this.blur}px`);
-          blurCanvas.style.setProperty('--opacity', `${this.opacity}`);
+          blurCanvas.style.setProperty("--width", `${this.size}%`);
+          blurCanvas.style.setProperty("--height", `${this.size}%`);
+          blurCanvas.style.setProperty("--blur", `${this.blur}px`);
+          blurCanvas.style.setProperty("--opacity", `${this.opacity}`);
         };
         this.update();
 
@@ -172,7 +172,7 @@ export default createPlugin({
         let canvasInterval: NodeJS.Timeout | null = null;
         canvasInterval = setInterval(
           onSync,
-          Math.max(1, Math.ceil(1000 / this.buffer)),
+          Math.max(1, Math.ceil(1000 / this.buffer))
         );
 
         const onPause = () => {
@@ -183,11 +183,11 @@ export default createPlugin({
           if (canvasInterval) clearInterval(canvasInterval);
           canvasInterval = setInterval(
             onSync,
-            Math.max(1, Math.ceil(1000 / this.buffer)),
+            Math.max(1, Math.ceil(1000 / this.buffer))
           );
         };
-        songVideo.addEventListener('pause', onPause);
-        songVideo.addEventListener('play', onPlay);
+        songVideo.addEventListener("pause", onPause);
+        songVideo.addEventListener("play", onPlay);
 
         /* injecting */
         videoWrapper.prepend(blurCanvas);
@@ -196,40 +196,40 @@ export default createPlugin({
         return () => {
           if (canvasInterval) clearInterval(canvasInterval);
 
-          songVideo.removeEventListener('pause', onPause);
-          songVideo.removeEventListener('play', onPlay);
+          songVideo.removeEventListener("pause", onPause);
+          songVideo.removeEventListener("play", onPlay);
 
           if (blurCanvas.isConnected) blurCanvas.remove();
         };
       };
 
       const isVideoMode = () => {
-        const songVideo = document.querySelector<HTMLDivElement>('#song-video');
+        const songVideo = document.querySelector<HTMLDivElement>("#song-video");
         if (!songVideo) {
-          this.lastMediaType = 'image';
+          this.lastMediaType = "image";
           return false;
         }
 
-        const isVideo = getComputedStyle(songVideo).display !== 'none';
-        this.lastMediaType = isVideo ? 'video' : 'image';
+        const isVideo = getComputedStyle(songVideo).display !== "none";
+        this.lastMediaType = isVideo ? "video" : "image";
         return isVideo;
       };
 
-      const playerPage = document.querySelector<HTMLElement>('#player-page');
-      const ytmusicAppLayout = document.querySelector<HTMLElement>('#layout');
+      const playerPage = document.querySelector<HTMLElement>("#player-page");
+      const ytmusicAppLayout = document.querySelector<HTMLElement>("#layout");
 
       const injectBlurElement = (force?: boolean): boolean | void => {
-        const isPageOpen = ytmusicAppLayout?.hasAttribute('player-page-open');
+        const isPageOpen = ytmusicAppLayout?.hasAttribute("player-page-open");
         if (isPageOpen) {
           const isVideo = isVideoMode();
           if (!force) {
             if (
-              this.lastMediaType === 'video' &&
+              this.lastMediaType === "video" &&
               this.lastVideoSource === video?.src
             )
               return false;
             if (
-              this.lastMediaType === 'image' &&
+              this.lastMediaType === "image" &&
               this.lastImageSource === image?.src
             )
               return false;
@@ -246,7 +246,7 @@ export default createPlugin({
       /* needed for switching between different views (e.g. miniplayer) */
       const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
-          if (mutation.type === 'attributes') {
+          if (mutation.type === "attributes") {
             injectBlurElement(true);
             break;
           }

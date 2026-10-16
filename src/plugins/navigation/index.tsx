@@ -1,64 +1,64 @@
-import { IconChevronLeft } from '@mdui/icons/chevron-left.js';
-import { IconChevronRight } from '@mdui/icons/chevron-right.js';
-import { render } from 'solid-js/web';
+import { IconChevronLeft } from "@mdui/icons/chevron-left.js";
+import { IconChevronRight } from "@mdui/icons/chevron-right.js";
+import { render } from "solid-js/web";
 
-import { t } from '@/i18n';
-import { LitElementWrapper } from '@/solit';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { LitElementWrapper } from "@/solit";
+import { createPlugin } from "@/utils";
 
 export default createPlugin({
   config: {
     enabled: true,
   },
-  description: () => t('plugins.navigation.description'),
-  name: () => t('plugins.navigation.name'),
+  description: () => t("plugins.navigation.description"),
+  name: () => t("plugins.navigation.name"),
   renderer: {
-    buttonContainer: document.createElement('div'),
+    buttonContainer: document.createElement("div"),
     start() {
       if (!this.buttonContainer) {
-        this.buttonContainer = document.createElement('div');
+        this.buttonContainer = document.createElement("div");
       }
 
       render(
         () => (
           <>
             <mdui-tooltip
-              content={t('plugins.navigation.templates.back.title')}
+              content={t("plugins.navigation.templates.back.title")}
             >
               <mdui-button-icon
                 onClick={() => {
                   history.back();
                 }}
-                style={{ width: '40px', height: '40px' }}
+                style={{ width: "40px", height: "40px" }}
               >
                 <LitElementWrapper
                   elementClass={IconChevronLeft}
                   props={{
                     style: {
-                      'padding': '5px',
-                      'scale': '1.5',
-                      'font-size': '24px',
+                      padding: "5px",
+                      scale: "1.5",
+                      "font-size": "24px",
                     },
                   }}
                 />
               </mdui-button-icon>
             </mdui-tooltip>
             <mdui-tooltip
-              content={t('plugins.navigation.templates.forward.title')}
+              content={t("plugins.navigation.templates.forward.title")}
             >
               <mdui-button-icon
                 onClick={() => {
                   history.forward();
                 }}
-                style={{ width: '40px', height: '40px' }}
+                style={{ width: "40px", height: "40px" }}
               >
                 <LitElementWrapper
                   elementClass={IconChevronRight}
                   props={{
                     style: {
-                      'padding': '5px',
-                      'scale': '1.5',
-                      'font-size': '24px',
+                      padding: "5px",
+                      scale: "1.5",
+                      "font-size": "24px",
                     },
                   }}
                 />
@@ -66,9 +66,9 @@ export default createPlugin({
             </mdui-tooltip>
           </>
         ),
-        this.buttonContainer,
+        this.buttonContainer
       );
-      const menu = document.querySelector('#right-content');
+      const menu = document.querySelector("#right-content");
       menu?.prepend(this.buttonContainer);
     },
     stop() {

@@ -1,13 +1,13 @@
-import { t } from '@/i18n';
-import type { MusicPlayer } from '@/types/music-player';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import type { MusicPlayer } from "@/types/music-player";
+import { createPlugin } from "@/utils";
 
 export default createPlugin({
   config: {
     enabled: false,
   },
-  description: () => t('plugins.exponential-volume.description'),
-  name: () => t('plugins.exponential-volume.name'),
+  description: () => t("plugins.exponential-volume.description"),
+  name: () => t("plugins.exponential-volume.name"),
   renderer: {
     onPlayerApiReady(playerApi) {
       const syncVolume = (playerApi: MusicPlayer) => {
@@ -32,9 +32,9 @@ export default createPlugin({
       const storedOriginalVolumes = new WeakMap<HTMLMediaElement, number>();
       const propertyDescriptor = Object.getOwnPropertyDescriptor(
         HTMLMediaElement.prototype,
-        'volume',
+        "volume"
       );
-      Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
+      Object.defineProperty(HTMLMediaElement.prototype, "volume", {
         get(this: HTMLMediaElement) {
           const lowVolume =
             (propertyDescriptor?.get?.call(this) as number) ?? 0;
@@ -46,7 +46,7 @@ export default createPlugin({
           // To avoid ill effects, I check if the stored volume is somewhere in the same range as the calculated volume.
           const storedOriginalVolume = storedOriginalVolumes.get(this) ?? 0;
           const storedDeviation = Math.abs(
-            storedOriginalVolume - calculatedOriginalVolume,
+            storedOriginalVolume - calculatedOriginalVolume
           );
 
           return storedDeviation < 0.01

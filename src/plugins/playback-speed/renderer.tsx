@@ -1,14 +1,14 @@
-import { createSignal } from 'solid-js';
-import { render } from 'solid-js/web';
+import { createSignal } from "solid-js";
+import { render } from "solid-js/web";
 
-import { t } from '@/i18n';
+import { t } from "@/i18n";
 import {
   isMusicOrVideoTrack,
   isPlayerMenu,
-} from '@/plugins/utils/renderer/check';
-import { getSongMenu } from '@/providers/dom-elements';
+} from "@/plugins/utils/renderer/check";
+import { getSongMenu } from "@/providers/dom-elements";
 
-import { PlaybackSpeedSlider } from './components/slider';
+import { PlaybackSpeedSlider } from "./components/slider";
 
 const MIN_PLAYBACK_SPEED = 0.07;
 const MAX_PLAYBACK_SPEED = 16;
@@ -25,12 +25,12 @@ const forcePlaybackRate = (e: Event) => {
 const roundToTwo = (n: number) => Math.round(n * 1e2) / 1e2;
 
 const [speed, setSpeed] = createSignal(1);
-const sliderContainer = document.createElement('div');
+const sliderContainer = document.createElement("div");
 
 export const onPlayerApiReady = () => {
   const observePopupContainer = () => {
     const updatePlayBackSpeed = () => {
-      const videoElement = document.querySelector<HTMLVideoElement>('video');
+      const videoElement = document.querySelector<HTMLVideoElement>("video");
       if (videoElement) {
         videoElement.playbackRate = speed();
       }
@@ -50,7 +50,7 @@ export const onPlayerApiReady = () => {
 
             targetSpeed = Math.min(
               Math.max(MIN_PLAYBACK_SPEED, targetSpeed),
-              MAX_PLAYBACK_SPEED,
+              MAX_PLAYBACK_SPEED
             );
 
             setSpeed(targetSpeed);
@@ -68,17 +68,17 @@ export const onPlayerApiReady = () => {
               roundToTwo(
                 e.deltaY < 0
                   ? Math.min(prev + 0.01, MAX_PLAYBACK_SPEED)
-                  : Math.max(prev - 0.01, MIN_PLAYBACK_SPEED),
-              ),
+                  : Math.max(prev - 0.01, MIN_PLAYBACK_SPEED)
+              )
             );
 
             updatePlayBackSpeed();
           }}
           speed={speed()}
-          title={t('plugins.playback-speed.templates.button')}
+          title={t("plugins.playback-speed.templates.button")}
         />
       ),
-      sliderContainer,
+      sliderContainer
     );
 
     const observer = new MutationObserver(() => {
@@ -94,7 +94,7 @@ export const onPlayerApiReady = () => {
       }
     });
 
-    const popupContainer = document.querySelector('ytmusic-popup-container');
+    const popupContainer = document.querySelector("ytmusic-popup-container");
     if (popupContainer) {
       observer.observe(popupContainer, {
         childList: true,
@@ -104,10 +104,10 @@ export const onPlayerApiReady = () => {
   };
 
   const observeVideo = () => {
-    const video = document.querySelector<HTMLVideoElement>('video');
+    const video = document.querySelector<HTMLVideoElement>("video");
     if (video) {
-      video.addEventListener('ratechange', forcePlaybackRate);
-      video.addEventListener('watchdeck:src-changed', forcePlaybackRate);
+      video.addEventListener("ratechange", forcePlaybackRate);
+      video.addEventListener("watchdeck:src-changed", forcePlaybackRate);
     }
   };
 
@@ -116,10 +116,10 @@ export const onPlayerApiReady = () => {
 };
 
 export const onUnload = () => {
-  const video = document.querySelector<HTMLVideoElement>('video');
+  const video = document.querySelector<HTMLVideoElement>("video");
   if (video) {
-    video.removeEventListener('ratechange', forcePlaybackRate);
-    video.removeEventListener('watchdeck:src-changed', forcePlaybackRate);
+    video.removeEventListener("ratechange", forcePlaybackRate);
+    video.removeEventListener("watchdeck:src-changed", forcePlaybackRate);
   }
   getSongMenu()?.removeChild(sliderContainer);
 };

@@ -1,16 +1,16 @@
-import * as net from 'node:net';
+import * as net from "node:net";
 
-import is from 'electron-is';
-import { SocksClient } from 'socks';
-import type { SocksClientOptions } from 'socks';
+import is from "electron-is";
+import { SocksClient } from "socks";
+import type { SocksClientOptions } from "socks";
 
-import * as config from '@/config';
-import type { BackendContext } from '@/types/contexts';
-import { createBackend, LoggerPrefix } from '@/utils';
+import * as config from "@/config";
+import type { BackendContext } from "@/types/contexts";
+import { createBackend, LoggerPrefix } from "@/utils";
 
-import { defaultAuthProxyConfig } from '../config';
-import type { AuthProxyConfig } from '../config';
-import type { BackendType } from './types';
+import { defaultAuthProxyConfig } from "../config";
+import type { AuthProxyConfig } from "../config";
+import type { BackendType } from "./types";
 
 // Parsing the upstream authentication SOCK proxy URL
 const parseSocksUrl = (socksUrl: string) => {
@@ -24,7 +24,7 @@ const parseSocksUrl = (socksUrl: string) => {
     host: url.hostname,
     password: url.password,
     port: parseInt(url.port, 10),
-    type: url.protocol === 'socks5:' ? 5 : 4,
+    type: url.protocol === "socks5:" ? 5 : 4,
     username: url.username,
   };
 };
@@ -60,10 +60,10 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
 
     const { port, hostname } = serverConfig;
     // Upstream proxy from system settings
-    const upstreamProxyUrl = config.get('options.proxy');
+    const upstreamProxyUrl = config.get("options.proxy");
     // Create SOCKS proxy server
     const socksServer = net.createServer((socket) => {
-      socket.once('data', (chunk) => {
+      socket.once("data", (chunk) => {
         if (Buffer.isBuffer(chunk) && chunk[0] === 0x05) {
           // SOCKS5
           this.handleSocks5(socket, chunk, upstreamProxyUrl);
@@ -72,28 +72,28 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
         }
       });
 
-      socket.on('error', (err) => {
-        console.error(LoggerPrefix, '[SOCKS] Socket error:', err.message);
+      socket.on("error", (err) => {
+        console.error(LoggerPrefix, "[SOCKS] Socket error:", err.message);
       });
     });
 
     // Listen for errors
-    socksServer.on('error', (err) => {
-      console.error(LoggerPrefix, '[SOCKS Server Error]', err.message);
+    socksServer.on("error", (err) => {
+      console.error(LoggerPrefix, "[SOCKS Server Error]", err.message);
     });
 
     // Start server
     socksServer.listen(port, hostname, () => {
-      console.log(LoggerPrefix, '===========================================');
+      console.log(LoggerPrefix, "===========================================");
       console.log(
         LoggerPrefix,
-        `[Auth-Proxy-Adapter] Enable SOCKS proxy at socks5://${hostname}:${port}`,
+        `[Auth-Proxy-Adapter] Enable SOCKS proxy at socks5://${hostname}:${port}`
       );
       console.log(
         LoggerPrefix,
-        `[Auth-Proxy-Adapter] Using upstream proxy: ${upstreamProxyUrl}`,
+        `[Auth-Proxy-Adapter] Using upstream proxy: ${upstreamProxyUrl}`
       );
-      console.log(LoggerPrefix, '===========================================');
+      console.log(LoggerPrefix, "===========================================");
     });
 
     this.server = socksServer;
@@ -103,7 +103,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
   handleSocks5(
     clientSocket: net.Socket,
     chunk: Buffer,
-    upstreamProxyUrl: string,
+    upstreamProxyUrl: string
   ) {
     // Handshake phase
     const numMethods = chunk[1];
@@ -115,7 +115,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
       clientSocket.write(Buffer.from([0x05, 0x00]));
 
       // Wait for client's connection request
-      clientSocket.once('data', (data) => {
+      clientSocket.once("data", (data) => {
         if (!Buffer.isBuffer(data)) {
           return;
         }
@@ -132,7 +132,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
   processSocks5Request(
     clientSocket: net.Socket,
     data: Buffer,
-    upstreamProxyUrl: string,
+    upstreamProxyUrl: string
   ) {
     // Parse target address and port
     let targetHost;
@@ -143,7 +143,7 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
     if (cmd !== 0x01) {
       // Currently only support CONNECT command
       clientSocket.write(
-        Buffer.from([0x05, 0x07, 0x00, 0x01, 0, 0, 0, 0, 0, 0]),
+        Buffer.from([0x05, 0x07, 0x00, 0x01, 0, 0, 0, 0, 0, 0])
       );
       clientSocket.end();
       return;
@@ -162,14 +162,14 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
       // IPv6
       const ipv6Buffer = data.subarray(4, 20);
       targetHost = Array.from(new Array(8), (_, i) =>
-        ipv6Buffer.readUInt16BE(i * 2).toString(16),
-      ).join(':');
+        ipv6Buffer.readUInt16BE(i * 2).toString(16)
+      ).join(":");
       targetPort = data.readUInt16BE(20);
     }
     if (is.dev()) {
       console.debug(
         LoggerPrefix,
-        `[SOCKS5] Request to connect to ${targetHost}:${targetPort}`,
+        `[SOCKS5] Request to connect to ${targetHost}:${targetPort}`
       );
     }
 
@@ -178,14 +178,14 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
     if (!socksProxy) {
       // Failed to parse proxy URL
       clientSocket.write(
-        Buffer.from([0x05, 0x01, 0x00, 0x01, 0, 0, 0, 0, 0, 0]),
+        Buffer.from([0x05, 0x01, 0x00, 0x01, 0, 0, 0, 0, 0, 0])
       );
       clientSocket.end();
       return;
     }
 
     const options: SocksClientOptions = {
-      command: 'connect',
+      command: "connect",
       destination: {
         host: targetHost || defaultAuthProxyConfig.hostname,
         port: targetPort || defaultAuthProxyConfig.port,
@@ -221,25 +221,25 @@ export const backend = createBackend<BackendType, AuthProxyConfig>({
         proxySocket.pipe(clientSocket);
         clientSocket.pipe(proxySocket);
 
-        proxySocket.on('error', (error) => {
-          console.error(LoggerPrefix, '[SOCKS5] Proxy socket error:', error);
+        proxySocket.on("error", (error) => {
+          console.error(LoggerPrefix, "[SOCKS5] Proxy socket error:", error);
           if (clientSocket.writable) {
             clientSocket.end();
           }
         });
 
-        clientSocket.on('error', (error) => {
-          console.error(LoggerPrefix, '[SOCKS5] Client socket error:', error);
+        clientSocket.on("error", (error) => {
+          console.error(LoggerPrefix, "[SOCKS5] Client socket error:", error);
           if (proxySocket.writable) {
             proxySocket.end();
           }
         });
       })
       .catch((error) => {
-        console.error(LoggerPrefix, '[SOCKS5] Connection error:', error);
+        console.error(LoggerPrefix, "[SOCKS5] Connection error:", error);
         // Send failure response to client
         clientSocket.write(
-          Buffer.from([0x05, 0x05, 0x00, 0x01, 0, 0, 0, 0, 0, 0]),
+          Buffer.from([0x05, 0x05, 0x00, 0x01, 0, 0, 0, 0, 0, 0])
         );
         clientSocket.end();
       });

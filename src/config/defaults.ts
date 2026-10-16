@@ -9,11 +9,11 @@ export interface WindowPositionConfig {
 }
 
 export interface DefaultConfig {
-  'window-size': WindowSizeConfig;
-  'window-maximized': boolean;
-  'window-position': WindowPositionConfig;
-  'url': string;
-  'options': {
+  "window-size": WindowSizeConfig;
+  "window-maximized": boolean;
+  "window-position": WindowPositionConfig;
+  url: string;
+  options: {
     language?: string;
     tray: boolean;
     appVisible: boolean;
@@ -37,11 +37,11 @@ export interface DefaultConfig {
     themes: string[];
     customWindowTitle?: string;
   };
-  'plugins': Record<string, unknown>;
+  plugins: Record<string, unknown>;
 }
 
 export const defaultConfig: DefaultConfig = {
-  'options': {
+  options: {
     tray: false,
     appVisible: true,
     // no update feed is configured yet (see docs/PRD.md §R8): the inherited
@@ -57,22 +57,22 @@ export const defaultConfig: DefaultConfig = {
     trayClickPlayPause: false,
     autoResetAppCache: false,
     resumeOnStart: true,
-    likeButtons: '',
+    likeButtons: "",
     swapLikeButtonsOrder: false,
-    proxy: '',
-    startingPage: '',
+    proxy: "",
+    startingPage: "",
     overrideUserAgent: false,
     usePodcastParticipantAsArtist: false,
     themes: [],
   },
-  'plugins': {},
-  'url': 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
-  'window-maximized': false,
-  'window-position': {
+  plugins: {},
+  url: "https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com",
+  "window-maximized": false,
+  "window-position": {
     x: -1,
     y: -1,
   },
-  'window-size': {
+  "window-size": {
     height: 550,
     width: 1100,
   },

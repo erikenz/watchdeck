@@ -5,7 +5,7 @@ on: [pull_request_target]
 permissions: {}
 
 env:
-  NODE_VERSION: '24.x'
+  NODE_VERSION: "24.x"
 
 jobs:
   oxlint:
@@ -22,14 +22,14 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         with:
-          version: 11
+          version: 12
           run_install: false
 
       - name: Setup NodeJS
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts

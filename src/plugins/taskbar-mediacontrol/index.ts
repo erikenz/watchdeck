@@ -1,20 +1,20 @@
-import nextIconBlack from '@assets/media-icons-black/next.png?asset&asarUnpack';
-import pauseIconBlack from '@assets/media-icons-black/pause.png?asset&asarUnpack';
-import playIconBlack from '@assets/media-icons-black/play.png?asset&asarUnpack';
-import previousIconBlack from '@assets/media-icons-black/previous.png?asset&asarUnpack';
-import nextIconWhite from '@assets/media-icons-white/next.png?asset&asarUnpack';
-import pauseIconWhite from '@assets/media-icons-white/pause.png?asset&asarUnpack';
-import playIconWhite from '@assets/media-icons-white/play.png?asset&asarUnpack';
-import previousIconWhite from '@assets/media-icons-white/previous.png?asset&asarUnpack';
-import { nativeImage, nativeTheme } from 'electron';
-import type { NativeImage } from 'electron';
+import nextIconBlack from "@assets/media-icons-black/next.png?asset&asarUnpack";
+import pauseIconBlack from "@assets/media-icons-black/pause.png?asset&asarUnpack";
+import playIconBlack from "@assets/media-icons-black/play.png?asset&asarUnpack";
+import previousIconBlack from "@assets/media-icons-black/previous.png?asset&asarUnpack";
+import nextIconWhite from "@assets/media-icons-white/next.png?asset&asarUnpack";
+import pauseIconWhite from "@assets/media-icons-white/pause.png?asset&asarUnpack";
+import playIconWhite from "@assets/media-icons-white/play.png?asset&asarUnpack";
+import previousIconWhite from "@assets/media-icons-white/previous.png?asset&asarUnpack";
+import { nativeImage, nativeTheme } from "electron";
+import type { NativeImage } from "electron";
 
-import { t } from '@/i18n';
-import { getSongControls } from '@/providers/song-controls';
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import { Platform } from '@/types/plugins';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { getSongControls } from "@/providers/song-controls";
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import { Platform } from "@/types/plugins";
+import { createPlugin } from "@/utils";
 
 export default createPlugin({
   backend({ window }) {
@@ -23,28 +23,28 @@ export default createPlugin({
     const { playPause, next, previous } = getSongControls(window);
 
     const getImages = (): Record<
-      'play' | 'pause' | 'next' | 'previous',
+      "play" | "pause" | "next" | "previous",
       NativeImage
     > => {
       const isDark = nativeTheme.shouldUseDarkColors;
       return {
         play: nativeImage.createFromPath(
-          isDark ? playIconWhite : playIconBlack,
+          isDark ? playIconWhite : playIconBlack
         ),
         pause: nativeImage.createFromPath(
-          isDark ? pauseIconWhite : pauseIconBlack,
+          isDark ? pauseIconWhite : pauseIconBlack
         ),
         next: nativeImage.createFromPath(
-          isDark ? nextIconWhite : nextIconBlack,
+          isDark ? nextIconWhite : nextIconBlack
         ),
         previous: nativeImage.createFromPath(
-          isDark ? previousIconWhite : previousIconBlack,
+          isDark ? previousIconWhite : previousIconBlack
         ),
       };
     };
     let images = getImages();
 
-    nativeTheme.on('updated', () => {
+    nativeTheme.on("updated", () => {
       images = getImages();
       setThumbar(currentSongInfo);
     });
@@ -58,14 +58,14 @@ export default createPlugin({
       // Win32 require full rewrite of components
       window.setThumbarButtons([
         {
-          tooltip: 'Previous',
+          tooltip: "Previous",
           icon: images.previous,
           click() {
             previous();
           },
         },
         {
-          tooltip: 'Play/Pause',
+          tooltip: "Play/Pause",
           // Update icon based on play state
           icon: songInfo.isPaused ? images.play : images.pause,
           click() {
@@ -73,7 +73,7 @@ export default createPlugin({
           },
         },
         {
-          tooltip: 'Next',
+          tooltip: "Next",
           icon: images.next,
           click() {
             next();
@@ -92,15 +92,15 @@ export default createPlugin({
     });
 
     // Need to set thumbar again after win.show
-    window.on('show', () => {
+    window.on("show", () => {
       setThumbar(currentSongInfo);
     });
   },
   config: {
     enabled: false,
   },
-  description: () => t('plugins.taskbar-mediacontrol.description'),
-  name: () => t('plugins.taskbar-mediacontrol.name'),
+  description: () => t("plugins.taskbar-mediacontrol.description"),
+  name: () => t("plugins.taskbar-mediacontrol.name"),
   platform: Platform.Windows,
   restartNeeded: true,
 });

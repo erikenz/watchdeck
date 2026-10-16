@@ -1,7 +1,7 @@
-import { Wave } from '@foobar404/wave';
+import { Wave } from "@foobar404/wave";
 
-import type { VisualizerPluginConfig } from '../index';
-import { Visualizer } from './visualizer';
+import type { VisualizerPluginConfig } from "../index";
+import { Visualizer } from "./visualizer";
 
 class WaveVisualizer extends Visualizer {
   private readonly visualizer: Wave;
@@ -12,13 +12,13 @@ class WaveVisualizer extends Visualizer {
     canvas: HTMLCanvasElement,
     audioNode: GainNode,
     _stream: MediaStream,
-    config: VisualizerPluginConfig,
+    config: VisualizerPluginConfig
   ) {
     super(audioSource, audioNode);
 
     this.visualizer = new Wave(
       { context: audioContext, source: audioSource },
-      canvas,
+      canvas
     );
     for (const animation of config.wave.animations) {
       const TargetVisualizer =
@@ -27,7 +27,7 @@ class WaveVisualizer extends Visualizer {
         ];
 
       this.visualizer.addAnimation(
-        new TargetVisualizer(animation.config as never), // Magic of Typescript
+        new TargetVisualizer(animation.config as never) // Magic of Typescript
       );
     }
   }

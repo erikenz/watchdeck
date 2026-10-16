@@ -1,8 +1,8 @@
-import { debounce } from '@/providers/decorators';
-import type { RendererContext } from '@/types/contexts';
-import type { MusicPlayer } from '@/types/music-player';
+import { debounce } from "@/providers/decorators";
+import type { RendererContext } from "@/types/contexts";
+import type { MusicPlayer } from "@/types/music-player";
 
-import type { PreciseVolumePluginConfig } from './index';
+import type { PreciseVolumePluginConfig } from "./index";
 
 function $<E extends Element = Element>(selector: string) {
   return document.querySelector<E>(selector);
@@ -11,21 +11,21 @@ function $<E extends Element = Element>(selector: string) {
 let api: MusicPlayer;
 
 export const moveVolumeHud = debounce((showVideo: boolean) => {
-  const volumeHud = $<HTMLElement>('#volumeHud');
+  const volumeHud = $<HTMLElement>("#volumeHud");
   if (!volumeHud) {
     return;
   }
 
   volumeHud.style.top = showVideo
-    ? `${($('ytmusic-player')!.clientHeight - $('video')!.clientHeight) / 2}px`
-    : '0';
+    ? `${($("ytmusic-player")!.clientHeight - $("video")!.clientHeight) / 2}px`
+    : "0";
 }, 250);
 
 let options: PreciseVolumePluginConfig;
 
 export const onPlayerApiReady = async (
   playerApi: MusicPlayer,
-  context: RendererContext<PreciseVolumePluginConfig>,
+  context: RendererContext<PreciseVolumePluginConfig>
 ) => {
   options = await context.getConfig();
   api = playerApi;
@@ -36,16 +36,16 @@ export const onPlayerApiReady = async (
   }, 1000);
 
   const hideVolumeHud = debounce((volumeHud: HTMLElement) => {
-    volumeHud.style.opacity = '0';
+    volumeHud.style.opacity = "0";
   }, 2000);
 
   const hideVolumeSlider = debounce((slider: HTMLElement) => {
-    slider.classList.remove('on-hover');
+    slider.classList.remove("on-hover");
   }, 2500);
 
   /** Restore saved volume and setup tooltip */
   function firstRun() {
-    if (typeof options.savedVolume === 'number') {
+    if (typeof options.savedVolume === "number") {
       // Set saved volume as tooltip
       setTooltip(options.savedVolume);
 
@@ -60,15 +60,15 @@ export const onPlayerApiReady = async (
 
     // Workaround: computedStyleMap().get(string) returns CSSKeywordValue instead of CSSStyleValue
     const noVid =
-      ($('#main-panel')?.computedStyleMap().get('display') as CSSKeywordValue)
-        ?.value === 'none';
+      ($("#main-panel")?.computedStyleMap().get("display") as CSSKeywordValue)
+        ?.value === "none";
     injectVolumeHud(noVid);
     if (!noVid) {
       setupVideoPlayerOnwheel();
       const videoMode = () =>
         api.getPlayerResponse().videoDetails?.musicVideoType !==
-        'MUSIC_VIDEO_TYPE_ATV';
-      $('video')?.addEventListener('watchdeck:src-changed', () => {
+        "MUSIC_VIDEO_TYPE_ATV";
+      $("video")?.addEventListener("watchdeck:src-changed", () => {
         moveVolumeHud(videoMode());
       });
     }
@@ -76,45 +76,45 @@ export const onPlayerApiReady = async (
 
   function injectVolumeHud(noVid: boolean) {
     if (noVid) {
-      const position = 'top: 18px; right: 60px;';
-      const mainStyle = 'font-size: xx-large;';
+      const position = "top: 18px; right: 60px;";
+      const mainStyle = "font-size: xx-large;";
 
-      $('.center-content.ytmusic-nav-bar')?.insertAdjacentHTML(
-        'beforeend',
-        `<span id="volumeHud" style="${position + mainStyle}"></span>`,
+      $(".center-content.ytmusic-nav-bar")?.insertAdjacentHTML(
+        "beforeend",
+        `<span id="volumeHud" style="${position + mainStyle}"></span>`
       );
     } else {
-      const position = 'top: 10px; left: 10px;';
+      const position = "top: 10px; left: 10px;";
       const mainStyle =
-        'font-size: xxx-large; webkit-text-stroke: 1px black; font-weight: 600;';
+        "font-size: xxx-large; webkit-text-stroke: 1px black; font-weight: 600;";
 
-      $('#song-video')?.insertAdjacentHTML(
-        'afterend',
-        `<span id="volumeHud" style="${position + mainStyle}"></span>`,
+      $("#song-video")?.insertAdjacentHTML(
+        "afterend",
+        `<span id="volumeHud" style="${position + mainStyle}"></span>`
       );
     }
   }
 
   function showVolumeHud(volume: number) {
-    const volumeHud = $<HTMLElement>('#volumeHud');
+    const volumeHud = $<HTMLElement>("#volumeHud");
     if (!volumeHud) {
       return;
     }
 
     volumeHud.textContent = `${volume}%`;
-    volumeHud.style.opacity = '1';
+    volumeHud.style.opacity = "1";
 
     hideVolumeHud(volumeHud);
   }
 
   /** Add onwheel event to video player */
   function setupVideoPlayerOnwheel() {
-    const panel = $<HTMLElement>('#main-panel');
+    const panel = $<HTMLElement>("#main-panel");
     if (!panel) {
       return;
     }
 
-    panel.addEventListener('wheel', (event) => {
+    panel.addEventListener("wheel", (event) => {
       event.preventDefault();
       // Event.deltaY < 0 means wheel-up
       changeVolume(event.deltaY < 0);
@@ -128,24 +128,24 @@ export const onPlayerApiReady = async (
 
   /** Add onwheel event to play bar and also track if play bar is hovered */
   function setupPlaybar() {
-    const playerbar = $<HTMLElement>('ytmusic-player-bar');
+    const playerbar = $<HTMLElement>("ytmusic-player-bar");
     if (!playerbar) {
       return;
     }
 
-    playerbar.addEventListener('wheel', (event) => {
+    playerbar.addEventListener("wheel", (event) => {
       event.preventDefault();
       // Event.deltaY < 0 means wheel-up
       changeVolume(event.deltaY < 0);
     });
 
     // Keep track of mouse position for showVolumeSlider()
-    playerbar.addEventListener('mouseenter', () => {
-      playerbar.classList.add('on-hover');
+    playerbar.addEventListener("mouseenter", () => {
+      playerbar.classList.add("on-hover");
     });
 
-    playerbar.addEventListener('mouseleave', () => {
-      playerbar.classList.remove('on-hover');
+    playerbar.addEventListener("mouseleave", () => {
+      playerbar.classList.remove("on-hover");
     });
 
     setupSliderObserver();
@@ -155,13 +155,13 @@ export const onPlayerApiReady = async (
   function setupSliderObserver() {
     const sliderObserver = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (mutation.target.nodeName === 'TP-YT-PAPER-SLIDER') {
+        if (mutation.target.nodeName === "TP-YT-PAPER-SLIDER") {
           // This checks that volume-slider was manually set
           const target = mutation.target as HTMLInputElement;
           const targetValueNumeric = Number(target.value);
           if (
             mutation.oldValue !== target.value &&
-            (typeof options.savedVolume !== 'number' ||
+            (typeof options.savedVolume !== "number" ||
               Math.abs(options.savedVolume - targetValueNumeric) > 4)
           ) {
             // Diff>4 means it was manually set
@@ -172,14 +172,14 @@ export const onPlayerApiReady = async (
       }
     });
 
-    const slider = $('#volume-slider');
+    const slider = $("#volume-slider");
     if (!slider) {
       return;
     }
 
     // Observing only changes in 'value' of volume-slider
     sliderObserver.observe(slider, {
-      attributeFilter: ['value'],
+      attributeFilter: ["value"],
       attributeOldValue: true,
     });
   }
@@ -207,41 +207,41 @@ export const onPlayerApiReady = async (
     setVolume(
       toIncrease
         ? Math.min(api.getVolume() + steps, 100)
-        : Math.max(api.getVolume() - steps, 0),
+        : Math.max(api.getVolume() - steps, 0)
     );
   }
 
   function updateVolumeSlider() {
     const savedVolume = options.savedVolume ?? 0;
     // Slider value automatically rounds to multiples of 5
-    for (const slider of ['#volume-slider', '#expand-volume-slider']) {
+    for (const slider of ["#volume-slider", "#expand-volume-slider"]) {
       const silderElement = $<HTMLInputElement>(slider);
       if (silderElement) {
         silderElement.value = String(
-          savedVolume > 0 && savedVolume < 5 ? 5 : savedVolume,
+          savedVolume > 0 && savedVolume < 5 ? 5 : savedVolume
         );
       }
     }
   }
 
   function showVolumeSlider() {
-    const slider = $<HTMLElement>('#volume-slider');
+    const slider = $<HTMLElement>("#volume-slider");
     if (!slider) {
       return;
     }
 
     // This class display the volume slider if not in minimized mode
-    slider.classList.add('on-hover');
+    slider.classList.add("on-hover");
 
     hideVolumeSlider(slider);
   }
 
   // Set new volume as tooltip for volume slider and icon + expanding slider (appears when window size is small)
   const tooltipTargets = [
-    '#volume-slider',
-    'tp-yt-paper-icon-button.volume',
-    '#expand-volume-slider',
-    '#expand-volume',
+    "#volume-slider",
+    "tp-yt-paper-icon-button.volume",
+    "#expand-volume-slider",
+    "#expand-volume",
   ];
 
   function setTooltip(volume: number) {
@@ -255,21 +255,21 @@ export const onPlayerApiReady = async (
 
   function setupLocalArrowShortcuts() {
     if (options.arrowsShortcut) {
-      window.addEventListener('keydown', (event) => {
+      window.addEventListener("keydown", (event) => {
         if (
-          $<HTMLElement & { opened: boolean }>('ytmusic-search-box')?.opened
+          $<HTMLElement & { opened: boolean }>("ytmusic-search-box")?.opened
         ) {
           return;
         }
 
         switch (event.code) {
-          case 'ArrowUp': {
+          case "ArrowUp": {
             event.preventDefault();
             changeVolume(true);
             break;
           }
 
-          case 'ArrowDown': {
+          case "ArrowDown": {
             event.preventDefault();
             changeVolume(false);
             break;
@@ -279,10 +279,10 @@ export const onPlayerApiReady = async (
     }
   }
 
-  context.ipc.on('changeVolume', (toIncrease: boolean) => {
+  context.ipc.on("changeVolume", (toIncrease: boolean) => {
     changeVolume(toIncrease);
   });
-  context.ipc.on('setVolume', (value: number) => {
+  context.ipc.on("setVolume", (value: number) => {
     setVolume(value);
   });
 

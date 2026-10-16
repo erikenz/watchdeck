@@ -1,10 +1,10 @@
-import type { GatewayActivityButton } from 'discord-api-types/v10';
+import type { GatewayActivityButton } from "discord-api-types/v10";
 
-import { APPLICATION_NAME } from '@/i18n';
-import type { SongInfo } from '@/providers/song-info';
+import { APPLICATION_NAME } from "@/i18n";
+import type { SongInfo } from "@/providers/song-info";
 
-import { HANGUL_FILLER } from './constants';
-import type { DiscordPluginConfig } from './index';
+import { HANGUL_FILLER } from "./constants";
+import type { DiscordPluginConfig } from "./index";
 
 /**
  * Truncates a string to a specified length, adding ellipsis if truncated.
@@ -27,7 +27,7 @@ export const truncateString = (str: string, length: number): string => {
  */
 export function sanitizeActivityText(
   input: string | undefined,
-  fallback: string = 'undefined',
+  fallback: string = "undefined"
 ): string {
   const text = input && input.trim() ? input.trim() : fallback.trim();
   let safeString = truncateString(text, 128);
@@ -37,7 +37,7 @@ export function sanitizeActivityText(
   }
 
   if (safeString.length < 2) {
-    safeString = safeString.padEnd(2, '⠀'); // change if necessary
+    safeString = safeString.padEnd(2, "⠀"); // change if necessary
   }
 
   return safeString;
@@ -51,7 +51,7 @@ export function sanitizeActivityText(
  */
 export const buildDiscordButtons = (
   config: DiscordPluginConfig,
-  songInfo: SongInfo,
+  songInfo: SongInfo
 ): GatewayActivityButton[] | undefined => {
   const buttons: GatewayActivityButton[] = [];
   if (config.playOnYouTubeMusic && songInfo.url) {
@@ -62,8 +62,8 @@ export const buildDiscordButtons = (
   }
   if (!config.hideGitHubButton) {
     buttons.push({
-      label: 'View App On GitHub',
-      url: 'https://github.com/erikenz/watchdeck',
+      label: "View App On GitHub",
+      url: "https://github.com/erikenz/watchdeck",
     });
   }
   return buttons.length ? buttons : undefined;
@@ -75,9 +75,9 @@ export const buildDiscordButtons = (
  * @param songInfo - The song information object (will be mutated).
  */
 export const padHangulFields = (songInfo: SongInfo): void => {
-  (['title', 'artist', 'album'] as const).forEach((key) => {
+  (["title", "artist", "album"] as const).forEach((key) => {
     const value = songInfo[key];
-    if (typeof value === 'string' && value.length > 0 && value.length < 2) {
+    if (typeof value === "string" && value.length > 0 && value.length < 2) {
       songInfo[key] = value + HANGUL_FILLER.repeat(2 - value.length);
     }
   });

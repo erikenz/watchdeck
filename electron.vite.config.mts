@@ -2,62 +2,62 @@
 // electron-vite bundles its config and the vite plugins below before running
 // them, so `import.meta.dirname` would resolve to the bundle instead of this
 // file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import builtinModules from 'builtin-modules';
-import { defineConfig } from 'electron-vite';
+import builtinModules from "builtin-modules";
+import { defineConfig } from "electron-vite";
 import type {
   MainViteConfig,
   PreloadViteConfig,
   RendererViteConfig,
-} from 'electron-vite';
-import { withFilter } from 'vite';
-import Inspect from 'vite-plugin-inspect';
-import viteResolve from 'vite-plugin-resolve';
-import solidPlugin from 'vite-plugin-solid';
+} from "electron-vite";
+import { withFilter } from "vite";
+import Inspect from "vite-plugin-inspect";
+import viteResolve from "vite-plugin-resolve";
+import solidPlugin from "vite-plugin-solid";
 
-import { i18nImporter } from './vite-plugins/i18n-importer.mjs';
-import { pluginVirtualModuleGenerator } from './vite-plugins/plugin-importer.mjs';
-import pluginLoader from './vite-plugins/plugin-loader.mjs';
+import { i18nImporter } from "./vite-plugins/i18n-importer.mjs";
+import { pluginVirtualModuleGenerator } from "./vite-plugins/plugin-importer.mjs";
+import pluginLoader from "./vite-plugins/plugin-loader.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const resolveAlias = {
-  '@': resolve(__dirname, './src'),
-  '@assets': resolve(__dirname, './assets'),
+  "@": resolve(__dirname, "./src"),
+  "@assets": resolve(__dirname, "./assets"),
 };
 
 export default defineConfig(({ mode }) => {
-  const isDev = mode === 'development';
+  const isDev = mode === "development";
 
   const mainAndPreloadExcludes = [
-    'electron',
-    'custom-electron-prompt',
+    "electron",
+    "custom-electron-prompt",
     ...builtinModules,
   ];
   const mainConfig: MainViteConfig = {
     plugins: [
-      pluginLoader('backend'),
+      pluginLoader("backend"),
       viteResolve({
-        'virtual:i18n': i18nImporter(),
-        'virtual:plugins': pluginVirtualModuleGenerator('main'),
+        "virtual:i18n": i18nImporter(),
+        "virtual:plugins": pluginVirtualModuleGenerator("main"),
       }),
     ],
-    publicDir: 'assets',
+    publicDir: "assets",
     define: {
-      __dirname: 'import.meta.dirname',
-      __filename: 'import.meta.filename',
+      __dirname: "import.meta.dirname",
+      __filename: "import.meta.filename",
     },
     build: {
       lib: {
-        entry: 'src/index.ts',
-        formats: ['es'],
+        entry: "src/index.ts",
+        formats: ["es"],
       },
-      outDir: 'dist/main',
+      outDir: "dist/main",
       rolldownOptions: {
         external: mainAndPreloadExcludes,
-        input: './src/index.ts',
+        input: "./src/index.ts",
         output: {
           comments: {
             jsdoc: true,
@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => {
       },
       minify: !isDev,
       cssMinify: !isDev,
-      sourcemap: isDev ? 'inline' : undefined,
+      sourcemap: isDev ? "inline" : undefined,
       externalizeDeps: false,
     },
     resolve: {
@@ -78,28 +78,28 @@ export default defineConfig(({ mode }) => {
 
   const preloadConfig: PreloadViteConfig = {
     plugins: [
-      pluginLoader('preload'),
+      pluginLoader("preload"),
       viteResolve({
-        'virtual:i18n': i18nImporter(),
-        'virtual:plugins': pluginVirtualModuleGenerator('preload'),
+        "virtual:i18n": i18nImporter(),
+        "virtual:plugins": pluginVirtualModuleGenerator("preload"),
       }),
     ],
     build: {
       lib: {
-        entry: 'src/preload.ts',
-        formats: ['cjs'],
+        entry: "src/preload.ts",
+        formats: ["cjs"],
       },
-      outDir: 'dist/preload',
+      outDir: "dist/preload",
       commonjsOptions: {
         ignoreDynamicRequires: true,
       },
       rolldownOptions: {
         external: mainAndPreloadExcludes,
-        input: './src/preload.ts',
+        input: "./src/preload.ts",
       },
       minify: !isDev,
       cssMinify: !isDev,
-      sourcemap: isDev ? 'inline' : undefined,
+      sourcemap: isDev ? "inline" : undefined,
       externalizeDeps: false,
     },
     resolve: {
@@ -107,40 +107,40 @@ export default defineConfig(({ mode }) => {
     },
   };
 
-  const rendererExcludes = ['electron', ...builtinModules];
+  const rendererExcludes = ["electron", ...builtinModules];
   const rendererConfig: RendererViteConfig = {
     plugins: [
-      pluginLoader('renderer'),
+      pluginLoader("renderer"),
       viteResolve({
-        'virtual:i18n': i18nImporter(),
-        'virtual:plugins': pluginVirtualModuleGenerator('renderer'),
+        "virtual:i18n": i18nImporter(),
+        "virtual:plugins": pluginVirtualModuleGenerator("renderer"),
       }),
       withFilter(solidPlugin(), {
-        load: { id: [/\.(tsx|jsx)$/, '/@solid-refresh'] },
+        load: { id: [/\.(tsx|jsx)$/, "/@solid-refresh"] },
       }),
     ],
-    root: './src/',
+    root: "./src/",
     build: {
       lib: {
-        entry: 'src/index.html',
-        formats: ['iife'],
-        name: 'renderer',
+        entry: "src/index.html",
+        formats: ["iife"],
+        name: "renderer",
       },
-      outDir: 'dist/renderer',
+      outDir: "dist/renderer",
       rolldownOptions: {
         external: rendererExcludes,
-        input: './src/index.html',
+        input: "./src/index.html",
       },
       minify: !isDev,
       cssMinify: !isDev,
-      sourcemap: isDev ? 'inline' : undefined,
+      sourcemap: isDev ? "inline" : undefined,
     },
     resolve: {
       alias: resolveAlias,
     },
     server: {
       cors: {
-        origin: 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
+        origin: "https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com",
       },
     },
   };
@@ -149,20 +149,20 @@ export default defineConfig(({ mode }) => {
     mainConfig.plugins?.push(
       Inspect({
         build: true,
-        outputDir: join(__dirname, '.vite-inspect/backend'),
-      }),
+        outputDir: join(__dirname, ".vite-inspect/backend"),
+      })
     );
     preloadConfig.plugins?.push(
       Inspect({
         build: true,
-        outputDir: join(__dirname, '.vite-inspect/preload'),
-      }),
+        outputDir: join(__dirname, ".vite-inspect/preload"),
+      })
     );
     rendererConfig.plugins?.push(
       Inspect({
         build: true,
-        outputDir: join(__dirname, '.vite-inspect/renderer'),
-      }),
+        outputDir: join(__dirname, ".vite-inspect/renderer"),
+      })
     );
   }
 

@@ -1,21 +1,21 @@
-import { Client as DiscordClient } from '@xhayper/discord-rpc';
-import type { SetActivity } from '@xhayper/discord-rpc/dist/structures/ClientUser';
-import { ActivityType } from 'discord-api-types/v10';
-import is from 'electron-is';
+import { Client as DiscordClient } from "@xhayper/discord-rpc";
+import type { SetActivity } from "@xhayper/discord-rpc/dist/structures/ClientUser";
+import { ActivityType } from "discord-api-types/v10";
+import is from "electron-is";
 
-import { t } from '@/i18n';
-import type { SongInfo } from '@/providers/song-info';
-import { LoggerPrefix } from '@/utils';
+import { t } from "@/i18n";
+import type { SongInfo } from "@/providers/song-info";
+import { LoggerPrefix } from "@/utils";
 
-import { clientId, PROGRESS_THROTTLE_MS, TimerKey } from './constants';
-import type { DiscordPluginConfig } from './index';
-import { TimerManager } from './timer-manager';
+import { clientId, PROGRESS_THROTTLE_MS, TimerKey } from "./constants";
+import type { DiscordPluginConfig } from "./index";
+import { TimerManager } from "./timer-manager";
 import {
   buildDiscordButtons,
   padHangulFields,
   sanitizeActivityText,
   isSeek,
-} from './utils';
+} from "./utils";
 
 // Public API definition for the Discord Service
 export class DiscordService {
@@ -56,7 +56,7 @@ export class DiscordService {
    */
   constructor(
     mainWindow: Electron.BrowserWindow,
-    config?: DiscordPluginConfig,
+    config?: DiscordPluginConfig
   ) {
     this.config = config;
     this.mainWindow = mainWindow;
@@ -77,23 +77,23 @@ export class DiscordService {
 
     this.rpc = new DiscordClient({ clientId });
 
-    this.rpc.on('connected', () => {
+    this.rpc.on("connected", () => {
       if (is.dev()) {
-        console.log(LoggerPrefix, t('plugins.discord.backend.connected'));
+        console.log(LoggerPrefix, t("plugins.discord.backend.connected"));
       }
       this.refreshCallbacks.forEach((cb) => {
         cb();
       });
     });
 
-    this.rpc.on('ready', () => {
+    this.rpc.on("ready", () => {
       this.ready = true;
       if (this.lastSongInfo && this.config) {
         this.updateActivity(this.lastSongInfo);
       }
     });
 
-    this.rpc.on('disconnected', () => {
+    this.rpc.on("disconnected", () => {
       this.resetInfo();
       if (this.autoReconnect) {
         this.connectRecursive();
@@ -109,14 +109,14 @@ export class DiscordService {
    */
   private buildActivityInfo(
     songInfo: SongInfo,
-    config: DiscordPluginConfig,
+    config: DiscordPluginConfig
   ): SetActivity {
     padHangulFields(songInfo);
 
     const activityInfo: SetActivity = {
       buttons: buildDiscordButtons(config, songInfo),
       details: sanitizeActivityText(
-        songInfo.alternativeTitle ?? songInfo.title,
+        songInfo.alternativeTitle ?? songInfo.title
       ), // Song title
       detailsUrl: songInfo.url ?? undefined,
       largeImageKey: songInfo.imageSrc ?? undefined,
@@ -131,16 +131,16 @@ export class DiscordService {
 
     // Handle paused state display
     if (songInfo.isPaused) {
-      activityInfo.largeImageText = '⏸︎';
+      activityInfo.largeImageText = "⏸︎";
     } else if (
       !config.hideDurationLeft &&
       songInfo.songDuration > 0 &&
-      typeof songInfo.elapsedSeconds === 'number'
+      typeof songInfo.elapsedSeconds === "number"
     ) {
       const songStartTime = Date.now() - songInfo.elapsedSeconds * 1000;
       activityInfo.startTimestamp = Math.floor(songStartTime / 1000);
       activityInfo.endTimestamp = Math.floor(
-        (songStartTime + songInfo.songDuration * 1000) / 1000,
+        (songStartTime + songInfo.songDuration * 1000) / 1000
       );
     }
 
@@ -165,7 +165,7 @@ export class DiscordService {
         () => {
           this.clearActivity();
         },
-        this.config.activityTimeoutTime,
+        this.config.activityTimeoutTime
       );
     }
   }
@@ -179,7 +179,7 @@ export class DiscordService {
     this.lastProgressUpdate = 0;
     this.timerManager.clearAll();
     if (is.dev()) {
-      console.log(LoggerPrefix, t('plugins.discord.backend.disconnected'));
+      console.log(LoggerPrefix, t("plugins.discord.backend.disconnected"));
     }
   }
 
@@ -199,7 +199,7 @@ export class DiscordService {
               resolve();
             } else {
               reject(
-                new Error('Auto-reconnect disabled or already connected.'),
+                new Error("Auto-reconnect disabled or already connected.")
               );
             }
             return;
@@ -217,7 +217,7 @@ export class DiscordService {
               this.connectRecursive();
             });
         },
-        5000, // 5-second delay before retrying
+        5000 // 5-second delay before retrying
       );
     });
   }
@@ -242,7 +242,7 @@ export class DiscordService {
       if (is.dev()) {
         console.log(
           LoggerPrefix,
-          t('plugins.discord.backend.already-connected'),
+          t("plugins.discord.backend.already-connected")
         );
       }
       return;
@@ -328,7 +328,7 @@ export class DiscordService {
 
       const activityInfo = this.buildActivityInfo(songInfo, this.config);
       this.rpc.user?.setActivity(activityInfo).catch((error) => {
-        console.error(LoggerPrefix, 'Failed to set activity:', error);
+        console.error(LoggerPrefix, "Failed to set activity:", error);
       });
 
       this.lastSongInfo.videoId = songInfo.videoId;
@@ -342,7 +342,7 @@ export class DiscordService {
 
       const activityInfo = this.buildActivityInfo(songInfo, this.config);
       this.rpc.user?.setActivity(activityInfo).catch((error) => {
-        console.error(LoggerPrefix, 'Failed to set throttled activity:', error);
+        console.error(LoggerPrefix, "Failed to set throttled activity:", error);
       });
 
       this.lastProgressUpdate = now;
@@ -362,7 +362,7 @@ export class DiscordService {
           ) {
             const activityInfo = this.buildActivityInfo(
               songInfoSnapshot,
-              this.config,
+              this.config
             );
             this.rpc.user?.setActivity(activityInfo);
             this.lastProgressUpdate = Date.now();
@@ -371,7 +371,7 @@ export class DiscordService {
             this.setActivityTimeout();
           }
         },
-        remainingThrottle,
+        remainingThrottle
       );
     }
     this.lastSongInfo = { ...songInfo };

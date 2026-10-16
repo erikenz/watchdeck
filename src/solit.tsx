@@ -1,7 +1,7 @@
 // A SolidJS wrapper for a LitElement
 
-import { createSignal, onMount, Show } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
+import { createSignal, onMount, Show } from "solid-js";
+import { Dynamic } from "solid-js/web";
 
 export interface LitElementWrapperProps {
   elementClass: CustomElementConstructor;

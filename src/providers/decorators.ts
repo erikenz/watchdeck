@@ -13,7 +13,7 @@ export function singleton<T extends (...params: never[]) => unknown>(fn: T): T {
 
 export function debounce<T extends (...params: never[]) => unknown>(
   fn: T,
-  delay: number,
+  delay: number
 ): T {
   let timeout: NodeJS.Timeout;
   return ((...args) => {
@@ -23,7 +23,7 @@ export function debounce<T extends (...params: never[]) => unknown>(
 }
 
 export function cache<T extends (...params: P) => R, P extends never[], R>(
-  fn: T,
+  fn: T
 ): T {
   let lastArgs: P;
   let lastResult: R;
@@ -56,7 +56,7 @@ export function cacheNoArgs<R>(fn: () => R): () => R {
 
 export function throttle<T extends (...params: unknown[]) => unknown>(
   fn: T,
-  delay: number,
+  delay: number
 ): T {
   let timeout: NodeJS.Timeout | undefined;
   return ((...args) => {
@@ -86,7 +86,7 @@ export function memoize<T extends (...params: unknown[]) => unknown>(fn: T): T {
 
 export function retry<T extends (...params: unknown[]) => Promise<unknown>>(
   fn: T,
-  { retries = 3, delay = 1000 } = {},
+  { retries = 3, delay = 1000 } = {}
 ) {
   return async (...args: unknown[]) => {
     let latestError: unknown;

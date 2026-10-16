@@ -1,5 +1,5 @@
-import type { GetState, QueueItem } from '@/types/datahost-get-state';
-import type { MusicPlayer } from '@/types/music-player';
+import type { GetState, QueueItem } from "@/types/datahost-get-state";
+import type { MusicPlayer } from "@/types/music-player";
 
 type StoreState = GetState;
 export interface Store {
@@ -27,7 +27,7 @@ export type ToastElement = HTMLElement & {
   autoFitOnAttach: boolean;
   duration: number;
   expandSizingTargetForScrollbars: boolean;
-  horizontalAlign: 'left' | 'right' | 'center';
+  horizontalAlign: "left" | "right" | "center";
   importPath?: unknown;
   label: string;
   noAutoFocus: boolean;
@@ -38,7 +38,7 @@ export type ToastElement = HTMLElement & {
   root: ToastElement;
   rootPath: string;
   sizingTarget: ToastElement;
-  verticalAlign: 'bottom' | 'top' | 'center';
+  verticalAlign: "bottom" | "top" | "center";
 };
 
 export interface ToastService {

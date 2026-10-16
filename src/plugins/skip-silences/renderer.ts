@@ -1,6 +1,6 @@
-import type { RendererContext } from '@/types/contexts';
+import type { RendererContext } from "@/types/contexts";
 
-import type { SkipSilencesPluginConfig } from './index';
+import type { SkipSilencesPluginConfig } from "./index";
 
 let config: SkipSilencesPluginConfig;
 
@@ -17,7 +17,7 @@ let playOrSeekHandler: (() => void) | undefined;
 
 const getMaxVolume = (
   analyser: AnalyserNode,
-  fftBins: Float32Array<ArrayBuffer>,
+  fftBins: Float32Array<ArrayBuffer>
 ) => {
   let maxVolume = Number.NEGATIVE_INFINITY;
   analyser.getFloatFrequencyData(fftBins);
@@ -32,7 +32,7 @@ const getMaxVolume = (
 };
 
 const audioCanPlayListener = (e: CustomEvent<Compressor>) => {
-  const video = document.querySelector('video');
+  const video = document.querySelector("video");
   const { audioContext } = e.detail;
   const sourceNode = e.detail.audioSource;
 
@@ -110,8 +110,8 @@ const audioCanPlayListener = (e: CustomEvent<Compressor>) => {
     skipSilence();
   };
 
-  video?.addEventListener('play', playOrSeekHandler);
-  video?.addEventListener('seeked', playOrSeekHandler);
+  video?.addEventListener("play", playOrSeekHandler);
+  video?.addEventListener("seeked", playOrSeekHandler);
 };
 
 export const onRendererLoad = async ({
@@ -119,20 +119,20 @@ export const onRendererLoad = async ({
 }: RendererContext<SkipSilencesPluginConfig>) => {
   config = await getConfig();
 
-  document.addEventListener('watchdeck:audio-can-play', audioCanPlayListener, {
+  document.addEventListener("watchdeck:audio-can-play", audioCanPlayListener, {
     passive: true,
   });
 };
 
 export const onRendererUnload = () => {
   document.removeEventListener(
-    'watchdeck:audio-can-play',
-    audioCanPlayListener,
+    "watchdeck:audio-can-play",
+    audioCanPlayListener
   );
 
   if (playOrSeekHandler) {
-    const video = document.querySelector('video');
-    video?.removeEventListener('play', playOrSeekHandler);
-    video?.removeEventListener('seeked', playOrSeekHandler);
+    const video = document.querySelector("video");
+    video?.removeEventListener("play", playOrSeekHandler);
+    video?.removeEventListener("seeked", playOrSeekHandler);
   }
 };

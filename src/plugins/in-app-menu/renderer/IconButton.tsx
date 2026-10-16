@@ -1,7 +1,7 @@
-import type { JSX } from 'solid-js';
-import { css } from 'solid-styled-components';
+import type { JSX } from "solid-js";
+import { css } from "solid-styled-components";
 
-import { cacheNoArgs } from '@/providers/decorators';
+import { cacheNoArgs } from "@/providers/decorators";
 
 const iconButton = cacheNoArgs(
   () => css`
@@ -33,7 +33,7 @@ const iconButton = cacheNoArgs(
     &:active {
       scale: 0.9;
     }
-  `,
+  `
 );
 
 type CollapseIconButtonProps = JSX.HTMLAttributes<HTMLButtonElement>;

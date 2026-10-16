@@ -1,7 +1,7 @@
 name: Feature Request
 description: Suggest an idea for Watchdeck
-title: '[Feature Request]: '
-labels: 'enhancement :sparkles:'
+title: "[Feature Request]: "
+labels: "enhancement :sparkles:"
 body:
   - type: checkboxes
     attributes:

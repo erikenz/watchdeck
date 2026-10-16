@@ -1,11 +1,11 @@
-import type { MusicPlayer } from '@/types/music-player';
+import type { MusicPlayer } from "@/types/music-player";
 
 import type {
   BackendContext,
   MenuContext,
   PreloadContext,
   RendererContext,
-} from './contexts';
+} from "./contexts";
 
 type Author = string;
 
@@ -15,7 +15,7 @@ export interface PluginConfig {
 
 export type PluginLifecycleSimple<Context, This> = (
   this: This,
-  ctx: Context,
+  ctx: Context
 ) => void | Promise<void>;
 export type PluginLifecycleExtra<Config, Context, This> = This & {
   start?: PluginLifecycleSimple<Context, This>;
@@ -27,7 +27,7 @@ export type RendererPluginLifecycleExtra<Config, Context, This> = This &
     onPlayerApiReady?: (
       this: This,
       playerApi: MusicPlayer,
-      context: Context,
+      context: Context
     ) => void | Promise<void>;
   };
 
@@ -59,7 +59,7 @@ export interface PluginDef<
   platform?: Platform;
 
   menu?: (
-    ctx: MenuContext<Config>,
+    ctx: MenuContext<Config>
   ) =>
     | Promise<Electron.MenuItemConstructorOptions[]>
     | Electron.MenuItemConstructorOptions[];

@@ -8,7 +8,7 @@ on:
 permissions: {}
 
 env:
-  NODE_VERSION: '24.x'
+  NODE_VERSION: "24.x"
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         with:
-          version: 11
+          version: 12
           run_install: false
 
       - name: Setup NodeJS
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Setup NodeJS for macOS
         if: startsWith(matrix.os, 'macOS')
@@ -111,14 +111,14 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         with:
-          version: 11
+          version: 12
           run_install: false
 
       - name: Setup NodeJS
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -171,4 +171,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
         with:
           commit_message: Update changelog for ${{ env.VERSION_TAG }}
-          file_pattern: 'changelog.md'
+          file_pattern: "changelog.md"

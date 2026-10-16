@@ -1,4 +1,4 @@
-import type { PlayerConfig } from '@/types/get-player-response';
+import type { PlayerConfig } from "@/types/get-player-response";
 
 export interface GetState {
   castStatus: CastStatus;
@@ -40,9 +40,9 @@ export interface LikeStatus {
 }
 
 export enum LikeType {
-  Dislike = 'DISLIKE',
-  Indifferent = 'INDIFFERENT',
-  Like = 'LIKE',
+  Dislike = "DISLIKE",
+  Indifferent = "INDIFFERENT",
+  Like = "LIKE",
 }
 
 export interface VolumeState {
@@ -210,9 +210,9 @@ export interface PurpleWatchEndpointMusicConfig {
 }
 
 export enum MusicVideoType {
-  MusicVideoTypeAtv = 'MUSIC_VIDEO_TYPE_ATV',
-  MusicVideoTypeOmv = 'MUSIC_VIDEO_TYPE_OMV',
-  MusicVideoTypeUgc = 'MUSIC_VIDEO_TYPE_UGC',
+  MusicVideoTypeAtv = "MUSIC_VIDEO_TYPE_ATV",
+  MusicVideoTypeOmv = "MUSIC_VIDEO_TYPE_OMV",
+  MusicVideoTypeUgc = "MUSIC_VIDEO_TYPE_UGC",
 }
 
 export interface DefaultIconClass {
@@ -220,24 +220,24 @@ export interface DefaultIconClass {
 }
 
 export enum IconType {
-  AddToPlaylist = 'ADD_TO_PLAYLIST',
-  AddToRemoteQueue = 'ADD_TO_REMOTE_QUEUE',
-  Album = 'ALBUM',
-  Artist = 'ARTIST',
-  Favorite = 'FAVORITE',
-  Flag = 'FLAG',
-  LibraryAdd = 'LIBRARY_ADD',
-  LibrarySaved = 'LIBRARY_SAVED',
-  Mix = 'MIX',
-  MusicShuffle = 'MUSIC_SHUFFLE',
-  Pause = 'PAUSE',
-  PlayArrow = 'PLAY_ARROW',
-  PlaylistAdd = 'PLAYLIST_ADD',
-  QueuePlayNext = 'QUEUE_PLAY_NEXT',
-  Remove = 'REMOVE',
-  Share = 'SHARE',
-  Unfavorite = 'UNFAVORITE',
-  VolumeUp = 'VOLUME_UP',
+  AddToPlaylist = "ADD_TO_PLAYLIST",
+  AddToRemoteQueue = "ADD_TO_REMOTE_QUEUE",
+  Album = "ALBUM",
+  Artist = "ARTIST",
+  Favorite = "FAVORITE",
+  Flag = "FLAG",
+  LibraryAdd = "LIBRARY_ADD",
+  LibrarySaved = "LIBRARY_SAVED",
+  Mix = "MIX",
+  MusicShuffle = "MUSIC_SHUFFLE",
+  Pause = "PAUSE",
+  PlayArrow = "PLAY_ARROW",
+  PlaylistAdd = "PLAYLIST_ADD",
+  QueuePlayNext = "QUEUE_PLAY_NEXT",
+  Remove = "REMOVE",
+  Share = "SHARE",
+  Unfavorite = "UNFAVORITE",
+  VolumeUp = "VOLUME_UP",
 }
 
 export interface Subtitle {
@@ -284,7 +284,7 @@ export interface MusicResponsiveListItemFlexColumnRenderer {
 }
 
 export enum DisplayPriority {
-  MusicResponsiveListItemColumnDisplayPriorityHigh = 'MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH',
+  MusicResponsiveListItemColumnDisplayPriorityHigh = "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
 }
 
 export interface Text {
@@ -316,12 +316,12 @@ export interface BrowseEndpointContextMusicConfig {
 }
 
 export enum PageType {
-  MusicPageTypeAlbum = 'MUSIC_PAGE_TYPE_ALBUM',
-  MusicPageTypeArtist = 'MUSIC_PAGE_TYPE_ARTIST',
-  MusicPageTypePlaylist = 'MUSIC_PAGE_TYPE_PLAYLIST',
-  MusicPageTypeTrackLyrics = 'MUSIC_PAGE_TYPE_TRACK_LYRICS',
-  MusicPageTypeTrackRelated = 'MUSIC_PAGE_TYPE_TRACK_RELATED',
-  MusicPageTypeUserChannel = 'MUSIC_PAGE_TYPE_USER_CHANNEL',
+  MusicPageTypeAlbum = "MUSIC_PAGE_TYPE_ALBUM",
+  MusicPageTypeArtist = "MUSIC_PAGE_TYPE_ARTIST",
+  MusicPageTypePlaylist = "MUSIC_PAGE_TYPE_PLAYLIST",
+  MusicPageTypeTrackLyrics = "MUSIC_PAGE_TYPE_TRACK_LYRICS",
+  MusicPageTypeTrackRelated = "MUSIC_PAGE_TYPE_TRACK_RELATED",
+  MusicPageTypeUserChannel = "MUSIC_PAGE_TYPE_USER_CHANNEL",
 }
 
 export interface OnTapWatchEndpoint {
@@ -373,7 +373,7 @@ export interface ShareEntityEndpoint {
 }
 
 export enum SharePanelType {
-  SharePanelTypeUnifiedSharePanel = 'SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL',
+  SharePanelTypeUnifiedSharePanel = "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL",
 }
 
 export interface PurpleWatchEndpoint {
@@ -433,8 +433,8 @@ export interface NotificationTextRenderer {
 }
 
 export enum QueueInsertPosition {
-  InsertAfterCurrentVideo = 'INSERT_AFTER_CURRENT_VIDEO',
-  InsertAtEnd = 'INSERT_AT_END',
+  InsertAfterCurrentVideo = "INSERT_AFTER_CURRENT_VIDEO",
+  InsertAtEnd = "INSERT_AT_END",
 }
 
 export interface RemoveFromQueueEndpoint {
@@ -1116,7 +1116,7 @@ export interface LinkAlternate {
 export interface PageOwnerDetails {
   name: string;
   externalChannelId: string;
-  ['\u0079\u006F\u0075\u0074\u0075\u0062\u0065ProfileUrl']: string;
+  ["\u0079\u006F\u0075\u0074\u0075\u0062\u0065ProfileUrl"]: string;
 }
 
 export interface MicroformatDataRendererVideoDetails {
@@ -1173,9 +1173,9 @@ export interface HeaderElement {
 }
 
 export enum HeaderType {
-  PlusPageID = 'PLUS_PAGE_ID',
-  UserAuth = 'USER_AUTH',
-  VisitorID = 'VISITOR_ID',
+  PlusPageID = "PLUS_PAGE_ID",
+  UserAuth = "USER_AUTH",
+  VisitorID = "VISITOR_ID",
 }
 
 export interface PtrackingURLClass {
@@ -1236,7 +1236,7 @@ export interface Range {
 }
 
 export enum ProjectionType {
-  Rectangular = 'RECTANGULAR',
+  Rectangular = "RECTANGULAR",
 }
 
 export interface Format {
@@ -1328,7 +1328,7 @@ export interface ServiceEndpointLikeEndpoint {
 
 // TODO: Add more
 export enum LikeParams {
-  Oai3D = 'OAI%3D',
+  Oai3D = "OAI%3D",
 }
 
 export interface BrowserMediaSession {
@@ -1456,7 +1456,7 @@ export interface FlagEndpoint {
   flagAction: string;
 }
 
-export type RepeatMode = 'NONE' | 'ONE' | 'ALL';
+export type RepeatMode = "NONE" | "ONE" | "ALL";
 
 export interface Queue {
   automixItems: unknown[];
@@ -1710,7 +1710,7 @@ export interface FetchContentsCommandWatchEndpoint {
 }
 
 export enum QueueUpdateSection {
-  QueueUpdateSectionQueue = 'QUEUE_UPDATE_SECTION_QUEUE',
+  QueueUpdateSectionQueue = "QUEUE_UPDATE_SECTION_QUEUE",
 }
 
 export interface SubscribeStatus {

@@ -1,8 +1,8 @@
-import Butterchurn from 'butterchurn';
-import ButterchurnPresets from 'butterchurn-presets';
+import Butterchurn from "butterchurn";
+import ButterchurnPresets from "butterchurn-presets";
 
-import type { VisualizerPluginConfig } from '../index';
-import { Visualizer } from './visualizer';
+import type { VisualizerPluginConfig } from "../index";
+import { Visualizer } from "./visualizer";
 
 class ButterchurnVisualizer extends Visualizer {
   private readonly visualizer: ReturnType<typeof Butterchurn.createVisualizer>;
@@ -15,7 +15,7 @@ class ButterchurnVisualizer extends Visualizer {
     canvas: HTMLCanvasElement,
     audioNode: GainNode,
     _stream: MediaStream,
-    config: VisualizerPluginConfig,
+    config: VisualizerPluginConfig
   ) {
     super(audioSource, audioNode);
 

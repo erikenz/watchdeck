@@ -65,7 +65,7 @@ interface Navigation extends EventTarget {
 
   addEventListener<K extends keyof NavigationEventsMap>(
     name: K,
-    listener: (event: NavigationEventsMap[K]) => void,
+    listener: (event: NavigationEventsMap[K]) => void
   );
 }
 
@@ -76,7 +76,7 @@ declare class NavigateEvent extends Event {
   formData: FormData;
   hashChange: boolean;
   info: Record<string, string>;
-  navigationType: 'push' | 'reload' | 'replace' | 'traverse';
+  navigationType: "push" | "reload" | "replace" | "traverse";
   signal: AbortSignal;
   userInitiated: boolean;
 
@@ -84,7 +84,7 @@ declare class NavigateEvent extends Event {
   scroll(): void;
 }
 
-type NavigationHistoryBehavior = 'auto' | 'push' | 'replace';
+type NavigationHistoryBehavior = "auto" | "push" | "replace";
 
 declare const Navigation: {
   prototype: Navigation;

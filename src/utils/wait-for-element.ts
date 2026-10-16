@@ -6,7 +6,7 @@ export const waitForElement = async <T extends Element>(
   } = {
     maxRetry: -1,
     retryInterval: 100,
-  },
+  }
 ): Promise<T> =>
   new Promise<T>((resolve) => {
     let retryCount = 0;

@@ -155,8 +155,8 @@
     "unreleased": true
   },
   "engines": {
-    "node": ">=22",
-    "pnpm": ">=11"
+    "node": ">=24",
+    "pnpm": ">=12"
   },
   "desktopName": "com.github.erikenz.watchdeck",
   "productName": "Watchdeck"

@@ -1,11 +1,11 @@
-import { net } from 'electron';
+import { net } from "electron";
 
-import { APPLICATION_NAME } from '@/i18n';
-import type { SongInfo } from '@/providers/song-info';
+import { APPLICATION_NAME } from "@/i18n";
+import type { SongInfo } from "@/providers/song-info";
 
-import type { ScrobblerPluginConfig } from '../index';
-import type { SetConfType } from '../main';
-import { ScrobblerBase } from './base';
+import type { ScrobblerPluginConfig } from "../index";
+import type { SetConfType } from "../main";
+import { ScrobblerBase } from "./base";
 
 interface ListenbrainzRequestBody {
   listen_type?: string;
@@ -32,7 +32,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
 
   override async createSession(
     config: ScrobblerPluginConfig,
-    _setConfig: SetConfType,
+    _setConfig: SetConfType
   ): Promise<ScrobblerPluginConfig> {
     return Promise.resolve(config);
   }
@@ -40,7 +40,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
   override setNowPlaying(
     songInfo: SongInfo,
     config: ScrobblerPluginConfig,
-    _setConfig: SetConfType,
+    _setConfig: SetConfType
   ): void {
     if (
       !config.scrobblers.listenbrainz.apiRoot ||
@@ -49,14 +49,14 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('playing_now', songInfo, config);
+    const body = createRequestBody("playing_now", songInfo, config);
     submitListen(body, config);
   }
 
   override addScrobble(
     songInfo: SongInfo,
     config: ScrobblerPluginConfig,
-    _setConfig: SetConfType,
+    _setConfig: SetConfType
   ): void {
     if (
       !config.scrobblers.listenbrainz.apiRoot ||
@@ -65,7 +65,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('single', songInfo, config);
+    const body = createRequestBody("single", songInfo, config);
     body.payload[0].listened_at = Math.trunc(Date.now() / 1000);
 
     submitListen(body, config);
@@ -75,7 +75,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
 function createRequestBody(
   listenType: string,
   songInfo: SongInfo,
-  config: ScrobblerPluginConfig,
+  config: ScrobblerPluginConfig
 ): ListenbrainzRequestBody {
   const title =
     config.alternativeTitles && songInfo.alternativeTitle !== undefined
@@ -111,16 +111,16 @@ function createRequestBody(
 
 function submitListen(
   body: ListenbrainzRequestBody,
-  config: ScrobblerPluginConfig,
+  config: ScrobblerPluginConfig
 ) {
   net
     .fetch(`${config.scrobblers.listenbrainz.apiRoot}submit-listens`, {
       body: JSON.stringify(body),
       headers: {
-        'Authorization': 'Token ' + config.scrobblers.listenbrainz.token,
-        'Content-Type': 'application/json',
+        Authorization: "Token " + config.scrobblers.listenbrainz.token,
+        "Content-Type": "application/json",
       },
-      method: 'POST',
+      method: "POST",
     })
     .catch(console.error);
 }

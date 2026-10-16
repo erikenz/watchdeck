@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fs from "node:fs";
 
 type Unregister = () => void;
 
@@ -14,7 +14,7 @@ const cssToInjectFile = new Map<
 >();
 export const injectCSS = async (
   webContents: Electron.WebContents,
-  css: string,
+  css: string
 ): Promise<Unregister> => {
   if (isLoaded) {
     const key = await webContents.insertCSS(css);
@@ -33,10 +33,10 @@ export const injectCSS = async (
 
 export const injectCSSAsFile = async (
   webContents: Electron.WebContents,
-  filepath: string,
+  filepath: string
 ): Promise<Unregister> => {
   if (isLoaded) {
-    const key = await webContents.insertCSS(fs.readFileSync(filepath, 'utf-8'));
+    const key = await webContents.insertCSS(fs.readFileSync(filepath, "utf-8"));
     return async () => {
       await webContents.removeInsertedCSS(key);
     };
@@ -52,7 +52,7 @@ export const injectCSSAsFile = async (
 };
 
 const setupCssInjection = (webContents: Electron.WebContents) => {
-  webContents.on('did-finish-load', () => {
+  webContents.on("did-finish-load", () => {
     isLoaded = true;
 
     cssToInject.forEach(async (callback, css) => {
@@ -66,7 +66,7 @@ const setupCssInjection = (webContents: Electron.WebContents) => {
 
     cssToInjectFile.forEach(async (callback, filepath) => {
       const key = await webContents.insertCSS(
-        fs.readFileSync(filepath, 'utf-8'),
+        fs.readFileSync(filepath, "utf-8")
       );
       const remove = async () => {
         await webContents.removeInsertedCSS(key);

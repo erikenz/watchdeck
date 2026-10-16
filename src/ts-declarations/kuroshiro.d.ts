@@ -2,17 +2,17 @@
 // Credit goes to https://github.com/ALOHACREPES345 and https://github.com/lcsvcn
 declare class Kuroshiro {
   constructor();
-  _analyzer: import('kuroshiro-analyzer-kuromoji') | null;
-  init(analyzer: import('kuroshiro-analyzer-kuromoji')): Promise<void>;
+  _analyzer: import("kuroshiro-analyzer-kuromoji") | null;
+  init(analyzer: import("kuroshiro-analyzer-kuromoji")): Promise<void>;
   convert(
     str: string,
     options?: {
-      to?: 'hiragana' | 'katakana' | 'romaji';
-      mode?: 'normal' | 'spaced' | 'okurigana' | 'furigana';
-      romajiSystem?: 'nippon' | 'passport' | 'hepburn';
+      to?: "hiragana" | "katakana" | "romaji";
+      mode?: "normal" | "spaced" | "okurigana" | "furigana";
+      romajiSystem?: "nippon" | "passport" | "hepburn";
       delimiter_start?: string;
       delimiter_end?: string;
-    },
+    }
   ): Promise<string>;
 
   static Util: {
@@ -30,11 +30,11 @@ declare class Kuroshiro {
     kanaToKatakana: (str: string) => string;
     kanaToRomaji: (
       str: string,
-      system: 'nippon' | 'passport' | 'hepburn',
+      system: "nippon" | "passport" | "hepburn"
     ) => string;
   };
 }
 
-declare module 'kuroshiro' {
+declare module "kuroshiro" {
   export = Kuroshiro;
 }

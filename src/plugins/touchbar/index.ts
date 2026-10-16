@@ -1,12 +1,12 @@
-import musicPlayerIcon from '@assets/icon.png?asset&asarUnpack';
-import { nativeImage, TouchBar } from 'electron';
-import type { NativeImage } from 'electron';
+import musicPlayerIcon from "@assets/icon.png?asset&asarUnpack";
+import { nativeImage, TouchBar } from "electron";
+import type { NativeImage } from "electron";
 
-import { t } from '@/i18n';
-import { getSongControls } from '@/providers/song-controls';
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import { Platform } from '@/types/plugins';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { getSongControls } from "@/providers/song-controls";
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import { Platform } from "@/types/plugins";
+import { createPlugin } from "@/utils";
 
 export default createPlugin({
   backend({ window }) {
@@ -20,7 +20,7 @@ export default createPlugin({
 
     // Songtitle label
     const songTitle = new TouchBarLabel({
-      label: '',
+      label: "",
     });
     // This will store the song controls once available
     let controls: (() => void)[] = [];
@@ -35,20 +35,20 @@ export default createPlugin({
 
     // The song control buttons (control functions are in the same order)
     const buttons = new TouchBarSegmentedControl({
-      mode: 'buttons',
+      mode: "buttons",
       segments: [
         new TouchBarButton({
-          label: '⏮',
+          label: "⏮",
         }),
         pausePlayButton,
         new TouchBarButton({
-          label: '⏭',
+          label: "⏭",
         }),
         new TouchBarButton({
-          label: '👎',
+          label: "👎",
         }),
         new TouchBarButton({
-          label: '👍',
+          label: "👍",
         }),
       ],
       change: (i) => {
@@ -64,7 +64,7 @@ export default createPlugin({
           continuous: false,
         }),
         new TouchBarSpacer({
-          size: 'flexible',
+          size: "flexible",
         }),
         buttons,
       ],
@@ -74,7 +74,7 @@ export default createPlugin({
       getSongControls(window);
 
     // If the page is ready, register the callback
-    window.once('ready-to-show', () => {
+    window.once("ready-to-show", () => {
       controls = [previous, playPause, next, dislike, like];
 
       // Register the callback
@@ -86,7 +86,7 @@ export default createPlugin({
         songTitle.label = songInfo.title;
 
         // Changes the pause button if paused
-        pausePlayButton.label = songInfo.isPaused ? '▶️' : '⏸';
+        pausePlayButton.label = songInfo.isPaused ? "▶️" : "⏸";
 
         // Get image source
         songImage.icon = (
@@ -102,8 +102,8 @@ export default createPlugin({
   config: {
     enabled: false,
   },
-  description: () => t('plugins.touchbar.description'),
-  name: () => t('plugins.touchbar.name'),
+  description: () => t("plugins.touchbar.description"),
+  name: () => t("plugins.touchbar.name"),
   platform: Platform.macOS,
   restartNeeded: true,
 });

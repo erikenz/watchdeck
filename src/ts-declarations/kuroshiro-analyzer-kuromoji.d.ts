@@ -7,6 +7,6 @@ declare class KuromojiAnalyzer {
   parse(str: string): Promise<unknown>;
 }
 
-declare module 'kuroshiro-analyzer-kuromoji' {
+declare module "kuroshiro-analyzer-kuromoji" {
   export = KuromojiAnalyzer;
 }

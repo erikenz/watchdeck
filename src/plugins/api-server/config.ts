@@ -1,6 +1,6 @@
 export enum AuthStrategy {
-  AUTH_AT_FIRST = 'AUTH_AT_FIRST',
-  NONE = 'NONE',
+  AUTH_AT_FIRST = "AUTH_AT_FIRST",
+  NONE = "NONE",
 }
 
 export interface APIServerConfig {
@@ -19,10 +19,10 @@ export interface APIServerConfig {
 export const defaultAPIServerConfig: APIServerConfig = {
   authStrategy: AuthStrategy.AUTH_AT_FIRST,
   authorizedClients: [],
-  certPath: '',
+  certPath: "",
   enabled: false,
-  hostname: '0.0.0.0',
-  keyPath: '',
+  hostname: "0.0.0.0",
+  keyPath: "",
   port: 26538,
   secret: Date.now().toString(36),
   useHttps: false,

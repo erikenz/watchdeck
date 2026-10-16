@@ -1,8 +1,8 @@
 /* what */
 
 const ignored = {
-  id: ['volume-slider', 'expand-volume-slider'],
-  types: ['mousewheel', 'keydown', 'keyup'],
+  id: ["volume-slider", "expand-volume-slider"],
+  types: ["mousewheel", "keydown", "keyup"],
 } as const;
 
 type CustomElementPrototype = typeof Element.prototype & {
@@ -19,13 +19,13 @@ function overrideAddEventListener() {
   Element.prototype.addEventListener = function addEventListener(
     type: string,
     listener: (event: Event) => void,
-    useCapture = false,
+    useCapture = false
   ) {
     if (!(ignored.id.includes(this.id) && ignored.types.includes(type))) {
       (this as CustomElementPrototype)._addEventListener!(
         type,
         listener,
-        useCapture,
+        useCapture
       );
     } else if (window.electronIs.dev()) {
       console.log(`Ignoring event: "${this.id}.${type}()"`);
@@ -37,7 +37,7 @@ export const overrideListener = () => {
   overrideAddEventListener();
   // Restore original function after finished loading to avoid keeping Element.prototype altered
   window.addEventListener(
-    'load',
+    "load",
     () => {
       Element.prototype.addEventListener = (
         Element.prototype as CustomElementPrototype
@@ -45,6 +45,6 @@ export const overrideListener = () => {
       (Element.prototype as CustomElementPrototype)._addEventListener =
         undefined;
     },
-    { once: true },
+    { once: true }
   );
 };

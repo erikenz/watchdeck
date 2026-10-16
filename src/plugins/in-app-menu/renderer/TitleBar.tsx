@@ -1,4 +1,4 @@
-import type { Menu, MenuItem } from 'electron';
+import type { Menu, MenuItem } from "electron";
 import {
   createEffect,
   createResource,
@@ -9,19 +9,19 @@ import {
   onMount,
   Show,
   Switch,
-} from 'solid-js';
-import { css } from 'solid-styled-components';
-import { TransitionGroup } from 'solid-transition-group';
+} from "solid-js";
+import { css } from "solid-styled-components";
+import { TransitionGroup } from "solid-transition-group";
 
-import { cacheNoArgs } from '@/providers/decorators';
-import type { RendererContext } from '@/types/contexts';
+import { cacheNoArgs } from "@/providers/decorators";
+import type { RendererContext } from "@/types/contexts";
 
-import type { InAppMenuConfig } from '../constants';
-import { IconButton } from './IconButton';
-import { MenuButton } from './MenuButton';
-import { Panel } from './Panel';
-import { PanelItem } from './PanelItem';
-import { WindowController } from './WindowController';
+import type { InAppMenuConfig } from "../constants";
+import { IconButton } from "./IconButton";
+import { MenuButton } from "./MenuButton";
+import { Panel } from "./Panel";
+import { PanelItem } from "./PanelItem";
+import { WindowController } from "./WindowController";
 
 const titleStyle = cacheNoArgs(
   () => css`
@@ -52,15 +52,15 @@ const titleStyle = cacheNoArgs(
       transform 300ms cubic-bezier(0.2, 0, 0.6, 1) 0s,
       background-color 300ms cubic-bezier(0.2, 0, 0.6, 1) 0s;
 
-    &[data-macos='true'] {
+    &[data-macos="true"] {
       padding: 4px 4px 4px 74px;
     }
 
-    ytmusic-app:has(ytmusic-player[player-ui-state='FULLSCREEN'])
-      ~ &:not([data-show='true']) {
+    ytmusic-app:has(ytmusic-player[player-ui-state="FULLSCREEN"])
+      ~ &:not([data-show="true"]) {
       transform: translateY(calc(-1 * var(--menu-bar-height, 32px)));
     }
-  `,
+  `
 );
 
 const separatorStyle = cacheNoArgs(
@@ -70,7 +70,7 @@ const separatorStyle = cacheNoArgs(
     margin: 4px 0;
 
     background-color: rgba(255, 255, 255, 0.2);
-  `,
+  `
 );
 
 const animationStyle = cacheNoArgs(() => ({
@@ -105,36 +105,36 @@ const animationStyle = cacheNoArgs(() => ({
 }));
 
 export interface PanelRendererProps {
-  items: Electron.Menu['items'];
+  items: Electron.Menu["items"];
   level?: number[];
   onClick?: (commandId: number, radioGroup?: MenuItem[]) => void;
 }
 const PanelRenderer = (props: PanelRendererProps) => {
-  const radioGroup = () => props.items.filter((it) => it.type === 'radio');
+  const radioGroup = () => props.items.filter((it) => it.type === "radio");
 
   return (
     <Index each={props.items}>
       {(subItem) => (
         <Show when={subItem().visible}>
           <Switch>
-            <Match when={subItem().type === 'normal'}>
+            <Match when={subItem().type === "normal"}>
               <PanelItem
                 chip={subItem().sublabel}
                 commandId={subItem().commandId}
                 name={subItem().label}
                 onClick={() => props.onClick?.(subItem().commandId)}
                 toolTip={subItem().toolTip}
-                type={'normal'}
+                type={"normal"}
               />
             </Match>
-            <Match when={subItem().type === 'submenu'}>
+            <Match when={subItem().type === "submenu"}>
               <PanelItem
                 chip={subItem().sublabel}
                 commandId={subItem().commandId}
                 level={[...(props.level ?? []), subItem().commandId]}
                 name={subItem().label}
                 toolTip={subItem().toolTip}
-                type={'submenu'}
+                type={"submenu"}
               >
                 <PanelRenderer
                   items={subItem().submenu?.items ?? []}
@@ -143,7 +143,7 @@ const PanelRenderer = (props: PanelRendererProps) => {
                 />
               </PanelItem>
             </Match>
-            <Match when={subItem().type === 'checkbox'}>
+            <Match when={subItem().type === "checkbox"}>
               <PanelItem
                 checked={subItem().checked}
                 chip={subItem().sublabel}
@@ -151,10 +151,10 @@ const PanelRenderer = (props: PanelRendererProps) => {
                 name={subItem().label}
                 onChange={() => props.onClick?.(subItem().commandId)}
                 toolTip={subItem().toolTip}
-                type={'checkbox'}
+                type={"checkbox"}
               />
             </Match>
-            <Match when={subItem().type === 'radio'}>
+            <Match when={subItem().type === "radio"}>
               <PanelItem
                 checked={subItem().checked}
                 chip={subItem().sublabel}
@@ -164,10 +164,10 @@ const PanelRenderer = (props: PanelRendererProps) => {
                   props.onClick?.(subItem().commandId, radioGroup())
                 }
                 toolTip={subItem().toolTip}
-                type={'radio'}
+                type={"radio"}
               />
             </Match>
-            <Match when={subItem().type === 'separator'}>
+            <Match when={subItem().type === "separator"}>
               <hr class={separatorStyle()} />
             </Match>
           </Switch>
@@ -178,7 +178,7 @@ const PanelRenderer = (props: PanelRendererProps) => {
 };
 
 export interface TitleBarProps {
-  ipc: RendererContext<InAppMenuConfig>['ipc'];
+  ipc: RendererContext<InAppMenuConfig>["ipc"];
   isMacOS?: boolean;
   enableController?: boolean;
   initialCollapsed?: boolean;
@@ -191,32 +191,32 @@ export const TitleBar = (props: TitleBarProps) => {
   const [mouseY, setMouseY] = createSignal(0);
 
   const [data, { refetch }] = createResource(
-    async () => (await props.ipc.invoke('get-menu')) as Promise<Menu | null>,
+    async () => (await props.ipc.invoke("get-menu")) as Promise<Menu | null>
   );
   const [isMaximized, { refetch: refetchMaximize }] = createResource(
     async () =>
-      (await props.ipc.invoke('window-is-maximized')) as Promise<boolean>,
+      (await props.ipc.invoke("window-is-maximized")) as Promise<boolean>
   );
 
   const handleToggleMaximize = async () => {
     if (isMaximized()) {
-      await props.ipc.invoke('window-unmaximize');
+      await props.ipc.invoke("window-unmaximize");
     } else {
-      await props.ipc.invoke('window-maximize');
+      await props.ipc.invoke("window-maximize");
     }
     await refetchMaximize();
   };
   const handleMinimize = async () => {
-    await props.ipc.invoke('window-minimize');
+    await props.ipc.invoke("window-minimize");
   };
   const handleClose = async () => {
-    await props.ipc.invoke('window-close');
+    await props.ipc.invoke("window-close");
   };
 
   const refreshMenuItem = async (originalMenu: Menu, commandId: number) => {
     const menuItem = (await window.ipcRenderer.invoke(
-      'get-menu-by-id',
-      commandId,
+      "get-menu-by-id",
+      commandId
     )) as MenuItem | null;
 
     const newMenu = structuredClone(originalMenu);
@@ -243,7 +243,7 @@ export const TitleBar = (props: TitleBarProps) => {
 
   const handleItemClick = async (
     commandId: number,
-    radioGroup?: MenuItem[],
+    radioGroup?: MenuItem[]
   ) => {
     const menuData = menu();
     if (!menuData) return;
@@ -266,33 +266,33 @@ export const TitleBar = (props: TitleBarProps) => {
   };
 
   onMount(() => {
-    props.ipc.on('close-all-in-app-menu-panel', async () => {
+    props.ipc.on("close-all-in-app-menu-panel", async () => {
       setIgnoreTransition(true);
       setMenu(null);
       await refetch();
       setMenu(data() ?? null);
       setIgnoreTransition(false);
     });
-    props.ipc.on('refresh-in-app-menu', async () => {
+    props.ipc.on("refresh-in-app-menu", async () => {
       setIgnoreTransition(true);
       await refetch();
       setMenu(data() ?? null);
       setIgnoreTransition(false);
     });
-    props.ipc.on('toggle-in-app-menu', () => {
+    props.ipc.on("toggle-in-app-menu", () => {
       setCollapsed(!collapsed());
     });
 
-    props.ipc.on('window-maximize', refetchMaximize);
-    props.ipc.on('window-unmaximize', refetchMaximize);
+    props.ipc.on("window-maximize", refetchMaximize);
+    props.ipc.on("window-unmaximize", refetchMaximize);
 
     // close menu when the outside of the panel or sub-panel is clicked
-    document.body.addEventListener('click', (e) => {
+    document.body.addEventListener("click", (e) => {
       if (
         e.target instanceof HTMLElement &&
         !(
-          e.target.closest('nav[data-wd-main-panel]') ||
-          e.target.closest('ul[data-wd-sub-panel]')
+          e.target.closest("nav[data-wd-main-panel]") ||
+          e.target.closest("ul[data-wd-sub-panel]")
         )
       ) {
         setOpenTarget(null);
@@ -300,14 +300,14 @@ export const TitleBar = (props: TitleBarProps) => {
     });
 
     // tracking mouse position
-    window.addEventListener('mousemove', listener);
-    const ytmusicAppLayout = document.querySelector<HTMLElement>('#layout');
-    ytmusicAppLayout?.addEventListener('scroll', () => {
+    window.addEventListener("mousemove", listener);
+    const ytmusicAppLayout = document.querySelector<HTMLElement>("#layout");
+    ytmusicAppLayout?.addEventListener("scroll", () => {
       const scrollValue = ytmusicAppLayout.scrollTop;
       if (scrollValue > 20) {
-        ytmusicAppLayout.classList.add('content-scrolled');
+        ytmusicAppLayout.classList.add("content-scrolled");
       } else {
-        ytmusicAppLayout.classList.remove('content-scrolled');
+        ytmusicAppLayout.classList.remove("content-scrolled");
       }
     });
   });
@@ -319,7 +319,7 @@ export const TitleBar = (props: TitleBarProps) => {
   });
 
   onCleanup(() => {
-    window.removeEventListener('mousemove', listener);
+    window.removeEventListener("mousemove", listener);
   });
 
   return (
@@ -328,15 +328,15 @@ export const TitleBar = (props: TitleBarProps) => {
       data-macos={props.isMacOS}
       data-show={mouseY() < 32}
       data-wd-main-panel={true}
-      id={'wd-title-bar-main-panel'}
+      id={"wd-title-bar-main-panel"}
     >
       <IconButton
         onClick={() => setCollapsed(!collapsed())}
         style={{
-          'border-top-left-radius': '4px',
+          "border-top-left-radius": "4px",
         }}
       >
-        <svg height={16} viewBox={'0 0 24 24'} width={16}>
+        <svg height={16} viewBox={"0 0 24 24"} width={16}>
           <path
             d="M3 17h12a1 1 0 0 1 .117 1.993L15 19H3a1 1 0 0 1-.117-1.993L3 17h12H3Zm0-6h18a1 1 0 0 1 .117 1.993L21 13H3a1 1 0 0 1-.117-1.993L3 11h18H3Zm0-6h15a1 1 0 0 1 .117 1.993L18 7H3a1 1 0 0 1-.117-1.993L3 5h15H3Z"
             fill="currentColor"
@@ -365,15 +365,15 @@ export const TitleBar = (props: TitleBarProps) => {
             : animationStyle().exitTo
         }
         onAfterEnter={(element) => {
-          (element as HTMLElement).style.removeProperty('transition-delay');
+          (element as HTMLElement).style.removeProperty("transition-delay");
         }}
         onBeforeEnter={(element) => {
           if (ignoreTransition()) return;
           const index = Number((element as HTMLElement).dataset.index ?? 0);
 
           (element as HTMLElement).style.setProperty(
-            'transition-delay',
-            `${index * 0.025}s`,
+            "transition-delay",
+            `${index * 0.025}s`
           );
         }}
         onBeforeExit={(element) => {
@@ -382,8 +382,8 @@ export const TitleBar = (props: TitleBarProps) => {
           const length = Number((element as HTMLElement).dataset.length ?? 1);
 
           (element as HTMLElement).style.setProperty(
-            'transition-delay',
-            `${length * 0.025 - index * 0.025}s`,
+            "transition-delay",
+            `${length * 0.025 - index * 0.025}s`
           );
         }}
       >
@@ -391,7 +391,7 @@ export const TitleBar = (props: TitleBarProps) => {
           <Index each={menu()?.items}>
             {(item, index) => {
               const [anchor, setAnchor] = createSignal<HTMLElement | null>(
-                null,
+                null
               );
 
               const handleClick = () => {
@@ -416,7 +416,7 @@ export const TitleBar = (props: TitleBarProps) => {
                     anchor={anchor()}
                     offset={{ mainAxis: 8 }}
                     open={openTarget() === anchor()}
-                    placement={'bottom-start'}
+                    placement={"bottom-start"}
                   >
                     <PanelRenderer
                       items={item().submenu?.items ?? []}

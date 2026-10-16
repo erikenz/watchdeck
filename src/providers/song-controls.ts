@@ -1,14 +1,14 @@
 // This is used for to control the songs
-import { ipcMain } from 'electron';
-import type { BrowserWindow } from 'electron';
+import { ipcMain } from "electron";
+import type { BrowserWindow } from "electron";
 
-import { LikeType } from '@/types/datahost-get-state';
+import { LikeType } from "@/types/datahost-get-state";
 
 // see protocol-handler.ts
 type ArgsType<T> = T | string[] | undefined;
 
 const parseNumberFromArgsType = (args: ArgsType<number>) => {
-  if (typeof args === 'number') {
+  if (typeof args === "number") {
     return args;
   } else if (Array.isArray(args)) {
     return Number(args[0]);
@@ -17,16 +17,16 @@ const parseNumberFromArgsType = (args: ArgsType<number>) => {
 };
 
 const parseBooleanFromArgsType = (args: ArgsType<boolean>) => {
-  if (typeof args === 'boolean') {
+  if (typeof args === "boolean") {
     return args;
   } else if (Array.isArray(args)) {
-    return args[0] === 'true';
+    return args[0] === "true";
   }
   return null;
 };
 
 const parseStringFromArgsType = (args: ArgsType<string>) => {
-  if (typeof args === 'string') {
+  if (typeof args === "string") {
     return args;
   } else if (Array.isArray(args)) {
     return args[0];
@@ -37,61 +37,61 @@ const parseStringFromArgsType = (args: ArgsType<string>) => {
 export const getSongControls = (win: BrowserWindow) => ({
   // Playback
   previous: () => {
-    win.webContents.send('watchdeck:previous-video');
+    win.webContents.send("watchdeck:previous-video");
   },
   next: () => {
-    win.webContents.send('watchdeck:next-video');
+    win.webContents.send("watchdeck:next-video");
   },
   play: () => {
-    win.webContents.send('watchdeck:play');
+    win.webContents.send("watchdeck:play");
   },
   pause: () => {
-    win.webContents.send('watchdeck:pause');
+    win.webContents.send("watchdeck:pause");
   },
   playPause: () => {
-    win.webContents.send('watchdeck:toggle-play');
+    win.webContents.send("watchdeck:toggle-play");
   },
   like: () => {
-    win.webContents.send('watchdeck:update-like', LikeType.Like);
+    win.webContents.send("watchdeck:update-like", LikeType.Like);
   },
   dislike: () => {
-    win.webContents.send('watchdeck:update-like', LikeType.Dislike);
+    win.webContents.send("watchdeck:update-like", LikeType.Dislike);
   },
   seekTo: (seconds: ArgsType<number>) => {
     const secondsNumber = parseNumberFromArgsType(seconds);
     if (secondsNumber !== null) {
-      win.webContents.send('watchdeck:seek-to', seconds);
+      win.webContents.send("watchdeck:seek-to", seconds);
     }
   },
   goBack: (seconds: ArgsType<number>) => {
     const secondsNumber = parseNumberFromArgsType(seconds);
     if (secondsNumber !== null) {
-      win.webContents.send('watchdeck:seek-by', -secondsNumber);
+      win.webContents.send("watchdeck:seek-by", -secondsNumber);
     }
   },
   goForward: (seconds: ArgsType<number>) => {
     const secondsNumber = parseNumberFromArgsType(seconds);
     if (secondsNumber !== null) {
-      win.webContents.send('watchdeck:seek-by', seconds);
+      win.webContents.send("watchdeck:seek-by", seconds);
     }
   },
   requestShuffleInformation: () => {
-    win.webContents.send('watchdeck:get-shuffle');
+    win.webContents.send("watchdeck:get-shuffle");
   },
   shuffle: () => {
-    win.webContents.send('watchdeck:shuffle');
+    win.webContents.send("watchdeck:shuffle");
   },
   switchRepeat: (n: ArgsType<number> = 1) => {
     const repeat = parseNumberFromArgsType(n);
     if (repeat !== null) {
-      win.webContents.send('watchdeck:switch-repeat', n);
+      win.webContents.send("watchdeck:switch-repeat", n);
     }
   },
   // General
   setVolume: (volume: ArgsType<number>) => {
     const volumeNumber = parseNumberFromArgsType(volume);
     if (volumeNumber !== null) {
-      win.webContents.send('watchdeck:update-volume', volume);
+      win.webContents.send("watchdeck:update-volume", volume);
     }
   },
   setFullscreen: (isFullscreen: ArgsType<boolean>) => {
@@ -99,24 +99,24 @@ export const getSongControls = (win: BrowserWindow) => ({
     if (isFullscreenValue !== null) {
       win.setFullScreen(isFullscreenValue);
       win.webContents.send(
-        'watchdeck:click-fullscreen-button',
-        isFullscreenValue,
+        "watchdeck:click-fullscreen-button",
+        isFullscreenValue
       );
     }
   },
   requestFullscreenInformation: () => {
-    win.webContents.send('watchdeck:get-fullscreen');
+    win.webContents.send("watchdeck:get-fullscreen");
   },
   requestQueueInformation: () => {
-    win.webContents.send('watchdeck:get-queue');
+    win.webContents.send("watchdeck:get-queue");
   },
   muteUnmute: () => {
-    win.webContents.send('watchdeck:toggle-mute');
+    win.webContents.send("watchdeck:toggle-mute");
   },
   openSearchBox: () => {
     win.webContents.sendInputEvent({
-      type: 'keyDown',
-      keyCode: '/',
+      type: "keyDown",
+      keyCode: "/",
     });
   },
   // Queue
@@ -125,9 +125,9 @@ export const getSongControls = (win: BrowserWindow) => ({
     if (videoIdValue === null) return;
 
     win.webContents.send(
-      'watchdeck:add-to-queue',
+      "watchdeck:add-to-queue",
       videoIdValue,
-      queueInsertPosition,
+      queueInsertPosition
     );
   },
   moveSongInQueue: (fromIndex: ArgsType<number>, toIndex: ArgsType<number>) => {
@@ -136,32 +136,32 @@ export const getSongControls = (win: BrowserWindow) => ({
     if (fromIndexValue === null || toIndexValue === null) return;
 
     win.webContents.send(
-      'watchdeck:move-in-queue',
+      "watchdeck:move-in-queue",
       fromIndexValue,
-      toIndexValue,
+      toIndexValue
     );
   },
   removeSongFromQueue: (index: ArgsType<number>) => {
     const indexValue = parseNumberFromArgsType(index);
     if (indexValue === null) return;
 
-    win.webContents.send('watchdeck:remove-from-queue', indexValue);
+    win.webContents.send("watchdeck:remove-from-queue", indexValue);
   },
   setQueueIndex: (index: ArgsType<number>) => {
     const indexValue = parseNumberFromArgsType(index);
     if (indexValue === null) return;
 
-    win.webContents.send('watchdeck:set-queue-index', indexValue);
+    win.webContents.send("watchdeck:set-queue-index", indexValue);
   },
   clearQueue: () => {
-    win.webContents.send('watchdeck:clear-queue');
+    win.webContents.send("watchdeck:clear-queue");
   },
 
   search: async (query: string, params?: string, continuation?: string) =>
     new Promise((resolve) => {
-      ipcMain.once('watchdeck:search-results', (_, result) => {
+      ipcMain.once("watchdeck:search-results", (_, result) => {
         resolve(result as string);
       });
-      win.webContents.send('watchdeck:search', query, params, continuation);
+      win.webContents.send("watchdeck:search", query, params, continuation);
     }),
 });

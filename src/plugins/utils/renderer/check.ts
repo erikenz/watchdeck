@@ -11,7 +11,7 @@ export const isMusicOrVideoTrack = () => {
         clickTrackingParams: string;
       };
     }
-  >('tp-yt-paper-listbox #navigation-endpoint')) {
+  >("tp-yt-paper-listbox #navigation-endpoint")) {
     if (
       menuSelector?.data?.addToPlaylistEndpoint?.videoId ||
       menuSelector?.data?.watchEndpoint?.videoId
@@ -32,7 +32,7 @@ export const isAlbumOrPlaylist = () => {
         clickTrackingParams: string;
       };
     }
-  >('tp-yt-paper-listbox #navigation-endpoint')) {
+  >("tp-yt-paper-listbox #navigation-endpoint")) {
     if (menuSelector?.data?.addToPlaylistEndpoint?.playlistId) {
       return true;
     }
@@ -52,5 +52,5 @@ export const isPlayerMenu = (menu?: HTMLElement | null) =>
         })
       | null
   )?.ytEventForwardingBehavior?.forwarder_?.eventSink?.matches(
-    'ytmusic-menu-renderer.ytmusic-player-bar',
+    "ytmusic-menu-renderer.ytmusic-player-bar"
   );

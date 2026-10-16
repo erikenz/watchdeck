@@ -1,11 +1,11 @@
-import { deepmerge } from 'deepmerge-ts';
-import { allPlugins, preloadPlugins } from 'virtual:plugins';
+import { deepmerge } from "deepmerge-ts";
+import { allPlugins, preloadPlugins } from "virtual:plugins";
 
-import * as config from '@/config';
-import { t } from '@/i18n';
-import type { PreloadContext } from '@/types/contexts';
-import type { PluginConfig, PluginDef } from '@/types/plugins';
-import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
+import * as config from "@/config";
+import { t } from "@/i18n";
+import type { PreloadContext } from "@/types/contexts";
+import type { PluginConfig, PluginDef } from "@/types/plugins";
+import { LoggerPrefix, startPlugin, stopPlugin } from "@/utils";
 
 const loadedPluginMap: Record<
   string,
@@ -15,13 +15,13 @@ const createContext = (id: string): PreloadContext<PluginConfig> => ({
   getConfig: async () =>
     deepmerge(
       (await allPlugins())[id].config ?? { enabled: false },
-      config.get(`plugins.${id}`) ?? {},
+      config.get(`plugins.${id}`) ?? {}
     ) as PluginConfig,
   setConfig: async (newConfig) => {
     config.setPartial(
       `plugins.${id}`,
       newConfig,
-      (await allPlugins())[id].config,
+      (await allPlugins())[id].config
     );
   },
 });
@@ -33,18 +33,18 @@ export const forceUnloadPreloadPlugin = async (id: string) => {
 
   const hasStopped = await stopPlugin(id, loadedPluginMap[id], {
     context: createContext(id),
-    ctx: 'preload',
+    ctx: "preload",
   });
   if (hasStopped || (hasStopped === null && loadedPluginMap[id].preload)) {
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.unloaded', { pluginName: id }),
+      t("common.console.plugins.unloaded", { pluginName: id })
     );
     delete loadedPluginMap[id];
   } else {
     console.error(
       LoggerPrefix,
-      t('common.console.plugins.unload-failed', { pluginName: id }),
+      t("common.console.plugins.unload-failed", { pluginName: id })
     );
   }
 };
@@ -58,13 +58,13 @@ export const forceLoadPreloadPlugin = async (id: string) => {
 
     const hasStarted = await startPlugin(id, plugin, {
       context: createContext(id),
-      ctx: 'preload',
+      ctx: "preload",
     });
 
     if (
       hasStarted ||
       (hasStarted === null &&
-        typeof plugin.preload !== 'function' &&
+        typeof plugin.preload !== "function" &&
         plugin.preload)
     ) {
       loadedPluginMap[id] = plugin;
@@ -72,12 +72,12 @@ export const forceLoadPreloadPlugin = async (id: string) => {
 
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.loaded', { pluginName: id }),
+      t("common.console.plugins.loaded", { pluginName: id })
     );
   } catch (error) {
     console.error(
       LoggerPrefix,
-      t('common.console.plugins.initialize-failed', { pluginName: id }),
+      t("common.console.plugins.initialize-failed", { pluginName: id })
     );
     console.trace(error);
   }
@@ -89,7 +89,7 @@ export const loadAllPreloadPlugins = async () => {
   for (const [pluginId, pluginDef] of Object.entries(await preloadPlugins())) {
     const config = deepmerge(
       pluginDef.config ?? { enable: false },
-      pluginConfigs[pluginId] ?? {},
+      pluginConfigs[pluginId] ?? {}
     );
 
     if (config.enabled) {
@@ -109,7 +109,7 @@ export const unloadAllPreloadPlugins = async () => {
 };
 
 export const getLoadedPreloadPlugin = (
-  id: string,
+  id: string
 ): PluginDef<unknown, unknown, unknown> | undefined => loadedPluginMap[id];
 
 export const getAllLoadedPreloadPlugins = () => loadedPluginMap;

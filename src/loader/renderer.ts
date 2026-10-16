@@ -1,10 +1,10 @@
-import { deepmerge } from 'deepmerge-ts';
-import { rendererPlugins } from 'virtual:plugins';
+import { deepmerge } from "deepmerge-ts";
+import { rendererPlugins } from "virtual:plugins";
 
-import { t } from '@/i18n';
-import type { RendererContext } from '@/types/contexts';
-import type { PluginConfig, PluginDef } from '@/types/plugins';
-import { LoggerPrefix, startPlugin, stopPlugin } from '@/utils';
+import { t } from "@/i18n";
+import type { RendererContext } from "@/types/contexts";
+import type { PluginConfig, PluginDef } from "@/types/plugins";
+import { LoggerPrefix, startPlugin, stopPlugin } from "@/utils";
 
 const unregisterStyleMap: Record<string, (() => void)[]> = {};
 const loadedPluginMap: Record<
@@ -13,10 +13,10 @@ const loadedPluginMap: Record<
 > = {};
 
 export const createContext = <Config extends PluginConfig>(
-  id: string,
+  id: string
 ): RendererContext<Config> => ({
   getConfig: async () =>
-    window.ipcRenderer.invoke('watchdeck:get-config', id) as Promise<Config>,
+    window.ipcRenderer.invoke("watchdeck:get-config", id) as Promise<Config>,
   ipc: {
     invoke: async (event: string, ...args: unknown[]) =>
       window.ipcRenderer.invoke(event, ...args),
@@ -34,7 +34,7 @@ export const createContext = <Config extends PluginConfig>(
     },
   },
   setConfig: async (newConfig) => {
-    await window.ipcRenderer.invoke('watchdeck:set-config', id, newConfig);
+    await window.ipcRenderer.invoke("watchdeck:set-config", id, newConfig);
   },
 });
 
@@ -53,7 +53,7 @@ export const forceUnloadRendererPlugin = async (id: string) => {
 
   const hasStopped = await stopPlugin(id, plugin, {
     context: createContext(id),
-    ctx: 'renderer',
+    ctx: "renderer",
   });
   if (plugin?.stylesheets) {
     document.querySelector(`style#plugin-${id}`)?.remove();
@@ -61,12 +61,12 @@ export const forceUnloadRendererPlugin = async (id: string) => {
   if (hasStopped || (hasStopped === null && plugin?.renderer)) {
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.unloaded', { pluginName: id }),
+      t("common.console.plugins.unloaded", { pluginName: id })
     );
   } else {
     console.error(
       LoggerPrefix,
-      t('common.console.plugins.unload-failed', { pluginName: id }),
+      t("common.console.plugins.unload-failed", { pluginName: id })
     );
   }
 };
@@ -79,14 +79,14 @@ export const forceLoadRendererPlugin = async (id: string) => {
 
   const hasEvaled = await startPlugin(id, plugin, {
     context: createContext(id),
-    ctx: 'renderer',
+    ctx: "renderer",
   });
 
   if (
     hasEvaled ||
     plugin?.stylesheets ||
     (hasEvaled === null &&
-      typeof plugin?.renderer !== 'function' &&
+      typeof plugin?.renderer !== "function" &&
       plugin?.renderer)
   ) {
     loadedPluginMap[id] = plugin;
@@ -107,12 +107,12 @@ export const forceLoadRendererPlugin = async (id: string) => {
 
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.loaded', { pluginName: id }),
+      t("common.console.plugins.loaded", { pluginName: id })
     );
   } else {
     console.log(
       LoggerPrefix,
-      t('common.console.plugins.initialize-failed', { pluginName: id }),
+      t("common.console.plugins.initialize-failed", { pluginName: id })
     );
   }
 };
@@ -140,7 +140,7 @@ export const unloadAllRendererPlugins = async () => {
 };
 
 export const getLoadedRendererPlugin = (
-  id: string,
+  id: string
 ): PluginDef<unknown, unknown, unknown> | undefined => loadedPluginMap[id];
 
 export const getAllLoadedRendererPlugins = () => loadedPluginMap;

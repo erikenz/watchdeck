@@ -1,20 +1,20 @@
-import type { BrowserWindow } from 'electron';
+import type { BrowserWindow } from "electron";
 
 import {
   registerCallback,
   MediaType,
   SongInfoEvent,
-} from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import { createBackend } from '@/utils';
+} from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import { createBackend } from "@/utils";
 
-import type { ScrobblerPluginConfig } from './index';
-import type { ScrobblerBase } from './services/base';
-import { LastFmScrobbler } from './services/lastfm';
-import { ListenbrainzScrobbler } from './services/listenbrainz';
+import type { ScrobblerPluginConfig } from "./index";
+import type { ScrobblerBase } from "./services/base";
+import { LastFmScrobbler } from "./services/lastfm";
+import { ListenbrainzScrobbler } from "./services/listenbrainz";
 
 export type SetConfType = (
-  conf: Partial<Omit<ScrobblerPluginConfig, 'enabled'>>,
+  conf: Partial<Omit<ScrobblerPluginConfig, "enabled">>
 ) => void | Promise<void>;
 
 export const backend = createBackend<
@@ -24,11 +24,11 @@ export const backend = createBackend<
     enabledScrobblers: Map<string, ScrobblerBase>;
     toggleScrobblers(
       config: ScrobblerPluginConfig,
-      window: BrowserWindow,
+      window: BrowserWindow
     ): void;
     createSessions(
       config: ScrobblerPluginConfig,
-      setConfig: SetConfType,
+      setConfig: SetConfType
     ): Promise<void>;
     setConfig?: SetConfType;
   },
@@ -49,7 +49,7 @@ export const backend = createBackend<
 
     this.toggleScrobblers(newConfig, this.window!);
     for (const [scrobblerName, scrobblerConfig] of Object.entries(
-      newConfig.scrobblers,
+      newConfig.scrobblers
     )) {
       if (scrobblerConfig.enabled) {
         const scrobbler = this.enabledScrobblers.get(scrobblerName);
@@ -97,7 +97,7 @@ export const backend = createBackend<
         // Scrobble when the song is halfway through, or has passed the 4-minute mark
         const scrobbleTime = Math.min(
           Math.ceil(songInfo.songDuration / 2),
-          4 * 60,
+          4 * 60
         );
         if (scrobbleTime > (songInfo.elapsedSeconds ?? 0)) {
           // Scrobble still needs to happen
@@ -111,7 +111,7 @@ export const backend = createBackend<
             },
             timeToWait,
             songInfo,
-            configNonnull,
+            configNonnull
           );
         }
 
@@ -124,18 +124,18 @@ export const backend = createBackend<
 
   toggleScrobblers(config: ScrobblerPluginConfig, window: BrowserWindow) {
     if (config.scrobblers.lastfm && config.scrobblers.lastfm.enabled) {
-      this.enabledScrobblers.set('lastfm', new LastFmScrobbler(window));
+      this.enabledScrobblers.set("lastfm", new LastFmScrobbler(window));
     } else {
-      this.enabledScrobblers.delete('lastfm');
+      this.enabledScrobblers.delete("lastfm");
     }
 
     if (
       config.scrobblers.listenbrainz &&
       config.scrobblers.listenbrainz.enabled
     ) {
-      this.enabledScrobblers.set('listenbrainz', new ListenbrainzScrobbler());
+      this.enabledScrobblers.set("listenbrainz", new ListenbrainzScrobbler());
     } else {
-      this.enabledScrobblers.delete('listenbrainz');
+      this.enabledScrobblers.delete("listenbrainz");
     }
   },
 });

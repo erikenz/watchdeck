@@ -1,30 +1,30 @@
-import { readFileSync } from 'node:fs';
-import { createServer as createHttpServer } from 'node:http';
-import { createServer as createHttpsServer } from 'node:https';
+import { readFileSync } from "node:fs";
+import { createServer as createHttpServer } from "node:http";
+import { createServer as createHttpsServer } from "node:https";
 
-import { serve, upgradeWebSocket } from '@hono/node-server';
-import { swaggerUI } from '@hono/swagger-ui';
-import { OpenAPIHono as Hono } from '@hono/zod-openapi';
-import type { MiddlewareHandler } from 'hono';
-import { cors } from 'hono/cors';
-import { jwt } from 'hono/jwt';
-import { WebSocketServer } from 'ws';
+import { serve, upgradeWebSocket } from "@hono/node-server";
+import { swaggerUI } from "@hono/swagger-ui";
+import { OpenAPIHono as Hono } from "@hono/zod-openapi";
+import type { MiddlewareHandler } from "hono";
+import { cors } from "hono/cors";
+import { jwt } from "hono/jwt";
+import { WebSocketServer } from "ws";
 
-import { APPLICATION_NAME } from '@/i18n';
-import { registerCallback } from '@/providers/song-info';
+import { APPLICATION_NAME } from "@/i18n";
+import { registerCallback } from "@/providers/song-info";
 import type {
   LikeType,
   RepeatMode,
   VolumeState,
-} from '@/types/datahost-get-state';
-import { createBackend } from '@/utils';
+} from "@/types/datahost-get-state";
+import { createBackend } from "@/utils";
 
-import { AuthStrategy } from '../config';
-import type { APIServerConfig } from '../config';
-import { API_VERSION } from './api-version';
-import { registerAuth, registerControl, registerWebsocket } from './routes';
-import { JWTPayloadSchema } from './scheme';
-import type { BackendType } from './types';
+import { AuthStrategy } from "../config";
+import type { APIServerConfig } from "../config";
+import { API_VERSION } from "./api-version";
+import { registerAuth, registerControl, registerWebsocket } from "./routes";
+import { JWTPayloadSchema } from "./scheme";
+import type { BackendType } from "./types";
 
 export const backend = createBackend<BackendType, APIServerConfig>({
   async start(ctx) {
@@ -35,23 +35,23 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.songInfo = songInfo;
     });
 
-    ctx.ipc.on('watchdeck:player-api-loaded', () => {
-      ctx.ipc.send('watchdeck:setup-seeked-listener');
-      ctx.ipc.send('watchdeck:setup-time-changed-listener');
-      ctx.ipc.send('watchdeck:setup-repeat-changed-listener');
-      ctx.ipc.send('watchdeck:setup-like-changed-listener');
-      ctx.ipc.send('watchdeck:setup-volume-changed-listener');
-      ctx.ipc.send('watchdeck:setup-shuffle-changed-listener');
+    ctx.ipc.on("watchdeck:player-api-loaded", () => {
+      ctx.ipc.send("watchdeck:setup-seeked-listener");
+      ctx.ipc.send("watchdeck:setup-time-changed-listener");
+      ctx.ipc.send("watchdeck:setup-repeat-changed-listener");
+      ctx.ipc.send("watchdeck:setup-like-changed-listener");
+      ctx.ipc.send("watchdeck:setup-volume-changed-listener");
+      ctx.ipc.send("watchdeck:setup-shuffle-changed-listener");
     });
 
     ctx.ipc.on(
-      'watchdeck:repeat-changed',
-      (mode: RepeatMode) => (this.currentRepeatMode = mode),
+      "watchdeck:repeat-changed",
+      (mode: RepeatMode) => (this.currentRepeatMode = mode)
     );
 
     ctx.ipc.on(
-      'watchdeck:volume-changed',
-      (newVolumeState: VolumeState) => (this.volumeState = newVolumeState),
+      "watchdeck:volume-changed",
+      (newVolumeState: VolumeState) => (this.volumeState = newVolumeState)
     );
 
     this.run(config);
@@ -81,11 +81,11 @@ export const backend = createBackend<BackendType, APIServerConfig>({
   init(backendCtx) {
     this.app = new Hono();
 
-    this.app.use('*', cors());
+    this.app.use("*", cors());
 
     // for web remote control
-    this.app.use('*', async (ctx, next) => {
-      ctx.header('Access-Control-Allow-Private-Network', 'true');
+    this.app.use("*", async (ctx, next) => {
+      ctx.header("Access-Control-Allow-Private-Network", "true");
       await next();
     });
 
@@ -100,18 +100,18 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       if (config.authStrategy !== AuthStrategy.NONE) {
         return await jwt({
           secret: config.secret,
-          alg: 'HS256',
+          alg: "HS256",
         })(ctx, next);
       }
       return await next();
     };
-    this.app.use('/api/*', jwtGuard);
-    this.app.use('/api/*', async (ctx, next) => {
+    this.app.use("/api/*", jwtGuard);
+    this.app.use("/api/*", async (ctx, next) => {
       if (ctx.req.path.endsWith(`${API_VERSION}/ws`)) {
         return await next();
       }
 
-      const result = await JWTPayloadSchema.spa(await ctx.get('jwtPayload'));
+      const result = await JWTPayloadSchema.spa(await ctx.get("jwtPayload"));
       const config = await backendCtx.getConfig();
 
       const isAuthorized =
@@ -119,7 +119,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
         (result.success && config.authorizedClients.includes(result.data.id));
       if (!isAuthorized) {
         ctx.status(401);
-        return ctx.body('Unauthorized');
+        return ctx.body("Unauthorized");
       }
 
       return await next();
@@ -133,30 +133,30 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       () => this.currentRepeatMode,
       () =>
         backendCtx.window.webContents.executeJavaScript(
-          'document.querySelector("#like-button-renderer")?.likeStatus',
+          'document.querySelector("#like-button-renderer")?.likeStatus'
         ) as Promise<LikeType>,
-      () => this.volumeState,
+      () => this.volumeState
     );
     registerAuth(this.app, backendCtx);
     registerWebsocket(this.app, backendCtx, upgradeWebSocket);
 
     // swagger
     this.app.openAPIRegistry.registerComponent(
-      'securitySchemes',
-      'bearerAuth',
+      "securitySchemes",
+      "bearerAuth",
       {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-      },
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      }
     );
-    this.app.doc('/doc', {
-      openapi: '3.1.0',
+    this.app.doc("/doc", {
+      openapi: "3.1.0",
       info: {
-        version: '1.0.0',
+        version: "1.0.0",
         title: `${APPLICATION_NAME} API Server`,
         description:
-          'Note: You need to get an access token using the `/auth/{id}` endpoint first to call any API endpoints under `/api`.',
+          "Note: You need to get an access token using the `/auth/{id}` endpoint first to call any API endpoints under `/api`.",
       },
       security: [
         {
@@ -165,7 +165,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       ],
     });
 
-    this.app.get('/swagger', swaggerUI({ url: '/doc' }));
+    this.app.get("/swagger", swaggerUI({ url: "/doc" }));
   },
   run(config) {
     if (!this.app) return;

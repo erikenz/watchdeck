@@ -205,17 +205,17 @@
 .mdui-prose pre,
 .mdui-prose pre tt,
 .mdui-prose samp {
-  font-family: Consolas, Courier, 'Courier New', monospace;
+  font-family: Consolas, Courier, "Courier New", monospace;
 }
 
 .mdui-prose caption {
   text-align: left;
 }
-.mdui-prose [draggable='true'],
+.mdui-prose [draggable="true"],
 .mdui-prose [draggable] {
   cursor: move;
 }
-.mdui-prose [draggable='false'] {
+.mdui-prose [draggable="false"] {
   cursor: inherit;
 }
 .mdui-prose dl,
@@ -370,19 +370,19 @@
 .mdui-prose ol {
   list-style-type: decimal;
 }
-.mdui-prose ol[type='A'] {
+.mdui-prose ol[type="A"] {
   list-style-type: upper-alpha;
 }
-.mdui-prose ol[type='a'] {
+.mdui-prose ol[type="a"] {
   list-style-type: lower-alpha;
 }
-.mdui-prose ol[type='I'] {
+.mdui-prose ol[type="I"] {
   list-style-type: upper-roman;
 }
-.mdui-prose ol[type='i'] {
+.mdui-prose ol[type="i"] {
   list-style-type: lower-roman;
 }
-.mdui-prose ol[type='1'] {
+.mdui-prose ol[type="1"] {
   list-style-type: decimal;
 }
 .mdui-prose li {

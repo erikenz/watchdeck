@@ -1,7 +1,7 @@
-import trayIcon from '@assets/tray.png?asset&asarUnpack';
+import trayIcon from "@assets/tray.png?asset&asarUnpack";
 
 const promptOptions = {
-  customStylesheet: 'dark',
+  customStylesheet: "dark",
   icon: trayIcon,
 };
 

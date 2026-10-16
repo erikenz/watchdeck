@@ -1,8 +1,8 @@
-import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { createPlugin } from "@/utils";
 
-import { onConfigChange, onMainLoad } from './main';
-import { onMenu } from './menu';
+import { onConfigChange, onMainLoad } from "./main";
+import { onMenu } from "./menu";
 
 export interface NotificationsPluginConfig {
   enabled: boolean;
@@ -10,7 +10,7 @@ export interface NotificationsPluginConfig {
   /**
    * Has effect only on Linux
    */
-  urgency: 'low' | 'normal' | 'critical';
+  urgency: "low" | "normal" | "critical";
   /**
    * the following has effect only on Windows
    */
@@ -32,7 +32,7 @@ export const defaultConfig: NotificationsPluginConfig = {
   toastStyle: 1,
   trayControls: true,
   unpauseNotification: false,
-  urgency: 'normal',
+  urgency: "normal",
 };
 
 export default createPlugin({
@@ -41,8 +41,8 @@ export default createPlugin({
     start: onMainLoad,
   },
   config: defaultConfig,
-  description: () => t('plugins.notifications.description'),
+  description: () => t("plugins.notifications.description"),
   menu: onMenu,
-  name: () => t('plugins.notifications.name'),
+  name: () => t("plugins.notifications.name"),
   restartNeeded: true,
 });

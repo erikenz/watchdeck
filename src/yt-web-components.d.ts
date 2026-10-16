@@ -1,9 +1,9 @@
-import type { IntrinsicElements as MDUIElements } from 'mdui/jsx.en';
+import type { IntrinsicElements as MDUIElements } from "mdui/jsx.en";
+import type { ComponentProps } from "solid-js";
 
-import type { Icons } from '@/types/icons';
-import type { ComponentProps } from 'solid-js';
+import type { Icons } from "@/types/icons";
 
-declare module 'solid-js' {
+declare module "solid-js" {
   namespace JSX {
     interface YtFormattedStringProps {
       text?: {
@@ -40,30 +40,30 @@ declare module 'solid-js' {
     }
 
     interface IntrinsicElements extends MDUIElements {
-      'center': ComponentProps<'div'>;
-      'wd-trans': ComponentProps<'span'> & WdTransProps;
-      'yt-formatted-string': ComponentProps<'span'> & YtFormattedStringProps;
-      'yt-button-renderer': ComponentProps<'button'> & YtButtonRendererProps;
-      'yt-touch-feedback-shape': ComponentProps<'div'>;
-      'tp-yt-paper-spinner-lite': ComponentProps<'div'> &
+      center: ComponentProps<"div">;
+      "wd-trans": ComponentProps<"span"> & WdTransProps;
+      "yt-formatted-string": ComponentProps<"span"> & YtFormattedStringProps;
+      "yt-button-renderer": ComponentProps<"button"> & YtButtonRendererProps;
+      "yt-touch-feedback-shape": ComponentProps<"div">;
+      "tp-yt-paper-spinner-lite": ComponentProps<"div"> &
         YpYtPaperSpinnerLiteProps;
-      'tp-yt-paper-icon-button': ComponentProps<'div'> &
+      "tp-yt-paper-icon-button": ComponentProps<"div"> &
         TpYtPaperIconButtonProps;
-      'yt-icon-button': ComponentProps<'div'> & TpYtPaperIconButtonProps;
-      'tp-yt-iron-icon': ComponentProps<'div'> & TpYtPaperIconButtonProps;
-      'yt-icon': ComponentProps<'div'> & TpYtPaperIconButtonProps;
+      "yt-icon-button": ComponentProps<"div"> & TpYtPaperIconButtonProps;
+      "tp-yt-iron-icon": ComponentProps<"div"> & TpYtPaperIconButtonProps;
+      "yt-icon": ComponentProps<"div"> & TpYtPaperIconButtonProps;
       // input type="range" slider component
-      'tp-yt-paper-slider': ComponentProps<'input'> & {
-        'value'?: number | string;
-        'min'?: number | string;
-        'max'?: number | string;
-        'step'?: number | string;
-        'disabled'?: boolean;
-        'on:immediate-value-changed'?: (
-          event: CustomEvent<{ value: number }>,
+      "tp-yt-paper-slider": ComponentProps<"input"> & {
+        value?: number | string;
+        min?: number | string;
+        max?: number | string;
+        step?: number | string;
+        disabled?: boolean;
+        "on:immediate-value-changed"?: (
+          event: CustomEvent<{ value: number }>
         ) => void;
       };
-      'tp-yt-paper-progress': ComponentProps<'input'>;
+      "tp-yt-paper-progress": ComponentProps<"input">;
     }
   }
 }

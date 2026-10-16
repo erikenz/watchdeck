@@ -1,4 +1,4 @@
 export const blockers = {
-  InPlayer: 'In player',
-  WithBlocklists: 'With blocklists',
+  InPlayer: "In player",
+  WithBlocklists: "With blocklists",
 } as const;

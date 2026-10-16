@@ -1,4 +1,4 @@
-import type { TimerKey } from './constants';
+import type { TimerKey } from "./constants";
 
 /**
  * Manages NodeJS Timers, ensuring only one timer exists per key.

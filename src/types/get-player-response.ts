@@ -202,7 +202,7 @@ export interface LinkAlternate {
 export interface PageOwnerDetails {
   name: string;
   externalChannelId: string;
-  ['\u0079\u006F\u0075\u0074\u0075\u0062\u0065ProfileUrl']: string;
+  ["\u0079\u006F\u0075\u0074\u0075\u0062\u0065ProfileUrl"]: string;
 }
 
 export interface MicroformatDataRendererVideoDetails {
@@ -270,9 +270,9 @@ export interface Header {
 }
 
 export enum HeaderType {
-  PlusPageID = 'PLUS_PAGE_ID',
-  UserAuth = 'USER_AUTH',
-  VisitorID = 'VISITOR_ID',
+  PlusPageID = "PLUS_PAGE_ID",
+  UserAuth = "USER_AUTH",
+  VisitorID = "VISITOR_ID",
 }
 
 export interface PtrackingURLClass {
@@ -431,7 +431,7 @@ export interface Range {
 }
 
 export enum ProjectionType {
-  Rectangular = 'RECTANGULAR',
+  Rectangular = "RECTANGULAR",
 }
 
 export interface Format {

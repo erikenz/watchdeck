@@ -1,4 +1,4 @@
-import type { BrowserWindow } from 'electron';
+import type { BrowserWindow } from "electron";
 
 export interface Config {
   enabled: boolean;

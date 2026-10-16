@@ -3,9 +3,9 @@ export type LanguageResources = Record<
   {
     translation: Record<string, unknown> & {
       language?: {
-        'name': string;
-        'local-name': string;
-        'code': string;
+        name: string;
+        "local-name": string;
+        code: string;
       };
     };
   }

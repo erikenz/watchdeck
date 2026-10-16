@@ -1,11 +1,11 @@
 // Segments are an array [ [start, end], … ]
-import type { Segment } from './types';
+import type { Segment } from "./types";
 
 export const sortSegments = (segments: Segment[]) => {
   segments.sort((segment1, segment2) =>
     segment1[0] === segment2[0]
       ? segment1[1] - segment2[1]
-      : segment1[0] - segment2[0],
+      : segment1[0] - segment2[0]
   );
 
   const compiledSegments: Segment[] = [];

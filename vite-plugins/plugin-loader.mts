@@ -2,22 +2,22 @@
 // electron-vite bundles its config and the vite plugins below before running
 // them, so `import.meta.dirname` would resolve to the bundle instead of this
 // file; the dirname(fileURLToPath(import.meta.url)) pair is the correct form.
-import { readFileSync } from 'node:fs';
-import { resolve, basename, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from "node:fs";
+import { resolve, basename, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { Project, ts, VariableDeclarationKind } from 'ts-morph';
+import { Project, ts, VariableDeclarationKind } from "ts-morph";
 import type {
   ObjectLiteralExpression,
   Node,
   ObjectLiteralElementLike,
-} from 'ts-morph';
-import type { PluginOption } from 'vite';
+} from "ts-morph";
+import type { PluginOption } from "vite";
 
 // Initialize a global project instance to reuse across load calls
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const globalProject = new Project({
-  tsConfigFilePath: resolve(__dirname, '..', 'tsconfig.json'),
+  tsConfigFilePath: resolve(__dirname, "..", "tsconfig.json"),
   skipAddingFilesFromTsConfig: true,
   skipLoadingLibFiles: true,
   skipFileDependencyResolution: true,
@@ -37,48 +37,48 @@ const getPropertyName = (prop: Node): string | null => {
 };
 
 export default function (
-  mode: 'backend' | 'preload' | 'renderer' | 'none',
+  mode: "backend" | "preload" | "renderer" | "none"
 ): PluginOption {
   return {
-    name: 'ytm-plugin-loader',
+    name: "ytm-plugin-loader",
     load: {
       filter: {
         id: /(?:\/plugins\/[^/]+\/index\.(?:js|ts|jsx|tsx)|\/plugins\/[^/]+\.(?:js|ts|jsx|tsx))$/,
       },
       handler(id) {
-        const fileContent = readFileSync(id, 'utf8');
+        const fileContent = readFileSync(id, "utf8");
         // Create or update source file in the global project instance
         const src = globalProject.createSourceFile(
-          '_pf' + basename(id),
+          "_pf" + basename(id),
           fileContent,
-          { overwrite: true },
+          { overwrite: true }
         );
 
         let objExpr: ObjectLiteralExpression | undefined;
 
         // Check for `export default ...`
         const defaultExportAssignment = src.getExportAssignment(
-          (ea) => !ea.isExportEquals(), // Filter out `export = `
+          (ea) => !ea.isExportEquals() // Filter out `export = `
         );
 
         if (defaultExportAssignment) {
           const expression = defaultExportAssignment.getExpression();
           if (expression.getKind() === ts.SyntaxKind.ObjectLiteralExpression) {
             objExpr = expression.asKindOrThrow(
-              ts.SyntaxKind.ObjectLiteralExpression,
+              ts.SyntaxKind.ObjectLiteralExpression
             );
           } else if (expression.getKind() === ts.SyntaxKind.CallExpression) {
             const callExpr = expression.asKindOrThrow(
-              ts.SyntaxKind.CallExpression,
+              ts.SyntaxKind.CallExpression
             );
             if (
               callExpr.getArguments().length === 1 &&
-              callExpr.getExpression().getText() === 'createPlugin'
+              callExpr.getExpression().getText() === "createPlugin"
             ) {
               const arg = callExpr.getArguments()[0];
               if (arg.getKind() === ts.SyntaxKind.ObjectLiteralExpression) {
                 objExpr = arg.asKindOrThrow(
-                  ts.SyntaxKind.ObjectLiteralExpression,
+                  ts.SyntaxKind.ObjectLiteralExpression
                 );
               }
             }
@@ -89,23 +89,23 @@ export default function (
         if (!objExpr) {
           const defaultExportDeclaration = src
             .getExportedDeclarations()
-            .get('default');
+            .get("default");
           if (defaultExportDeclaration && defaultExportDeclaration.length > 0) {
             const expr = defaultExportDeclaration[0];
             if (expr.getKind() === ts.SyntaxKind.ObjectLiteralExpression) {
               objExpr = expr.asKindOrThrow(
-                ts.SyntaxKind.ObjectLiteralExpression,
+                ts.SyntaxKind.ObjectLiteralExpression
               );
             } else if (expr.getKind() === ts.SyntaxKind.CallExpression) {
               const callExpr = expr.asKindOrThrow(ts.SyntaxKind.CallExpression);
               if (
                 callExpr.getArguments().length === 1 &&
-                callExpr.getExpression().getText() === 'createPlugin'
+                callExpr.getExpression().getText() === "createPlugin"
               ) {
                 const arg = callExpr.getArguments()[0];
                 if (arg.getKind() === ts.SyntaxKind.ObjectLiteralExpression) {
                   objExpr = arg.asKindOrThrow(
-                    ts.SyntaxKind.ObjectLiteralExpression,
+                    ts.SyntaxKind.ObjectLiteralExpression
                   );
                 }
               }
@@ -122,13 +122,13 @@ export default function (
           if (name) propMap.set(name, prop);
         }
 
-        const contexts = ['backend', 'preload', 'renderer', 'menu'];
+        const contexts = ["backend", "preload", "renderer", "menu"];
         for (const ctx of contexts) {
-          if (mode === 'none' && propMap.has(ctx)) {
+          if (mode === "none" && propMap.has(ctx)) {
             propMap.get(ctx)?.remove();
             continue;
           }
-          if (ctx === mode || (ctx === 'menu' && mode === 'backend')) continue;
+          if (ctx === mode || (ctx === "menu" && mode === "backend")) continue;
           if (propMap.has(ctx)) propMap.get(ctx)?.remove();
         }
 
@@ -138,7 +138,7 @@ export default function (
           declarationKind: VariableDeclarationKind.Const,
           declarations: [
             {
-              name: 'pluginStub',
+              name: "pluginStub",
               initializer: (writer) => writer.write(objExpr.getText()),
             },
           ],
@@ -155,8 +155,8 @@ export default function (
         }
 
         const stubContexts =
-          mode === 'backend'
-            ? contexts.filter((ctx) => ctx !== 'menu')
+          mode === "backend"
+            ? contexts.filter((ctx) => ctx !== "menu")
             : contexts;
         for (const ctx of stubContexts) {
           if (stubMap.has(ctx)) {

@@ -1,4 +1,4 @@
-declare module 'vudio/umd/vudio' {
+declare module "vudio/umd/vudio" {
   interface NoneWaveformOptions {
     maxHeight?: number;
     minHeight?: number;
@@ -10,12 +10,12 @@ declare module 'vudio/umd/vudio' {
   }
 
   interface WaveformOptions extends NoneWaveformOptions {
-    horizontalAlign: 'left' | 'center' | 'right';
-    verticalAlign: 'top' | 'middle' | 'bottom';
+    horizontalAlign: "left" | "center" | "right";
+    verticalAlign: "top" | "middle" | "bottom";
   }
 
   interface VudioOptions {
-    effect?: 'waveform' | 'circlewave' | 'circlebar' | 'lighting';
+    effect?: "waveform" | "circlewave" | "circlebar" | "lighting";
     accuracy?: number;
     width?: number;
     height?: number;
@@ -26,7 +26,7 @@ declare module 'vudio/umd/vudio' {
     constructor(
       audio: HTMLAudioElement | MediaStream,
       canvas: HTMLCanvasElement,
-      options: VudioOptions = {},
+      options: VudioOptions = {}
     );
 
     dance(): void;

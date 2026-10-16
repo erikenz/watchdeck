@@ -1,29 +1,29 @@
-import { toKeyEvent } from 'keyboardevent-from-electron-accelerator';
-import keyEventAreEqual from 'keyboardevents-areequal';
-import { render } from 'solid-js/web';
+import { toKeyEvent } from "keyboardevent-from-electron-accelerator";
+import keyEventAreEqual from "keyboardevents-areequal";
+import { render } from "solid-js/web";
 
-import { t } from '@/i18n';
+import { t } from "@/i18n";
 import {
   isMusicOrVideoTrack,
   isPlayerMenu,
-} from '@/plugins/utils/renderer/check';
-import { getSongMenu } from '@/providers/dom-elements';
-import type { RendererContext } from '@/types/contexts';
-import type { MusicPlayer } from '@/types/music-player';
+} from "@/plugins/utils/renderer/check";
+import { getSongMenu } from "@/providers/dom-elements";
+import type { RendererContext } from "@/types/contexts";
+import type { MusicPlayer } from "@/types/music-player";
 
-import type { PictureInPicturePluginConfig } from './index';
-import { PictureInPictureButton } from './templates/picture-in-picture-button';
+import type { PictureInPicturePluginConfig } from "./index";
+import { PictureInPictureButton } from "./templates/picture-in-picture-button";
 
 export const onPlayerApiReady = async (
   _: MusicPlayer,
-  { ipc, getConfig }: RendererContext<PictureInPicturePluginConfig>,
+  { ipc, getConfig }: RendererContext<PictureInPicturePluginConfig>
 ) => {
   const config = await getConfig();
 
   const togglePictureInPicture = async () => {
     if ((await getConfig()).useNativePiP) {
       const isInPiP = document.pictureInPictureElement !== null;
-      const video = document.querySelector<HTMLVideoElement>('video');
+      const video = document.querySelector<HTMLVideoElement>("video");
       const togglePiP = () =>
         isInPiP
           ? document.exitPictureInPicture()
@@ -31,22 +31,22 @@ export const onPlayerApiReady = async (
 
       try {
         await togglePiP();
-        document.querySelector<HTMLButtonElement>('#icon')?.click(); // Close the menu
+        document.querySelector<HTMLButtonElement>("#icon")?.click(); // Close the menu
         return true;
       } catch {}
     }
 
-    ipc.send('plugin:toggle-picture-in-picture');
+    ipc.send("plugin:toggle-picture-in-picture");
     return false;
   };
 
   if (config.hotkey) {
     const hotkeyEvent = toKeyEvent(config.hotkey);
-    window.addEventListener('keydown', (event) => {
+    window.addEventListener("keydown", (event) => {
       if (
         keyEventAreEqual(event, hotkeyEvent) &&
         !document.querySelector<HTMLElement & { opened: boolean }>(
-          'ytmusic-search-box',
+          "ytmusic-search-box"
         )?.opened
       ) {
         togglePictureInPicture();
@@ -55,30 +55,30 @@ export const onPlayerApiReady = async (
   }
 
   const exitFullScreenButton = document.querySelector<HTMLButtonElement>(
-    '.exit-fullscreen-button',
+    ".exit-fullscreen-button"
   );
   const getPlayMinimizeButton = () =>
-    document.querySelector('.player-minimize-button');
-  const appLayout = document.querySelector<HTMLElement>('ytmusic-app-layout');
-  const expandMenu = document.querySelector<HTMLElement>('#expanding-menu');
+    document.querySelector(".player-minimize-button");
+  const appLayout = document.querySelector<HTMLElement>("ytmusic-app-layout");
+  const expandMenu = document.querySelector<HTMLElement>("#expanding-menu");
   const middleControls =
-    document.querySelector<HTMLButtonElement>('.middle-controls');
+    document.querySelector<HTMLButtonElement>(".middle-controls");
   const playerPage = document.querySelector<
     HTMLElement & { playerPageOpen_: boolean }
-  >('ytmusic-player-page');
+  >("ytmusic-player-page");
   const togglePlayerPageButton = document.querySelector<HTMLButtonElement>(
-    '.toggle-player-page-button',
+    ".toggle-player-page-button"
   );
   const fullScreenButton =
-    document.querySelector<HTMLButtonElement>('.fullscreen-button');
+    document.querySelector<HTMLButtonElement>(".fullscreen-button");
   const player = document.querySelector<
     HTMLVideoElement & { onDoubleClick_: (() => void) | undefined }
-  >('#player');
+  >("#player");
   const onPlayerDblClick = player?.onDoubleClick_;
   const mouseLeaveEventListener = () => middleControls?.click();
 
   const titleBar = document.querySelector<HTMLElement>(
-    'nav[data-wd-main-panel]',
+    "nav[data-wd-main-panel]"
   );
 
   const pipClickEventListener = async (e: Event) => {
@@ -87,67 +87,67 @@ export const onPlayerApiReady = async (
     await togglePictureInPicture();
   };
 
-  ipc.on('watchdeck:pip-toggle', (isPip: boolean) => {
+  ipc.on("watchdeck:pip-toggle", (isPip: boolean) => {
     if (exitFullScreenButton && player) {
       if (isPip) {
-        exitFullScreenButton?.addEventListener('click', pipClickEventListener);
+        exitFullScreenButton?.addEventListener("click", pipClickEventListener);
         getPlayMinimizeButton()?.removeEventListener(
-          'click',
-          pipClickEventListener,
+          "click",
+          pipClickEventListener
         );
         player.onDoubleClick_ = () => {};
 
-        expandMenu?.addEventListener('mouseleave', mouseLeaveEventListener);
+        expandMenu?.addEventListener("mouseleave", mouseLeaveEventListener);
         if (!playerPage?.playerPageOpen_) {
           togglePlayerPageButton?.click();
         }
 
         fullScreenButton?.click();
-        appLayout?.classList.add('pip');
+        appLayout?.classList.add("pip");
         if (titleBar) {
-          titleBar.style.display = 'none';
+          titleBar.style.display = "none";
         }
       } else {
         exitFullScreenButton.removeEventListener(
-          'click',
-          pipClickEventListener,
+          "click",
+          pipClickEventListener
         );
         getPlayMinimizeButton()?.addEventListener(
-          'click',
-          pipClickEventListener,
+          "click",
+          pipClickEventListener
         );
         player.onDoubleClick_ = onPlayerDblClick;
-        expandMenu?.removeEventListener('mouseleave', mouseLeaveEventListener);
+        expandMenu?.removeEventListener("mouseleave", mouseLeaveEventListener);
         exitFullScreenButton.click();
-        appLayout?.classList.remove('pip');
+        appLayout?.classList.remove("pip");
         if (titleBar) {
-          titleBar.style.display = 'flex';
+          titleBar.style.display = "flex";
         }
       }
     }
   });
 
-  getPlayMinimizeButton()?.addEventListener('click', pipClickEventListener);
+  getPlayMinimizeButton()?.addEventListener("click", pipClickEventListener);
 
-  const pipButtonContainer = document.createElement('div');
+  const pipButtonContainer = document.createElement("div");
   pipButtonContainer.classList.add(
-    'style-scope',
-    'menu-item',
-    'ytmusic-menu-popup-renderer',
+    "style-scope",
+    "menu-item",
+    "ytmusic-menu-popup-renderer"
   );
-  pipButtonContainer.setAttribute('aria-disabled', 'false');
-  pipButtonContainer.setAttribute('aria-selected', 'false');
-  pipButtonContainer.setAttribute('role', 'option');
-  pipButtonContainer.setAttribute('tabindex', '-1');
+  pipButtonContainer.setAttribute("aria-disabled", "false");
+  pipButtonContainer.setAttribute("aria-selected", "false");
+  pipButtonContainer.setAttribute("role", "option");
+  pipButtonContainer.setAttribute("tabindex", "-1");
 
   render(
     () => (
       <PictureInPictureButton
         onClick={togglePictureInPicture}
-        text={t('plugins.picture-in-picture.templates.button')}
+        text={t("plugins.picture-in-picture.templates.button")}
       />
     ),
-    pipButtonContainer,
+    pipButtonContainer
   );
 
   const observer = new MutationObserver(() => {
@@ -164,7 +164,7 @@ export const onPlayerApiReady = async (
     menu?.prepend(pipButtonContainer);
   });
 
-  observer.observe(document.querySelector('ytmusic-popup-container')!, {
+  observer.observe(document.querySelector("ytmusic-popup-container")!, {
     childList: true,
     subtree: true,
   });

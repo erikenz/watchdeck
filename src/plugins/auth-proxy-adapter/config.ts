@@ -6,6 +6,6 @@ export interface AuthProxyConfig {
 
 export const defaultAuthProxyConfig: AuthProxyConfig = {
   enabled: false,
-  hostname: '127.0.0.1',
+  hostname: "127.0.0.1",
   port: 4545,
 };

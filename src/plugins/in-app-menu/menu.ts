@@ -1,10 +1,10 @@
-import is from 'electron-is';
+import is from "electron-is";
 
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import type { MenuContext } from "@/types/contexts";
 
-import type { InAppMenuConfig } from './constants';
+import type { InAppMenuConfig } from "./constants";
 
 export const onMenu = async ({
   getConfig,
@@ -20,8 +20,8 @@ export const onMenu = async ({
           config.hideDOMWindowControls = item.checked;
           setConfig(config);
         },
-        label: t('plugins.in-app-menu.menu.hide-dom-window-controls'),
-        type: 'checkbox',
+        label: t("plugins.in-app-menu.menu.hide-dom-window-controls"),
+        type: "checkbox",
       },
     ];
   }

@@ -1,9 +1,9 @@
-import { Show } from 'solid-js';
-import { css } from 'solid-styled-components';
+import { Show } from "solid-js";
+import { css } from "solid-styled-components";
 
-import { cacheNoArgs } from '@/providers/decorators';
+import { cacheNoArgs } from "@/providers/decorators";
 
-import { IconButton } from './IconButton';
+import { IconButton } from "./IconButton";
 
 const containerStyle = cacheNoArgs(
   () => css`
@@ -18,7 +18,7 @@ const containerStyle = cacheNoArgs(
         background: rgba(255, 0, 0, 0.5);
       }
     }
-  `,
+  `
 );
 
 export interface WindowControllerProps {

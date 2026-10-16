@@ -1,15 +1,15 @@
-import i18next, { init, t as i18t, changeLanguage } from 'i18next';
-import { languageResources } from 'virtual:i18n';
+import i18next, { init, t as i18t, changeLanguage } from "i18next";
+import { languageResources } from "virtual:i18n";
 
-export const APPLICATION_NAME = 'Watchdeck';
+export const APPLICATION_NAME = "Watchdeck";
 
 export const loadI18n = async () =>
   await init({
-    fallbackLng: 'en',
+    fallbackLng: "en",
     interpolation: {
       escapeValue: false,
     },
-    lng: 'en',
+    lng: "en",
     resources: await languageResources(),
   });
 

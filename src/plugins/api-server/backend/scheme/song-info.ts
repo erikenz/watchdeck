@@ -1,6 +1,6 @@
-import { z } from '@hono/zod-openapi';
+import { z } from "@hono/zod-openapi";
 
-import { MediaType } from '@/providers/song-info';
+import { MediaType } from "@/providers/song-info";
 
 export type ResponseSongInfo = z.infer<typeof SongInfoSchema>;
 export const SongInfoSchema = z.object({

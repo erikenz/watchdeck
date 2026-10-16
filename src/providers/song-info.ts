@@ -1,28 +1,28 @@
-import { Mutex } from 'async-mutex';
-import { ipcMain, nativeImage, net } from 'electron';
-import type { BrowserWindow } from 'electron';
+import { Mutex } from "async-mutex";
+import { ipcMain, nativeImage, net } from "electron";
+import type { BrowserWindow } from "electron";
 
-import * as config from '@/config';
-import type { GetPlayerResponse } from '@/types/get-player-response';
+import * as config from "@/config";
+import type { GetPlayerResponse } from "@/types/get-player-response";
 
 export enum MediaType {
   /**
    * Audio uploaded by the original artist
    */
-  Audio = 'AUDIO',
+  Audio = "AUDIO",
   /**
    * Official music video uploaded by the original artist
    */
-  OriginalMusicVideo = 'ORIGINAL_MUSIC_VIDEO',
+  OriginalMusicVideo = "ORIGINAL_MUSIC_VIDEO",
   /**
    * Normal video uploaded by a user
    */
-  UserGeneratedContent = 'USER_GENERATED_CONTENT',
+  UserGeneratedContent = "USER_GENERATED_CONTENT",
   /**
    * Podcast episode
    */
-  PodcastEpisode = 'PODCAST_EPISODE',
-  OtherVideo = 'OTHER_VIDEO',
+  PodcastEpisode = "PODCAST_EPISODE",
+  OtherVideo = "OTHER_VIDEO",
 }
 
 export interface SongInfo {
@@ -49,11 +49,11 @@ export interface SongInfo {
 export const getImage = async (src: string): Promise<Electron.NativeImage> => {
   const result = await net.fetch(src);
   const output = nativeImage.createFromBuffer(
-    Buffer.from(await result.arrayBuffer()),
+    Buffer.from(await result.arrayBuffer())
   );
-  if (output.isEmpty() && !src.endsWith('.jpg') && src.includes('.jpg')) {
+  if (output.isEmpty() && !src.endsWith(".jpg") && src.includes(".jpg")) {
     // Fix hidden webp files (https://github.com/erikenz/watchdeck/issues/315)
-    return await getImage(src.slice(0, src.lastIndexOf('.jpg') + 4));
+    return await getImage(src.slice(0, src.lastIndexOf(".jpg") + 4));
   }
 
   return output;
@@ -61,7 +61,7 @@ export const getImage = async (src: string): Promise<Electron.NativeImage> => {
 
 const handleData = async (
   data: GetPlayerResponse,
-  win: Electron.BrowserWindow,
+  win: Electron.BrowserWindow
 ): Promise<SongInfo | null> => {
   if (!data) {
     return null;
@@ -70,37 +70,37 @@ const handleData = async (
   // Fill songInfo with empty values
   const songInfo: SongInfo = {
     album: undefined,
-    alternativeTitle: '',
-    artist: '',
-    artistUrl: '',
+    alternativeTitle: "",
+    artist: "",
+    artistUrl: "",
     elapsedSeconds: 0,
     image: null,
-    imageSrc: '',
+    imageSrc: "",
     isPaused: undefined,
     mediaType: MediaType.Audio,
-    playlistId: '',
+    playlistId: "",
     songDuration: 0,
     tags: [],
-    title: '',
-    uploadDate: '',
-    url: '',
-    videoId: '',
+    title: "",
+    uploadDate: "",
+    url: "",
+    videoId: "",
     views: 0,
   } satisfies SongInfo;
 
   const microformat = data.microformat?.microformatDataRenderer;
   if (microformat) {
     songInfo.uploadDate = microformat.uploadDate;
-    songInfo.url = microformat.urlCanonical?.split('&')[0];
+    songInfo.url = microformat.urlCanonical?.split("&")[0];
     songInfo.playlistId =
-      URL.parse(microformat.urlCanonical)?.searchParams?.get('list') ?? '';
+      URL.parse(microformat.urlCanonical)?.searchParams?.get("list") ?? "";
     if (microformat.pageOwnerDetails?.externalChannelId) {
       songInfo.artistUrl = `https://www.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
     }
     // Used for options.resumeOnStart
-    config.set('url', microformat.urlCanonical);
+    config.set("url", microformat.urlCanonical);
     songInfo.alternativeTitle = microformat.linkAlternates.find(
-      (link) => link.title,
+      (link) => link.title
     )?.title;
     songInfo.tags = Array.isArray(microformat.tags) ? microformat.tags : [];
   }
@@ -117,24 +117,24 @@ const handleData = async (
     songInfo.album = videoDetails.album; // Will be undefined if video exist
 
     switch (videoDetails?.musicVideoType) {
-      case 'MUSIC_VIDEO_TYPE_ATV': {
+      case "MUSIC_VIDEO_TYPE_ATV": {
         songInfo.mediaType = MediaType.Audio;
         break;
       }
-      case 'MUSIC_VIDEO_TYPE_OMV': {
+      case "MUSIC_VIDEO_TYPE_OMV": {
         songInfo.mediaType = MediaType.OriginalMusicVideo;
         break;
       }
-      case 'MUSIC_VIDEO_TYPE_UGC': {
+      case "MUSIC_VIDEO_TYPE_UGC": {
         songInfo.mediaType = MediaType.UserGeneratedContent;
         break;
       }
-      case 'MUSIC_VIDEO_TYPE_PODCAST_EPISODE': {
+      case "MUSIC_VIDEO_TYPE_PODCAST_EPISODE": {
         songInfo.mediaType = MediaType.PodcastEpisode;
         // HACK: Podcast's participant is not the artist
-        if (!config.get('options.usePodcastParticipantAsArtist')) {
+        if (!config.get("options.usePodcastParticipantAsArtist")) {
           songInfo.artist = cleanupName(
-            data.microformat.microformatDataRenderer.pageOwnerDetails.name,
+            data.microformat.microformatDataRenderer.pageOwnerDetails.name
           );
         }
         break;
@@ -143,13 +143,13 @@ const handleData = async (
         songInfo.mediaType = MediaType.OtherVideo;
         // HACK: This is a workaround for "podcast" types where "musicVideoType" doesn't exist. Google :facepalm:
         if (
-          !config.get('options.usePodcastParticipantAsArtist') &&
+          !config.get("options.usePodcastParticipantAsArtist") &&
           (data.responseContext.serviceTrackingParams
             ?.at(0)
-            ?.params?.find((it) => it.key === 'ipcc')?.value ?? '1') != '0'
+            ?.params?.find((it) => it.key === "ipcc")?.value ?? "1") != "0"
         ) {
           songInfo.artist = cleanupName(
-            data.microformat.microformatDataRenderer.pageOwnerDetails.name,
+            data.microformat.microformatDataRenderer.pageOwnerDetails.name
           );
         }
         break;
@@ -157,11 +157,11 @@ const handleData = async (
     }
 
     const thumbnails = videoDetails.thumbnail?.thumbnails;
-    songInfo.imageSrc = thumbnails?.at(-1)?.url?.split('?')?.at(0);
+    songInfo.imageSrc = thumbnails?.at(-1)?.url?.split("?")?.at(0);
 
     if (
       songInfo.imageSrc &&
-      !(await net.fetch(songInfo.imageSrc, { method: 'HEAD' })).ok
+      !(await net.fetch(songInfo.imageSrc, { method: "HEAD" })).ok
     ) {
       songInfo.imageSrc = thumbnails.at(-1)?.url;
     }
@@ -170,22 +170,22 @@ const handleData = async (
       songInfo.image = await getImage(songInfo.imageSrc);
     }
 
-    win.webContents.send('watchdeck:update-song-info', songInfo);
+    win.webContents.send("watchdeck:update-song-info", songInfo);
   }
 
   return songInfo;
 };
 
 export enum SongInfoEvent {
-  VideoSrcChanged = 'watchdeck:video-src-changed',
-  PlayOrPaused = 'watchdeck:play-or-paused',
-  TimeChanged = 'watchdeck:time-changed',
+  VideoSrcChanged = "watchdeck:video-src-changed",
+  PlayOrPaused = "watchdeck:play-or-paused",
+  TimeChanged = "watchdeck:time-changed",
 }
 
 // This variable will be filled with the callbacks once they register
 export type SongInfoCallback = (
   songInfo: SongInfo,
-  event: SongInfoEvent,
+  event: SongInfoEvent
 ) => void;
 const callbacks = new Set<SongInfoCallback>();
 
@@ -200,13 +200,13 @@ const registerProvider = (win: BrowserWindow) => {
 
   // This will be called when the song-info-front finds a new request with song data
   ipcMain.on(
-    'watchdeck:video-src-changed',
+    "watchdeck:video-src-changed",
     async (_, data: GetPlayerResponse) => {
       const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(
         async () => {
           songInfo = await handleData(data, win);
           return songInfo;
-        },
+        }
       );
 
       if (tempSongInfo) {
@@ -214,16 +214,16 @@ const registerProvider = (win: BrowserWindow) => {
           c(tempSongInfo, SongInfoEvent.VideoSrcChanged);
         }
       }
-    },
+    }
   );
   ipcMain.on(
-    'watchdeck:play-or-paused',
+    "watchdeck:play-or-paused",
     async (
       _,
       {
         isPaused,
         elapsedSeconds,
-      }: { isPaused: boolean; elapsedSeconds: number },
+      }: { isPaused: boolean; elapsedSeconds: number }
     ) => {
       const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(() => {
         if (!songInfo) {
@@ -241,10 +241,10 @@ const registerProvider = (win: BrowserWindow) => {
           c(tempSongInfo, SongInfoEvent.PlayOrPaused);
         }
       }
-    },
+    }
   );
 
-  ipcMain.on('watchdeck:time-changed', async (_, seconds: number) => {
+  ipcMain.on("watchdeck:time-changed", async (_, seconds: number) => {
     const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(() => {
       if (!songInfo) {
         return null;
@@ -285,7 +285,7 @@ export function cleanupName(name: string): string {
   }
 
   for (const suffix of suffixesToRemove) {
-    name = name.replace(suffix, '');
+    name = name.replace(suffix, "");
   }
 
   return name;

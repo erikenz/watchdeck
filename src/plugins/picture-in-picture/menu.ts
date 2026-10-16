@@ -1,11 +1,11 @@
-import prompt from 'custom-electron-prompt';
+import prompt from "custom-electron-prompt";
 
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import promptOptions from '@/providers/prompt-options';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import promptOptions from "@/providers/prompt-options";
+import type { MenuContext } from "@/types/contexts";
 
-import type { PictureInPicturePluginConfig } from './index';
+import type { PictureInPicturePluginConfig } from "./index";
 
 export const onMenu = async ({
   window,
@@ -21,45 +21,45 @@ export const onMenu = async ({
         setConfig({ alwaysOnTop: item.checked });
         window.setAlwaysOnTop(item.checked);
       },
-      label: t('plugins.picture-in-picture.menu.always-on-top'),
-      type: 'checkbox',
+      label: t("plugins.picture-in-picture.menu.always-on-top"),
+      type: "checkbox",
     },
     {
       checked: config.savePosition,
       click(item) {
         setConfig({ savePosition: item.checked });
       },
-      label: t('plugins.picture-in-picture.menu.save-window-position'),
-      type: 'checkbox',
+      label: t("plugins.picture-in-picture.menu.save-window-position"),
+      type: "checkbox",
     },
     {
       checked: config.saveSize,
       click(item) {
         setConfig({ saveSize: item.checked });
       },
-      label: t('plugins.picture-in-picture.menu.save-window-size'),
-      type: 'checkbox',
+      label: t("plugins.picture-in-picture.menu.save-window-size"),
+      type: "checkbox",
     },
     {
       checked: !!config.hotkey,
       async click(item) {
         const output = await prompt(
           {
-            title: t('plugins.picture-in-picture.menu.prompt.title'),
-            label: t('plugins.picture-in-picture.menu.prompt.label'),
-            type: 'keybind',
+            title: t("plugins.picture-in-picture.menu.prompt.title"),
+            label: t("plugins.picture-in-picture.menu.prompt.label"),
+            type: "keybind",
             keybindOptions: [
               {
-                value: 'hotkey',
+                value: "hotkey",
                 label: t(
-                  'plugins.picture-in-picture.menu.prompt.keybind-options.hotkey',
+                  "plugins.picture-in-picture.menu.prompt.keybind-options.hotkey"
                 ),
                 default: config.hotkey,
               },
             ],
             ...promptOptions(),
           },
-          window,
+          window
         );
 
         if (output) {
@@ -72,16 +72,16 @@ export const onMenu = async ({
           item.checked = !item.checked;
         }
       },
-      label: t('plugins.picture-in-picture.menu.hotkey.label'),
-      type: 'checkbox',
+      label: t("plugins.picture-in-picture.menu.hotkey.label"),
+      type: "checkbox",
     },
     {
       checked: config.useNativePiP,
       click(item) {
         setConfig({ useNativePiP: item.checked });
       },
-      label: t('plugins.picture-in-picture.menu.use-native-pip'),
-      type: 'checkbox',
+      label: t("plugins.picture-in-picture.menu.use-native-pip"),
+      type: "checkbox",
     },
   ];
 };

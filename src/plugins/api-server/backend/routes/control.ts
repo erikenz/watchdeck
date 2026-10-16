@@ -1,16 +1,16 @@
-import { createRoute, z } from '@hono/zod-openapi';
-import { ipcMain } from 'electron';
-import type { Context } from 'hono';
+import { createRoute, z } from "@hono/zod-openapi";
+import { ipcMain } from "electron";
+import type { Context } from "hono";
 
-import { getSongControls } from '@/providers/song-controls';
-import type { SongInfo } from '@/providers/song-info';
-import type { BackendContext } from '@/types/contexts';
-import { LikeType } from '@/types/datahost-get-state';
-import type { RepeatMode, VolumeState } from '@/types/datahost-get-state';
-import type { QueueResponse } from '@/types/music-player-desktop-internal';
+import { getSongControls } from "@/providers/song-controls";
+import type { SongInfo } from "@/providers/song-info";
+import type { BackendContext } from "@/types/contexts";
+import { LikeType } from "@/types/datahost-get-state";
+import type { RepeatMode, VolumeState } from "@/types/datahost-get-state";
+import type { QueueResponse } from "@/types/music-player-desktop-internal";
 
-import type { APIServerConfig } from '../../config';
-import { API_VERSION } from '../api-version';
+import type { APIServerConfig } from "../../config";
+import { API_VERSION } from "../api-version";
 import {
   AddSongToQueueSchema,
   GoBackSchema,
@@ -24,21 +24,21 @@ import {
   SetVolumeSchema,
   SongInfoSchema,
   SwitchRepeatSchema,
-} from '../scheme';
-import type { ResponseSongInfo } from '../scheme';
-import type { HonoApp } from '../types';
+} from "../scheme";
+import type { ResponseSongInfo } from "../scheme";
+import type { HonoApp } from "../types";
 
 const routes = {
   addSongToQueue: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/queue`,
-    summary: 'add song to queue',
-    description: 'Add a song to the queue',
+    summary: "add song to queue",
+    description: "Add a song to the queue",
     request: {
       body: {
-        description: 'video id of the song to add',
+        description: "video id of the song to add",
         content: {
-          'application/json': {
+          "application/json": {
             schema: AddSongToQueueSchema,
           },
         },
@@ -46,42 +46,42 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   clearQueue: createRoute({
-    method: 'delete',
+    method: "delete",
     path: `/api/${API_VERSION}/queue`,
-    summary: 'clear queue',
-    description: 'Clear the queue',
+    summary: "clear queue",
+    description: "Clear the queue",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   dislike: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/dislike`,
-    summary: 'dislike song',
-    description: 'Set the current song as disliked',
+    summary: "dislike song",
+    description: "Set the current song as disliked",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   getFullscreenState: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/fullscreen`,
-    summary: 'get fullscreen state',
-    description: 'Get the current fullscreen state',
+    summary: "get fullscreen state",
+    description: "Get the current fullscreen state",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({
               state: z.boolean(),
             }),
@@ -91,15 +91,15 @@ const routes = {
     },
   }),
   getLikeState: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/like-state`,
-    summary: 'get like state',
-    description: 'Get the current like state',
+    summary: "get like state",
+    description: "Get the current like state",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({
               state: z.enum(LikeType).nullable(),
             }),
@@ -109,15 +109,15 @@ const routes = {
     },
   }),
   getShuffleState: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/shuffle`,
-    summary: 'get shuffle state',
-    description: 'Get the current shuffle state',
+    summary: "get shuffle state",
+    description: "Get the current shuffle state",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({
               state: z.boolean().nullable(),
             }),
@@ -127,15 +127,15 @@ const routes = {
     },
   }),
   getVolumeState: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/volume`,
-    summary: 'get volume state',
-    description: 'Get the current volume state of the player',
+    summary: "get volume state",
+    description: "Get the current volume state of the player",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({
               state: z.number(),
               isMuted: z.boolean(),
@@ -146,15 +146,15 @@ const routes = {
     },
   }),
   goBack: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/go-back`,
-    summary: 'go back',
-    description: 'Move the current song back by a number of seconds',
+    summary: "go back",
+    description: "Move the current song back by a number of seconds",
     request: {
       body: {
-        description: 'seconds to go back',
+        description: "seconds to go back",
         content: {
-          'application/json': {
+          "application/json": {
             schema: GoBackSchema,
           },
         },
@@ -162,20 +162,20 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   goForward: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/go-forward`,
-    summary: 'go forward',
-    description: 'Move the current song forward by a number of seconds',
+    summary: "go forward",
+    description: "Move the current song forward by a number of seconds",
     request: {
       body: {
-        description: 'seconds to go forward',
+        description: "seconds to go forward",
         content: {
-          'application/json': {
+          "application/json": {
             schema: GoForwardScheme,
           },
         },
@@ -183,32 +183,32 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   like: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/like`,
-    summary: 'like song',
-    description: 'Set the current song as liked',
+    summary: "like song",
+    description: "Set the current song as liked",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   moveSongInQueue: createRoute({
-    method: 'patch',
+    method: "patch",
     path: `/api/${API_VERSION}/queue/{index}`,
-    summary: 'move song in queue',
-    description: 'Move a song in the queue',
+    summary: "move song in queue",
+    description: "Move a song in the queue",
     request: {
       params: QueueParamsSchema,
       body: {
-        description: 'index to move the song to',
+        description: "index to move the song to",
         content: {
-          'application/json': {
+          "application/json": {
             schema: MoveSongInQueueSchema,
           },
         },
@@ -216,159 +216,159 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   next: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/next`,
-    summary: 'play next song',
-    description: 'Plays the next song in the queue',
+    summary: "play next song",
+    description: "Plays the next song in the queue",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   nextSongInfo: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/queue/next`,
-    summary: 'get next song info',
+    summary: "get next song info",
     description:
-      'Get information about the next song in the queue (relative index +1)',
+      "Get information about the next song in the queue (relative index +1)",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SongInfoSchema,
           },
         },
       },
       204: {
-        description: 'No next song in queue',
+        description: "No next song in queue",
       },
     },
   }),
   oldQueueInfo: createRoute({
     deprecated: true,
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/queue-info`,
-    summary: 'get current queue info',
-    description: 'Get the current queue info',
+    summary: "get current queue info",
+    description: "Get the current queue info",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({}),
           },
         },
       },
       204: {
-        description: 'No queue info',
+        description: "No queue info",
       },
     },
   }),
   oldSongInfo: createRoute({
     deprecated: true,
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/song-info`,
-    summary: 'get current song info',
-    description: 'Get the current song info',
+    summary: "get current song info",
+    description: "Get the current song info",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SongInfoSchema,
           },
         },
       },
       204: {
-        description: 'No song info',
+        description: "No song info",
       },
     },
   }),
   pause: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/pause`,
-    summary: 'Pause',
-    description: 'Change the state of the player to pause',
+    summary: "Pause",
+    description: "Change the state of the player to pause",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   play: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/play`,
-    summary: 'Play',
-    description: 'Change the state of the player to play',
+    summary: "Play",
+    description: "Change the state of the player to play",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   previous: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/previous`,
-    summary: 'play previous song',
-    description: 'Plays the previous song in the queue',
+    summary: "play previous song",
+    description: "Plays the previous song in the queue",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   queueInfo: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/queue`,
-    summary: 'get current queue info',
-    description: 'Get the current queue info',
+    summary: "get current queue info",
+    description: "Get the current queue info",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({}),
           },
         },
       },
       204: {
-        description: 'No queue info',
+        description: "No queue info",
       },
     },
   }),
   removeSongFromQueue: createRoute({
-    method: 'delete',
+    method: "delete",
     path: `/api/${API_VERSION}/queue/{index}`,
-    summary: 'remove song from queue',
-    description: 'Remove a song from the queue',
+    summary: "remove song from queue",
+    description: "Remove a song from the queue",
     request: {
       params: QueueParamsSchema,
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   repeatMode: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/repeat-mode`,
-    summary: 'get current repeat mode',
-    description: 'Get the current repeat mode (NONE, ALL, ONE)',
+    summary: "get current repeat mode",
+    description: "Get the current repeat mode (NONE, ALL, ONE)",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({
-              mode: z.enum(['ONE', 'NONE', 'ALL']).nullable(),
+              mode: z.enum(["ONE", "NONE", "ALL"]).nullable(),
             }),
           },
         },
@@ -376,15 +376,15 @@ const routes = {
     },
   }),
   search: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/search`,
-    summary: 'search for a song',
-    description: 'search for a song',
+    summary: "search for a song",
+    description: "search for a song",
     request: {
       body: {
-        description: 'search query',
+        description: "search query",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SearchSchema,
           },
         },
@@ -392,9 +392,9 @@ const routes = {
     },
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: z.object({}),
           },
         },
@@ -402,15 +402,15 @@ const routes = {
     },
   }),
   seekTo: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/seek-to`,
-    summary: 'seek',
-    description: 'Seek to a specific time in the current song',
+    summary: "seek",
+    description: "Seek to a specific time in the current song",
     request: {
       body: {
-        description: 'seconds to seek to',
+        description: "seconds to seek to",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SeekSchema,
           },
         },
@@ -418,20 +418,20 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   setFullscreen: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/fullscreen`,
-    summary: 'set fullscreen',
-    description: 'Set the fullscreen state of the player',
+    summary: "set fullscreen",
+    description: "Set the fullscreen state of the player",
     request: {
       body: {
-        description: 'fullscreen state',
+        description: "fullscreen state",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SetFullscreenSchema,
           },
         },
@@ -439,20 +439,20 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   setQueueIndex: createRoute({
-    method: 'patch',
+    method: "patch",
     path: `/api/${API_VERSION}/queue`,
-    summary: 'set queue index',
-    description: 'Set the current index of the queue',
+    summary: "set queue index",
+    description: "Set the current index of the queue",
     request: {
       body: {
-        description: 'index to move the song to',
+        description: "index to move the song to",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SetQueueIndexSchema,
           },
         },
@@ -460,20 +460,20 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   setVolume: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/volume`,
-    summary: 'set volume',
-    description: 'Set the volume of the player',
+    summary: "set volume",
+    description: "Set the volume of the player",
     request: {
       body: {
-        description: 'volume to set',
+        description: "volume to set",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SetVolumeSchema,
           },
         },
@@ -481,50 +481,50 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   shuffle: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/shuffle`,
-    summary: 'shuffle',
-    description: 'Shuffle the queue',
+    summary: "shuffle",
+    description: "Shuffle the queue",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   songInfo: createRoute({
-    method: 'get',
+    method: "get",
     path: `/api/${API_VERSION}/song`,
-    summary: 'get current song info',
-    description: 'Get the current song info',
+    summary: "get current song info",
+    description: "Get the current song info",
     responses: {
       200: {
-        description: 'Success',
+        description: "Success",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SongInfoSchema,
           },
         },
       },
       204: {
-        description: 'No song info',
+        description: "No song info",
       },
     },
   }),
   switchRepeat: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/switch-repeat`,
-    summary: 'switch repeat',
-    description: 'Switch the repeat mode',
+    summary: "switch repeat",
+    description: "Switch the repeat mode",
     request: {
       body: {
-        description: 'number of times to click the repeat button',
+        description: "number of times to click the repeat button",
         content: {
-          'application/json': {
+          "application/json": {
             schema: SwitchRepeatSchema,
           },
         },
@@ -532,30 +532,30 @@ const routes = {
     },
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   toggleMute: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/toggle-mute`,
-    summary: 'toggle mute',
-    description: 'Toggle the mute state of the player',
+    summary: "toggle mute",
+    description: "Toggle the mute state of the player",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
   togglePlay: createRoute({
-    method: 'post',
+    method: "post",
     path: `/api/${API_VERSION}/toggle-play`,
-    summary: 'Toggle play/pause',
+    summary: "Toggle play/pause",
     description:
-      'Change the state of the player to play if paused, or pause if playing',
+      "Change the state of the player to play if paused, or pause if playing",
     responses: {
       204: {
-        description: 'Success',
+        description: "Success",
       },
     },
   }),
@@ -569,7 +569,7 @@ export const register = (
   songInfoGetter: () => PromiseOrValue<SongInfo | undefined>,
   repeatModeGetter: () => PromiseOrValue<RepeatMode | undefined>,
   likeTypeGetter: () => PromiseOrValue<LikeType | undefined>,
-  volumeStateGetter: () => PromiseOrValue<VolumeState | undefined>,
+  volumeStateGetter: () => PromiseOrValue<VolumeState | undefined>
 ) => {
   const controller = getSongControls(window);
 
@@ -620,21 +620,21 @@ export const register = (
     return ctx.body(null);
   });
   app.openapi(routes.seekTo, (ctx) => {
-    const { seconds } = ctx.req.valid('json');
+    const { seconds } = ctx.req.valid("json");
     controller.seekTo(seconds);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.goBack, (ctx) => {
-    const { seconds } = ctx.req.valid('json');
+    const { seconds } = ctx.req.valid("json");
     controller.goBack(seconds);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.goForward, (ctx) => {
-    const { seconds } = ctx.req.valid('json');
+    const { seconds } = ctx.req.valid("json");
     controller.goForward(seconds);
 
     ctx.status(204);
@@ -644,10 +644,10 @@ export const register = (
   app.openapi(routes.getShuffleState, async (ctx) => {
     const stateResponsePromise = new Promise<boolean>((resolve) => {
       ipcMain.once(
-        'watchdeck:get-shuffle-response',
+        "watchdeck:get-shuffle-response",
         (_, isShuffled: boolean | undefined) => {
           resolve(!!isShuffled);
-        },
+        }
       );
 
       controller.requestShuffleInformation();
@@ -671,14 +671,14 @@ export const register = (
     return ctx.json({ mode: (await repeatModeGetter()) ?? null });
   });
   app.openapi(routes.switchRepeat, (ctx) => {
-    const { iteration } = ctx.req.valid('json');
+    const { iteration } = ctx.req.valid("json");
     controller.switchRepeat(iteration);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.setVolume, (ctx) => {
-    const { volume } = ctx.req.valid('json');
+    const { volume } = ctx.req.valid("json");
     controller.setVolume(volume);
 
     ctx.status(204);
@@ -687,11 +687,11 @@ export const register = (
   app.openapi(routes.getVolumeState, async (ctx) => {
     ctx.status(200);
     return ctx.json(
-      (await volumeStateGetter()) ?? { isMuted: false, state: 0 },
+      (await volumeStateGetter()) ?? { isMuted: false, state: 0 }
     );
   });
   app.openapi(routes.setFullscreen, (ctx) => {
-    const { state } = ctx.req.valid('json');
+    const { state } = ctx.req.valid("json");
     controller.setFullscreen(state);
 
     ctx.status(204);
@@ -707,10 +707,10 @@ export const register = (
   app.openapi(routes.getFullscreenState, async (ctx) => {
     const stateResponsePromise = new Promise<boolean>((resolve) => {
       ipcMain.once(
-        'watchdeck:set-fullscreen',
+        "watchdeck:set-fullscreen",
         (_, isFullscreen: boolean | undefined) => {
           resolve(!!isFullscreen);
-        },
+        }
       );
 
       controller.requestFullscreenInformation();
@@ -743,10 +743,10 @@ export const register = (
   const queueInfo = async (ctx: Context) => {
     const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
       ipcMain.once(
-        'watchdeck:get-queue-response',
+        "watchdeck:get-queue-response",
         (_, queue: QueueResponse) => {
           resolve(queue);
-        },
+        }
       );
 
       controller.requestQueueInformation();
@@ -768,10 +768,10 @@ export const register = (
   app.openapi(routes.nextSongInfo, async (ctx) => {
     const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
       ipcMain.once(
-        'watchdeck:get-queue-response',
+        "watchdeck:get-queue-response",
         (_, queue: QueueResponse) => {
           resolve(queue);
-        },
+        }
       );
 
       controller.requestQueueInformation();
@@ -826,29 +826,29 @@ export const register = (
   });
 
   app.openapi(routes.addSongToQueue, (ctx) => {
-    const { videoId, insertPosition } = ctx.req.valid('json');
+    const { videoId, insertPosition } = ctx.req.valid("json");
     controller.addSongToQueue(videoId, insertPosition);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.moveSongInQueue, (ctx) => {
-    const index = Number(ctx.req.param('index'));
-    const { toIndex } = ctx.req.valid('json');
+    const index = Number(ctx.req.param("index"));
+    const { toIndex } = ctx.req.valid("json");
     controller.moveSongInQueue(index, toIndex);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.removeSongFromQueue, (ctx) => {
-    const index = Number(ctx.req.param('index'));
+    const index = Number(ctx.req.param("index"));
     controller.removeSongFromQueue(index);
 
     ctx.status(204);
     return ctx.body(null);
   });
   app.openapi(routes.setQueueIndex, (ctx) => {
-    const { index } = ctx.req.valid('json');
+    const { index } = ctx.req.valid("json");
     controller.setQueueIndex(index);
 
     ctx.status(204);
@@ -861,7 +861,7 @@ export const register = (
     return ctx.body(null);
   });
   app.openapi(routes.search, async (ctx) => {
-    const { query, params, continuation } = ctx.req.valid('json');
+    const { query, params, continuation } = ctx.req.valid("json");
     const response = await controller.search(query, params, continuation);
 
     ctx.status(200);

@@ -1,13 +1,13 @@
-import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { createPlugin } from "@/utils";
 
-import { onConfigChange, onMainLoad } from './main';
-import { onMenu } from './menu';
-import { onPlayerApiReady, onRendererLoad } from './renderer';
-import { DefaultPresetList } from './types';
-import type { Preset } from './types';
+import { onConfigChange, onMainLoad } from "./main";
+import { onMenu } from "./menu";
+import { onPlayerApiReady, onRendererLoad } from "./renderer";
+import { DefaultPresetList } from "./types";
+import type { Preset } from "./types";
 
-import style from './style.css?inline';
+import style from "./style.css?inline";
 
 export interface DownloaderPluginConfig {
   enabled: boolean;
@@ -16,7 +16,7 @@ export interface DownloaderPluginConfig {
     enabled: boolean;
     seconds: number;
     percent: number;
-    mode: 'percent' | 'seconds';
+    mode: "percent" | "seconds";
     folder?: string;
   };
   selectedPreset: string;
@@ -26,18 +26,18 @@ export interface DownloaderPluginConfig {
 }
 
 export const defaultConfig: DownloaderPluginConfig = {
-  customPresetSetting: DefaultPresetList['mp3 (256kbps)'], // Presets
+  customPresetSetting: DefaultPresetList["mp3 (256kbps)"], // Presets
   downloadFolder: undefined,
   downloadOnFinish: {
     enabled: false,
     folder: undefined,
-    mode: 'seconds',
+    mode: "seconds",
     percent: 10,
     seconds: 20,
   },
   enabled: false,
   playlistMaxItems: undefined,
-  selectedPreset: 'mp3 (256kbps)', // Selected preset
+  selectedPreset: "mp3 (256kbps)", // Selected preset
   skipExisting: false,
 };
 
@@ -47,9 +47,9 @@ export default createPlugin({
     start: onMainLoad,
   },
   config: defaultConfig,
-  description: () => t('plugins.downloader.description'),
+  description: () => t("plugins.downloader.description"),
   menu: onMenu,
-  name: () => t('plugins.downloader.name'),
+  name: () => t("plugins.downloader.name"),
   renderer: {
     onPlayerApiReady,
     start: onRendererLoad,

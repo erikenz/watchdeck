@@ -1,40 +1,40 @@
 /// <reference types="electron-vite/node" />
 
-declare module '*.html' {
+declare module "*.html" {
   const html: string;
 
   export default html;
 }
-declare module '*.html?raw' {
+declare module "*.html?raw" {
   const html: string;
 
   export default html;
 }
-declare module '*.svg?inline' {
+declare module "*.svg?inline" {
   const base64: string;
 
   export default base64;
 }
-declare module '*.svg?raw' {
+declare module "*.svg?raw" {
   const html: string;
 
   export default html;
 }
-declare module '*.png' {
+declare module "*.png" {
   const element: HTMLImageElement;
 
   export default element;
 }
-declare module '*.jpg' {
+declare module "*.jpg" {
   const element: HTMLImageElement;
   export default element;
 }
-declare module '*.css' {
+declare module "*.css" {
   const css: string;
 
   export default css;
 }
-declare module '*.css?inline' {
+declare module "*.css?inline" {
   const css: string;
 
   export default css;

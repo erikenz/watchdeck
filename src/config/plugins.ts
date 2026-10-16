@@ -1,19 +1,19 @@
-import { deepmerge } from 'deepmerge-ts';
-import { allPlugins } from 'virtual:plugins';
+import { deepmerge } from "deepmerge-ts";
+import { allPlugins } from "virtual:plugins";
 
-import { restart } from '@/providers/app-controls';
-import type { PluginConfig } from '@/types/plugins';
+import { restart } from "@/providers/app-controls";
+import type { PluginConfig } from "@/types/plugins";
 
-import { store } from './store';
+import { store } from "./store";
 
 export function getPlugins() {
-  return store.get('plugins') as Record<string, PluginConfig>;
+  return store.get("plugins") as Record<string, PluginConfig>;
 }
 
 export async function isEnabled(plugin: string) {
   const pluginConfig = deepmerge(
     (await allPlugins())[plugin]?.config ?? { enabled: false },
-    (store.get('plugins') as Record<string, PluginConfig>)[plugin] ?? {},
+    (store.get("plugins") as Record<string, PluginConfig>)[plugin] ?? {}
   );
   return pluginConfig !== undefined && pluginConfig.enabled;
 }
@@ -27,16 +27,16 @@ export async function isEnabled(plugin: string) {
 export function setOptions<T extends object>(
   plugin: string,
   options: T,
-  exclude: string[] = ['enabled'],
+  exclude: string[] = ["enabled"]
 ) {
-  const plugins = store.get('plugins') as Record<string, T>;
+  const plugins = store.get("plugins") as Record<string, T>;
   // HACK: This is a workaround for preventing changed options from being overwritten
   exclude.forEach((key) => {
     if (Object.hasOwn(options, key)) {
       delete options[key as keyof T];
     }
   });
-  store.set('plugins', {
+  store.set("plugins", {
     ...plugins,
     [plugin]: {
       ...plugins[plugin],
@@ -48,16 +48,16 @@ export function setOptions<T extends object>(
 export function setMenuOptions<T extends object>(
   plugin: string,
   options: T,
-  exclude: string[] = ['enabled'],
+  exclude: string[] = ["enabled"]
 ) {
   setOptions(plugin, options, exclude);
-  if (store.get('options.restartOnConfigChanges')) {
+  if (store.get("options.restartOnConfigChanges")) {
     restart();
   }
 }
 
 export function getOptions<T>(plugin: string): T {
-  return (store.get('plugins') as Record<string, T>)[plugin];
+  return (store.get("plugins") as Record<string, T>)[plugin];
 }
 
 export function enable(plugin: string) {

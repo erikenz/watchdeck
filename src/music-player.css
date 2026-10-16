@@ -7,7 +7,7 @@ ytmusic-nav-bar {
   position: relative;
 }
 ytmusic-nav-bar::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
 
@@ -65,7 +65,7 @@ tp-yt-paper-item.ytmusic-guide-entry-renderer::before {
   padding-bottom: 0;
 }
 
-#av-id ~ #player.ytmusic-player-page:not([player-ui-state='FULLSCREEN']) {
+#av-id ~ #player.ytmusic-player-page:not([player-ui-state="FULLSCREEN"]) {
   margin-top: auto !important;
   margin-bottom: auto !important;
   margin-left: var(--ytmusic-player-page-vertical-padding);
@@ -75,10 +75,10 @@ tp-yt-paper-item.ytmusic-guide-entry-renderer::before {
 }
 
 /* macos traffic lights fix */
-:where([data-os*='Macintosh']) ytmusic-app-layout#layout ytmusic-nav-bar {
+:where([data-os*="Macintosh"]) ytmusic-app-layout#layout ytmusic-nav-bar {
   padding-top: var(--ytmusic-nav-bar-offset, 0);
 }
-:where([data-os*='Macintosh']) ytmusic-app-layout#layout {
+:where([data-os*="Macintosh"]) ytmusic-app-layout#layout {
   --ytmusic-nav-bar-offset: 24px;
   --ytmusic-nav-bar-height: calc(90px + var(--ytmusic-nav-bar-offset, 0));
 }

@@ -1,14 +1,14 @@
-import { t } from '@/i18n';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { createPlugin } from "@/utils";
 
 import {
   ButterchurnVisualizer as butterchurn,
   VudioVisualizer as vudio,
   WaveVisualizer as wave,
-} from './visualizers';
-import type { Visualizer } from './visualizers/visualizer';
+} from "./visualizers";
+import type { Visualizer } from "./visualizers/visualizer";
 
-import emptyStyle from './empty-player.css?inline';
+import emptyStyle from "./empty-player.css?inline";
 
 interface WaveColor {
   gradient: string[];
@@ -17,7 +17,7 @@ interface WaveColor {
 
 export interface VisualizerPluginConfig {
   enabled: boolean;
-  type: 'butterchurn' | 'vudio' | 'wave';
+  type: "butterchurn" | "vudio" | "wave";
   butterchurn: {
     preset: string;
     blendTimeInSeconds: number;
@@ -66,72 +66,72 @@ interface RenderProps {
 }
 
 export default createPlugin({
-  name: () => t('plugins.visualizer.name'),
-  description: () => t('plugins.visualizer.description'),
+  name: () => t("plugins.visualizer.name"),
+  description: () => t("plugins.visualizer.description"),
   restartNeeded: false,
   // The assertion below widens this object's literals to the plugin config
   // type (without it TS narrows `type` to the literal).
   // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
-    type: 'butterchurn',
+    type: "butterchurn",
     // Config per visualizer
     butterchurn: {
-      preset: 'martin [shadow harlequins shape code] - fata morgana',
+      preset: "martin [shadow harlequins shape code] - fata morgana",
       blendTimeInSeconds: 2.7,
     },
     vudio: {
-      effect: 'lighting',
+      effect: "lighting",
       accuracy: 128,
       lighting: {
         maxHeight: 160,
         maxSize: 12,
         lineWidth: 1,
-        color: '#49f3f7',
+        color: "#49f3f7",
         shadowBlur: 2,
-        shadowColor: 'rgba(244,244,244,.5)',
+        shadowColor: "rgba(244,244,244,.5)",
         fadeSide: true,
         prettify: false,
-        horizontalAlign: 'center',
-        verticalAlign: 'middle',
+        horizontalAlign: "center",
+        verticalAlign: "middle",
         dottify: true,
       },
     },
     wave: {
       animations: [
         {
-          type: 'Cubes',
+          type: "Cubes",
           config: {
             bottom: true,
             count: 30,
             cubeHeight: 5,
-            fillColor: { gradient: ['#FAD961', '#F76B1C'] },
-            lineColor: 'rgba(0,0,0,0)',
+            fillColor: { gradient: ["#FAD961", "#F76B1C"] },
+            lineColor: "rgba(0,0,0,0)",
             radius: 20,
           },
         },
         {
-          type: 'Cubes',
+          type: "Cubes",
           config: {
             top: true,
             count: 12,
             cubeHeight: 5,
-            fillColor: { gradient: ['#FAD961', '#F76B1C'] },
-            lineColor: 'rgba(0,0,0,0)',
+            fillColor: { gradient: ["#FAD961", "#F76B1C"] },
+            lineColor: "rgba(0,0,0,0)",
             radius: 10,
           },
         },
         {
-          type: 'Circles',
+          type: "Circles",
           config: {
             lineColor: {
-              gradient: ['#FAD961', '#FAD961', '#F76B1C'],
+              gradient: ["#FAD961", "#FAD961", "#F76B1C"],
               rotate: 90,
             },
             lineWidth: 4,
             diameter: 20,
             count: 10,
-            frequencyBand: 'base',
+            frequencyBand: "base",
           },
         },
       ],
@@ -141,14 +141,14 @@ export default createPlugin({
   stylesheets: [emptyStyle],
   menu: async ({ getConfig, setConfig }) => {
     const config = await getConfig();
-    const visualizerTypes = ['butterchurn', 'vudio', 'wave'] as const; // For bundling
+    const visualizerTypes = ["butterchurn", "vudio", "wave"] as const; // For bundling
 
     return [
       {
-        label: t('plugins.visualizer.menu.visualizer-type'),
+        label: t("plugins.visualizer.menu.visualizer-type"),
         submenu: visualizerTypes.map((visualizerType) => ({
           label: visualizerType,
-          type: 'radio',
+          type: "radio",
           checked: config.type === visualizerType,
           click() {
             setConfig({ type: visualizerType });
@@ -172,7 +172,7 @@ export default createPlugin({
 
     createVisualizer(
       this: { props: RenderProps },
-      config: VisualizerPluginConfig,
+      config: VisualizerPluginConfig
     ) {
       this.props.visualizerInstance?.destroy();
       this.props.visualizerInstance = null;
@@ -182,21 +182,21 @@ export default createPlugin({
 
       const video = document.querySelector<
         HTMLVideoElement & { captureStream(): MediaStream }
-      >('video');
+      >("video");
       if (!video) {
         return;
       }
 
       const visualizerContainer =
-        document.querySelector<HTMLElement>('#player');
+        document.querySelector<HTMLElement>("#player");
       if (!visualizerContainer) {
         return;
       }
 
-      let canvas = document.querySelector<HTMLCanvasElement>('#visualizer');
+      let canvas = document.querySelector<HTMLCanvasElement>("#visualizer");
       if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.id = 'visualizer';
+        canvas = document.createElement("canvas");
+        canvas.id = "visualizer";
         visualizerContainer?.prepend(canvas);
       }
 
@@ -207,9 +207,9 @@ export default createPlugin({
       let visualizerType: {
         new (...args: ConstructorParameters<typeof vudio>): Visualizer;
       } = vudio;
-      if (config.type === 'wave') {
+      if (config.type === "wave") {
         visualizerType = wave;
-      } else if (config.type === 'butterchurn') {
+      } else if (config.type === "butterchurn") {
         visualizerType = butterchurn;
       }
       this.props.visualizerInstance = new visualizerType(
@@ -218,7 +218,7 @@ export default createPlugin({
         canvas,
         gainNode,
         video.captureStream(),
-        config,
+        config
       );
 
       const resizeVisualizer = () => {
@@ -243,13 +243,13 @@ export default createPlugin({
 
     onPlayerApiReady(_, { getConfig }) {
       document.addEventListener(
-        'watchdeck:audio-can-play',
+        "watchdeck:audio-can-play",
         async (e) => {
           this.props.audioContext = e.detail.audioContext;
           this.props.audioSource = e.detail.audioSource;
           this.createVisualizer(await getConfig());
         },
-        { passive: true },
+        { passive: true }
       );
     },
   },

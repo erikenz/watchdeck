@@ -6,7 +6,7 @@
  * https://github.com/gorhill/uBlock/blob/5de0ce975753b7565759ac40983d31978d1f84ca/assets/resources/scriptlets.js#L704
  */
 
-import type { ContextBridge } from 'electron';
+import type { ContextBridge } from "electron";
 
 interface PrunableResponse {
   playerAds?: unknown;
@@ -51,25 +51,25 @@ export const inject = (contextBridge: ContextBridge): void => {
       return o;
     };
 
-    contextBridge.exposeInMainWorld('_pruner', pruner);
+    contextBridge.exposeInMainWorld("_pruner", pruner);
   }
 
   const chains = [
     {
-      cValue: 'undefined',
-      chain: 'playerResponse.adPlacements',
+      cValue: "undefined",
+      chain: "playerResponse.adPlacements",
     },
     {
-      cValue: 'undefined',
-      chain: 'ytInitialPlayerResponse.playerAds',
+      cValue: "undefined",
+      chain: "ytInitialPlayerResponse.playerAds",
     },
     {
-      cValue: 'undefined',
-      chain: 'ytInitialPlayerResponse.adPlacements',
+      cValue: "undefined",
+      chain: "ytInitialPlayerResponse.adPlacements",
     },
     {
-      cValue: 'undefined',
-      chain: 'ytInitialPlayerResponse.adSlots',
+      cValue: "undefined",
+      chain: "ytInitialPlayerResponse.adSlots",
     },
   ];
 
@@ -77,44 +77,44 @@ export const inject = (contextBridge: ContextBridge): void => {
     const thisScript = document.currentScript;
     let cValue: unknown;
     switch (rawValue) {
-      case 'null': {
+      case "null": {
         cValue = null;
         break;
       }
 
       case "''": {
-        cValue = '';
+        cValue = "";
         break;
       }
 
-      case 'true': {
+      case "true": {
         cValue = true;
         break;
       }
 
-      case 'false': {
+      case "false": {
         cValue = false;
         break;
       }
 
-      case 'undefined': {
+      case "undefined": {
         cValue = undefined;
         break;
       }
 
-      case 'noopFunc': {
+      case "noopFunc": {
         cValue = () => {};
 
         break;
       }
 
-      case 'trueFunc': {
+      case "trueFunc": {
         cValue = () => true;
 
         break;
       }
 
-      case 'falseFunc': {
+      case "falseFunc": {
         cValue = () => false;
 
         break;
@@ -157,7 +157,7 @@ export const inject = (contextBridge: ContextBridge): void => {
       owner: PropertyOwner,
       prop: string,
       configurable: boolean,
-      handler: TrapHandler,
+      handler: TrapHandler
     ) => {
       if (!handler.init(owner[prop])) {
         return;
@@ -202,7 +202,7 @@ export const inject = (contextBridge: ContextBridge): void => {
     };
 
     const trapChain = (owner: PropertyOwner, chain: string) => {
-      const pos = chain.indexOf('.');
+      const pos = chain.indexOf(".");
       if (pos === -1) {
         trapProp(owner, chain, false, {
           getter() {
@@ -232,7 +232,7 @@ export const inject = (contextBridge: ContextBridge): void => {
       const v = owner[prop];
 
       const remainingChain = chain.slice(pos + 1);
-      if (v instanceof Object || (typeof v === 'object' && v !== null)) {
+      if (v instanceof Object || (typeof v === "object" && v !== null)) {
         trapChain(v as PropertyOwner, remainingChain);
         return;
       }

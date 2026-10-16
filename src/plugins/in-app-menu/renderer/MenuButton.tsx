@@ -1,8 +1,8 @@
-import { splitProps } from 'solid-js';
-import type { JSX } from 'solid-js';
-import { css } from 'solid-styled-components';
+import { splitProps } from "solid-js";
+import type { JSX } from "solid-js";
+import { css } from "solid-styled-components";
 
-import { cacheNoArgs } from '@/providers/decorators';
+import { cacheNoArgs } from "@/providers/decorators";
 
 const menuStyle = cacheNoArgs(
   () => css`
@@ -26,10 +26,10 @@ const menuStyle = cacheNoArgs(
       scale: 0.9;
     }
 
-    &[data-selected='true'] {
+    &[data-selected="true"] {
       background-color: rgba(255, 255, 255, 0.2);
     }
-  `,
+  `
 );
 
 export type MenuButtonProps = JSX.HTMLAttributes<HTMLLIElement> & {
@@ -37,7 +37,7 @@ export type MenuButtonProps = JSX.HTMLAttributes<HTMLLIElement> & {
   selected?: boolean;
 };
 export const MenuButton = (props: MenuButtonProps) => {
-  const [local, leftProps] = splitProps(props, ['text']);
+  const [local, leftProps] = splitProps(props, ["text"]);
 
   return (
     <li {...leftProps} class={menuStyle()} data-selected={props.selected}>

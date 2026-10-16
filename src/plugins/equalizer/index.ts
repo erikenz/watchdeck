@@ -1,10 +1,10 @@
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import type { MenuContext } from '@/types/contexts';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import type { MenuContext } from "@/types/contexts";
+import { createPlugin } from "@/utils";
 
-import { defaultPresets, presetConfigs } from './presets';
-import type { Preset, FilterConfig } from './presets';
+import { defaultPresets, presetConfigs } from "./presets";
+import type { Preset, FilterConfig } from "./presets";
 
 export interface EqualizerPluginConfig {
   enabled: boolean;
@@ -15,17 +15,17 @@ export interface EqualizerPluginConfig {
 let appliedFilters: BiquadFilterNode[] = [];
 
 export default createPlugin({
-  name: () => t('plugins.equalizer.name'),
-  description: () => t('plugins.equalizer.description'),
+  name: () => t("plugins.equalizer.name"),
+  description: () => t("plugins.equalizer.description"),
   restartNeeded: false,
-  addedVersion: '3.7.X',
+  addedVersion: "3.7.X",
   // The assertion below widens this object's literals to the plugin config
   // type (without it TS narrows e.g. `blocker` to the literal).
   // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   config: {
     enabled: false,
     filters: [],
-    presets: { 'bass-booster': false },
+    presets: { "bass-booster": false },
   } as EqualizerPluginConfig,
   menu: async ({
     getConfig,
@@ -35,11 +35,11 @@ export default createPlugin({
 
     return [
       {
-        label: t('plugins.equalizer.menu.presets.label'),
-        type: 'submenu',
+        label: t("plugins.equalizer.menu.presets.label"),
+        type: "submenu",
         submenu: defaultPresets.map((preset) => ({
           label: t(`plugins.equalizer.menu.presets.list.${preset}`),
-          type: 'radio',
+          type: "radio",
           checked: config.presets[preset],
           click() {
             setConfig({
@@ -55,12 +55,12 @@ export default createPlugin({
       const config = await getConfig();
 
       document.addEventListener(
-        'watchdeck:audio-can-play',
+        "watchdeck:audio-can-play",
         ({ detail: { audioSource, audioContext } }) => {
           const filtersToApply = config.filters.concat(
             defaultPresets
               .filter((preset) => config.presets[preset])
-              .map((preset) => presetConfigs[preset]),
+              .map((preset) => presetConfigs[preset])
           );
           filtersToApply.forEach((filter) => {
             const biquadFilter = audioContext.createBiquadFilter();
@@ -75,7 +75,7 @@ export default createPlugin({
             appliedFilters.push(biquadFilter);
           });
         },
-        { once: true, passive: true },
+        { once: true, passive: true }
       );
     },
     stop() {

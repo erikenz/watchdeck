@@ -1,12 +1,12 @@
-import { createSignal } from 'solid-js';
-import { render } from 'solid-js/web';
+import { createSignal } from "solid-js";
+import { render } from "solid-js/web";
 
-import { APPLICATION_NAME } from '@/i18n';
-import type { RendererContext } from '@/types/contexts';
+import { APPLICATION_NAME } from "@/i18n";
+import type { RendererContext } from "@/types/contexts";
 
-import { defaultInAppMenuConfig } from './constants';
-import type { InAppMenuConfig } from './constants';
-import { TitleBar } from './renderer/TitleBar';
+import { defaultInAppMenuConfig } from "./constants";
+import type { InAppMenuConfig } from "./constants";
+import { TitleBar } from "./renderer/TitleBar";
 
 const scrollStyle = `
   html::-webkit-scrollbar {
@@ -14,12 +14,12 @@ const scrollStyle = `
   }
 `;
 
-const isMacOS = navigator.userAgent.includes('Macintosh');
+const isMacOS = navigator.userAgent.includes("Macintosh");
 const isNotWindowsOrMacOS =
-  !navigator.userAgent.includes('Windows') && !isMacOS;
+  !navigator.userAgent.includes("Windows") && !isMacOS;
 
 const [config, setConfig] = createSignal<InAppMenuConfig>(
-  defaultInAppMenuConfig,
+  defaultInAppMenuConfig
 );
 export const onRendererLoad = async ({
   getConfig,
@@ -38,12 +38,12 @@ export const onRendererLoad = async ({
         enableController={
           isNotWindowsOrMacOS && !config().hideDOMWindowControls
         }
-        initialCollapsed={window.mainConfig.get('options.hideMenu')}
+        initialCollapsed={window.mainConfig.get("options.hideMenu")}
         ipc={ipc}
         isMacOS={isMacOS}
       />
     ),
-    document.body,
+    document.body
   );
 };
 

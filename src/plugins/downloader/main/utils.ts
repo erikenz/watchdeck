@@ -1,12 +1,12 @@
-import { app } from 'electron';
-import type { BrowserWindow } from 'electron';
-import is from 'electron-is';
+import { app } from "electron";
+import type { BrowserWindow } from "electron";
+import is from "electron-is";
 
 export const getFolder = (customFolder?: string) =>
-  customFolder ?? app.getPath('downloads');
+  customFolder ?? app.getPath("downloads");
 
 export const sendFeedback = (win: BrowserWindow, message?: unknown) => {
-  win.webContents.send('downloader-feedback', message);
+  win.webContents.send("downloader-feedback", message);
 };
 
 export const cropMaxWidth = (image: Electron.NativeImage) => {

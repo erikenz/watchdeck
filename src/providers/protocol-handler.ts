@@ -1,11 +1,11 @@
-import path from 'node:path';
+import path from "node:path";
 
-import { app } from 'electron';
-import type { BrowserWindow } from 'electron';
+import { app } from "electron";
+import type { BrowserWindow } from "electron";
 
-import { getSongControls } from './song-controls';
+import { getSongControls } from "./song-controls";
 
-export const APP_PROTOCOL = 'watchdeck';
+export const APP_PROTOCOL = "watchdeck";
 
 let protocolHandler: ((cmd: string, ...args: string[]) => void) | undefined;
 
@@ -33,7 +33,7 @@ export function handleProtocol(cmd: string, ...args: string[]) {
 }
 
 export function changeProtocolHandler(
-  f: (cmd: string, ...args: string[]) => void,
+  f: (cmd: string, ...args: string[]) => void
 ) {
   protocolHandler = f;
 }

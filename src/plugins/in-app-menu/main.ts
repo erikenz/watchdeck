@@ -1,33 +1,33 @@
-import { BrowserWindow, Menu, ipcMain, nativeImage } from 'electron';
-import type { MenuItem, WebContents } from 'electron';
-import { register } from 'electron-localshortcut';
+import { BrowserWindow, Menu, ipcMain, nativeImage } from "electron";
+import type { MenuItem, WebContents } from "electron";
+import { register } from "electron-localshortcut";
 
-import type { BackendContext } from '@/types/contexts';
+import type { BackendContext } from "@/types/contexts";
 
-import type { InAppMenuConfig } from './constants';
+import type { InAppMenuConfig } from "./constants";
 
 export const onMainLoad = ({
   window: win,
   ipc: { handle, send },
 }: BackendContext<InAppMenuConfig>) => {
-  win.on('close', () => {
-    send('close-all-in-app-menu-panel');
+  win.on("close", () => {
+    send("close-all-in-app-menu-panel");
   });
 
-  win.once('ready-to-show', () => {
-    register(win, '`', () => {
-      send('toggle-in-app-menu');
+  win.once("ready-to-show", () => {
+    register(win, "`", () => {
+      send("toggle-in-app-menu");
     });
   });
 
-  handle('get-menu', () =>
+  handle("get-menu", () =>
     JSON.parse(
       JSON.stringify(
         Menu.getApplicationMenu(),
         (key: string, value: unknown) =>
-          key !== 'commandsMap' && key !== 'menu' ? value : undefined,
-      ),
-    ),
+          key !== "commandsMap" && key !== "menu" ? value : undefined
+      )
+    )
   );
 
   const getMenuItemById = (commandId: number): MenuItem | null => {
@@ -48,51 +48,51 @@ export const onMainLoad = ({
     return target;
   };
 
-  ipcMain.handle('watchdeck:menu-event', (event, commandId: number) => {
+  ipcMain.handle("watchdeck:menu-event", (event, commandId: number) => {
     const target = getMenuItemById(commandId);
     if (target) {
       (
         target.click as (
           args0: unknown,
           args1: BrowserWindow | null,
-          args3: WebContents,
+          args3: WebContents
         ) => void
       )(undefined, BrowserWindow.fromWebContents(event.sender), event.sender);
     }
   });
 
-  handle('get-menu-by-id', (commandId: number) => {
+  handle("get-menu-by-id", (commandId: number) => {
     const result = getMenuItemById(commandId);
 
     return JSON.parse(
       JSON.stringify(result, (key: string, value: unknown) =>
-        key !== 'commandsMap' && key !== 'menu' ? value : undefined,
-      ),
+        key !== "commandsMap" && key !== "menu" ? value : undefined
+      )
     );
   });
 
-  handle('window-is-maximized', () => win.isMaximized());
+  handle("window-is-maximized", () => win.isMaximized());
 
-  handle('window-close', () => {
+  handle("window-close", () => {
     win.close();
   });
-  handle('window-minimize', () => {
+  handle("window-minimize", () => {
     win.minimize();
   });
-  handle('window-maximize', () => {
+  handle("window-maximize", () => {
     win.maximize();
   });
-  win.on('maximize', () => {
-    send('window-maximize');
+  win.on("maximize", () => {
+    send("window-maximize");
   });
-  handle('window-unmaximize', () => {
+  handle("window-unmaximize", () => {
     win.unmaximize();
   });
-  win.on('unmaximize', () => {
-    send('window-unmaximize');
+  win.on("unmaximize", () => {
+    send("window-unmaximize");
   });
 
-  handle('image-path-to-data-url', (imagePath: string) => {
+  handle("image-path-to-data-url", (imagePath: string) => {
     const nativeImageIcon = nativeImage.createFromPath(imagePath);
     return nativeImageIcon?.toDataURL();
   });

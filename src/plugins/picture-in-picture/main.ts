@@ -1,8 +1,8 @@
-import { app } from 'electron';
+import { app } from "electron";
 
-import type { BackendContext } from '@/types/contexts';
+import type { BackendContext } from "@/types/contexts";
 
-import type { PictureInPicturePluginConfig } from './index';
+import type { PictureInPicturePluginConfig } from "./index";
 
 let config: PictureInPicturePluginConfig;
 
@@ -19,8 +19,8 @@ export const onMainLoad = async ({
   let originalMaximized: boolean;
 
   const pipPosition = () =>
-    (config.savePosition && config['pip-position']) || [10, 10];
-  const pipSize = () => (config.saveSize && config['pip-size']) || [450, 275];
+    (config.savePosition && config["pip-position"]) || [10, 10];
+  const pipSize = () => (config.saveSize && config["pip-size"]) || [450, 275];
 
   const togglePiP = () => {
     isInPiP = !isInPiP;
@@ -40,12 +40,12 @@ export const onMainLoad = async ({
       originalPosition = window.getPosition();
       originalSize = window.getSize();
 
-      window.webContents.addListener('before-input-event', blockShortcutsInPiP);
+      window.webContents.addListener("before-input-event", blockShortcutsInPiP);
 
       window.setMaximizable(false);
       window.setFullScreenable(false);
 
-      send('watchdeck:pip-toggle', true);
+      send("watchdeck:pip-toggle", true);
 
       app.dock?.hide();
       window.setVisibleOnAllWorkspaces(true, {
@@ -53,17 +53,17 @@ export const onMainLoad = async ({
       });
       app.dock?.show();
       if (config.alwaysOnTop) {
-        window.setAlwaysOnTop(true, 'screen-saver', 1);
+        window.setAlwaysOnTop(true, "screen-saver", 1);
       }
     } else {
       window.webContents.removeListener(
-        'before-input-event',
-        blockShortcutsInPiP,
+        "before-input-event",
+        blockShortcutsInPiP
       );
       window.setMaximizable(true);
       window.setFullScreenable(true);
 
-      send('watchdeck:pip-toggle', false);
+      send("watchdeck:pip-toggle", false);
 
       window.setVisibleOnAllWorkspaces(false);
       window.setAlwaysOnTop(false);
@@ -87,13 +87,13 @@ export const onMainLoad = async ({
 
   const blockShortcutsInPiP = (
     event: Electron.Event,
-    input: Electron.Input,
+    input: Electron.Input
   ) => {
     const key = input.key.toLowerCase();
 
-    if (key === 'f') {
+    if (key === "f") {
       event.preventDefault();
-    } else if (key === 'escape') {
+    } else if (key === "escape") {
       togglePiP();
       event.preventDefault();
     }
@@ -101,21 +101,21 @@ export const onMainLoad = async ({
 
   config ??= await getConfig();
   setConfig({ isInPiP });
-  on('plugin:toggle-picture-in-picture', () => {
+  on("plugin:toggle-picture-in-picture", () => {
     togglePiP();
   });
 
-  window.on('move', () => {
+  window.on("move", () => {
     if (config.isInPiP && !config.useNativePiP) {
       const [x, y] = window.getPosition();
-      setConfig({ 'pip-position': [x, y] });
+      setConfig({ "pip-position": [x, y] });
     }
   });
 
-  window.on('resize', () => {
+  window.on("resize", () => {
     if (config.isInPiP && !config.useNativePiP) {
       const [width, height] = window.getSize();
-      setConfig({ 'pip-size': [width, height] });
+      setConfig({ "pip-size": [width, height] });
     }
   });
 };

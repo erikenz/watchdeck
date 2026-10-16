@@ -1,16 +1,16 @@
-appId: 'com.github.erikenz.watchdeck'
-productName: 'Watchdeck'
+appId: "com.github.erikenz.watchdeck"
+productName: "Watchdeck"
 files:
-  - '!*'
+  - "!*"
   - dist
   - assets
   - license
-  - '!node_modules'
-  - 'node_modules/custom-electron-prompt/**'
-  - 'node_modules/@ghostery/adblocker-electron-preload/**'
-  - 'node_modules/@ffmpeg.wasm/core-mt/**'
-  - '!node_modules/**/*.map'
-  - '!node_modules/**/*.ts'
+  - "!node_modules"
+  - "node_modules/custom-electron-prompt/**"
+  - "node_modules/@ghostery/adblocker-electron-preload/**"
+  - "node_modules/@ffmpeg.wasm/core-mt/**"
+  - "!node_modules/**/*.map"
+  - "!node_modules/**/*.ts"
 asarUnpack:
   - assets
 mac:
@@ -44,7 +44,7 @@ linux:
   syncDesktopName: true
   desktop:
     entry:
-      StartupWMClass: 'com.github.erikenz.watchdeck'
+      StartupWMClass: "com.github.erikenz.watchdeck"
   target:
     - target: AppImage
       arch:
@@ -82,20 +82,20 @@ appImage:
 flatpak:
   description: "Unofficial \u0059\u006f\u0075\u0054\u0075\u0062\u0065 desktop client (Watchdeck)"
   category: AudioVideo
-  runtimeVersion: '24.08'
-  baseVersion: '24.08'
+  runtimeVersion: "24.08"
+  baseVersion: "24.08"
   finishArgs:
-    - '--socket=wayland'
-    - '--socket=x11'
-    - '--share=ipc'
-    - '--device=dri'
-    - '--socket=pulseaudio'
-    - '--share=network'
-    - '--filesystem=xdg-music:rw'
-    - '--talk-name=org.freedesktop.Notifications'
-    - '--talk-name=org.gnome.SessionManager'
-    - '--talk-name=org.kde.StatusNotifierWatcher'
-    - '--own-name=org.mpris.MediaPlayer2.Watchdeck.*'
+    - "--socket=wayland"
+    - "--socket=x11"
+    - "--share=ipc"
+    - "--device=dri"
+    - "--socket=pulseaudio"
+    - "--share=network"
+    - "--filesystem=xdg-music:rw"
+    - "--talk-name=org.freedesktop.Notifications"
+    - "--talk-name=org.gnome.SessionManager"
+    - "--talk-name=org.kde.StatusNotifierWatcher"
+    - "--own-name=org.mpris.MediaPlayer2.Watchdeck.*"
 deb:
   depends:
     - libgtk-3-0
@@ -112,7 +112,7 @@ rpm:
   depends:
     - libuuid
   fpm:
-    - '--rpm-rpmbuild-define'
+    - "--rpm-rpmbuild-define"
     - _build_id_links none
 snap:
   slots:

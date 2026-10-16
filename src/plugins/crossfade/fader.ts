@@ -22,7 +22,7 @@ const validateVolumeLevel = (value: number) => {
     // Yup, that's fine
   } else {
     // Abort and throw an exception
-    throw new TypeError('Number between 0 and 1 expected as volume!');
+    throw new TypeError("Number between 0 and 1 expected as volume!");
   }
 };
 
@@ -88,14 +88,14 @@ export class VolumeFader {
       this.media = media;
     } else {
       // Abort and throw an exception
-      throw new TypeError('Media element expected!');
+      throw new TypeError("Media element expected!");
     }
 
     // Make sure options is an object
     options = options || {};
 
     // Log function passed?
-    if (typeof options.logger === 'function') {
+    if (typeof options.logger === "function") {
       // Set log function to the one specified
       this.logger = options.logger;
     } else {
@@ -104,7 +104,7 @@ export class VolumeFader {
     }
 
     // Linear volume fading?
-    if (options.fadeScaling === 'linear') {
+    if (options.fadeScaling === "linear") {
       // Pass levels unchanged
       this.scale = {
         internalToVolume: (level: number) => level,
@@ -112,7 +112,7 @@ export class VolumeFader {
       };
 
       // Log setting
-      this.logger?.('Using linear fading.');
+      this.logger?.("Using linear fading.");
     }
     // No linear, but logarithmic fading…
     else {
@@ -121,14 +121,14 @@ export class VolumeFader {
       // Default dynamic range?
       if (
         options.fadeScaling === undefined ||
-        options.fadeScaling === 'logarithmic'
+        options.fadeScaling === "logarithmic"
       ) {
         // Set default of 60 dB
         dynamicRange = 3;
       }
       // Custom dynamic range?
       else if (
-        typeof options.fadeScaling === 'number' &&
+        typeof options.fadeScaling === "number" &&
         !Number.isNaN(options.fadeScaling) &&
         options.fadeScaling > 0
       ) {
@@ -139,7 +139,7 @@ export class VolumeFader {
       else {
         // Abort and throw exception
         throw new TypeError(
-          "Expected 'linear', 'logarithmic' or a positive number as fade scaling preference!",
+          "Expected 'linear', 'logarithmic' or a positive number as fade scaling preference!"
         );
       }
 
@@ -154,9 +154,9 @@ export class VolumeFader {
       // Log setting if not default
       if (options.fadeScaling) {
         this.logger?.(
-          'Using logarithmic fading with ' +
+          "Using logarithmic fading with " +
             String(10 * dynamicRange) +
-            ' dB dynamic range.',
+            " dB dynamic range."
         );
       }
     }
@@ -186,7 +186,7 @@ export class VolumeFader {
     this.active = false;
 
     // Initialization done
-    this.logger?.('Initialized for', this.media);
+    this.logger?.("Initialized for", this.media);
   }
 
   /**
@@ -238,7 +238,7 @@ export class VolumeFader {
       this.logger?.(`Set fade duration to ${String(fadeDuration)} ms.`);
     } else {
       // Abort and throw an exception
-      throw new TypeError('Positive number expected as fade duration!');
+      throw new TypeError("Positive number expected as fade duration!");
     }
 
     // Return instance for chaining
@@ -277,7 +277,7 @@ export class VolumeFader {
     this.start();
 
     // Log new fade
-    this.logger?.('New fade started:', this.fade);
+    this.logger?.("New fade started:", this.fade);
 
     // Return instance for chaining
     return this;
@@ -330,7 +330,7 @@ export class VolumeFader {
         this.active = false;
 
         // Done, call back (if callable)
-        if (typeof this.fade.callback === 'function') {
+        if (typeof this.fade.callback === "function") {
           this.fade.callback();
         }
 

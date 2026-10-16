@@ -1,7 +1,7 @@
-import { t } from '@/i18n';
-import type { MusicPlayer } from '@/types/music-player';
-import type { VideoDataChanged } from '@/types/video-data-changed';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import type { MusicPlayer } from "@/types/music-player";
+import type { VideoDataChanged } from "@/types/video-data-changed";
+import { createPlugin } from "@/utils";
 
 export interface DisableAutoPlayPluginConfig {
   enabled: boolean;
@@ -23,14 +23,14 @@ export default createPlugin<
     applyOnce: false,
     enabled: false,
   },
-  description: () => t('plugins.disable-autoplay.description'),
+  description: () => t("plugins.disable-autoplay.description"),
   menu: async ({ getConfig, setConfig }) => {
     const config = await getConfig();
 
     return [
       {
-        label: t('plugins.disable-autoplay.menu.apply-once'),
-        type: 'checkbox',
+        label: t("plugins.disable-autoplay.menu.apply-once"),
+        type: "checkbox",
         checked: config.applyOnce,
         async click() {
           const nowConfig = await getConfig();
@@ -41,20 +41,20 @@ export default createPlugin<
       },
     ];
   },
-  name: () => t('plugins.disable-autoplay.name'),
+  name: () => t("plugins.disable-autoplay.name"),
   renderer: {
     api: null,
     config: null,
     eventListener(event: CustomEvent<VideoDataChanged>) {
       if (this.config?.applyOnce) {
-        document.removeEventListener('videodatachange', this.eventListener);
+        document.removeEventListener("videodatachange", this.eventListener);
       }
 
-      if (event.detail.name === 'dataloaded') {
+      if (event.detail.name === "dataloaded") {
         this.api?.pauseVideo();
         document
-          .querySelector<HTMLVideoElement>('video')
-          ?.addEventListener('timeupdate', this.timeUpdateListener, {
+          .querySelector<HTMLVideoElement>("video")
+          ?.addEventListener("timeupdate", this.timeUpdateListener, {
             once: true,
           });
       }
@@ -65,13 +65,13 @@ export default createPlugin<
     onPlayerApiReady(api) {
       this.api = api;
 
-      document.addEventListener('videodatachange', this.eventListener);
+      document.addEventListener("videodatachange", this.eventListener);
     },
     async start({ getConfig }) {
       this.config = await getConfig();
     },
     stop() {
-      document.removeEventListener('videodatachange', this.eventListener);
+      document.removeEventListener("videodatachange", this.eventListener);
     },
     timeUpdateListener(e: Event) {
       if (e.target instanceof HTMLVideoElement) {

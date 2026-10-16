@@ -1,15 +1,15 @@
-import { contextBridge, ipcRenderer, webFrame } from 'electron';
-import type { IpcRendererEvent } from 'electron';
-import is from 'electron-is';
+import { contextBridge, ipcRenderer, webFrame } from "electron";
+import type { IpcRendererEvent } from "electron";
+import is from "electron-is";
 
-import { loadI18n, setLanguage } from '@/i18n';
+import { loadI18n, setLanguage } from "@/i18n";
 
-import * as config from './config';
+import * as config from "./config";
 import {
   forceLoadPreloadPlugin,
   forceUnloadPreloadPlugin,
   loadAllPreloadPlugins,
-} from './loader/preload';
+} from "./loader/preload";
 
 // @ts-expect-error dummy
 globalThis.customElements = { define() {} };
@@ -18,13 +18,13 @@ new MutationObserver((mutations, observer) => {
   for (const mutation of mutations) {
     for (const node of mutation.addedNodes) {
       const elem = node as HTMLElement;
-      if (elem.tagName !== 'SCRIPT') {
+      if (elem.tagName !== "SCRIPT") {
         continue;
       }
 
       const script = elem as HTMLScriptElement;
       if (
-        !script.getAttribute('src')?.endsWith('custom-elements-es5-adapter.js')
+        !script.getAttribute("src")?.endsWith("custom-elements-es5-adapter.js")
       ) {
         continue;
       }
@@ -38,31 +38,31 @@ new MutationObserver((mutations, observer) => {
 }).observe(document, { childList: true, subtree: true });
 
 loadI18n().then(async () => {
-  await setLanguage(config.get('options.language') ?? 'en');
+  await setLanguage(config.get("options.language") ?? "en");
   await loadAllPreloadPlugins();
 });
 
-ipcRenderer.on('plugin:unload', async (_, id: string) => {
+ipcRenderer.on("plugin:unload", async (_, id: string) => {
   await forceUnloadPreloadPlugin(id);
 });
-ipcRenderer.on('plugin:enable', async (_, id: string) => {
+ipcRenderer.on("plugin:enable", async (_, id: string) => {
   await forceLoadPreloadPlugin(id);
 });
 
-contextBridge.exposeInMainWorld('mainConfig', config);
-contextBridge.exposeInMainWorld('electronIs', is);
-contextBridge.exposeInMainWorld('ipcRenderer', {
+contextBridge.exposeInMainWorld("mainConfig", config);
+contextBridge.exposeInMainWorld("electronIs", is);
+contextBridge.exposeInMainWorld("ipcRenderer", {
   invoke: async (channel: string, ...args: unknown[]): Promise<unknown> =>
     await ipcRenderer.invoke(channel, ...args),
   off: (channel: string, listener: (...args: unknown[]) => void) =>
     ipcRenderer.off(channel, listener),
   on: (
     channel: string,
-    listener: (event: IpcRendererEvent, ...args: unknown[]) => void,
+    listener: (event: IpcRendererEvent, ...args: unknown[]) => void
   ) => ipcRenderer.on(channel, listener),
   once: (
     channel: string,
-    listener: (event: IpcRendererEvent, ...args: unknown[]) => void,
+    listener: (event: IpcRendererEvent, ...args: unknown[]) => void
   ) => ipcRenderer.once(channel, listener),
   removeAllListeners: (channel: string) =>
     ipcRenderer.removeAllListeners(channel),
@@ -77,15 +77,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     ipcRenderer.sendToHost(channel, ...args);
   },
 });
-contextBridge.exposeInMainWorld('reload', () => {
-  ipcRenderer.send('watchdeck:reload');
+contextBridge.exposeInMainWorld("reload", () => {
+  ipcRenderer.send("watchdeck:reload");
 });
 contextBridge.exposeInMainWorld(
-  'ELECTRON_RENDERER_URL',
-  process.env.ELECTRON_RENDERER_URL,
+  "ELECTRON_RENDERER_URL",
+  process.env.ELECTRON_RENDERER_URL
 );
 
-const [path, script] = ipcRenderer.sendSync('get-renderer-script') as [
+const [path, script] = ipcRenderer.sendSync("get-renderer-script") as [
   string | null,
   string,
 ];
@@ -100,7 +100,7 @@ if (path) {
       },
     ],
     true,
-    () => (blocked = false),
+    () => (blocked = false)
   );
 } else {
   webFrame.executeJavaScript(script, true, () => (blocked = false));

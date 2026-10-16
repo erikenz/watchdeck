@@ -1,13 +1,13 @@
-import { autoUpdate, flip, offset, size } from '@floating-ui/dom';
-import type { OffsetOptions } from '@floating-ui/dom';
-import { useFloating } from 'solid-floating-ui';
-import { createSignal, Show, splitProps, mergeProps } from 'solid-js';
-import type { JSX } from 'solid-js';
-import { Portal } from 'solid-js/web';
-import { css } from 'solid-styled-components';
-import { Transition } from 'solid-transition-group';
+import { autoUpdate, flip, offset, size } from "@floating-ui/dom";
+import type { OffsetOptions } from "@floating-ui/dom";
+import { useFloating } from "solid-floating-ui";
+import { createSignal, Show, splitProps, mergeProps } from "solid-js";
+import type { JSX } from "solid-js";
+import { Portal } from "solid-js/web";
+import { css } from "solid-styled-components";
+import { Transition } from "solid-transition-group";
 
-import { cacheNoArgs } from '@/providers/decorators';
+import { cacheNoArgs } from "@/providers/decorators";
 
 const panelStyle = cacheNoArgs(
   () => css`
@@ -38,7 +38,7 @@ const panelStyle = cacheNoArgs(
       0 2px 8px rgba(0, 0, 0, 0.2);
 
     transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
-  `,
+  `
 );
 
 const animationStyle = cacheNoArgs(() => ({
@@ -63,18 +63,18 @@ const animationStyle = cacheNoArgs(() => ({
 }));
 
 export type Placement =
-  | 'top'
-  | 'bottom'
-  | 'left'
-  | 'right'
-  | 'top-start'
-  | 'top-end'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'right-start'
-  | 'right-end'
-  | 'left-start'
-  | 'left-end';
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "top-start"
+  | "top-end"
+  | "bottom-start"
+  | "bottom-end"
+  | "right-start"
+  | "right-end"
+  | "left-start"
+  | "left-end";
 export type PanelProps = JSX.HTMLAttributes<HTMLUListElement> & {
   open?: boolean;
   anchor?: HTMLElement | null;
@@ -85,9 +85,9 @@ export type PanelProps = JSX.HTMLAttributes<HTMLUListElement> & {
 };
 export const Panel = (props: PanelProps) => {
   const [elements, local, leftProps] = splitProps(
-    mergeProps({ placement: 'bottom' }, props),
-    ['anchor', 'children'],
-    ['open', 'placement', 'offset'],
+    mergeProps({ placement: "bottom" }, props),
+    ["anchor", "children"],
+    ["open", "placement", "offset"]
   );
 
   const [panel, setPanel] = createSignal<HTMLElement | null>(null);
@@ -99,62 +99,62 @@ export const Panel = (props: PanelProps) => {
         padding: 8,
         apply({ elements, availableWidth, availableHeight }) {
           elements.floating.style.setProperty(
-            '--max-width',
-            `${Math.max(200, availableWidth)}px`,
+            "--max-width",
+            `${Math.max(200, availableWidth)}px`
           );
           elements.floating.style.setProperty(
-            '--max-height',
-            `${Math.max(200, availableHeight)}px`,
+            "--max-height",
+            `${Math.max(200, availableHeight)}px`
           );
         },
       }),
-      flip({ fallbackStrategy: 'initialPlacement' }),
+      flip({ fallbackStrategy: "initialPlacement" }),
     ],
     placement: local.placement as Placement,
-    strategy: 'fixed',
+    strategy: "fixed",
     whileElementsMounted: autoUpdate,
   });
 
   const originX = () => {
-    if (position.placement.includes('left')) {
-      return '100%';
+    if (position.placement.includes("left")) {
+      return "100%";
     }
-    if (position.placement.includes('right')) {
-      return '0';
+    if (position.placement.includes("right")) {
+      return "0";
     }
     if (
-      position.placement.includes('top') ||
-      position.placement.includes('bottom')
+      position.placement.includes("top") ||
+      position.placement.includes("bottom")
     ) {
-      if (position.placement.includes('start')) {
-        return '0';
+      if (position.placement.includes("start")) {
+        return "0";
       }
-      if (position.placement.includes('end')) {
-        return '100%';
+      if (position.placement.includes("end")) {
+        return "100%";
       }
     }
 
-    return '50%';
+    return "50%";
   };
   const originY = () => {
-    if (position.placement.includes('top')) {
-      return '100%';
+    if (position.placement.includes("top")) {
+      return "100%";
     }
-    if (position.placement.includes('bottom')) {
-      return '0';
+    if (position.placement.includes("bottom")) {
+      return "0";
     }
     if (
-      position.placement.includes('left') ||
-      position.placement.includes('right')
+      position.placement.includes("left") ||
+      position.placement.includes("right")
     ) {
-      if (position.placement.includes('start')) {
-        return '0';
+      if (position.placement.includes("start")) {
+        return "0";
       }
-      if (position.placement.includes('end')) {
-        return '100%';
+      if (position.placement.includes("end")) {
+        return "100%";
       }
     }
-    return '50%';
+    return "50%";
   };
 
   return (
@@ -173,10 +173,10 @@ export const Panel = (props: PanelProps) => {
             data-wd-sub-panel={true}
             ref={setPanel}
             style={{
-              '--offset-x': `${position.x}px`,
-              '--offset-y': `${position.y}px`,
-              '--origin-x': originX(),
-              '--origin-y': originY(),
+              "--offset-x": `${position.x}px`,
+              "--offset-y": `${position.y}px`,
+              "--origin-x": originX(),
+              "--origin-y": originY(),
             }}
           >
             {elements.children}

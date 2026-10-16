@@ -1,46 +1,46 @@
-import prompt from 'custom-electron-prompt';
-import type { BrowserWindow } from 'electron';
+import prompt from "custom-electron-prompt";
+import type { BrowserWindow } from "electron";
 
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import promptOptions from '@/providers/prompt-options';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import promptOptions from "@/providers/prompt-options";
+import type { MenuContext } from "@/types/contexts";
 
-import type { ScrobblerPluginConfig } from './index';
-import { backend } from './main';
-import type { SetConfType } from './main';
+import type { ScrobblerPluginConfig } from "./index";
+import { backend } from "./main";
+import type { SetConfType } from "./main";
 
 async function promptLastFmOptions(
   options: ScrobblerPluginConfig,
   setConfig: SetConfType,
-  window: BrowserWindow,
+  window: BrowserWindow
 ) {
   const output = await prompt(
     {
       height: 360,
-      label: t('plugins.scrobbler.menu.lastfm.api-settings'),
+      label: t("plugins.scrobbler.menu.lastfm.api-settings"),
       multiInputOptions: [
         {
-          label: t('plugins.scrobbler.prompt.lastfm.api-key'),
+          label: t("plugins.scrobbler.prompt.lastfm.api-key"),
           value: options.scrobblers.lastfm?.apiKey,
           inputAttrs: {
-            type: 'text',
+            type: "text",
           },
         },
         {
-          label: t('plugins.scrobbler.prompt.lastfm.api-secret'),
+          label: t("plugins.scrobbler.prompt.lastfm.api-secret"),
           value: options.scrobblers.lastfm?.secret,
           inputAttrs: {
-            type: 'text',
+            type: "text",
           },
         },
       ],
       resizable: true,
-      title: t('plugins.scrobbler.menu.lastfm.api-settings'),
-      type: 'multiInput',
+      title: t("plugins.scrobbler.menu.lastfm.api-settings"),
+      type: "multiInput",
       ...promptOptions(),
     },
-    window,
+    window
   );
 
   if (output) {
@@ -59,17 +59,17 @@ async function promptLastFmOptions(
 async function promptListenbrainzOptions(
   options: ScrobblerPluginConfig,
   setConfig: SetConfType,
-  window: BrowserWindow,
+  window: BrowserWindow
 ) {
   const output = await prompt(
     {
-      label: t('plugins.scrobbler.prompt.listenbrainz.token.label'),
-      title: t('plugins.scrobbler.prompt.listenbrainz.token.title'),
-      type: 'input',
+      label: t("plugins.scrobbler.prompt.listenbrainz.token.label"),
+      title: t("plugins.scrobbler.prompt.listenbrainz.token.title"),
+      type: "input",
       value: options.scrobblers.listenbrainz?.token,
       ...promptOptions(),
     },
-    window,
+    window
   );
 
   if (output) {
@@ -92,8 +92,8 @@ export const onMenu = async ({
         config.scrobbleOtherMedia = item.checked;
         setConfig(config);
       },
-      label: t('plugins.scrobbler.menu.scrobble-other-media'),
-      type: 'checkbox',
+      label: t("plugins.scrobbler.menu.scrobble-other-media"),
+      type: "checkbox",
     },
     {
       checked: Boolean(config.alternativeTitles),
@@ -101,8 +101,8 @@ export const onMenu = async ({
         config.alternativeTitles = item.checked;
         setConfig(config);
       },
-      label: t('plugins.scrobbler.menu.scrobble-alternative-title'),
-      type: 'checkbox',
+      label: t("plugins.scrobbler.menu.scrobble-alternative-title"),
+      type: "checkbox",
     },
     {
       checked: Boolean(config.alternativeArtist),
@@ -110,11 +110,11 @@ export const onMenu = async ({
         config.alternativeArtist = item.checked;
         setConfig(config);
       },
-      label: t('plugins.scrobbler.menu.scrobble-alternative-artist'),
-      type: 'checkbox',
+      label: t("plugins.scrobbler.menu.scrobble-alternative-artist"),
+      type: "checkbox",
     },
     {
-      label: 'Last.fm',
+      label: "Last.fm",
       submenu: [
         {
           checked: Boolean(config.scrobblers.lastfm?.enabled),
@@ -123,19 +123,19 @@ export const onMenu = async ({
             config.scrobblers.lastfm.enabled = item.checked;
             setConfig(config);
           },
-          label: t('main.menu.plugins.enabled'),
-          type: 'checkbox',
+          label: t("main.menu.plugins.enabled"),
+          type: "checkbox",
         },
         {
           click() {
             promptLastFmOptions(config, setConfig, window);
           },
-          label: t('plugins.scrobbler.menu.lastfm.api-settings'),
+          label: t("plugins.scrobbler.menu.lastfm.api-settings"),
         },
       ],
     },
     {
-      label: 'ListenBrainz',
+      label: "ListenBrainz",
       submenu: [
         {
           checked: Boolean(config.scrobblers.listenbrainz?.enabled),
@@ -144,14 +144,14 @@ export const onMenu = async ({
             config.scrobblers.listenbrainz.enabled = item.checked;
             setConfig(config);
           },
-          label: t('main.menu.plugins.enabled'),
-          type: 'checkbox',
+          label: t("main.menu.plugins.enabled"),
+          type: "checkbox",
         },
         {
           click() {
             promptListenbrainzOptions(config, setConfig, window);
           },
-          label: t('plugins.scrobbler.menu.listenbrainz.token'),
+          label: t("plugins.scrobbler.menu.listenbrainz.token"),
         },
       ],
     },

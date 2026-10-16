@@ -1,22 +1,22 @@
-import prompt from 'custom-electron-prompt';
-import type { BrowserWindow } from 'electron';
-import { Howl } from 'howler';
-import { Innertube } from 'youtubei.js';
+import prompt from "custom-electron-prompt";
+import type { BrowserWindow } from "electron";
+import { Howl } from "howler";
+import { Innertube } from "youtubei.js";
 
-import { t } from '@/i18n';
-import { getNetFetchAsFetch } from '@/plugins/utils/main';
-import promptOptions from '@/providers/prompt-options';
-import type { RendererContext } from '@/types/contexts';
-import { createPlugin } from '@/utils';
+import { t } from "@/i18n";
+import { getNetFetchAsFetch } from "@/plugins/utils/main";
+import promptOptions from "@/providers/prompt-options";
+import type { RendererContext } from "@/types/contexts";
+import { createPlugin } from "@/utils";
 
-import { VolumeFader } from './fader';
+import { VolumeFader } from "./fader";
 
 export interface CrossfadePluginConfig {
   enabled: boolean;
   fadeInDuration: number;
   fadeOutDuration: number;
   secondsBeforeEnd: number;
-  fadeScaling: 'linear' | 'logarithmic' | number;
+  fadeScaling: "linear" | "logarithmic" | number;
 }
 
 export default createPlugin<
@@ -24,7 +24,7 @@ export default createPlugin<
   unknown,
   {
     config?: CrossfadePluginConfig;
-    ipc?: RendererContext<CrossfadePluginConfig>['ipc'];
+    ipc?: RendererContext<CrossfadePluginConfig>["ipc"];
   },
   CrossfadePluginConfig
 >({
@@ -33,7 +33,7 @@ export default createPlugin<
       fetch: getNetFetchAsFetch(),
     });
 
-    ipc.handle('audio-url', async (videoID: string) => {
+    ipc.handle("audio-url", async (videoID: string) => {
       const info = await yt.getBasicInfo(videoID);
       return await info.streaming_data?.formats[0].decipher(yt.session.player);
     });
@@ -58,7 +58,7 @@ export default createPlugin<
      *
      * @default 'linear'
      */
-    fadeScaling: 'linear',
+    fadeScaling: "linear",
     /**
      * The duration of the fade in and fade out in seconds.
      *
@@ -66,62 +66,62 @@ export default createPlugin<
      */
     secondsBeforeEnd: 10,
   },
-  description: () => t('plugins.crossfade.description'),
+  description: () => t("plugins.crossfade.description"),
   menu({ window, getConfig, setConfig }) {
     const promptCrossfadeValues = async (
       win: BrowserWindow,
-      options: CrossfadePluginConfig,
-    ): Promise<Omit<CrossfadePluginConfig, 'enabled'> | undefined> => {
+      options: CrossfadePluginConfig
+    ): Promise<Omit<CrossfadePluginConfig, "enabled"> | undefined> => {
       const res = await prompt(
         {
-          title: t('plugins.crossfade.prompt.options'),
-          type: 'multiInput',
+          title: t("plugins.crossfade.prompt.options"),
+          type: "multiInput",
           multiInputOptions: [
             {
               label: t(
-                'plugins.crossfade.prompt.options.multi-input.fade-in-duration',
+                "plugins.crossfade.prompt.options.multi-input.fade-in-duration"
               ),
               value: options.fadeInDuration,
               inputAttrs: {
-                type: 'number',
+                type: "number",
                 required: true,
-                min: '0',
-                step: '100',
+                min: "0",
+                step: "100",
               },
             },
             {
               label: t(
-                'plugins.crossfade.prompt.options.multi-input.fade-out-duration',
+                "plugins.crossfade.prompt.options.multi-input.fade-out-duration"
               ),
               value: options.fadeOutDuration,
               inputAttrs: {
-                type: 'number',
+                type: "number",
                 required: true,
-                min: '0',
-                step: '100',
+                min: "0",
+                step: "100",
               },
             },
             {
               label: t(
-                'plugins.crossfade.prompt.options.multi-input.seconds-before-end',
+                "plugins.crossfade.prompt.options.multi-input.seconds-before-end"
               ),
               value: options.secondsBeforeEnd,
               inputAttrs: {
-                type: 'number',
+                type: "number",
                 required: true,
-                min: '0',
+                min: "0",
               },
             },
             {
               label: t(
-                'plugins.crossfade.prompt.options.multi-input.fade-scaling.label',
+                "plugins.crossfade.prompt.options.multi-input.fade-scaling.label"
               ),
               selectOptions: {
                 linear: t(
-                  'plugins.crossfade.prompt.options.multi-input.fade-scaling.linear',
+                  "plugins.crossfade.prompt.options.multi-input.fade-scaling.linear"
                 ),
                 logarithmic: t(
-                  'plugins.crossfade.prompt.options.multi-input.fade-scaling.logarithmic',
+                  "plugins.crossfade.prompt.options.multi-input.fade-scaling.logarithmic"
                 ),
               },
               value: options.fadeScaling,
@@ -131,15 +131,15 @@ export default createPlugin<
           height: 360,
           ...promptOptions(),
         },
-        win,
+        win
       ).catch(console.error);
 
       if (!res) {
         return undefined;
       }
 
-      let fadeScaling: 'linear' | 'logarithmic' | number;
-      if (res[3] === 'linear' || res[3] === 'logarithmic') {
+      let fadeScaling: "linear" | "logarithmic" | number;
+      if (res[3] === "linear" || res[3] === "logarithmic") {
         fadeScaling = res[3];
       } else if (isFinite(Number(res[3]))) {
         fadeScaling = Number(res[3]);
@@ -157,11 +157,11 @@ export default createPlugin<
 
     return [
       {
-        label: t('plugins.crossfade.menu.advanced'),
+        label: t("plugins.crossfade.menu.advanced"),
         async click() {
           const newOptions = await promptCrossfadeValues(
             window,
-            await getConfig(),
+            await getConfig()
           );
           if (newOptions) {
             setConfig(newOptions);
@@ -170,7 +170,7 @@ export default createPlugin<
       },
     ];
   },
-  name: () => t('plugins.crossfade.name'),
+  name: () => t("plugins.crossfade.name"),
   renderer: {
     onConfigChange(newConfig) {
       this.config = newConfig;
@@ -181,20 +181,20 @@ export default createPlugin<
       let waitForTransition: Promise<unknown>;
 
       const getStreamURL = async (videoID: string): Promise<string> =>
-        await (this.ipc?.invoke('audio-url', videoID) as Promise<string>);
+        await (this.ipc?.invoke("audio-url", videoID) as Promise<string>);
 
       const getVideoIDFromURL = (url: string) =>
-        new URLSearchParams(url.split('?')?.at(-1)).get('v');
+        new URLSearchParams(url.split("?")?.at(-1)).get("v");
 
       const isReadyToCrossfade = () =>
-        transitionAudio && transitionAudio.state() === 'loaded';
+        transitionAudio && transitionAudio.state() === "loaded";
 
       const watchVideoIDChanges = (cb: (id: string) => void) => {
-        window.navigation.addEventListener('navigate', (event) => {
+        window.navigation.addEventListener("navigate", (event) => {
           const currentVideoID = getVideoIDFromURL(
-            (event.currentTarget as Navigation).currentEntry?.url ?? '',
+            (event.currentTarget as Navigation).currentEntry?.url ?? ""
           );
-          const nextVideoID = getVideoIDFromURL(event.destination.url ?? '');
+          const nextVideoID = getVideoIDFromURL(event.destination.url ?? "");
 
           if (
             nextVideoID &&
@@ -227,7 +227,7 @@ export default createPlugin<
       };
 
       const syncVideoWithTransitionAudio = () => {
-        const video = document.querySelector('video')!;
+        const video = document.querySelector("video")!;
 
         const videoFader = new VolumeFader(video, {
           fadeScaling: this.config?.fadeScaling,
@@ -237,15 +237,15 @@ export default createPlugin<
         transitionAudio.play();
         transitionAudio.seek(video.currentTime);
 
-        video.addEventListener('seeking', () => {
+        video.addEventListener("seeking", () => {
           transitionAudio.seek(video.currentTime);
         });
 
-        video.addEventListener('pause', () => {
+        video.addEventListener("pause", () => {
           transitionAudio.pause();
         });
 
-        video.addEventListener('play', () => {
+        video.addEventListener("play", () => {
           transitionAudio.play();
           transitionAudio.seek(video.currentTime);
 
@@ -262,14 +262,14 @@ export default createPlugin<
               video.duration - (this.config?.secondsBeforeEnd ?? 0) &&
             isReadyToCrossfade()
           ) {
-            video.removeEventListener('timeupdate', transitionBeforeEnd);
+            video.removeEventListener("timeupdate", transitionBeforeEnd);
 
             // Go to next video - XXX: does not support "repeat 1" mode
-            document.querySelector<HTMLButtonElement>('.next-button')?.click();
+            document.querySelector<HTMLButtonElement>(".next-button")?.click();
           }
         };
 
-        video.addEventListener('timeupdate', transitionBeforeEnd);
+        video.addEventListener("timeupdate", transitionBeforeEnd);
       };
 
       const crossfade = (cb: () => void) => {
@@ -283,7 +283,7 @@ export default createPlugin<
           resolveTransition = resolve;
         });
 
-        const video = document.querySelector('video')!;
+        const video = document.querySelector("video")!;
 
         const fader = new VolumeFader(transitionAudio._sounds[0]._node, {
           initialVolume: video.volume,

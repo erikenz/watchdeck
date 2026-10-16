@@ -1,17 +1,17 @@
-import prompt from 'custom-electron-prompt';
-import { deepmerge } from 'deepmerge-ts';
-import { dialog } from 'electron';
+import prompt from "custom-electron-prompt";
+import { deepmerge } from "deepmerge-ts";
+import { dialog } from "electron";
 
-import { t } from '@/i18n';
-import type { MenuTemplate } from '@/menu';
-import promptOptions from '@/providers/prompt-options';
-import type { MenuContext } from '@/types/contexts';
+import { t } from "@/i18n";
+import type { MenuTemplate } from "@/menu";
+import promptOptions from "@/providers/prompt-options";
+import type { MenuContext } from "@/types/contexts";
 
-import { defaultConfig } from './index';
-import type { DownloaderPluginConfig } from './index';
-import { downloadPlaylist } from './main';
-import { getFolder } from './main/utils';
-import { DefaultPresetList } from './types';
+import { defaultConfig } from "./index";
+import type { DownloaderPluginConfig } from "./index";
+import { downloadPlaylist } from "./main";
+import { getFolder } from "./main/utils";
+import { DefaultPresetList } from "./types";
 
 export const onMenu = async ({
   getConfig,
@@ -21,20 +21,20 @@ export const onMenu = async ({
 
   return [
     {
-      label: t('plugins.downloader.menu.download-finish-settings.label'),
+      label: t("plugins.downloader.menu.download-finish-settings.label"),
       submenu: [
         {
           label: t(
-            'plugins.downloader.menu.download-finish-settings.submenu.enabled',
+            "plugins.downloader.menu.download-finish-settings.submenu.enabled"
           ),
-          type: 'checkbox',
+          type: "checkbox",
           checked: config.downloadOnFinish?.enabled ?? false,
           click(item) {
             setConfig({
               downloadOnFinish: {
                 ...deepmerge(
                   defaultConfig.downloadOnFinish,
-                  config.downloadOnFinish,
+                  config.downloadOnFinish
                 ),
                 enabled: item.checked,
               },
@@ -42,15 +42,15 @@ export const onMenu = async ({
           },
         },
         {
-          type: 'separator',
+          type: "separator",
         },
         {
-          label: t('plugins.downloader.menu.choose-download-folder'),
+          label: t("plugins.downloader.menu.choose-download-folder"),
           click() {
             const result = dialog.showOpenDialogSync({
-              properties: ['openDirectory', 'createDirectory'],
+              properties: ["openDirectory", "createDirectory"],
               defaultPath: getFolder(
-                config.downloadOnFinish?.folder ?? config.downloadFolder,
+                config.downloadOnFinish?.folder ?? config.downloadFolder
               ),
             });
             if (result) {
@@ -58,7 +58,7 @@ export const onMenu = async ({
                 downloadOnFinish: {
                   ...deepmerge(
                     defaultConfig.downloadOnFinish,
-                    config.downloadOnFinish,
+                    config.downloadOnFinish
                   ),
                   folder: result[0],
                 },
@@ -68,42 +68,42 @@ export const onMenu = async ({
         },
         {
           label: t(
-            'plugins.downloader.menu.download-finish-settings.submenu.mode',
+            "plugins.downloader.menu.download-finish-settings.submenu.mode"
           ),
-          type: 'submenu',
+          type: "submenu",
           submenu: [
             {
               label: t(
-                'plugins.downloader.menu.download-finish-settings.submenu.seconds',
+                "plugins.downloader.menu.download-finish-settings.submenu.seconds"
               ),
-              type: 'radio',
-              checked: config.downloadOnFinish?.mode === 'seconds',
+              type: "radio",
+              checked: config.downloadOnFinish?.mode === "seconds",
               click() {
                 setConfig({
                   downloadOnFinish: {
                     ...deepmerge(
                       defaultConfig.downloadOnFinish,
-                      config.downloadOnFinish,
+                      config.downloadOnFinish
                     ),
-                    mode: 'seconds',
+                    mode: "seconds",
                   },
                 });
               },
             },
             {
               label: t(
-                'plugins.downloader.menu.download-finish-settings.submenu.percent',
+                "plugins.downloader.menu.download-finish-settings.submenu.percent"
               ),
-              type: 'radio',
-              checked: config.downloadOnFinish?.mode === 'percent',
+              type: "radio",
+              checked: config.downloadOnFinish?.mode === "percent",
               click() {
                 setConfig({
                   downloadOnFinish: {
                     ...deepmerge(
                       defaultConfig.downloadOnFinish,
-                      config.downloadOnFinish,
+                      config.downloadOnFinish
                     ),
-                    mode: 'percent',
+                    mode: "percent",
                   },
                 });
               },
@@ -112,24 +112,24 @@ export const onMenu = async ({
         },
         {
           label: t(
-            'plugins.downloader.menu.download-finish-settings.submenu.advanced',
+            "plugins.downloader.menu.download-finish-settings.submenu.advanced"
           ),
           async click() {
             const res = await prompt({
               title: t(
-                'plugins.downloader.menu.download-finish-settings.prompt.title',
+                "plugins.downloader.menu.download-finish-settings.prompt.title"
               ),
-              type: 'multiInput',
+              type: "multiInput",
               multiInputOptions: [
                 {
                   label: t(
-                    'plugins.downloader.menu.download-finish-settings.prompt.last-seconds',
+                    "plugins.downloader.menu.download-finish-settings.prompt.last-seconds"
                   ),
                   inputAttrs: {
-                    type: 'number',
+                    type: "number",
                     required: true,
-                    min: '0',
-                    step: '1',
+                    min: "0",
+                    step: "1",
                   },
                   value:
                     config.downloadOnFinish?.seconds ??
@@ -137,14 +137,14 @@ export const onMenu = async ({
                 },
                 {
                   label: t(
-                    'plugins.downloader.menu.download-finish-settings.prompt.last-percent',
+                    "plugins.downloader.menu.download-finish-settings.prompt.last-percent"
                   ),
                   inputAttrs: {
-                    type: 'number',
+                    type: "number",
                     required: true,
-                    min: '1',
-                    max: '100',
-                    step: '1',
+                    min: "1",
+                    max: "100",
+                    step: "1",
                   },
                   value:
                     config.downloadOnFinish?.percent ??
@@ -164,7 +164,7 @@ export const onMenu = async ({
               downloadOnFinish: {
                 ...deepmerge(
                   defaultConfig.downloadOnFinish,
-                  config.downloadOnFinish,
+                  config.downloadOnFinish
                 ),
                 seconds: Number(res[0]),
                 percent: Number(res[1]),
@@ -174,34 +174,34 @@ export const onMenu = async ({
           },
         },
       ],
-      type: 'submenu',
+      type: "submenu",
     },
 
     {
       click: async () => downloadPlaylist(),
-      label: t('plugins.downloader.menu.download-playlist'),
+      label: t("plugins.downloader.menu.download-playlist"),
     },
     {
       click() {
         const result = dialog.showOpenDialogSync({
-          properties: ['openDirectory', 'createDirectory'],
-          defaultPath: getFolder(config.downloadFolder ?? ''),
+          properties: ["openDirectory", "createDirectory"],
+          defaultPath: getFolder(config.downloadFolder ?? ""),
         });
         if (result) {
           setConfig({ downloadFolder: result[0] });
         } // Else = user pressed cancel
       },
-      label: t('plugins.downloader.menu.choose-download-folder'),
+      label: t("plugins.downloader.menu.choose-download-folder"),
     },
     {
-      label: t('plugins.downloader.menu.presets'),
+      label: t("plugins.downloader.menu.presets"),
       submenu: Object.keys(DefaultPresetList).map((preset) => ({
         checked: config.selectedPreset === preset,
         click() {
           setConfig({ selectedPreset: preset });
         },
         label: preset,
-        type: 'radio',
+        type: "radio",
       })),
     },
     {
@@ -209,8 +209,8 @@ export const onMenu = async ({
       click(item) {
         setConfig({ skipExisting: item.checked });
       },
-      label: t('plugins.downloader.menu.skip-existing'),
-      type: 'checkbox',
+      label: t("plugins.downloader.menu.skip-existing"),
+      type: "checkbox",
     },
   ];
 };

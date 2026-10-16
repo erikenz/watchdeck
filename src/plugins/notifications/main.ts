@@ -1,13 +1,13 @@
-import { Notification } from 'electron';
-import is from 'electron-is';
+import { Notification } from "electron";
+import is from "electron-is";
 
-import { registerCallback, SongInfoEvent } from '@/providers/song-info';
-import type { SongInfo } from '@/providers/song-info';
-import type { BackendContext } from '@/types/contexts';
+import { registerCallback, SongInfoEvent } from "@/providers/song-info";
+import type { SongInfo } from "@/providers/song-info";
+import type { BackendContext } from "@/types/contexts";
 
-import type { NotificationsPluginConfig } from './index';
-import interactive from './interactive';
-import { notificationImage } from './utils';
+import type { NotificationsPluginConfig } from "./index";
+import interactive from "./interactive";
+import { notificationImage } from "./utils";
 
 let config: NotificationsPluginConfig;
 
@@ -17,7 +17,7 @@ const notify = (info: SongInfo) => {
     body: info.artist,
     icon: notificationImage(info, config),
     silent: true,
-    title: info.title || 'Playing',
+    title: info.title || "Playing",
     urgency: config.urgency,
   });
   currentNotification.show();
@@ -47,7 +47,7 @@ const setup = () => {
 };
 
 export const onMainLoad = async (
-  context: BackendContext<NotificationsPluginConfig>,
+  context: BackendContext<NotificationsPluginConfig>
 ) => {
   config = await context.getConfig();
 

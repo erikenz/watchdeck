@@ -4,7 +4,7 @@
   "desktopName": "com.github.erikenz.watchdeck",
   "productName": "Watchdeck",
   "version": "0.1.0",
-  "description": "Unofficial YouTube desktop client, built around a plugin system",
+  "description": "Unofficial \u0059\u006f\u0075\u0054\u0075\u0062\u0065 desktop client, built around a plugin system",
   "main": "./dist/main/index.js",
   "type": "module",
   "license": "MIT",
@@ -36,6 +36,7 @@
     "lint": "pnpm oxlint --type-aware src",
     "format": "pnpm oxfmt --write src",
     "format:check": "pnpm oxfmt --check src",
+    "changelog": "pnpm dlx auto-changelog",
     "release:linux": "pnpm clean && pnpm build && pnpm electron-builder --linux -p always -c.snap.publish=github",
     "release:mac": "pnpm clean && pnpm build && pnpm electron-builder --mac -p always",
     "release:win": "pnpm clean && pnpm build && pnpm electron-builder --win -p always",
@@ -155,5 +156,11 @@
     "vite-plugin-resolve": "2.5.2",
     "vite-plugin-solid": "2.11.12",
     "ws": "8.21.0"
+  },
+  "auto-changelog": {
+    "hideCredit": true,
+    "package": true,
+    "unreleased": true,
+    "output": "changelog.md"
   }
 }

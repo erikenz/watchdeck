@@ -89,7 +89,7 @@ const isPremium = async () => {
 
   // If signed in, check if the upgrade button is present
   const upgradeBtnIconPathData = (await win.webContents.executeJavaScript(
-    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #youtube_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
+    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006f\u0075\u0074\u0075\u0062\u0065_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
   )) as string | null;
 
   // Fallback to non-premium if the icon is not found
@@ -130,7 +130,7 @@ const sendError = (error: Error, source?: string) => {
 export const getCookieFromWindow = async (win: BrowserWindow) => {
   return (
     await win.webContents.session.cookies.get({
-      url: 'https://www.youtube.com',
+      url: 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
     })
   )
     .map((it) => it.name + '=' + it.value)

@@ -71,11 +71,11 @@ export const onMenu = async ({
       type: 'checkbox',
       checked:
         config[
-          'playOnYouTubeMusic'
+          'playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music'
         ],
       click(item: Electron.MenuItem) {
         setConfig({
-          'playOnYouTubeMusic':
+          'playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music':
             item.checked,
         });
       },

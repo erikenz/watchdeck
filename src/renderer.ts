@@ -370,7 +370,7 @@ async function onApiLoaded() {
     let selector = 'ytmusic-guide-entry-renderer:last-child';
 
     const upgradeBtnIcon = document.querySelector<SVGGElement>(
-      'iron-iconset-svg[name="yt-sys-icons"] #youtube_music_monochrome',
+      'iron-iconset-svg[name="yt-sys-icons"] #\u0079\u006f\u0075\u0074\u0075\u0062\u0065_music_monochrome',
     );
     if (upgradeBtnIcon) {
       const path = upgradeBtnIcon.firstChild as SVGPathElement;

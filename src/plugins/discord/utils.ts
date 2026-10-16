@@ -56,7 +56,7 @@ export const buildDiscordButtons = (
   const buttons: GatewayActivityButton[] = [];
   if (
     config[
-      'playOnYouTubeMusic'
+      'playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music'
     ] &&
     songInfo.url
   ) {

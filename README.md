@@ -2,37 +2,66 @@
 
 # Watchdeck
 
-**An unofficial desktop client for YouTube.**
-
-The site runs in a native Electron window; a plugin system injects the behaviour we want on top of
-it — Watch Later tooling, SponsorBlock, autoplay control, mouse gestures.
+[![GitHub release](https://img.shields.io/github/release/erikenz/watchdeck.svg?style=for-the-badge)](https://github.com/erikenz/watchdeck/releases/)
+[![GitHub license](https://img.shields.io/github/license/erikenz/watchdeck.svg?style=for-the-badge)](https://github.com/erikenz/watchdeck/blob/main/license)
+[![Build status](https://img.shields.io/github/actions/workflow/status/erikenz/watchdeck/build.yml?branch=main&style=for-the-badge)](https://github.com/erikenz/watchdeck/actions/workflows/build.yml)
+[![GitHub All Releases](https://img.shields.io/github/downloads/erikenz/watchdeck/total?style=for-the-badge)](https://github.com/erikenz/watchdeck/releases/)
 
 </div>
 
+- Native look & feel extension
+
 > [!IMPORTANT]
-> **No affiliation.** Watchdeck is not affiliated with, authorized by, endorsed by, or in any way
-> officially connected with Google LLC or YouTube. "Google" and "YouTube" are trademarks of their
-> respective owners, used here only to identify the service the application talks to.
+> ⚠️ Disclaimer
 >
-> **Liability.** This application is provided "AS IS"; you use it at your own risk and you are
-> responsible for how you use it.
+> **No Affiliation**
+>
+> This project, and its contributors, are not affiliated with, authorized by, endorsed by, or in any way officially connected with Google LLC, YouTube, or any of their subsidiaries or affiliates. **This is an independent, non-profit, and unofficial extension developed by a team of volunteers with the goal of providing a desktop experience.**
+>
+> **Trademarks**
+>
+> The names "Google" and "YouTube", as well as related names, marks, emblems, and images, are registered trademarks of their respective owners. Any use of these trademarks is for identification and reference purposes only and does not imply any association with the trademark holder. We have no intention of infringing upon these trademarks or causing harm to the trademark holders.
+>
+> **Limitation of Liability**
+>
+> This application (extension) is provided "AS IS", and you use it at your own risk. In no event shall the developers or contributors be liable for any claim, damages, or other liability, including any legal consequences, arising from, out of, or in connection with the software or the use or other dealings in the software. The responsibility for any and all outcomes of using this software rests entirely with the user.
 
-## Status
+## Content
 
-Watchdeck is at the start of its life: the repository reset is landing and **there is no release
-build yet**. [`docs/PRD.md`](docs/PRD.md) is the source of truth for scope, verified research,
-architecture decisions and the open questions — read it first.
+- [Features](#features)
+- [Translation](#translation)
+- [Download](#download)
+- [Themes](#themes)
+- [Dev](#dev)
+- [Build your own plugins](#build-your-own-plugins)
+  - [Creating a plugin](#creating-a-plugin)
+  - [Common use cases](#common-use-cases)
+- [Build](#build)
+- [Production Preview](#production-preview)
+- [Tests](#tests)
+- [License](#license)
+- [FAQ](#faq)
 
-What v1 is meant to be:
+## Features
 
-- **Watch Later, indexed locally** — a SQLite mirror of `playlist?list=WL` with full-text search,
-  filters and grouping, plus watch-progress classification that merges YouTube's own resume
-  percentage with what the app itself has seen.
-- **Quick add** — add or remove a video from Watch Later right on its thumbnail.
-- **SponsorBlock** — segment skipping, by loading SponsorBlock's own release at runtime.
-- **Autoplay off** — enforced, not just remembered.
-- **Mouse gestures** — right-drag for volume, seeking and playback speed.
-- **Plugins** — the extension point for everything else; see [`docs/plugins.md`](docs/plugins.md).
+- the website and its player run inside a native `BrowserWindow`, with the tray, menu and shortcuts the app adds around it
+- a plugin system with `backend` (main process), `preload` and `renderer` lifecycles, per-plugin config, menu entries and hot enable/disable
+- plugins can inject CSS and JS into the page, drive the player through `#movie_player`, and talk to the app over IPC
+- plugin themes: any plugin can ship stylesheets, and you can load your own CSS
+
+## Translation
+
+Translations live in `src/i18n/resources/*.json`. Add or improve a language there and open a pull
+request — the app picks the file up by filename.
+
+## Download
+
+You can check out the [latest release](https://github.com/erikenz/watchdeck/releases/latest) to
+quickly find the latest version.
+
+## Themes
+
+You can load CSS files to change the look of the application (Options > Visual Tweaks > Themes).
 
 ## Dev
 
@@ -43,32 +72,181 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-[Devcontainers](https://containers.dev/) are supported (see `.devcontainer/`); note that GUI
-applications may not work inside some Linux containers.
+Instead of installing pnpm on your system, you can also use [devcontainers](https://containers.dev/). You can use devcontainers either as a development environment in VS Code, or as a way to easily build the project without installing dependencies on your host system.
 
-## Checks
+Note that this has it's own limitations (for example, GUI doesn't work on, at least some, Linux hosts).
 
-```bash
-pnpm check   # lint + format check + typecheck
-pnpm build   # electron-vite build
-pnpm test    # Playwright smoke test (launches the app and checks the loaded URL)
+## Build your own plugins
+
+Using plugins, you can:
+
+- manipulate the app - the `BrowserWindow` from electron is passed to the plugin handler
+- change the front by manipulating the HTML/CSS
+
+### Creating a plugin
+
+Create a folder in `src/plugins/YOUR-PLUGIN-NAME`:
+
+- `index.ts`: the main file of the plugin
+```typescript
+import style from './style.css?inline'; // import style as inline
+
+import { createPlugin } from '@/utils';
+
+export default createPlugin({
+  name: 'Plugin Label',
+  restartNeeded: true, // if value is true, Watchdeck shows the restart dialog
+  config: {
+    enabled: false,
+  }, // your custom config
+  stylesheets: [style], // your custom style,
+  menu: async ({ getConfig, setConfig }) => {
+    // All *Config methods are wrapped Promise<T>
+    const config = await getConfig();
+    return [
+      {
+        label: 'menu',
+        submenu: [1, 2, 3].map((value) => ({
+          label: `value ${value}`,
+          type: 'radio',
+          checked: config.value === value,
+          click() {
+            setConfig({ value });
+          },
+        })),
+      },
+    ];
+  },
+  backend: {
+    start({ window, ipc }) {
+      window.maximize();
+
+      // you can communicate with renderer plugin
+      ipc.handle('some-event', () => {
+        return 'hello';
+      });
+    },
+    // it fired when config changed
+    onConfigChange(newConfig) { /* ... */ },
+    // it fired when plugin disabled
+    stop(context) { /* ... */ },
+  },
+  renderer: {
+    async start(context) {
+      console.log(await context.ipc.invoke('some-event'));
+    },
+    // Only renderer available hook
+    onPlayerApiReady(api, context) {
+      // set plugin config easily
+      context.setConfig({ myConfig: api.getVolume() });
+    },
+    onConfigChange(newConfig) { /* ... */ },
+    stop(_context) { /* ... */ },
+  },
+  preload: {
+    async start({ getConfig }) {
+      const config = await getConfig();
+    },
+    onConfigChange(newConfig) {},
+    stop(_context) {},
+  },
+});
 ```
+
+### Common use cases
+
+- injecting custom CSS: create a `style.css` file in the same folder then:
+
+```typescript
+// index.ts
+import style from './style.css?inline'; // import style as inline
+
+import { createPlugin } from '@/utils';
+
+export default createPlugin({
+  name: 'Plugin Label',
+  restartNeeded: true, // if value is true, watchdeck will show a restart dialog
+  config: {
+    enabled: false,
+  }, // your custom config
+  stylesheets: [style], // your custom style
+  renderer() {} // define renderer hook
+});
+```
+
+- If you want to change the HTML:
+
+```typescript
+import { createPlugin } from '@/utils';
+
+export default createPlugin({
+  name: 'Plugin Label',
+  restartNeeded: true, // if value is true, watchdeck will show the restart dialog
+  config: {
+    enabled: false,
+  }, // your custom config
+  renderer() {
+    console.log('hello from renderer');
+  } // define renderer hook
+});
+```
+
+- communicating between the front and back: can be done using the ipcMain module from electron. See `index.ts` file and
+  example in `sponsorblock` plugin.
 
 ## Build
 
-Installers are produced with [electron-builder](https://github.com/electron-userland/electron-builder):
+1. Clone the repo
+2. Follow [this guide](https://pnpm.io/installation) to install `pnpm`
+3. Run `pnpm install --frozen-lockfile` to install dependencies
+4. Run `pnpm build:OS`
 
-- `pnpm dist:linux` — Linux (amd64), plus `dist:linux:deb-arm64` / `dist:linux:rpm-arm64`
-- `pnpm dist:mac` / `pnpm dist:mac:arm64` — macOS
-- `pnpm dist:win` — Windows
+- `pnpm dist:win` - Windows
+- `pnpm dist:linux` - Linux (amd64)
+- `pnpm dist:linux:deb-arm64` - Linux (arm64 for Debian)
+- `pnpm dist:linux:rpm-arm64` - Linux (arm64 for Fedora)
+- `pnpm dist:mac` - macOS (amd64)
+- `pnpm dist:mac:arm64` - macOS (arm64)
 
-## Production preview
+Builds the app for macOS, Linux, and Windows,
+using [electron-builder](https://github.com/electron-userland/electron-builder).
+
+### Building in devcontainer
+
+1. Clone the repo;
+2. Open the folder in VS Code;
+3. Reopen in container when prompted;
+4. Run `pnpm build` as above (choosing the desired target);
+5. Collect the built files from the `dist` folder.
+
+Since devcontainer uses a mount for the workspace, the built files will be available on the host system as well.
+
+## Production Preview
 
 ```bash
 pnpm start
 ```
 
+## Tests
+
+```bash
+pnpm test
+```
+
+Uses [Playwright](https://playwright.dev/) to test the app.
+
 ## License
 
-MIT © 2026 erikenz. Watchdeck started from an MIT-licensed project; the attribution for the code it
-inherited is kept in [NOTICE](NOTICE) and `license`.
+MIT © [erikenz](https://github.com/erikenz) — the code Watchdeck started from is MIT-licensed too,
+see [NOTICE](NOTICE) and `license` for its attribution.
+
+## FAQ
+
+### Why apps menu isn't showing up?
+
+If `Hide Menu` option is on - you can show the menu with the <kbd>alt</kbd> key (or <kbd>\`</kbd> [backtick] if using
+the in-app-menu plugin)
+
+### Is this a YouTube/Google product?
+
+No. It is an unofficial, community-built desktop client that displays the website in a window; see the disclaimer above.

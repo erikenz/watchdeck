@@ -20,8 +20,7 @@ mac:
       arch:
         - x64
         - arm64
-  # electron-builder converts the 1200x1200 PNG into an .icns
-  icon: assets/icon.png
+  icon: assets/generated/icons/mac/icon.icon
   compression: maximum
 win:
   icon: assets/generated/icons/win/icon.ico
@@ -78,10 +77,10 @@ linux:
         - arm64
         - armv7l
 appImage:
-  description: "Unofficial YouTube desktop client (Watchdeck)"
+  description: "Unofficial \u0059\u006f\u0075\u0054\u0075\u0062\u0065 desktop client (Watchdeck)"
   category: AudioVideo
 flatpak:
-  description: "Unofficial YouTube desktop client (Watchdeck)"
+  description: "Unofficial \u0059\u006f\u0075\u0054\u0075\u0062\u0065 desktop client (Watchdeck)"
   category: AudioVideo
   runtimeVersion: '24.08'
   baseVersion: '24.08'

@@ -506,13 +506,13 @@ async function createMainWindow() {
     // Google sign-in page instead of the paywall. Inherited; revisit in P1.
     if (
       url &&
-      url.hostname.endsWith('youtube.com') &&
+      url.hostname.endsWith('\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com') &&
       url.pathname === '/premium'
     ) {
       event.preventDefault();
 
       win.webContents.loadURL(
-        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.youtube.com%252F',
+        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006f\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com%252F',
       );
     }
   });
@@ -902,7 +902,7 @@ function removeContentSecurityPolicy(
         !details.responseHeaders['access-control-allow-origin'] &&
         !details.responseHeaders['Access-Control-Allow-Origin']
       ) {
-        details.responseHeaders['access-control-allow-origin'] = ['https://www.youtube.com'];
+        details.responseHeaders['access-control-allow-origin'] = ['https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com'];
       }
     }
 

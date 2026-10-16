@@ -4,6 +4,8 @@
 **Revision 4** — P0 work has begun: the project folder is renamed and the repository is published, the music-only plugin
 inventory is deleted, and the §R8 debrand gate passes. Decisions and open questions are unchanged; §8 and §15 list what
 is left in P0.
+**Revision 5** — owner review of the P0 diff: the `\u` escapes stay in code and package metadata (§R8), `auto-changelog`
+and the upstream-shaped CI (including the winget workflows) are kept, and the README keeps the upstream section layout.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -635,8 +637,17 @@ name and `ytmd-` DOM id (one new prefix, matching the chosen name), the `pear-tr
 the "not affiliated with Google/YouTube" disclaimer), `license` + a `NOTICE`/credits section that **keeps** the upstream
 MIT attribution text, `changelog.md` (delete), `renovate.json` (rewrite), `.github/workflows/winget-*.yml` (delete),
 `web/screenshot.png`, `assets/icon.svg` + `assets/generated/**` (new icon set), `assets/error.html` text,
-`tests/index.test.js` (assert `https://www.youtube.com`), and the lingering `\u0079\u006f\u0075\u0074\u0075\u0062\u0065`
-escapes (replace with plain strings). `.devcontainer/` is fine as-is.
+`tests/index.test.js` (assert `https://www.youtube.com`). `.devcontainer/` is fine as-is.
+
+**On the escapes (rev 5, owner's call).** Revision 1 proposed replacing the `\u0079\u006f\u0075\u0074\u0075\u0062\u0065`
+escapes with plain strings. They stay instead, and for a reason worth recording: the upstream fork introduced them in the
+same commit that renamed the app (upstream `ffa61687` "chore: improve readability", which turned `youtube-music` /
+`YouTube Music` into `pear-music` / `Pear Desktop` and dropped a YouTube-related dependency), so they are a deliberate
+de-trademarking pass after a claim by Google, not an accident. The convention kept here is upstream's: **code and package
+metadata** (`src/**`, `tests/**`, `package.json`, `electron-builder.yml`, `electron.vite.config.mts`) carry the escapes,
+while **docs, forms and attribution** (README, `docs/`, `.github/`, `license`, `NOTICE`) stay readable, and third-party
+names such as the `youtubei.js` dependency are untouched. This is textual only — the strings are identical at runtime —
+so it costs greppability, which is the accepted trade.
 
 Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytmd|youtube-music|th-ch' --exclude-dir=node_modules
 --exclude-dir=.git .` returns only the attribution/license lines.
@@ -826,12 +837,13 @@ conversation. The research behind it happened in one Delta thread, which was clo
 - **Still open:** §13 Q2–Q6, Q9, Q12 — plugin-inventory strategy, Watch Later UI surface, hover-button size/badge handling,
   thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
 - **Next step:** finish phase **P0** in §8, then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
-- **P0 progress (revision 4).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, placeholder icon
-  set, rewritten README/CI, `NOTICE` + MIT attribution kept) with `tools/identity-gate.sh` green; the music-only plugin
-  inventory deleted (R5 "delete outright" + the orphan `audio-compressor.ts`) together with its i18n blocks and the code that
-  referenced it; `.npmrc` with `save-exact=true`; `pnpm typecheck`, `pnpm build` and `pnpm test` (smoke test against
-  `www.youtube.com`) verified locally. Still to do in P0: `ultracite init` with the verified toolchain (§5.3), the package
-  version sweep (§R6), `docs/plugins.md`, the app URL/provider rework that P1 owns, and the Q2 answer that decides the fate of
-  the 24 plugins kept in-tree.
+- **P0 progress (revision 5).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, replaced icon
+  set, `NOTICE` + MIT attribution kept) with `tools/identity-gate.sh` green; the music-only plugin inventory deleted
+  (R5 "delete outright" + the orphan `audio-compressor.ts`) together with its i18n blocks and the code that referenced it;
+  `.npmrc` with `save-exact=true`; `pnpm typecheck`, `pnpm build` and `pnpm test` (smoke test against `www.youtube.com`)
+  verified locally. After owner review the escapes were restored in code/metadata (§R8), `auto-changelog` and the
+  upstream-shaped CI (matrix build + release job, `winget-*` workflows) came back, and the README follows the upstream
+  section layout. Still to do in P0: `ultracite init` with the verified toolchain (§5.3), the package version sweep (§R6),
+  `docs/plugins.md`, and the Q2 answer that decides the fate of the 24 plugins kept in-tree.
 
 When the project folder is renamed (§11), update the paths in §11 and §15 rather than leaving them stale.

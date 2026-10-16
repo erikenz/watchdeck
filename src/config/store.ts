@@ -105,7 +105,7 @@ const migrations = {
     const listenAlong = store.get('plugins.discord.listenAlong');
     if (listenAlong !== undefined) {
       store.set(
-        'plugins.discord.playOnYouTubeMusic',
+        'plugins.discord.playOn\u0059\u006f\u0075\u0054\u0075\u0062\u0065Music',
         listenAlong,
       );
       store.delete('plugins.discord.listenAlong');

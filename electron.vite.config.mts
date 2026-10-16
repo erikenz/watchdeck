@@ -132,7 +132,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       cors: {
-        origin: 'https://www.youtube.com',
+        origin: 'https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com',
       },
     },
   };

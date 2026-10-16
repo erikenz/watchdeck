@@ -95,7 +95,7 @@ const handleData = async (
     songInfo.playlistId =
       URL.parse(microformat.urlCanonical)?.searchParams?.get('list') ?? '';
     if (microformat.pageOwnerDetails?.externalChannelId) {
-      songInfo.artistUrl = `https://www.youtube.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
+      songInfo.artistUrl = `https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com/channel/${microformat.pageOwnerDetails.externalChannelId}`;
     }
     // Used for options.resumeOnStart
     config.set('url', microformat.urlCanonical);

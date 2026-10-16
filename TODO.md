@@ -24,6 +24,8 @@ These four are held at the version the current code is written against. Each one
 
 - [ ] **`pnpm test` cannot attach to the page without a window manager** (this sandbox): `firstWindow()` never resolves — for this app _and_ for the commit before it. The window is created and titled correctly, which the launch test asserts. The page load assertion is `test.fixme` in `tests/index.test.js`; drop the `.fixme` where `pnpm dev` shows the site (a real desktop, or xvfb in CI).
 
+- [ ] **Port 9222 is single-owner.** `pnpm dev:debug` asks for it because that is where a Chrome DevTools MCP looks by default, so a Chrome started with `--remote-debugging-port=9222` takes it from the app: Chromium does not report the failed bind, and the MCP then drives that Chrome instead of the app. The app now says which case it is at startup (`remote debugging ready` versus `port 9222 answers, but not for this app`); close the other browser or pass `WATCHDECK_REMOTE_DEBUG=<free port>`.
+
 - [ ] **Killing a running app needs the right name, and it differs by build**: only the packaged app renames its process, so `pkill -x watchdeck` works there; a `pnpm dev` instance is still called `electron` (`pkill -x watchdeck` silently does nothing to it — check `/proc/<pid>/comm` if unsure). `pkill -x electron` is too broad, and `pkill -f "electron ."` can match the shell you are typing in, so kill the dev instance by pid or with `pkill -f "[e]lectron/dist/electron [.]"`. A leftover instance holds the CDP port and the single-instance lock, which makes the next launch fail quietly (and makes `pnpm test` fail in `launchApp`).
 
 Resolved, and worth remembering:

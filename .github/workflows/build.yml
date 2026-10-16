@@ -57,9 +57,10 @@ jobs:
       - name: Upstream identity gate
         run: bash tools/identity-gate.sh
 
-      # Only vite build without release if it is a fork, or it is a pull-request
+      # The launch test starts the built app, so the build has to happen here - it used to be
+      # limited to pull requests, which left pushes testing an app that was never built.
       - name: Vite Build
-        if: github.repository == 'erikenz/watchdeck' && github.event_name == 'pull_request'
+        if: github.repository == 'erikenz/watchdeck'
         run: |
           pnpm build
 

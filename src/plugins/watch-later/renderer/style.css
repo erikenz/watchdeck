@@ -25,7 +25,10 @@
     background-color 120ms ease;
 }
 
+/* Hovering the card shows the button; so does the site's preview playing over it, because that
+   overlay takes the pointer and the card stops being hovered while it is up. */
 .wd-wl-anchor:hover .wd-wl-save,
+.wd-wl-anchor.wd-wl-preview-open .wd-wl-save,
 .wd-wl-save:focus-visible {
   opacity: 1;
 }
@@ -63,9 +66,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-/* While the inline preview plays, its own button is the one on screen. */
-.wd-wl-anchor.wd-wl-preview-open > .wd-wl-save {
-  display: none;
 }

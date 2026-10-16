@@ -77,29 +77,51 @@ export const videoIdFromHost = (host: Element): string | undefined => {
 };
 
 /**
- * The element that actually paints the video for a card. Cards wrap their thumbnail (and,
- * on hover, the inline preview) in boxes with their own padding, so anchoring the button to
- * the card's corner puts it in the gap beside the video instead of on it.
+ * The element that actually paints the video for a card. Cards wrap their thumbnail in boxes
+ * with their own padding, so anchoring the button to the card's corner puts it in the gap
+ * beside the video instead of on it. The thumbnail box is preferred over the `<img>` inside it:
+ * the site swaps that image around (and hides it behind its preview), while the box it lives in
+ * keeps the video's footprint.
  */
-const mediaOf = (host: Element): Element | undefined =>
+export const mediaOf = (host: Element): Element | undefined =>
+  host.querySelector("ytd-thumbnail, yt-thumbnail-view-model, #thumbnail") ??
   host.querySelector(
     "#video-preview, ytd-video-preview, #inline-preview-player, #mouseover-overlay, img"
-  ) ?? undefined;
+  ) ??
+  undefined;
 
 /**
- * The site's inline preview: it replaces the thumbnail with a surface of its own, often
- * outside the card, so it gets its own button (the card's is hidden while it plays).
+ * The site's inline preview. Hidden, it is still in the document, keeps the geometry it last had
+ * and reports `opacity: 0`; it becomes visible and interactive - `pointer-events: auto` - through
+ * its own `active` attribute. It is one shared element the site moves over whichever card is
+ * hovered, never part of the card's markup, which is why it gets no button of its own: a button
+ * inside it would be painted by the site's player instead of above it, and until the preview
+ * plays the overlay does not even take the pointer.
  */
-export const PREVIEW_SELECTOR = [
-  "#video-preview",
-  "#inline-preview-player",
-  "ytd-video-preview",
-  ".ytdVideoPreviewLoaderVideoPreviewContainer",
-].join(",");
+export const PREVIEW_SELECTOR = "ytd-video-preview";
+
+/** Set on the card the preview is covering, for as long as it covers it. */
+export const PREVIEW_OPEN_CLASS = "wd-wl-preview-open";
+
+/** The preview while it is actually on screen, `undefined` when there is none. */
+export const shownPreview = (): Element | undefined => {
+  const preview = document.querySelector(PREVIEW_SELECTOR);
+  if (!preview) {
+    return undefined;
+  }
+  // The site's own signal first, then what it looks like: a preview the site has put away keeps
+  // its last geometry and is only faded out, so size alone would say it is still there.
+  if (preview.matches("[active], [playing]")) {
+    return preview;
+  }
+  const box = preview.getBoundingClientRect();
+  const painted = Number.parseFloat(getComputedStyle(preview).opacity) > 0;
+  return painted && box.width > 60 && box.height > 60 ? preview : undefined;
+};
 
 /**
  * Puts the button in the bottom-right corner of the video itself, clear of what sits there:
- * the duration badge on a thumbnail, the control bar on the inline preview.
+ * the duration badge on a thumbnail, the control bar of the preview playing over the card.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
   const media = mediaOf(host) ?? host;
@@ -108,10 +130,7 @@ export const alignButton = (button: HTMLButtonElement, host: Element) => {
   if (mediaRect.width < 40 || mediaRect.height < 30) {
     return;
   }
-  const isPlayingSurface = media.matches(
-    "video, #video-preview, ytd-video-preview"
-  );
-  const clearance = (isPlayingSurface ? 56 : 28) + 8;
+  const clearance = (host.classList.contains(PREVIEW_OPEN_CLASS) ? 56 : 28) + 8;
   button.style.right = `${Math.max(4, Math.round(hostRect.right - mediaRect.right) + 8)}px`;
   button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - mediaRect.bottom) + clearance)}px`;
 };

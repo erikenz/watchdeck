@@ -18,8 +18,11 @@ import {
   createSaveButton,
   HOST_CLASS,
   isThumbnailHost,
+  mediaOf,
   paintButton,
+  PREVIEW_OPEN_CLASS,
   PREVIEW_SELECTOR,
+  shownPreview,
   THUMBNAIL_HOST_SELECTOR,
   videoIdFromHost,
 } from "./dom";
@@ -40,6 +43,16 @@ import Toolbar from "./ui/toolbar";
 /** How often the local high-water mark is reported while something plays. */
 const PROGRESS_INTERVAL_MS = 5000;
 
+const overlapArea = (one: DOMRect, other: DOMRect) =>
+  Math.max(
+    0,
+    Math.min(one.right, other.right) - Math.max(one.left, other.left)
+  ) *
+  Math.max(
+    0,
+    Math.min(one.bottom, other.bottom) - Math.max(one.top, other.top)
+  );
+
 type Ipc = RendererContext<WatchLaterPluginConfig>["ipc"];
 
 export const renderer = {
@@ -50,6 +63,7 @@ export const renderer = {
   observer: null as MutationObserver | null,
   pending: new Set<string>(),
   scanQueued: false,
+  previewMarkQueued: false,
   lastProgressSentAt: 0,
   sessionIndexAttempts: 0,
   toolbarHost: null as HTMLElement | null,
@@ -58,6 +72,9 @@ export const renderer = {
   context: null as RendererContext<WatchLaterPluginConfig> | null,
   videoDataListener: null as ((event: Event) => void) | null,
   timeUpdateListener: null as ((event: Event) => void) | null,
+  previewCard: null as Element | null,
+  previewObserved: null as Element | null,
+  previewObserver: null as MutationObserver | null,
 
   async start(context: RendererContext<WatchLaterPluginConfig>) {
     this.ipc = context.ipc;
@@ -213,6 +230,10 @@ export const renderer = {
       this.cardEnterListener = null;
     }
     this.hoveredCard = null;
+    this.previewObserver?.disconnect();
+    this.previewObserver = null;
+    this.previewObserved = null;
+    this.unmarkPreview();
     this.toolbarHost?.remove();
     this.toolbarHost = null;
     this.filter = null;
@@ -313,9 +334,10 @@ export const renderer = {
       !this.config?.showHoverButton ||
       (this.config.enhancePage && isWatchLaterPage())
     ) {
+      this.unmarkPreview();
       return;
     }
-    this.scanPreview();
+
     for (const host of document.querySelectorAll(THUMBNAIL_HOST_SELECTOR)) {
       if (!isThumbnailHost(host)) {
         continue;
@@ -354,47 +376,111 @@ export const renderer = {
         passive: true,
       });
     }
+    this.markPreview();
   },
 
   /**
-   * The inline preview covers the card it belongs to, so it carries its own button and the
-   * card's is hidden while it is up. Same state, same click, just where the pointer is.
+   * The site plays its inline preview in one overlay it moves over the hovered card. While that
+   * overlay is up it takes the pointer (`ytd-video-preview[active]` is `pointer-events: auto`),
+   * so the card is no longer `:hover`ed and a button that follows `:hover` fades out exactly
+   * while the user is looking at it. Marking the covered card keeps its button up, and clear of
+   * the player's control bar, for as long as the overlay is there.
    */
-  scanPreview() {
-    const previews = [...document.querySelectorAll(PREVIEW_SELECTOR)];
-    const showing = previews.find(
-      (preview) => preview.getBoundingClientRect().height > 60
+  markPreview() {
+    const preview = shownPreview();
+    const card = preview ? this.cardUnderPreview(preview) : null;
+    this.observePreview();
+    if (card === this.previewCard) {
+      return;
+    }
+    this.markCard(this.previewCard, false);
+    this.previewCard = card;
+    this.markCard(card, true);
+  },
+
+  /** The mark decides how high the button sits, so the button is put back in place with it. */
+  markCard(card: Element | null, covered: boolean) {
+    if (!card) {
+      return;
+    }
+    card.classList.toggle(PREVIEW_OPEN_CLASS, covered);
+    const button = card.querySelector<HTMLButtonElement>(
+      `:scope > .${BUTTON_CLASS}`
     );
+    if (button) {
+      alignButton(button, card);
+    }
+  },
+
+  /**
+   * The preview shows and hides by setting attributes on itself, which the document observer
+   * (structure only) never sees; that one element gets an observer of its own. Buttons left in
+   * it by an older build are dropped: this overlay is not a host any more.
+   */
+  observePreview() {
+    const preview = document.querySelector(PREVIEW_SELECTOR);
+    if (preview && this.previewObserved !== preview) {
+      this.previewObserver ??= new MutationObserver(() =>
+        this.queuePreviewMark()
+      );
+      this.previewObserver.disconnect();
+      this.previewObserver.observe(preview, {
+        attributeFilter: ["active", "playing", "style"],
+        attributes: true,
+      });
+      this.previewObserved = preview;
+    }
+    if (this.previewObserved) {
+      for (const stray of this.previewObserved.querySelectorAll(
+        `.${BUTTON_CLASS}`
+      )) {
+        stray.remove();
+      }
+    }
+  },
+
+  /** The card the preview is sitting on: the one under the pointer, or the one it covers. */
+  cardUnderPreview(preview: Element): Element | null {
+    const box = preview.getBoundingClientRect();
+    const hovered = this.hoveredCard;
+    if (hovered?.isConnected) {
+      const media = mediaOf(hovered);
+      if (media && overlapArea(media.getBoundingClientRect(), box) > 0) {
+        return hovered;
+      }
+    }
+    // While it plays the preview is the element under the pointer, so no card is hovered and
+    // the one it was opened from has to be found by geometry.
+    let found: Element | null = null;
+    let foundArea = 0;
     for (const card of document.querySelectorAll(`.${HOST_CLASS}`)) {
-      card.classList.toggle("wd-wl-preview-open", Boolean(showing));
+      const media = mediaOf(card);
+      const area = media ? overlapArea(media.getBoundingClientRect(), box) : 0;
+      if (area > foundArea) {
+        found = card;
+        foundArea = area;
+      }
     }
-    if (!showing) {
+    return found;
+  },
+
+  unmarkPreview() {
+    for (const card of document.querySelectorAll(`.${PREVIEW_OPEN_CLASS}`)) {
+      card.classList.remove(PREVIEW_OPEN_CLASS);
+    }
+    this.previewCard = null;
+  },
+
+  /** Marks are geometry, and geometry changes without a structure change: coalesce them. */
+  queuePreviewMark() {
+    if (this.previewMarkQueued) {
       return;
     }
-    // The preview belongs to the card the pointer is over; its own markup does not always
-    // carry the video id (the card is the reliable source).
-    const previewCard = cardOf(showing);
-    const videoId =
-      videoIdFromHost(showing) ??
-      (this.hoveredCard ? videoIdFromHost(this.hoveredCard) : undefined) ??
-      (previewCard ? videoIdFromHost(previewCard) : undefined);
-    if (!videoId) {
-      return;
-    }
-    const existing = showing.querySelector<HTMLButtonElement>(
-      `.${BUTTON_CLASS}`
-    );
-    if (existing) {
-      alignButton(existing, showing);
-      this.paint(existing);
-      return;
-    }
-    const button = createSaveButton(videoId, (button_) => {
-      this.toggle(button_).catch(() => undefined);
+    this.previewMarkQueued = true;
+    requestAnimationFrame(() => {
+      this.previewMarkQueued = false;
+      this.markPreview();
     });
-    showing.append(button);
-    alignButton(button, showing);
-    this.paint(button);
   },
 
   /** The list inside our own UI must not grow buttons. */
@@ -471,9 +557,16 @@ export const renderer = {
 
   onCardEnter(event: Event) {
     const target = event.target;
-    if (target instanceof Element) {
-      this.hoveredCard = cardOf(target);
+    if (!(target instanceof Element)) {
+      return;
     }
+    // The preview is the pointer's target while it plays, so this may be no card at all: keep
+    // the last one instead of forgetting which card the pointer came from.
+    const card = cardOf(target);
+    if (card) {
+      this.hoveredCard = card;
+    }
+    this.queuePreviewMark();
   },
 
   onResize() {

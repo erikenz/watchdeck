@@ -3,8 +3,13 @@ import process from "node:process";
 
 import { test, expect, _electron as electron } from "@playwright/test";
 
-process.env.NODE_ENV = "test";
-
+/**
+ * Deliberately *not* `NODE_ENV=test`: that switch turns on `webPreferences.sandbox`, and
+ * with it the window never leaves `loading: true` - an empty URL for as long as you watch
+ * it, measured here and in CI's shape of the same session - while the configuration the app
+ * ships (`sandbox: false`, docs/PRD.md §3.3) loads the site at once. A smoke test that
+ * runs a configuration which cannot load a page cannot smoke-test anything.
+ */
 const appPath = path.resolve(import.meta.dirname, "..");
 
 const launchApp = () =>
@@ -48,27 +53,49 @@ test("Watchdeck App - launches, with a window titled after the app", async () =>
 });
 
 /**
- * The page load itself needs a session where Chromium can attach a renderer to the
- * window (a real desktop, or xvfb in CI). On a bare X display without a window
- * manager - a sandbox, or a headless build host - `firstWindow()` never resolves for
- * either this app or the code before it, so the assertion lives here, marked fixme,
- * until it can run: drop the `.fixme` on a machine where `pnpm dev` shows the site.
+ * The smoke test for the page itself. It asks the main process to run the checks inside
+ * the window, because attaching to the page with Playwright needs a session that can
+ * hand a renderer to a window (a desktop, or xvfb in CI) - `firstWindow()` never
+ * resolves on a bare X display, while `webContents.executeJavaScript` always does.
+ *
+ * What it catches, in order of how bad it is: the app falling back to its error page, the
+ * preload not exposing the bridge, and the injected page bundle not running - the last two
+ * mean no playback bridge, no plugins and no hover button.
  */
-test.fixme("the launched window shows the site", async () => {
+test("the launched window shows the site, with the app's page half running", async () => {
   const app = await launchApp();
-  const window = await app.firstWindow();
 
-  const consentForm = await window.$(
-    "form[action='https://consent.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com/save']"
+  const inPage = async (source) =>
+    await app.evaluate(async ({ BrowserWindow }, code) => {
+      const [window] = BrowserWindow.getAllWindows();
+      return await window?.webContents.executeJavaScript(String(code));
+    }, source);
+
+  const readUrl = async () =>
+    (
+      await app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows().map((win) => win.webContents.getURL())
+      )
+    )[0] ?? "";
+
+  await expect
+    .poll(readUrl, { timeout: 30_000 })
+    .toContain("://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com");
+
+  // A consent wall is the one page that is not the site and not a failure
+  await inPage(
+    "document.querySelector(\"form[action*='consent.'] button\")?.click()"
   );
-  if (consentForm) {
-    await consentForm.click("button");
-  }
 
-  const url = window.url();
-  expect(
-    url.startsWith("https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com")
-  ).toBe(true);
+  await expect
+    .poll(
+      async () =>
+        await inPage(
+          '[typeof window.mainConfig, typeof customElements.get("wd-trans")].join(",")'
+        ),
+      { timeout: 30_000 }
+    )
+    .toBe("object,function");
 
   await app.close();
 });

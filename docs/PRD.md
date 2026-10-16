@@ -1,7 +1,9 @@
 # PRD — YouTube desktop wrapper (working title: **Watchdeck**)
 
 **Status:** draft for approval — **no implementation has started**.
-**Revision 2** — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
+**Revision 3** — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
+**Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
+**Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
 **Author:** Delta agent, for erikenz.
 **Source of truth for:** scope, verified research, architecture decisions, open questions.
 
@@ -33,7 +35,7 @@ plugins for YouTube.
 
 | # | Topic | Recommendation | Needs your answer? |
 |---|-------|----------------|--------------------|
-| D1 | Project name | **Watchdeck** (same domain, same criteria; alternates: Videck, Playdeck, Porthole) | **yes — Q1** |
+| D1 | Project name | **Watchdeck** — decided (chosen over Lounge; `lounge` on npm is The Lounge IRC client, `watchdeck` is free) | no (Q1 answered) |
 | D2 | YouTube Music support | Drop it entirely; target `www.youtube.com` only | **yes — Q2** |
 | D3 | Plugin inventory | Delete the YTM-only plugins; ship a documented plugin API + authoring guide in P0 so contributors can add their own | **yes — Q2** |
 | D4 | Watch Later storage | SQLite via built-in `node:sqlite` (FTS5 verified on Node 24); DB owned by the main process | no (impl detail) |
@@ -46,7 +48,7 @@ plugins for YouTube.
 | D10 | Gestures | Own pointer-state tracking + wheel/pointer movement; right-drag = volume, right-drag horizontal = seek, shift+right-drag = speed | **yes — Q6** |
 | D11 | Lint/format | `pnpm dlx ultracite init --linter oxlint --pm pnpm --frameworks solid --type-aware` (command you specified), replacing `.oxlintrc.json`/`.oxfmtrc.json`; documented suppression list for type-aware rules that even the prototype had to disable | no (Q8 answered) |
 | D12 | Versions | Exact pins everywhere (already the case) + `save-exact=true`; no pre-release pins — stable equivalents exist for all of them | no — resolved in §5.5 |
-| D13 | Git history | Re-init in **your** checkout (`~Projects/youtube-client`), not in the Delta worktree (see §11) | **yes — Q10** |
+| D13 | Git history | **Done**: fresh repo `main` @ `6007aa4` in `~/Projects/youtube-client`, no remotes, upstream `.git` backed up; project-folder rename to `~/Projects/watchdeck` pending (§11) | no (Q10 done) |
 
 ---
 
@@ -655,7 +657,7 @@ usable player; P2 is the requested core feature; P3 is independent and can be pa
 
 ## 9. Non-goals (v1)
 
-- YouTube Music support (see Q2).
+- YouTube Music support (§R5).
 - Account switching / multiple accounts (Q12).
 - Importing YouTube's own history or resume positions; downloading/offline; sync between machines (the DB is local).
 - SponsorBlock segment submission/voting (only if the plugin ends up loading the real extension, where it comes for
@@ -680,31 +682,51 @@ usable player; P2 is the requested core feature; P3 is independent and can be pa
 
 ---
 
-## 11. Git reset plan (your call — Q10)
+## 11. Git state, and moving the project to `watchdeck`
 
-Your local checkout is `~/Projects/youtube-client` with remotes `local` (itself, used by Delta) and
-`origin → https://github.com/pear-devs/pear-desktop.git`, i.e. **all upstream history** (and ~40 MB of packfile and
-thousands of commits of pear-desktop/YouTube-Music history) is what we would be deleting.
+**Done in this thread** (so nothing here needs redoing):
 
-I recommend doing the reset **in your own checkout**, after P0 content is ready, not inside the Delta worktree:
+- `~/Projects/youtube-client` was re-initialised: upstream history and the `pear-devs/pear-desktop` remote are gone; one
+  commit on `main`, `6007aa4` "chore: initial commit" (416 files: the pear-desktop skeleton plus this PRD), followed by a
+  second commit that refreshes this document; **no remote** is configured yet.
+- The old `.git` was moved out of the repo (never committed) to `~/Projects/.youtube-client-git-backup-pear-desktop`
+  (25 MB). Delete it once you are satisfied: `rm -rf ~/Projects/.youtube-client-git-backup-pear-desktop`.
+- The prototype is already renamed: `~/Projects/watchdeck` → `~/Projects/watchdeck-old`.
+- Delta's checkout directory inside the repo (`/.delta/`) is excluded through `.git/info/exclude` so it cannot be staged.
+
+**Remaining, in this order.** Run these only when this thread's work is finished — Delta keeps this thread's checkout
+and a clone inside `~/Projects/youtube-client/.delta/`, and their internal paths are absolute, so a rename while the thread
+is in use makes Delta show a checkout/preparation error (the conversation itself is safe — it lives in Delta's own storage,
+not in the folder).
 
 ```bash
-cd ~/Projects/youtube-client
-rm -rf .git                                  # irreversible: upstream history + remotes go away
-git init -b main
-git add -A
-git commit -m "chore: initial commit — YouTube desktop wrapper (forked structure from pear-desktop)"
+# 1. move the project to its final name
+cd ~/Projects
+mv youtube-client watchdeck
+
+# 2. remove Delta's per-thread checkout machinery (it is rebuilt for the next thread)
+rm -rf ~/Projects/watchdeck/.delta
+
+# 3. verify: one commit, clean tree, no remotes
+cd ~/Projects/watchdeck
+git log --oneline && git status --short && git remote -v
 ```
 
-Why not inside the worktree: Delta tracks this worktree through the git `local` remote; deleting `.git` here would break
-this thread's ability to show diffs/sync your checkout (I would have to recreate a repo that Delta then re-attaches —
-possible, but I would rather not make your checkout diverge from the thread).
-Alternative if you prefer me to do it here: I create the fresh repo in a subdirectory/another path and you copy it —
-or you explicitly accept that this thread's worktree link may break.
+The new repository has **no remote on purpose** (the point was to drop pear-desktop's). Delta identifies a project by its
+Git remote and a project without one cannot be synced or joined, so add the real one as soon as the GitHub side exists:
 
-Also part of the reset: drop `origin` (and any fork references), set the license copyright line to you while retaining
-upstream attribution in a `NOTICE`/`CREDITS` section of the README, and delete inherited release artifacts
-(`changelog.md`, winget workflows, AUR/spoon references).
+```bash
+# 4. free the name held by the prototype, then publish the new repo
+gh repo rename watchdeck-old -R erikenz/watchdeck --yes        # prototype repo keeps its code; GitHub redirects
+gh repo create erikenz/watchdeck --private --source=. --remote=origin --push
+#    (use --public when the debrand is done and the README is ready to be read by strangers)
+```
+
+If the history should not be published yet, `git remote add origin git@github.com:erikenz/watchdeck.git` alone is enough
+to make the project attachable in Delta; push later.
+
+Still part of the reset: keep upstream attribution (MIT) in the README/`license`, set your own copyright line, and delete
+inherited release artifacts (`changelog.md`, winget workflows, AUR/scoop references).
 
 ---
 
@@ -741,39 +763,39 @@ AppUserModelID, tray tooltips, window title, DB filename, IPC/DOM prefixes, and 
 I kept the original question ids so the cross-references elsewhere in this document still resolve. "Answered" means your
 review already settled it; "open" means I need an answer — a single "yes to the open ones" works.
 
-**Answered by your review** (no action unless you disagree):
+**Answered** (your review or this thread's work already settled these; no action unless you disagree):
 
+- **Q1 Name → Watchdeck.** Chosen over Lounge: `lounge` on npm is taken by The Lounge (the self-hosted IRC client),
+  `watchdeck` is unpublished, and the name describes the domain rather than a feature. The prototype folder was renamed to
+  `watchdeck-old`; the GitHub repo name still has to be freed (§11).
 - **Q7 SponsorBlock** → §5.1 revised: load the official release at runtime with a compat shim as the primary path, spike
   first; native client as the fallback.
 - **Q8 Ultracite** → setup via `ultracite init` exactly as you instructed (§5.3).
 - **Q8b** → drop the inherited custom lint config in favour of Ultracite's presets + oxfmt formatting (implied by the above).
 - **Q8c** → pre-release toolchain pins go; stable equivalents exist (§5.5).
+- **Q10 Git reset** → done in this thread, including the upstream history backup; only the project-folder rename and the
+  GitHub remote are left (§11).
 - **Q11 tests** → `vitest` (your prototype uses it; Ultracite ships a preset).
 - **Debrand** → confirmed as a phase-0 gate with the grep acceptance check (§R8), including the upstream update feed.
 
 **Open:**
 
-1. **Q1 — Name.** Confirm **Watchdeck**, or pick **Videck** / **Porthole** / **Watchpad**, or ask me for a fresh set that
-   does not reuse the prototype's name. This is the only hard blocker for P0 (it feeds `appId`, IPC/DOM prefixes, DB name,
-   packaging identity).
-2. **Q2 — Plugin inventory.** Given your "public FOSS app, contributors will want other things" point: keep the plan of
+1. **Q2 — Plugin inventory.** Given your "public FOSS app, contributors will want other things" point: keep the plan of
    *deleting* the YTM-only plugins and shipping a documented plugin API + authoring guide (my recommendation, §R5), or keep
    the zero-YTM-coupling plugins in-tree as-is (cheaper now, more maintenance and Ultracite churn later)?
-3. **Q3 — Watch Later UI.** My recommendation: a dedicated Library window for v1 plus a small in-page surface (hover
+2. **Q3 — Watch Later UI.** My recommendation: a dedicated Library window for v1 plus a small in-page surface (hover
    button, progress reporting), and the `/playlist?list=WL` takeover in a later phase. Your prototype went in-page first —
    confirm or override.
-4. **Q4 — Hover button.** Reference size: player-control look (40×40, measured on the live page) or thumbnail-overlay look
+3. **Q4 — Hover button.** Reference size: player-control look (40×40, measured on the live page) or thumbnail-overlay look
    (~28 px with a 24 px icon, as the prototype built)? And the duration badge: shift it left (my recommendation) or cover it?
-5. **Q5 — Thresholds and progress merge.** Confirm defaults (continue watching ≥2 min or ≥5 %; watched ≥90 % or the
+4. **Q5 — Thresholds and progress merge.** Confirm defaults (continue watching ≥2 min or ≥5 %; watched ≥90 % or the
    "Watched" badge) and the `max(local, YouTube)` merge rule of §4.3 — or tell me to prefer one source only (e.g. local
    only, so another device cannot mark your items watched).
-6. **Q6 — Gestures.** Confirm right+wheel → volume (the one you named) plus right-drag vertical → volume, right-drag
+5. **Q6 — Gestures.** Confirm right+wheel → volume (the one you named) plus right-drag vertical → volume, right-drag
    horizontal → seek, shift+right-drag → speed. Anything else from "and others"?
-7. **Q9 — Metadata enrichment.** OK to fetch full details (description, tags, channel, duration) for every Watch Later video
+6. **Q9 — Metadata enrichment.** OK to fetch full details (description, tags, channel, duration) for every Watch Later video
    via InnerTube, batched and rate-limited, or should descriptions be lazy?
-8. **Q10 — Git reset.** You run the reset in your checkout (my recommendation, §11), or I do it in this worktree and accept
-   that the thread's worktree link may break? Branch name `main`?
-9. **Q12 — Accounts.** v1 assumes the browser session's active account (multi-account switching is a known InnerTube mess).
+7. **Q12 — Accounts.** v1 assumes the browser session's active account (multi-account switching is a known InnerTube mess).
    Acceptable?
 
 ---
@@ -787,4 +809,43 @@ review already settled it; "open" means I need an answer — a single "yes to th
 - `src/reset.d.ts` (ts-reset) plus `@total-typescript/ts-reset` are unused in config-visible ways; verify before keeping.
 - `assets/error.html` + the `did-fail-load` handler load a local error page — worth keeping, but its text should be
   rebranded.
-- `docs/PRD.md` (this file) is the only documentation change in this step; nothing else in the worktree was modified.
+- `docs/PRD.md` (this file) and the git reset described in §11 are the only changes this thread made to the project; no
+  application code was touched.
+
+---
+
+## 15. Provenance and handoff (read this first in a new thread)
+
+This document is the continuation point: a new thread should be able to pick the project up from here without the original
+conversation. The research behind it happened in one Delta thread, which was closed rather than carried forward.
+
+- **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt)
+  — Delta thread id `ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt`. If its transcript is needed:
+  `delta thread show --format summarize ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt` (persisted copy;
+  the live conversation is only readable while it is open). No subthreads or forks were created — this PRD is the only
+  artifact deliberately carried over.
+- **Participants:** erikenz (owner) with the Delta agent. Research date: October 2026.
+- **Where the code lived during research:** a Delta managed checkout inside the project folder
+  (`~/Projects/youtube-client/.delta/worktrees/…/pear-desktop`). That is why §11 sequences the folder rename *after* this
+  thread's work ends: the checkout and its clone are keyed by absolute paths.
+- **Repo state handed over:** branch `main`: the initial commit `6007aa4` "chore: initial commit" (416 files) plus a
+  follow-up commit that updates this document — **no git remote yet**. See §11 for the move and GitHub steps.
+- **Upstream history backup (safe to delete):** `~/Projects/.youtube-client-git-backup-pear-desktop` (25 MB) — the only
+  remaining copy of the pear-desktop/YouTube-Music history that was deliberately dropped.
+- **Discarded prototype (read-only reference):** `~/Projects/watchdeck-old` (formerly `~/Projects/watchdeck`), reviewed in
+  §3.4. Its GitHub repo is still `github.com/erikenz/watchdeck`, which is why §11 frees that name before the new project
+  publishes.
+- **Where the evidence lives:** measured YouTube facts in §3.2 and §3.4 (DOM metrics, player API surface, playlist
+  payloads, extension-loading behaviour); decisions and their reasoning in §5; the designs they imply in §7.
+- **Decisions already made** (do not reopen without a reason): name **Watchdeck**; target `www.youtube.com` only and drop
+  YouTube Music; delete the YTM-only plugin inventory while shipping a documented plugin API (§R5); SponsorBlock by loading
+  the official release at runtime with a compat shim, native client as fallback after a spike (§5.1); Ultracite through
+  `ultracite init` with the verified toolchain set (§5.3, §5.5); debrand as a phase-0 gate including the update feed (§R8);
+  watch progress = `max(local high-water mark, YouTube resume %)` (§4.3); autoplay by a one-shot capturing `play` listener
+  (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11).
+- **Still open:** §13 Q2–Q6, Q9, Q12 — plugin-inventory strategy, Watch Later UI surface, hover-button size/badge handling,
+  thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
+- **Next step:** phase **P0** in §8 — debrand with the grep gate, delete the plugin inventory, `ultracite init`, version
+  sweep, plugin authoring guide, CI — then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
+
+When the project folder is renamed (§11), update the paths in §11 and §15 rather than leaving them stale.

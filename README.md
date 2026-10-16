@@ -73,12 +73,12 @@ pnpm dev
 ```
 
 `pnpm dev:debug` also turns on logging and opens a Chrome DevTools Protocol endpoint
-(`http://127.0.0.1:9222`), so you can attach DevTools or a CDP client to the running app —
-including the Chrome DevTools MCP, whose default browser URL is that same port;
-`WATCHDECK_REMOTE_DEBUG=<port> pnpm dev` picks another port, or leaves it out for none.
-Mind that only one process can own a port: a Chrome started with
-`--remote-debugging-port=9222` would take it from the app, and the app then runs without an
-endpoint (Chromium logs the bind failure at start).
+(`http://127.0.0.1:9223`), so you can attach DevTools or a CDP client to the running app —
+including a Chrome DevTools MCP pointed at that port. It is deliberately not the default
+`9222`: a Chrome started with `--remote-debugging-port=9222` wants that port, and one port
+has one owner, so keeping them apart lets the app and a browser be debugged at the same
+time. `WATCHDECK_REMOTE_DEBUG=<port> pnpm dev` picks another port, or leaves it out for
+none; the app logs whether the endpoint it asked for ended up being its own.
 
 Instead of installing pnpm on your system, you can also use [devcontainers](https://containers.dev/). You can use devcontainers either as a development environment in VS Code, or as a way to easily build the project without installing dependencies on your host system.
 

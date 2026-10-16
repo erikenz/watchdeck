@@ -20,7 +20,7 @@
     "start:debug": "pnpm cross-env ELECTRON_ENABLE_LOGGING=1 pnpm start",
     "dev": "pnpm cross-env NODE_ENV=development NODE_OPTIONS=--enable-source-maps electron-vite dev --watch",
     "dev:renderer": "pnpm cross-env NODE_ENV=development NODE_OPTIONS=--enable-source-maps electron-vite dev",
-    "dev:debug": "pnpm cross-env ELECTRON_ENABLE_LOGGING=1 WATCHDECK_REMOTE_DEBUG=9222 pnpm dev",
+    "dev:debug": "pnpm cross-env ELECTRON_ENABLE_LOGGING=1 WATCHDECK_REMOTE_DEBUG=9223 pnpm dev",
     "clean": "pnpm del-cli dist && pnpm del-cli pack && pnpm del-cli .vite-inspect",
     "dist": "pnpm clean && pnpm build && pnpm electron-builder --win --mac --linux -p never",
     "dist:linux": "pnpm clean && pnpm build && pnpm electron-builder --linux -p never",

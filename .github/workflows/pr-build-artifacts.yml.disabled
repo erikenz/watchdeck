@@ -1,3 +1,6 @@
+# Disabled 2026-10-16: packages installers for all three platforms on every pull request.
+# That is P4 work (PRD §8) and needs the packaging toolchains; build.yml covers the checks
+# that do run today. Rename to .yml when packaging is real.
 name: Build PR Artifacts
 
 on:

@@ -1,3 +1,5 @@
+# Disabled 2026-10-16: submits to the Windows Package Manager repository and needs a
+# WINGET_ACC_TOKEN; it belongs with releases, which are manual for now (PRD §8 P4).
 name: Submit to Windows Package Manager Community Repository
 
 on:

@@ -157,14 +157,6 @@
                   "placeholder": "Ejemplo: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Predeterminado",
-                "force-show": "Forzar la visualización",
-                "hide": "Ocultar",
-                "label": "Botones de \"Me Gusta\"",
-                "swap": "Intercambiar el orden de los botones de \"Me Gusta\""
-              },
-              "remove-upgrade-button": "Eliminar el botón de Actualización",
               "theme": {
                 "dialog": {
                   "button": {

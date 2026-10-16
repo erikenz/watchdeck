@@ -157,14 +157,6 @@
                   "placeholder": "উদাহরণস্বরূপ: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "ডিফল্ট লাইক বাটন",
-                "force-show": "সবসময় লাইক বাটন দেখান",
-                "hide": "লাইক বাটন লুকান",
-                "label": "লাইক বাটনের নিয়ন্ত্রণ",
-                "swap": "বাটনের ধারাবাহিকতা পাল্টাও"
-              },
-              "remove-upgrade-button": "আপগ্রেড বাটন সরান",
               "theme": {
                 "dialog": {
                   "button": {

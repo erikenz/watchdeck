@@ -157,14 +157,6 @@
                   "placeholder": "Приклад: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "За замовчуванням",
-                "force-show": "Завжди показувати",
-                "hide": "Приховати",
-                "label": "Як кнопки",
-                "swap": "Замінити місцями порядок кнопок лайка"
-              },
-              "remove-upgrade-button": "Прибрати кнопку оновлення",
               "theme": {
                 "dialog": {
                   "button": {

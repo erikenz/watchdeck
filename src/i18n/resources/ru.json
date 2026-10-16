@@ -157,14 +157,6 @@
                   "placeholder": "Например: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "По умолчанию",
-                "force-show": "Всегда показывать",
-                "hide": "Скрывать",
-                "label": "Кнопка лайка",
-                "swap": "Поменять порядок кнопок лайка"
-              },
-              "remove-upgrade-button": "Убрать кнопку Premium",
               "theme": {
                 "dialog": {
                   "button": {

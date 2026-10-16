@@ -157,14 +157,6 @@
                   "placeholder": "مثال: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "الافتراضي",
-                "force-show": "اجبار الظهور",
-                "hide": "اخفاء",
-                "label": "أزرار الاعجاب",
-                "swap": "تبديل ترتيب ازرار الاعجاب"
-              },
-              "remove-upgrade-button": "ازالة زر التطوير",
               "theme": {
                 "dialog": {
                   "button": {

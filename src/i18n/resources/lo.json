@@ -157,14 +157,6 @@
                   "placeholder": "ຕົວຢ່າງ: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "ຄ່າເລີ່ມຕົ້ນ",
-                "force-show": "ບັງຄັບໃຫ້ສະແດງ",
-                "hide": "ເຊື່ອງ",
-                "label": "ປຸ່ມຖືກໃຈ",
-                "swap": "ສະລັບລຳດັບປຸ່ມຖືກໃຈ"
-              },
-              "remove-upgrade-button": "ເອົາປຸ່ມອັບເກຣດອອກ",
               "theme": {
                 "dialog": {
                   "button": {

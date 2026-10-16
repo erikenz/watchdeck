@@ -157,13 +157,6 @@
                   "placeholder": "Piemērs: Watchdeck"
                 }
               },
-              "like-buttons": {
-                "default": "Noklusējums",
-                "force-show": "Vienmēr rādīt",
-                "hide": "Paslēpt",
-                "label": "Like pogas"
-              },
-              "remove-upgrade-button": "Noslēpt Premium pogu",
               "theme": {
                 "dialog": {
                   "button": {

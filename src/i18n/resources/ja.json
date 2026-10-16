@@ -157,14 +157,6 @@
                   "placeholder": "例: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "デフォルト",
-                "force-show": "強制的に表示",
-                "hide": "非表示",
-                "label": "いいねボタン",
-                "swap": "ボタンの順序などを入れ替える"
-              },
-              "remove-upgrade-button": "アップグレードボタンを削除",
               "theme": {
                 "dialog": {
                   "button": {

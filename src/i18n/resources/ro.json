@@ -157,14 +157,6 @@
                   "placeholder": "Exemplu: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Default",
-                "force-show": "Forțează randarea",
-                "hide": "Ascunde",
-                "label": "Butoane de like",
-                "swap": "Schimbă ordinea butoanelor like"
-              },
-              "remove-upgrade-button": "Elimina butonul de upgrade",
               "theme": {
                 "dialog": {
                   "button": {

@@ -157,14 +157,6 @@
                   "placeholder": "Exemple: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Per defecte",
-                "force-show": "Força que es mostri",
-                "hide": "Amaga",
-                "label": "Botons de «m'agrada»",
-                "swap": "Intercambiar l'ordre dels botons de m'agrada"
-              },
-              "remove-upgrade-button": "Elimina el botó «Actualitza a Music Premium»",
               "theme": {
                 "dialog": {
                   "button": {

@@ -157,14 +157,6 @@
                   "placeholder": "Exemplo: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Padrão",
-                "force-show": "Forçar exibir",
-                "hide": "Ocultar",
-                "label": "Botões de 'Curtir'",
-                "swap": "Inverter ordem dos botões de curtir"
-              },
-              "remove-upgrade-button": "Remover botão de atualização",
               "theme": {
                 "dialog": {
                   "button": {

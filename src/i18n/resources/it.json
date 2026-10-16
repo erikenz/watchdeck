@@ -157,14 +157,6 @@
                   "placeholder": "Esempio: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Predefinito",
-                "force-show": "Forza la visualizzazione",
-                "hide": "Nascondi",
-                "label": "Pulsanti Like",
-                "swap": "Scambia l'ordine dei pulsanti like"
-              },
-              "remove-upgrade-button": "Rimuovi il pulsante aggiorna",
               "theme": {
                 "dialog": {
                   "button": {

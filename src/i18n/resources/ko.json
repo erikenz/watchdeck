@@ -157,14 +157,6 @@
                   "placeholder": "예: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "기본",
-                "force-show": "강제로 표시하기",
-                "hide": "숨기기",
-                "label": "좋아요 버튼",
-                "swap": "\"좋아요\" 버튼 순서 변경하기"
-              },
-              "remove-upgrade-button": "업그레이드 버튼 제거",
               "theme": {
                 "dialog": {
                   "button": {

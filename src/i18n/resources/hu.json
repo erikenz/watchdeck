@@ -157,14 +157,6 @@
                   "placeholder": "Példa: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Alapértelmezett",
-                "force-show": "Megjelenítés kényszerítése",
-                "hide": "Elrejtése",
-                "label": "Reakció gombok",
-                "swap": "A reakció gombok sorrendjének megcserélése"
-              },
-              "remove-upgrade-button": "Előfizetés gombjának eltávolítása",
               "theme": {
                 "dialog": {
                   "button": {

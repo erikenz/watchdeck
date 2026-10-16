@@ -157,14 +157,6 @@
                   "placeholder": "Exemplo: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Padrão",
-                "force-show": "Mostrar sempre",
-                "hide": "Ocultar",
-                "label": "Botões \"Gosto\"",
-                "swap": "Trocar a ordem dos botões de like"
-              },
-              "remove-upgrade-button": "Remover botão \"Upgrade\"",
               "theme": {
                 "dialog": {
                   "button": {

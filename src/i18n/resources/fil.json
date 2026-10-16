@@ -157,14 +157,6 @@
                   "placeholder": "Halimbawa: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Default",
-                "force-show": "Pilitang ipakita",
-                "hide": "Itago",
-                "label": "Mga Like na button",
-                "swap": "Ipagpalit ang pagkakasunud-sunod ng mga like button"
-              },
-              "remove-upgrade-button": "Tanggalin ang upgrade na button",
               "theme": {
                 "dialog": {
                   "button": {

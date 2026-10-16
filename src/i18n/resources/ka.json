@@ -157,14 +157,6 @@
                   "placeholder": "მაგალითად: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "ნაგულისხმევი",
-                "force-show": "დააძალე ჩვენება",
-                "hide": "დამალე",
-                "label": "დალაიქების ღილაკები",
-                "swap": "დალაიქების ღილაკები ჩაანაცვლე ერთმანეთში"
-              },
-              "remove-upgrade-button": "გააქრე \"upgrade\" ღილაკი",
               "theme": {
                 "dialog": {
                   "button": {

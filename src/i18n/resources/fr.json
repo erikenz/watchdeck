@@ -157,14 +157,6 @@
                   "placeholder": "Exemple : {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Par défaut",
-                "force-show": "Forcer à apparaître",
-                "hide": "Cacher",
-                "label": "Boutons « J'aime »",
-                "swap": "Inverser l'order des boutons like"
-              },
-              "remove-upgrade-button": "Supprimer le bouton de mise à niveau",
               "theme": {
                 "dialog": {
                   "button": {

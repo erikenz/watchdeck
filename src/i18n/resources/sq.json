@@ -157,14 +157,6 @@
                   "placeholder": "Shembull: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Parazgjedhjet",
-                "force-show": "Forco shfaqjen",
-                "hide": "Fshih",
-                "label": "Butonat e pëlqimit",
-                "swap": "Ndërro rendin e butonave të pëlqimit"
-              },
-              "remove-upgrade-button": "Hiq butonin e përmirësimit",
               "theme": {
                 "dialog": {
                   "button": {

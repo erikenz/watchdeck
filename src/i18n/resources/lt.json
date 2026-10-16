@@ -157,14 +157,6 @@
                   "placeholder": "Pavyzdys: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Numatytasis",
-                "force-show": "Priversti rodyti",
-                "hide": "Slėpti",
-                "label": "„Patinka“ mygtukai",
-                "swap": "Sukeisti „Patinka“ mygtukų vietas"
-              },
-              "remove-upgrade-button": "Nerodyti „Patobulinti“ mygtuko",
               "theme": {
                 "dialog": {
                   "button": {

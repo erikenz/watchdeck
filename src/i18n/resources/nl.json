@@ -157,14 +157,6 @@
                   "placeholder": "Voorbeeld: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standaard",
-                "force-show": "Forceren weergeven",
-                "hide": "Verbergen",
-                "label": "Vind ik leuk-knoppen",
-                "swap": "Wissel volgorde van de like knoppen om"
-              },
-              "remove-upgrade-button": "Upgrade-knop verwijderen",
               "theme": {
                 "dialog": {
                   "button": {

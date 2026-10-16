@@ -157,13 +157,6 @@
                   "placeholder": "Primjer: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Zadano",
-                "force-show": "Prinudno prikaži",
-                "hide": "Sakrij",
-                "label": "'Sviđa mi se' dugmadi"
-              },
-              "remove-upgrade-button": "Ukloni dugme za nadogradnju",
               "theme": {
                 "dialog": {
                   "button": {

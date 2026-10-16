@@ -150,13 +150,6 @@
           "visual-tweaks": {
             "label": "Visual tweaks කරන්න",
             "submenu": {
-              "like-buttons": {
-                "default": "මූලික",
-                "force-show": "Force show කරන්න",
-                "hide": "සඟවන්න",
-                "label": "Like බොත්තම්"
-              },
-              "remove-upgrade-button": "Upgrade බොත්තම ඉවත් කරන්න",
               "theme": {
                 "dialog": {
                   "button": {

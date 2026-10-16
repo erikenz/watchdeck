@@ -157,14 +157,6 @@
                   "placeholder": "Näide: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Vaikimisi",
-                "force-show": "Sunni näitama",
-                "hide": "Peida",
-                "label": "Meeldimise nupud",
-                "swap": "Muuda meeldimise nuppude järjekorda"
-              },
-              "remove-upgrade-button": "Eemalda upgrade nupp",
               "theme": {
                 "dialog": {
                   "button": {

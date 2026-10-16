@@ -150,13 +150,6 @@
           "visual-tweaks": {
             "label": "Vizualni popravki",
             "submenu": {
-              "like-buttons": {
-                "default": "Privzeto",
-                "force-show": "Prisilno pokaži",
-                "hide": "Skrij",
-                "label": "Gumbi za všečkanje"
-              },
-              "remove-upgrade-button": "Odstrani gumb za nadgradnjo",
               "theme": {
                 "dialog": {
                   "button": {

@@ -157,14 +157,6 @@
                   "placeholder": "Örnek: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Varsayılan",
-                "force-show": "Zorla göster",
-                "hide": "Gizle",
-                "label": "Beğenme düğmeleri",
-                "swap": "Beğenme butonlarının sıralamasını değiştir"
-              },
-              "remove-upgrade-button": "Yükseltme düğmesini kaldır",
               "theme": {
                 "dialog": {
                   "button": {

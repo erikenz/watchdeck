@@ -157,14 +157,6 @@
                   "placeholder": "Exemplo: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Predeterminado",
-                "force-show": "Forzar a visualización",
-                "hide": "Agochar",
-                "label": "Botóns de Gústame",
-                "swap": "Cambiar a orde dos botóns de Gústame"
-              },
-              "remove-upgrade-button": "Retirar o botón de anovación",
               "theme": {
                 "dialog": {
                   "button": {

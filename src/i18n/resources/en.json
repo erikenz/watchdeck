@@ -150,13 +150,6 @@
           "visual-tweaks": {
             "label": "Visual Tweaks",
             "submenu": {
-              "like-buttons": {
-                "default": "Default",
-                "force-show": "Force show",
-                "hide": "Hide",
-                "swap": "Swap like buttons order",
-                "label": "Like buttons"
-              },
               "custom-window-title": {
                 "label": "Custom window title",
                 "prompt": {
@@ -164,7 +157,6 @@
                   "placeholder": "Example: {{applicationName}}"
                 }
               },
-              "remove-upgrade-button": "Remove upgrade button",
               "theme": {
                 "dialog": {
                   "button": {
@@ -198,6 +190,19 @@
           "toggle-fullscreen": "Toggle Full Screen",
           "zoom-in": "Zoom In",
           "zoom-out": "Zoom Out"
+        }
+      },
+      "playback": {
+        "label": "Playback",
+        "submenu": {
+          "back": "Back 10 seconds",
+          "forward": "Forward 10 seconds",
+          "mute": "Mute",
+          "next": "Next video",
+          "play-pause": "Play/Pause",
+          "previous": "Previous video",
+          "volume-down": "Volume down",
+          "volume-up": "Volume up"
         }
       }
     },

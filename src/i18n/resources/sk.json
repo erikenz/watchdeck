@@ -157,14 +157,6 @@
                   "placeholder": "Napríklad: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Základný",
-                "force-show": "Vynútiť zobrazenie",
-                "hide": "Skryť",
-                "label": "Like tlačítko",
-                "swap": "Otočiť poradie tlačidiel „Páči sa mi“"
-              },
-              "remove-upgrade-button": "Odstrániť tlačidlo povýšiť",
               "theme": {
                 "dialog": {
                   "button": {

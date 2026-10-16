@@ -23,17 +23,13 @@ export interface DefaultConfig {
     hideMenuWarned: boolean;
     startAtLogin: boolean;
     disableHardwareAcceleration: boolean;
-    removeUpgradeButton: boolean;
     restartOnConfigChanges: boolean;
     trayClickPlayPause: boolean;
     autoResetAppCache: boolean;
     resumeOnStart: boolean;
-    likeButtons: string;
-    swapLikeButtonsOrder: boolean;
     proxy: string;
     startingPage: string;
     overrideUserAgent: boolean;
-    usePodcastParticipantAsArtist: boolean;
     themes: string[];
     customWindowTitle?: string;
   };
@@ -52,17 +48,13 @@ export const defaultConfig: DefaultConfig = {
     hideMenuWarned: false,
     startAtLogin: false,
     disableHardwareAcceleration: false,
-    removeUpgradeButton: false,
     restartOnConfigChanges: false,
     trayClickPlayPause: false,
     autoResetAppCache: false,
     resumeOnStart: true,
-    likeButtons: "",
-    swapLikeButtonsOrder: false,
     proxy: "",
     startingPage: "",
     overrideUserAgent: false,
-    usePodcastParticipantAsArtist: false,
     themes: [],
   },
   plugins: {},

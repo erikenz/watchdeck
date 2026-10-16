@@ -157,13 +157,6 @@
                   "placeholder": "Příklad: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Výchozí",
-                "force-show": "Vynutit zobrazení",
-                "hide": "Skrýt",
-                "label": "Like tlačítka"
-              },
-              "remove-upgrade-button": "Odebrat upgrade tlačítko",
               "theme": {
                 "dialog": {
                   "button": {

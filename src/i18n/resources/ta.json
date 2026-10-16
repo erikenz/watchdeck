@@ -157,13 +157,6 @@
                   "placeholder": "எடுத்துக்காட்டு: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "இயல்புநிலை",
-                "force-show": "படை நிகழ்ச்சி",
-                "hide": "மறை",
-                "label": "பொத்தான்கள் போன்றவை"
-              },
-              "remove-upgrade-button": "மேம்படுத்தல் பொத்தானை அகற்று",
               "theme": {
                 "dialog": {
                   "button": {

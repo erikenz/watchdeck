@@ -157,14 +157,6 @@
                   "placeholder": "Ví dụ: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Mặc định",
-                "force-show": "Tập trung hiển thị",
-                "hide": "Ẩn",
-                "label": "Nút thích",
-                "swap": "Hoán đổi thứ tự nút Thích"
-              },
-              "remove-upgrade-button": "Xóa nút nâng cấp",
               "theme": {
                 "dialog": {
                   "button": {

@@ -157,14 +157,6 @@
                   "placeholder": "לדוגמה: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "ברירת מחדל",
-                "force-show": "הפעל בכוח",
-                "hide": "הסתר",
-                "label": "כפתורי לייק",
-                "swap": "החלפת סדר כפתורי לייק"
-              },
-              "remove-upgrade-button": "הסר לחצן שדרוג",
               "theme": {
                 "dialog": {
                   "button": {

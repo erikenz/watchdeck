@@ -38,20 +38,19 @@ import {
 } from "@/loader/main";
 import { refreshMenu, setApplicationMenu } from "@/menu";
 import { defaultAuthProxyConfig } from "@/plugins/auth-proxy-adapter/config";
-import { fileExists, injectCSS, injectCSSAsFile } from "@/plugins/utils/main";
+import { fileExists, injectCSSAsFile } from "@/plugins/utils/main";
 import { restart, setupAppControls } from "@/providers/app-controls";
 import {
   APP_PROTOCOL,
   handleProtocol,
   setupProtocolHandler,
 } from "@/providers/protocol-handler";
+import { START_PAGES } from "@/providers/start-pages";
 import { setupVideoInfo } from "@/providers/video-info";
 import { setUpTray } from "@/tray";
 import type { PluginConfig } from "@/types/plugins";
 import { LoggerPrefix } from "@/utils";
 import { isTesting } from "@/utils/testing";
-
-import musicPlayerCss from "@/music-player.css?inline";
 
 // Catch errors and log them
 unhandled({
@@ -299,7 +298,6 @@ const showNeedToRestartDialog = async (id: string) => {
 };
 
 function initTheme(win: BrowserWindow) {
-  injectCSS(win.webContents, musicPlayerCss);
   // Load user CSS
   const themes: string[] = config.get("options.themes");
   if (Array.isArray(themes)) {
@@ -433,9 +431,14 @@ async function createMainWindow() {
     win.setAlwaysOnTop(true);
   }
 
-  const urlToLoad = config.get("options.resumeOnStart")
-    ? config.get("url")
-    : config.defaultConfig.url;
+  // An explicitly chosen starting page wins over resuming: the user asked for that page
+  // on every launch, and the resume option sits right next to it in the menu.
+  const startingPage = START_PAGES[config.get("options.startingPage")];
+  const urlToLoad = startingPage
+    ? `${config.defaultConfig.url}${startingPage}`
+    : config.get("options.resumeOnStart")
+      ? config.get("url")
+      : config.defaultConfig.url;
   win.on("closed", onClosed);
 
   win.on("move", () => {
@@ -508,24 +511,6 @@ async function createMainWindow() {
       });
     }
   });
-  win.webContents.on("will-redirect", (event) => {
-    const url = URL.parse(event.url);
-
-    // Workaround for the regional "/premium" redirect: send the user to the
-    // Google sign-in page instead of the paywall. Inherited; revisit in P1.
-    if (
-      url &&
-      url.hostname.endsWith("\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com") &&
-      url.pathname === "/premium"
-    ) {
-      event.preventDefault();
-
-      win.webContents.loadURL(
-        "https://accounts.google.com/ServiceLogin?ltmpl=music&service=\u0079\u006F\u0075\u0074\u0075\u0062\u0065&continue=https%3A%2F%2Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fwww.\u0079\u006F\u0075\u0074\u0075\u0062\u0065.com%252F"
-      );
-    }
-  });
-
   win.webContents.loadURL(urlToLoad);
 
   return win;

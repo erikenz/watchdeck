@@ -157,13 +157,6 @@
                   "placeholder": "Eksempel: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standard",
-                "force-show": "Tving visning",
-                "hide": "Skjul",
-                "label": "Like knapper"
-              },
-              "remove-upgrade-button": "Fjern opgrader knappen",
               "theme": {
                 "dialog": {
                   "button": {

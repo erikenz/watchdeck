@@ -105,12 +105,7 @@
             }
           },
           "visual-tweaks": {
-            "submenu": {
-              "like-buttons": {
-                "label": "లైక్ బటన్",
-                "swap": "లైక్ బటన్‌ల క్రమాన్ని మార్చండి"
-              }
-            }
+            "submenu": {}
           }
         }
       }

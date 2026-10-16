@@ -157,13 +157,6 @@
                   "placeholder": "مثال :{{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "پیش‌فرض",
-                "force-show": "اجبار به نمایش",
-                "hide": "پنهان کردن",
-                "label": "دکمه‌های پسندیدن"
-              },
-              "remove-upgrade-button": "حذف دکمه ارتقا",
               "theme": {
                 "dialog": {
                   "button": {

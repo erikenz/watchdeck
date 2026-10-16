@@ -150,13 +150,6 @@
           "visual-tweaks": {
             "label": "Sjónrænaraðlögun",
             "submenu": {
-              "like-buttons": {
-                "default": "Sjálfgefinn",
-                "force-show": "Þvingaðu sýna",
-                "hide": "Fela",
-                "label": "Líkartakkar"
-              },
-              "remove-upgrade-button": "Fjarlægja uppgræðartakkan",
               "theme": {
                 "dialog": {
                   "button": {

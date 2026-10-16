@@ -157,14 +157,6 @@
                   "placeholder": "Παράδειγμα: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Προεπιλογή",
-                "force-show": "Επιβολή εμφάνισης",
-                "hide": "Απόκρυψη",
-                "label": "Κουμπιά like",
-                "swap": "Εναλλαγή της σειράς των κουμπιών like"
-              },
-              "remove-upgrade-button": "Αφαίρεση κουμπιού αναβάθμισης",
               "theme": {
                 "dialog": {
                   "button": {

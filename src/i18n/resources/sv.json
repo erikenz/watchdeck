@@ -157,14 +157,6 @@
                   "placeholder": "Exempel: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standard",
-                "force-show": "Tvinga fram visning",
-                "hide": "Dölj",
-                "label": "Gilla-knappar",
-                "swap": "Byt plats på gilla-knapparna"
-              },
-              "remove-upgrade-button": "Ta bort knappen för uppgradering",
               "theme": {
                 "dialog": {
                   "button": {

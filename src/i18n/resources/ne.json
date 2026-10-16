@@ -157,13 +157,6 @@
                   "placeholder": "उदाहरण: पियर डेस्कटप"
                 }
               },
-              "like-buttons": {
-                "default": "पूर्वनिर्धारित",
-                "force-show": "देखाउनुहोस",
-                "hide": "लुकाउनुहोस",
-                "label": "लाइक बटनहरू"
-              },
-              "remove-upgrade-button": "अपग्रेड बटन हटाउनुहोस्",
               "theme": {
                 "dialog": {
                   "button": {

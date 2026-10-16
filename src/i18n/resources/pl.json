@@ -157,14 +157,6 @@
                   "placeholder": "Przykład: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Domyślne",
-                "force-show": "Wymuś pokazywanie",
-                "hide": "Ukryj",
-                "label": "Przyciski polubienia",
-                "swap": "Zamień kolejność przycisków polubień"
-              },
-              "remove-upgrade-button": "Usuń przycisk subskrypcji premium",
               "theme": {
                 "dialog": {
                   "button": {

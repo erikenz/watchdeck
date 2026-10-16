@@ -150,10 +150,6 @@
           "visual-tweaks": {
             "label": "ദൃശ്യ ക്രമീകരണങ്ങൾ",
             "submenu": {
-              "like-buttons": {
-                "default": "സ്വതവേയുള്ളത്",
-                "hide": "മറയ്ക്കുക"
-              },
               "theme": {
                 "submenu": {
                   "no-theme": "തീം ഇല്ല"

@@ -157,14 +157,6 @@
                   "placeholder": "範例：{{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "預設",
-                "force-show": "強制顯示",
-                "hide": "隱藏",
-                "label": "按讚按鈕",
-                "swap": "交換讚及倒讚的按鈕位置"
-              },
-              "remove-upgrade-button": "移除升級按鈕",
               "theme": {
                 "dialog": {
                   "button": {

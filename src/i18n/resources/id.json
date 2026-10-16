@@ -157,14 +157,6 @@
                   "placeholder": "Contoh: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standar",
-                "force-show": "Pertunjukan paksa",
-                "hide": "Sembunyikan",
-                "label": "Tombol suka",
-                "swap": "Tukar urutan tombol suka"
-              },
-              "remove-upgrade-button": "Hapus tombol peningkatan",
               "theme": {
                 "dialog": {
                   "button": {

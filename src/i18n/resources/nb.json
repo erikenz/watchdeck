@@ -148,13 +148,6 @@
           "visual-tweaks": {
             "label": "Visuelle tilpasninger",
             "submenu": {
-              "like-buttons": {
-                "default": "Forvalg",
-                "force-show": "Tving visning",
-                "hide": "Skjul",
-                "label": "Begunstningsknapper"
-              },
-              "remove-upgrade-button": "Fjern oppgraderingsknapp",
               "theme": {
                 "label": "Drakt",
                 "submenu": {

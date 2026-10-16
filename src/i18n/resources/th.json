@@ -157,14 +157,6 @@
                   "placeholder": "ตัวอย่าง: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "ค่าเริ่มต้น",
-                "force-show": "บังคับให้แสดง",
-                "hide": "ซ่อน",
-                "label": "ปุ่มถูกใจ",
-                "swap": "สลับลำดับปุ่มถูกใจ"
-              },
-              "remove-upgrade-button": "ลบปุ่มอัปเกรด",
               "theme": {
                 "dialog": {
                   "button": {

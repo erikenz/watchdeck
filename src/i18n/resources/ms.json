@@ -157,14 +157,6 @@
                   "placeholder": "Contoh: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Lalai",
-                "force-show": "Paksa pamer",
-                "hide": "Sembunyi",
-                "label": "Butang suka",
-                "swap": "Tukar susunan butang Suka"
-              },
-              "remove-upgrade-button": "Buang butang naik taraf",
               "theme": {
                 "dialog": {
                   "button": {

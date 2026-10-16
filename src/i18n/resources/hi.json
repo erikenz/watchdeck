@@ -157,14 +157,6 @@
                   "placeholder": "उदाहरण: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "डिफॉल्ट",
-                "force-show": "बल पूर्वक दिखाएं",
-                "hide": "छुपाएं",
-                "label": "लाइक बटंस",
-                "swap": "लाइक बटन का क्रम बदलें"
-              },
-              "remove-upgrade-button": "अपग्रेड बटन हटाएं",
               "theme": {
                 "dialog": {
                   "button": {

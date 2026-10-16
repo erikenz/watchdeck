@@ -157,13 +157,6 @@
                   "placeholder": "مثال: پیئر ڈیسک ٹاپ"
                 }
               },
-              "like-buttons": {
-                "default": "پہلے سے طے شدہ",
-                "force-show": "زبردستی دکھائیں",
-                "hide": "چھپائیں",
-                "label": "لائیک بٹن"
-              },
-              "remove-upgrade-button": "اپ گریڈ بٹن ہٹائیں",
               "theme": {
                 "dialog": {
                   "button": {

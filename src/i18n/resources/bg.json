@@ -157,13 +157,6 @@
                   "placeholder": "Пример: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "По подразбиране",
-                "force-show": "Принудително показване",
-                "hide": "Скриване",
-                "label": "Показване на \"Харесвам\" бутони"
-              },
-              "remove-upgrade-button": "Премахване на \"Ъпгрейд\" бутона",
               "theme": {
                 "dialog": {
                   "button": {

@@ -157,14 +157,6 @@
                   "placeholder": "Beispiel: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standard",
-                "force-show": "Zeigen erzwungen",
-                "hide": "Versteckt",
-                "label": "Gefällt mir-Knopf",
-                "swap": "Gefällt mir-Knopf Reihenfolge ändern"
-              },
-              "remove-upgrade-button": "Upgrade-Schaltfläche entfernen",
               "theme": {
                 "dialog": {
                   "button": {

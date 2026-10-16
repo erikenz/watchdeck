@@ -152,11 +152,6 @@
                   "placeholder": "Nümunə: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Standart",
-                "hide": "Gizlət"
-              },
-              "remove-upgrade-button": "Yeniləmə düyməsini sil",
               "theme": {
                 "dialog": {
                   "button": {

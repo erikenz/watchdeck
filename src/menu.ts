@@ -12,10 +12,14 @@ import packageJson from "../package.json";
 import * as config from "./config";
 import { getAllMenuTemplate, loadAllMenuPlugins } from "./loader/menu";
 import { restart } from "./providers/app-controls";
-import { startingPages } from "./providers/extracted-data";
 import promptOptions from "./providers/prompt-options";
+import { START_PAGES } from "./providers/start-pages";
+import { getVideoControls } from "./providers/video-controls";
 
 export type MenuTemplate = Electron.MenuItemConstructorOptions[];
+
+/** How far the Playback menu's seek items move, in seconds. */
+const SEEK_STEP_SECONDS = 10;
 
 // True only if in-app-menu was loaded on launch
 const inAppMenuActive = await config.plugins.isEnabled("in-app-menu");
@@ -58,6 +62,7 @@ export const mainMenuTemplate = async (
 ): Promise<MenuTemplate> => {
   const innerRefreshMenu = async () => refreshMenu(win);
   const { navigationHistory } = win.webContents;
+  const controls = getVideoControls(win);
   await loadAllMenuPlugins(win);
 
   const allPluginsStubs = await allPlugins();
@@ -146,6 +151,52 @@ export const mainMenuTemplate = async (
 
   return [
     {
+      label: t("main.menu.playback.label"),
+      submenu: [
+        {
+          accelerator: "MediaPlayPause",
+          click: controls.playPause,
+          label: t("main.menu.playback.submenu.play-pause"),
+        },
+        {
+          accelerator: "MediaNextTrack",
+          click: controls.next,
+          label: t("main.menu.playback.submenu.next"),
+        },
+        {
+          accelerator: "MediaPreviousTrack",
+          click: controls.previous,
+          label: t("main.menu.playback.submenu.previous"),
+        },
+        { type: "separator" },
+        // No accelerators on these: a menu accelerator is handled before the page sees
+        // the key (GTK grabs it at the window), so Ctrl+arrows would break word-wise
+        // cursor movement in the site's own fields. The media keys above are the ones
+        // that cost nothing, and gestures (R7) are the intended quick path for these.
+        {
+          click: () => controls.goBack(SEEK_STEP_SECONDS),
+          label: t("main.menu.playback.submenu.back"),
+        },
+        {
+          click: () => controls.goForward(SEEK_STEP_SECONDS),
+          label: t("main.menu.playback.submenu.forward"),
+        },
+        { type: "separator" },
+        {
+          click: controls.volumeUp,
+          label: t("main.menu.playback.submenu.volume-up"),
+        },
+        {
+          click: controls.volumeDown,
+          label: t("main.menu.playback.submenu.volume-down"),
+        },
+        {
+          click: controls.muteUnmute,
+          label: t("main.menu.playback.submenu.mute"),
+        },
+      ],
+    },
+    {
       label: t("main.menu.plugins.label"),
       submenu: pluginMenus,
     },
@@ -172,7 +223,7 @@ export const mainMenuTemplate = async (
           label: t("main.menu.options.submenu.starting-page.label"),
           submenu: (() => {
             const subMenuArray: Electron.MenuItemConstructorOptions[] =
-              Object.keys(startingPages).map((name) => ({
+              Object.keys(START_PAGES).map((name) => ({
                 checked: config.get("options.startingPage") === name,
                 click() {
                   config.set("options.startingPage", name);
@@ -194,19 +245,6 @@ export const mainMenuTemplate = async (
         {
           label: t("main.menu.options.submenu.visual-tweaks.label"),
           submenu: [
-            {
-              checked: config.get("options.removeUpgradeButton"),
-              click(item: MenuItem) {
-                config.setMenuOption(
-                  "options.removeUpgradeButton",
-                  item.checked
-                );
-              },
-              label: t(
-                "main.menu.options.submenu.visual-tweaks.submenu.remove-upgrade-button"
-              ),
-              type: "checkbox",
-            },
             {
               async click() {
                 const output = await prompt(
@@ -240,56 +278,6 @@ export const mainMenuTemplate = async (
               label: t(
                 "main.menu.options.submenu.visual-tweaks.submenu.custom-window-title.label"
               ),
-            },
-            {
-              label: t(
-                "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.label"
-              ),
-              submenu: [
-                {
-                  checked: !config.get("options.likeButtons"),
-                  click() {
-                    config.set("options.likeButtons", "");
-                  },
-                  label: t(
-                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.default"
-                  ),
-                  type: "radio",
-                },
-                {
-                  checked: config.get("options.likeButtons") === "force",
-                  click() {
-                    config.set("options.likeButtons", "force");
-                  },
-                  label: t(
-                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.force-show"
-                  ),
-                  type: "radio",
-                },
-                {
-                  checked: config.get("options.likeButtons") === "hide",
-                  click() {
-                    config.set("options.likeButtons", "hide");
-                  },
-                  label: t(
-                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.hide"
-                  ),
-                  type: "radio",
-                },
-                {
-                  checked: config.get("options.swapLikeButtonsOrder"),
-                  click(item: MenuItem) {
-                    config.setMenuOption(
-                      "options.swapLikeButtonsOrder",
-                      item.checked
-                    );
-                  },
-                  label: t(
-                    "main.menu.options.submenu.visual-tweaks.submenu.like-buttons.swap"
-                  ),
-                  type: "checkbox",
-                },
-              ],
             },
             {
               label: t(

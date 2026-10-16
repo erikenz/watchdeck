@@ -157,13 +157,6 @@
                   "placeholder": "Esimerkki: {{applicationName}}"
                 }
               },
-              "like-buttons": {
-                "default": "Vakio",
-                "force-show": "Pakota näyttämään",
-                "hide": "Piilota",
-                "label": "Tykkäys nappula"
-              },
-              "remove-upgrade-button": "Poista päivitys nappula",
               "theme": {
                 "dialog": {
                   "button": {

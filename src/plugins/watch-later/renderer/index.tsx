@@ -28,6 +28,8 @@ import type { WatchLaterBridge } from "./ui/bridge";
 import {
   applyRowVisibility,
   enhanceRow,
+  ROW_HIDDEN_CLASS,
+  ROW_META_CLASS,
   ROW_SELECTOR,
   rowVideoId,
   TOOLBAR_HOST_CLASS,
@@ -68,6 +70,10 @@ export const renderer = {
 
     this.resizeListener = this.onResize.bind(this);
     window.addEventListener("resize", this.resizeListener, { passive: true });
+    this.cardEnterListener = this.onCardEnter.bind(this);
+    document.addEventListener("mouseover", this.cardEnterListener, {
+      passive: true,
+    });
     this.observer = new MutationObserver(() => this.queueScan());
     this.observer.observe(document.body, {
       childList: true,
@@ -165,10 +171,22 @@ export const renderer = {
 
   navigateListener: null as ((event: Event) => void) | null,
   resizeListener: null as ((event: Event) => void) | null,
+  cardEnterListener: null as ((event: Event) => void) | null,
+  hoveredCard: null as Element | null,
 
-  /** Enrich and (when a filter is on) show or hide each of the site's own rows. */
+  /**
+   * Enrich and (when a filter is on) show or hide the rows of the *Watch Later* page. Every
+   * other page is left exactly as the site rendered it: this is bookkeeping for a list you
+   * are curating, not decoration for browsing.
+   */
   applyRows() {
+    const onWatchLater = isWatchLaterPage();
     for (const row of document.querySelectorAll(ROW_SELECTOR)) {
+      if (!onWatchLater) {
+        row.classList.remove(ROW_HIDDEN_CLASS);
+        row.querySelector(`.${ROW_META_CLASS}`)?.remove();
+        continue;
+      }
       const videoId = rowVideoId(row);
       const visible = applyRowVisibility(row, this.filter);
       if (visible && videoId) {
@@ -190,6 +208,11 @@ export const renderer = {
       window.removeEventListener("resize", this.resizeListener);
       this.resizeListener = null;
     }
+    if (this.cardEnterListener) {
+      document.removeEventListener("mouseover", this.cardEnterListener);
+      this.cardEnterListener = null;
+    }
+    this.hoveredCard = null;
     this.toolbarHost?.remove();
     this.toolbarHost = null;
     this.filter = null;
@@ -285,7 +308,11 @@ export const renderer = {
     }
     this.applyRows();
 
-    if (this.config && !this.config.showHoverButton) {
+    // On the Watch Later page every row is already saved, so a button per row is noise.
+    if (
+      !this.config?.showHoverButton ||
+      (this.config.enhancePage && isWatchLaterPage())
+    ) {
       return;
     }
     this.scanPreview();
@@ -344,7 +371,13 @@ export const renderer = {
     if (!showing) {
       return;
     }
-    const videoId = videoIdFromHost(showing);
+    // The preview belongs to the card the pointer is over; its own markup does not always
+    // carry the video id (the card is the reliable source).
+    const previewCard = cardOf(showing);
+    const videoId =
+      videoIdFromHost(showing) ??
+      (this.hoveredCard ? videoIdFromHost(this.hoveredCard) : undefined) ??
+      (previewCard ? videoIdFromHost(previewCard) : undefined);
     if (!videoId) {
       return;
     }
@@ -433,6 +466,13 @@ export const renderer = {
     } finally {
       this.pending.delete(videoId);
       this.repaint();
+    }
+  },
+
+  onCardEnter(event: Event) {
+    const target = event.target;
+    if (target instanceof Element) {
+      this.hoveredCard = cardOf(target);
     }
   },
 

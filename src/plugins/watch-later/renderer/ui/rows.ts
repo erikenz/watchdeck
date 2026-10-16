@@ -110,18 +110,17 @@ export const rowVideoId = videoIdFromRow;
  * header when there is one, and above the first row otherwise.
  */
 /**
- * Where the toolbar goes: as the first thing after the playlist header, which is above the
- * site's own "Date added (newest)" chip and above the rows. The list renderer is the last
- * resort, for the surfaces that render no header.
+ * Where the toolbar goes: inside the page's main column, immediately before the site's own
+ * "Date added (newest)" chip. The chip sits in a container the site has already laid out, so
+ * the toolbar inherits that layout; the playlist header is *not* a usable anchor (it is a
+ * child of `ytd-browse`, outside the column, where a sibling renders out of the flow).
  */
 export const toolbarInsertionPoint = ():
   | { before: Element | null; parent: Element }
   | undefined => {
-  const header = document.querySelector("ytd-playlist-header-renderer");
-  if (header?.parentElement) {
-    return { before: header.nextElementSibling, parent: header.parentElement };
-  }
-  const chip = document.querySelector("yt-sort-filter-sub-menu-renderer");
+  const chip =
+    document.querySelector("yt-sort-filter-sub-menu-renderer") ??
+    document.querySelector("#sort-filter-menu");
   if (chip?.parentElement) {
     return { before: chip, parent: chip.parentElement };
   }

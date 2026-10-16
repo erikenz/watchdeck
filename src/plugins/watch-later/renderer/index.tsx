@@ -14,10 +14,12 @@ import type {
 import {
   alignButton,
   BUTTON_CLASS,
+  cardOf,
   createSaveButton,
   HOST_CLASS,
   isThumbnailHost,
   paintButton,
+  PREVIEW_SELECTOR,
   THUMBNAIL_HOST_SELECTOR,
   videoIdFromHost,
 } from "./dom";
@@ -286,41 +288,80 @@ export const renderer = {
     if (this.config && !this.config.showHoverButton) {
       return;
     }
+    this.scanPreview();
     for (const host of document.querySelectorAll(THUMBNAIL_HOST_SELECTOR)) {
       if (!isThumbnailHost(host)) {
         continue;
       }
-      const videoId = videoIdFromHost(host);
-      if (!videoId) {
+      // Host on the card, not on the thumbnail link inside it: the site's inline preview
+      // replaces the thumbnail with a surface outside that link, so a button anchored there
+      // only shows up when the pointer is over the little of the link that is left.
+      const card = cardOf(host) ?? host;
+      const videoId = videoIdFromHost(card);
+      if (!videoId || card.closest(`.${HOST_CLASS}`)) {
         continue;
       }
-      // A card and its inner thumbnail link both match the selector; the outermost hosts.
-      if (host.closest(`.${HOST_CLASS}`)) {
-        continue;
-      }
-      const existing = host.querySelector<HTMLButtonElement>(
+      const existing = card.querySelector<HTMLButtonElement>(
         `.${BUTTON_CLASS}`
       );
       if (existing) {
         // The card may have swapped its thumbnail for the inline preview since last scan.
-        alignButton(existing, host);
+        alignButton(existing, card);
         this.paint(existing);
         continue;
       }
-      if (this.isOwnSurface(host)) {
+      if (this.isOwnSurface(card)) {
         continue;
       }
-      host.classList.add(HOST_CLASS);
+      card.classList.add(HOST_CLASS);
       const button = createSaveButton(videoId, (button_) => {
         this.toggle(button_).catch(() => undefined);
       });
-      host.append(button);
-      alignButton(button, host);
+      card.append(button);
+      alignButton(button, card);
+      // Paint it now: an unpainted button has no state, and a button with no state is an
+      // invisible button (which is what "sometimes there is no button" was).
+      this.paint(button);
       // Hovering can bring the preview in and move the video box; the button follows it.
-      host.addEventListener("mouseenter", () => alignButton(button, host), {
+      card.addEventListener("mouseenter", () => alignButton(button, card), {
         passive: true,
       });
     }
+  },
+
+  /**
+   * The inline preview covers the card it belongs to, so it carries its own button and the
+   * card's is hidden while it is up. Same state, same click, just where the pointer is.
+   */
+  scanPreview() {
+    const previews = [...document.querySelectorAll(PREVIEW_SELECTOR)];
+    const showing = previews.find(
+      (preview) => preview.getBoundingClientRect().height > 60
+    );
+    for (const card of document.querySelectorAll(`.${HOST_CLASS}`)) {
+      card.classList.toggle("wd-wl-preview-open", Boolean(showing));
+    }
+    if (!showing) {
+      return;
+    }
+    const videoId = videoIdFromHost(showing);
+    if (!videoId) {
+      return;
+    }
+    const existing = showing.querySelector<HTMLButtonElement>(
+      `.${BUTTON_CLASS}`
+    );
+    if (existing) {
+      alignButton(existing, showing);
+      this.paint(existing);
+      return;
+    }
+    const button = createSaveButton(videoId, (button_) => {
+      this.toggle(button_).catch(() => undefined);
+    });
+    showing.append(button);
+    alignButton(button, showing);
+    this.paint(button);
   },
 
   /** The list inside our own UI must not grow buttons. */

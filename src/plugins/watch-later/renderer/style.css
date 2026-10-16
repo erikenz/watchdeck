@@ -30,6 +30,13 @@
   opacity: 1;
 }
 
+/* A saved video says so without being hovered: that is the point of the button. */
+.wd-wl-save[data-state="saved"],
+.wd-wl-save[data-state="pending"],
+.wd-wl-save[data-state="error"] {
+  opacity: 1;
+}
+
 .wd-wl-save:hover {
   background: rgba(0, 0, 0, 0.8);
 }
@@ -58,11 +65,7 @@
   }
 }
 
-/* Keep the duration readable: shift whatever badge the surface renders to the left
-   of our button instead of covering it. Two generations of class names, so match by
-   substring rather than by exact name. */
-.wd-wl-anchor:hover [class*="TimeStatus"],
-.wd-wl-anchor:hover [class*="Duration"],
-.wd-wl-anchor:hover [class*="time-status"] {
-  transform: translateX(-40px);
+/* While the inline preview plays, its own button is the one on screen. */
+.wd-wl-anchor.wd-wl-preview-open > .wd-wl-save {
+  display: none;
 }

@@ -24,17 +24,25 @@ test("Watchdeck App - launches, with a window titled after the app", async () =>
 
   // Asking the main process is the only reliable way to see the window: the page is
   // attached separately and may never come up in a session without a window manager.
-  const windows = await app.evaluate(({ BrowserWindow }) =>
-    BrowserWindow.getAllWindows().map((win) => ({
-      title: win.getTitle(),
-      url: win.webContents.getURL(),
-    }))
-  );
+  // The window appears after the plugins load, so poll instead of sampling once.
+  const readWindows = () =>
+    app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows().map((win) => ({
+        title: win.getTitle(),
+        url: win.webContents.getURL(),
+      }))
+    );
 
-  expect(windows.length).toBeGreaterThan(0);
+  await expect
+    .poll(async () => (await readWindows()).length, {
+      timeout: 20_000,
+    })
+    .toBeGreaterThan(0);
+
   // The site renames every window after its own <title> ("YouTube"); the app has to
   // win that fight or the task bar and window list say "YouTube".
-  expect(windows[0].title).toBe("Watchdeck");
+  const [window] = await readWindows();
+  expect(window.title).toBe("Watchdeck");
 
   await app.close();
 });

@@ -6,6 +6,8 @@ inventory is deleted, and the §R8 debrand gate passes. Decisions and open quest
 is left in P0.
 **Revision 5** — owner review of the P0 diff: the `\u` escapes stay in code and package metadata (§R8), `auto-changelog`
 and the upstream-shaped CI (including the winget workflows) are kept, and the README keeps the upstream section layout.
+**Revision 6** — Q2 answered (keep the neutral plugins in tree) and the Ultracite migration landed; the deviation list
+in `oxlint.config.ts` is measured, not guessed.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -767,12 +769,12 @@ review already settled it; "open" means I need an answer — a single "yes to th
   GitHub remote are left (§11).
 - **Q11 tests** → `vitest` (your prototype uses it; Ultracite ships a preset).
 - **Debrand** → confirmed as a phase-0 gate with the grep acceptance check (§R8), including the upstream update feed.
+- **Q2 Plugin inventory → keep them (rev 6).** The 15 music-only plugins are deleted; the remaining 24 stay in tree for now,
+  as reference material and to be reworked or dropped deliberately as P1/P2 reach them. The price is visible and accepted:
+  Ultracite's strict defaults are documented as per-rule deviations in `oxlint.config.ts` instead of being satisfied.
 
 **Open:**
 
-1. **Q2 — Plugin inventory.** Given your "public FOSS app, contributors will want other things" point: keep the plan of
-   *deleting* the YTM-only plugins and shipping a documented plugin API + authoring guide (my recommendation, §R5), or keep
-   the zero-YTM-coupling plugins in-tree as-is (cheaper now, more maintenance and Ultracite churn later)?
 2. **Q3 — Watch Later UI.** My recommendation: a dedicated Library window for v1 plus a small in-page surface (hover
    button, progress reporting), and the `/playlist?list=WL` takeover in a later phase. Your prototype went in-page first —
    confirm or override.
@@ -834,7 +836,7 @@ conversation. The research behind it happened in one Delta thread, which was clo
   `ultracite init` with the verified toolchain set (§5.3, §5.5); debrand as a phase-0 gate including the update feed (§R8);
   watch progress = `max(local high-water mark, YouTube resume %)` (§4.3); autoplay by a one-shot capturing `play` listener
   (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11).
-- **Still open:** §13 Q2–Q6, Q9, Q12 — plugin-inventory strategy, Watch Later UI surface, hover-button size/badge handling,
+- **Still open:** §13 Q3–Q6, Q9, Q12 — Watch Later UI surface, hover-button size/badge handling,
   thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
 - **Next step:** finish phase **P0** in §8, then P1 (YouTube base), P2 (Watch Later), P3 (SponsorBlock).
 - **P0 progress (revision 5).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, replaced icon
@@ -843,7 +845,8 @@ conversation. The research behind it happened in one Delta thread, which was clo
   `.npmrc` with `save-exact=true`; `pnpm typecheck`, `pnpm build` and `pnpm test` (smoke test against `www.youtube.com`)
   verified locally. After owner review the escapes were restored in code/metadata (§R8), `auto-changelog` and the
   upstream-shaped CI (matrix build + release job, `winget-*` workflows) came back, and the README follows the upstream
-  section layout. Still to do in P0: `ultracite init` with the verified toolchain (§5.3), the package version sweep (§R6),
-  `docs/plugins.md`, and the Q2 answer that decides the fate of the 24 plugins kept in-tree.
+  section layout. The Ultracite migration is in as well (toolchain pinned to the set in §5.3, `ultracite fix` over the
+  tree, `oxlint.config.ts` keeps Ultracite's presets with a measured 117-rule deviation list). Still to do in P0: the
+  package version sweep (§R6) and `docs/plugins.md`.
 
 When the project folder is renamed (§11), update the paths in §11 and §15 rather than leaving them stale.

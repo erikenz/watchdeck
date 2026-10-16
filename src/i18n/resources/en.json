@@ -685,6 +685,21 @@
         "visualizer-type": "Visualizer Type"
       },
       "name": "Visualizer"
+    },
+    "watch-later": {
+      "button": {
+        "remove": "Remove from Watch Later",
+        "save": "Save to Watch Later"
+      },
+      "description": "Mirrors your Watch Later list into a local database: search, filter and group it by how much you have watched",
+      "menu": {
+        "account": "Account",
+        "enrich-metadata": "Fetch descriptions and tags",
+        "hover-button": "Show the save button on thumbnails",
+        "sync-now": "Sync Watch Later now",
+        "sync-on-start": "Sync when the app starts"
+      },
+      "name": "Watch Later"
     }
   }
 }

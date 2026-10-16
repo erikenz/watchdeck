@@ -1,0 +1,68 @@
+/* The button lives inside the thumbnail card, bottom right, like the duration badge. */
+.wd-wl-anchor {
+  position: relative;
+}
+
+.wd-wl-save {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease;
+}
+
+.wd-wl-anchor:hover .wd-wl-save,
+.wd-wl-save:focus-visible {
+  opacity: 1;
+}
+
+.wd-wl-save:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.wd-wl-save svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.wd-wl-save[data-state="saved"] {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.wd-wl-save[data-state="error"] {
+  background: rgba(180, 30, 30, 0.85);
+}
+
+.wd-wl-spin {
+  animation: wd-wl-spin 900ms linear infinite;
+}
+
+@keyframes wd-wl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Keep the duration readable: shift whatever badge the surface renders to the left
+   of our button instead of covering it. Two generations of class names, so match by
+   substring rather than by exact name. */
+.wd-wl-anchor:hover [class*="TimeStatus"],
+.wd-wl-anchor:hover [class*="Duration"],
+.wd-wl-anchor:hover [class*="time-status"] {
+  transform: translateX(-40px);
+}

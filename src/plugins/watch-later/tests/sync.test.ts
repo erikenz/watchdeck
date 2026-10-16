@@ -1,0 +1,254 @@
+import { expect, test } from "@playwright/test";
+
+import { openNodeSqlite, WatchLaterStore } from "../backend/db";
+import { parseWatchLaterPage } from "../backend/inner-tube";
+import type { VideoDetails, WatchLaterPage } from "../backend/inner-tube";
+import { WatchLaterSync } from "../backend/sync";
+import type { WatchLaterTransport } from "../backend/sync";
+import { defaultConfig } from "../config";
+
+const config = { ...defaultConfig, requestsPerSecond: 0 };
+
+/** Synthetic pages in the shape the site returns (trimmed to what we read). */
+const legacyPage = (items: number, continuation?: string) => ({
+  contents: {
+    twoColumnBrowseResultsRenderer: {
+      tabs: [
+        {
+          tabRenderer: {
+            content: {
+              sectionListRenderer: {
+                contents: [
+                  {
+                    itemSectionRenderer: {
+                      contents: [
+                        {
+                          playlistVideoListRenderer: {
+                            contents: Array.from(
+                              { length: items },
+                              (_, index) => ({
+                                playlistVideoRenderer: {
+                                  lengthText: { simpleText: "10:00" },
+                                  setVideoId: `set-${index}`,
+                                  shortBylineText: {
+                                    runs: [{ text: `Channel ${index}` }],
+                                  },
+                                  thumbnail: {
+                                    thumbnails: [
+                                      {
+                                        url: `https://i.ytimg.com/vi/v${index}/hq.jpg`,
+                                      },
+                                    ],
+                                  },
+                                  thumbnailOverlays:
+                                    index === 0
+                                      ? [
+                                          {
+                                            thumbnailOverlayResumePlaybackRenderer:
+                                              { percentDurationWatched: 42 },
+                                          },
+                                        ]
+                                      : index === 1
+                                        ? [
+                                            {
+                                              thumbnailOverlayPlaybackStatusRenderer:
+                                                {
+                                                  text: {
+                                                    runs: [{ text: "Watched" }],
+                                                  },
+                                                },
+                                            },
+                                          ]
+                                        : [],
+                                  title: { runs: [{ text: `Video ${index}` }] },
+                                  videoId: `vid${index.toString().padStart(8, "0")}`,
+                                },
+                              })
+                            ),
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+  header: {
+    playlistHeaderRenderer: { numVideosText: { runs: [{ text: "2 videos" }] } },
+  },
+  ...(continuation
+    ? {
+        onResponseReceivedActions: [
+          { continuationCommand: { token: continuation } },
+        ],
+      }
+    : {}),
+});
+
+test("parses a page into items, resume percent, badge and continuation", () => {
+  const parsed = parseWatchLaterPage(legacyPage(3, "next-page"));
+
+  expect(parsed.items).toHaveLength(3);
+  expect(parsed.items[0].videoId).toBe("vid00000000");
+  expect(parsed.items[0].ytPercentWatched).toBe(42);
+  expect(parsed.items[0].setVideoId).toBe("set-0");
+  expect(parsed.items[0].durationSeconds).toBe(600);
+  expect(parsed.items[0].title).toBe("Video 0");
+  expect(parsed.items[1].watchedBadge).toBe(true);
+  expect(parsed.items[0].thumbnailUrl).toContain("i.ytimg.com");
+  expect(parsed.continuation).toBe("next-page");
+  expect(parsed.totalItems).toBe(2);
+});
+
+test("paging walks to the end, captures progress and soft-deletes what is gone", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  db.upsertEntry({ accountId: "alpha", videoId: "stale000001" });
+
+  const pages: Record<string, unknown> = {
+    "": legacyPage(2, "page-2"),
+    "page-2": {
+      contents: {
+        itemSectionRenderer: {
+          contents: [
+            {
+              playlistVideoListRenderer: {
+                contents: Array.from({ length: 1 }, (_, index) => ({
+                  playlistVideoRenderer: {
+                    lengthText: { simpleText: "3:00" },
+                    setVideoId: `set-b${index}`,
+                    title: { runs: [{ text: `Video b${index}` }] },
+                    videoId: `vidb${index.toString().padStart(8, "0")}`,
+                  },
+                })),
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const asked: string[] = [];
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: (continuation?: string): Promise<WatchLaterPage> => {
+      asked.push(continuation ?? "");
+      return Promise.resolve(parseWatchLaterPage(pages[continuation ?? ""]));
+    },
+    removeVideo: () => Promise.resolve(),
+    videoDetails: (): Promise<VideoDetails> => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  const result = await sync.pull(transport, {
+    accountId: "alpha",
+    resume: false,
+  });
+
+  expect(result.status).toBe("ok");
+  expect(result.pages).toBe(2);
+  expect(result.items).toBe(3);
+  expect(result.completed).toBe(true);
+  expect(asked).toEqual(["", "page-2"]);
+  expect(db.membershipIds("alpha").sort()).toEqual([
+    "vid00000000",
+    "vid00000001",
+    "vidb00000000",
+  ]);
+  // The stale entry disappeared from the walk, so it is soft-deleted...
+  expect(db.membershipIds("alpha")).not.toContain("stale000001");
+  // ...but the row is still there for provenance.
+  expect(db.entryFor("alpha", "stale000001")?.removed_at).not.toBeNull();
+  // Progress from the same page walk needed no extra request.
+  const [first] = db.query({ accountId: "alpha" }, defaultConfig);
+  expect(first.bucket).toBe("in-progress");
+  db.close();
+});
+
+test("an interrupted walk resumes from the stored cursor", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: (continuation?: string) =>
+      Promise.resolve(
+        parseWatchLaterPage(
+          continuation ? legacyPage(1) : legacyPage(1, "page-2")
+        )
+      ),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  const first = await sync.pull(transport, {
+    accountId: "alpha",
+    maxPages: 1,
+    resume: false,
+  });
+  expect(first.status).toBe("partial");
+  expect(db.loadCursor("alpha")?.continuation).toBe("page-2");
+
+  const second = await sync.pull(transport, {
+    accountId: "alpha",
+    resume: true,
+  });
+  expect(second.completed).toBe(true);
+  expect(db.loadCursor("alpha")).toBeUndefined();
+  db.close();
+});
+
+test("remove resolves the entry id the list carries, and queues when it cannot", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const removed: string[] = [];
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(1))),
+    removeVideo: (setVideoId: string) => {
+      removed.push(setVideoId);
+      return Promise.resolve();
+    },
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  db.upsertVideo({ title: "Video 0", videoId: "vid00000000" });
+  db.upsertEntry({
+    accountId: "alpha",
+    setVideoId: "set-0",
+    videoId: "vid00000000",
+  });
+
+  await sync.remove(transport, "alpha", "vid00000000");
+  expect(removed).toEqual(["set-0"]);
+  expect(db.membershipIds("alpha")).toEqual([]);
+
+  // Without the setVideoId the removal waits for a sync instead of guessing.
+  db.upsertEntry({ accountId: "alpha", videoId: "unknown0001" });
+  await expect(sync.remove(transport, "alpha", "unknown0001")).rejects.toThrow(
+    "set-video-id-unknown"
+  );
+  expect(db.listOutbox("alpha")).toHaveLength(1);
+  db.close();
+});
+
+test("a failed add is queued in the outbox for the next sync", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.reject(new Error("offline")),
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+    removeVideo: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  const sync = new WatchLaterSync(db, config);
+  await expect(sync.add(transport, "alpha", "vid00000000")).rejects.toThrow(
+    "offline"
+  );
+  expect(db.listOutbox("alpha")).toHaveLength(1);
+  expect(db.listOutbox("alpha")[0].kind).toBe("add");
+  db.close();
+});

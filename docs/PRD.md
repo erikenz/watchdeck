@@ -9,7 +9,10 @@ and the upstream-shaped CI (including the winget workflows) are kept, and the RE
 **Revision 6** — Q2 answered (keep the neutral plugins in tree) and the Ultracite migration landed; the deviation list
 in `oxlint.config.ts` is measured, not guessed.
 **Revision 7** — **P0 is done**: the version sweep landed with four documented pins, `docs/plugins.md` is written, and the
-first real bug the reset caused (the store typing behind `config.get`) is fixed. Next is P1.
+first real bug the reset caused (the store typing behind `config.get`) is fixed.
+**Revision 8** — the owner re-prioritised: **Watch Later first**, not the P1 base. The service, the account-aware schema,
+the sync engine with resumable paging, the quick-add hover button and account switching (which replaces the single-account
+assumption of Q12) are in as a plugin, with unit tests. The Library window is next; P1's provider rework follows.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -434,7 +437,19 @@ Data flow for the quick-add button (the round trip that must feel instant):
 
 ### R1 — Enhanced Watch Later
 
+> **Status (rev 8): implemented as `src/plugins/watch-later/`** — schema (account-scoped, see below), sync engine with
+> resumable paging, metadata enrichment, YouTube-resume capture, the quick-add hover button (R4) and account switching.
+> Covered by unit tests for the store, the page parsers and the sync engine. The **Library window** (search/filter/group)
+> is the remaining piece, and it is the next thing to build.
+
 **Database schema (SQLite, main process, `userData/watch-later.db`)**
+
+The tables below are the revision-1 sketch. What shipped adds the account dimension: `account` (id, name, handle, photo,
+`index_in_list` = the `X-Goog-Authuser` index, selected flag), an `account_id` key on `wl_entry` and `progress`, a
+`sync_cursor` table that makes paging resumable, and a `video` table that stays account-independent (the same video has the
+same title in every account). `video_fts` is kept current by triggers, and the classification rule gained one fix: the
+"continue watching" band reaches up to the watched threshold, so raising `watched.percent` cannot leave a video that is
+in neither bucket.
 
 ```sql
 CREATE TABLE video (
@@ -789,8 +804,10 @@ review already settled it; "open" means I need an answer — a single "yes to th
    horizontal → seek, shift+right-drag → speed. Anything else from "and others"?
 6. **Q9 — Metadata enrichment.** OK to fetch full details (description, tags, channel, duration) for every Watch Later video
    via InnerTube, batched and rate-limited, or should descriptions be lazy?
-7. **Q12 — Accounts.** v1 assumes the browser session's active account (multi-account switching is a known InnerTube mess).
-   Acceptable?
+7. **Q12 — Accounts → account switching required (rev 8).** Not "active account only": the plugin discovers the accounts
+   signed into the session (the account switcher's list), stores one row set per account, and switches by setting the
+   InnerTube account index, which every following request carries as `X-Goog-Authuser`. The menu has an account submenu, and
+   switching clears the resumable cursor so a half-synced list is never shown as another account's.
 
 ---
 

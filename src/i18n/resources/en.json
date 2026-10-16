@@ -729,7 +729,13 @@
       "sync": {
         "now": "Sync now",
         "progress": "{{items}} of {{total}} entries (page {{pages}})",
-        "running": "Syncing…"
+        "running": "Syncing…",
+        "reconciling": "Reconciling…"
+      },
+      "status": {
+        "failed": "Could not read the local index",
+        "mirrored": "{{count}} mirrored",
+        "mirrored-of": "{{items}} of {{total}} mirrored"
       }
     }
   }

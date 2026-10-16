@@ -31,6 +31,11 @@ interface BackendState {
   needsAuth: boolean;
   /** `SESSION_INDEX` the page reports, i.e. the account the user is browsing as. */
   sessionIndex: number | null;
+  /** The reason the running walk was started with, and what the site says the list holds. */
+  syncReason: string | null;
+  expectedTotal: number | null;
+  /** The repair below runs at most once per start; see `repairEntryIds`. */
+  repairedEntryIds: boolean;
   interval?: NodeJS.Timeout;
   window: BackendContext<WatchLaterPluginConfig>["window"] | null;
   config: WatchLaterPluginConfig | null;
@@ -40,13 +45,16 @@ const state: BackendState = {
   accounts: [],
   activeAccountId: null,
   config: null,
+  expectedTotal: null,
   needsAuth: false,
+  repairedEntryIds: false,
   session: null,
   sessionIndex: null,
   // Both are assigned in onMainLoad, before any IPC handler or menu click can use
   // them; the assertion is the module-private way of saying so.
   store: null!,
   sync: null!,
+  syncReason: null,
   syncing: false,
   window: null,
 };
@@ -62,6 +70,7 @@ const currentState = (): WatchLaterState => {
   return {
     accounts: state.accounts,
     activeAccountId: state.activeAccountId,
+    expectedTotal: state.expectedTotal ?? undefined,
     lastSync: run
       ? {
           error: run.error ?? undefined,
@@ -73,6 +82,7 @@ const currentState = (): WatchLaterState => {
         }
       : undefined,
     needsAuth: state.needsAuth,
+    syncReason: state.syncReason ?? undefined,
     syncing: state.syncing,
     totalEntries: state.activeAccountId
       ? state.store.countEntries(state.activeAccountId)
@@ -170,6 +180,7 @@ const runSync = async (options: {
   }
 
   state.syncing = true;
+  state.syncReason = options.reason;
   broadcast();
 
   const accountId = state.activeAccountId;
@@ -179,11 +190,13 @@ const runSync = async (options: {
     const result = await state.sync.pull(session, {
       accountId,
       maxPages: options.maxPages,
-      onProgress: (progress) =>
+      onProgress: (progress) => {
+        state.expectedTotal = progress.totalItems ?? state.expectedTotal;
         state.window?.webContents.send("watchdeck:watch-later-sync-progress", {
           accountId,
           ...progress,
-        }),
+        });
+      },
       protectVideoIds: new Set(mutatedDuringWalk),
       resume: options.resume ?? true,
     });
@@ -196,6 +209,7 @@ const runSync = async (options: {
     log("sync failed", error);
   } finally {
     state.syncing = false;
+    state.syncReason = null;
     broadcast();
   }
 };
@@ -236,6 +250,7 @@ const adoptSessionIndex = async (index: number) => {
   }
 
   flushStartupSync("session-index");
+  repairEntryIds();
 };
 
 const flushStartupSync = (reason: string) => {
@@ -244,6 +259,23 @@ const flushStartupSync = (reason: string) => {
   }
   startupSyncPending = false;
   void runSync({ reason: `start/${reason}` });
+};
+
+/**
+ * An entry the app added gets its `set_video_id` from the one-page walk scheduled 15s later. If the
+ * app is closed before that walk runs, nothing else teaches it, and the entry cannot be removed by
+ * id until a later walk - one page at the top is enough, so it is repaired once per start.
+ */
+const repairEntryIds = () => {
+  if (state.repairedEntryIds || !state.activeAccountId) {
+    return;
+  }
+  state.repairedEntryIds = true;
+  if (state.store.countEntriesMissingSetVideoId(state.activeAccountId) === 0) {
+    return;
+  }
+  log("entries without an entry id: checking the top of the list");
+  void runSync({ maxPages: 1, reason: "repair", resume: false });
 };
 
 export const onMainLoad = async ({

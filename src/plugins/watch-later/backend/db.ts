@@ -607,6 +607,19 @@ export class WatchLaterStore {
     return row?.count ?? 0;
   }
 
+  /**
+   * Entries the app added itself and no walk has seen yet: they have no `set_video_id`, so they
+   * cannot be removed by id until a page carries them.
+   */
+  countEntriesMissingSetVideoId(accountId: string): number {
+    const row = this.#db.get<{ count: number }>(
+      `SELECT count(*) AS count FROM wl_entry
+       WHERE account_id = ? AND removed_at IS NULL AND set_video_id IS NULL`,
+      accountId
+    );
+    return row?.count ?? 0;
+  }
+
   entryFor(accountId: string, videoId: string) {
     return this.#db.get<{
       set_video_id: string | null;

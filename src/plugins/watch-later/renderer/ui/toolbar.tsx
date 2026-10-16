@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onCleanup, onMount } from "solid-js";
+import { For, createSignal, onCleanup, onMount } from "solid-js";
 
 import { t } from "@/i18n";
 
@@ -38,6 +38,7 @@ const Toolbar = (props: ToolbarProps) => {
   const [entries, setEntries] = createSignal<WatchLaterEntry[]>([]);
   const [progress, setProgress] = createSignal<string | null>(null);
   const [busy, setBusy] = createSignal(false);
+  const [failure, setFailure] = createSignal(false);
 
   const selectedBucket = () => {
     const value = bucket();
@@ -45,28 +46,69 @@ const Toolbar = (props: ToolbarProps) => {
   };
 
   const refresh = async () => {
-    const [nextState, list] = await Promise.all([
-      props.bridge.state(),
-      props.bridge.query({
-        bucket: selectedBucket(),
-        limit: 5000,
-        search: search().trim() || undefined,
-      }),
-    ]);
-    setState(nextState);
-    setEntries(list);
-    // A walk the backend starts on its own - the one-page reconcile after an add, or the period -
-    // ends without this component being told, and its last line would otherwise sit in the status
-    // for the rest of the session. The state says whether a walk is running: if none is, clear it.
-    if (!nextState.syncing) {
-      setProgress(null);
+    try {
+      const [nextState, list] = await Promise.all([
+        props.bridge.state(),
+        props.bridge.query({
+          bucket: selectedBucket(),
+          limit: 5000,
+          search: search().trim() || undefined,
+        }),
+      ]);
+      setFailure(false);
+      setState(nextState);
+      setEntries(list);
+      // A walk the backend starts on its own - the one-page reconcile after an add, or the period -
+      // ends without this component being told, and its last line would otherwise sit in the status
+      // for the rest of the session. The state says whether a walk is running: if none is, clear it.
+      if (!nextState.syncing) {
+        setProgress(null);
+      }
+      props.onChange(
+        bucket() === "all" && !search().trim()
+          ? null
+          : new Set(list.map((entry) => entry.videoId)),
+        new Map(list.map((entry) => [entry.videoId, entry]))
+      );
+    } catch {
+      // This toolbar is the only place that can say so: without it a read that fails looks like a
+      // button that does nothing.
+      setFailure(true);
     }
-    props.onChange(
-      bucket() === "all" && !search().trim()
-        ? null
-        : new Set(list.map((entry) => entry.videoId)),
-      new Map(list.map((entry) => [entry.videoId, entry]))
-    );
+  };
+
+  const statusText = () => {
+    if (failure()) {
+      return t("plugins.watch-later.status.failed");
+    }
+    const running = progress();
+    if (running) {
+      return running;
+    }
+    const mirrored = state()?.totalEntries ?? 0;
+    const total = state()?.expectedTotal;
+    return total && total > mirrored
+      ? t("plugins.watch-later.status.mirrored-of", {
+          items: mirrored,
+          total,
+        })
+      : t("plugins.watch-later.status.mirrored", { count: mirrored });
+  };
+
+  const syncLabel = () => {
+    if (busy()) {
+      return t("plugins.watch-later.sync.running");
+    }
+    const current = state();
+    if (current?.syncing) {
+      // A walk the backend started by itself is not a full sync, and naming it as one makes the
+      // button look like it is doing work nobody asked for.
+      return current.syncReason === "reconcile" ||
+        current.syncReason === "repair"
+        ? t("plugins.watch-later.sync.reconciling")
+        : t("plugins.watch-later.sync.running");
+    }
+    return t("plugins.watch-later.sync.now");
   };
 
   onMount(() => {
@@ -106,6 +148,8 @@ const Toolbar = (props: ToolbarProps) => {
     try {
       setState(await props.bridge.sync());
       await refresh();
+    } catch {
+      setFailure(true);
     } finally {
       setBusy(false);
       setProgress(null);
@@ -168,18 +212,9 @@ const Toolbar = (props: ToolbarProps) => {
           onClick={() => runSync().catch(() => undefined)}
           type="button"
         >
-          {busy() || state()?.syncing
-            ? t("plugins.watch-later.sync.running")
-            : t("plugins.watch-later.sync.now")}
+          {syncLabel()}
         </button>
-        <span class="wd-wl-status">
-          <Show
-            when={progress()}
-            fallback={`${state()?.totalEntries ?? 0} mirrored`}
-          >
-            {progress()}
-          </Show>
-        </span>
+        <span class="wd-wl-status">{statusText()}</span>
       </div>
     </div>
   );

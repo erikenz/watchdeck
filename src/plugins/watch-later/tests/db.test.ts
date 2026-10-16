@@ -172,3 +172,24 @@ test("the sync cursor is resumable and clears when the walk completes", () => {
   expect(db.loadCursor("alpha")).toBeUndefined();
   db.close();
 });
+
+test("an entry the app added counts as missing its id until a page carries it", () => {
+  const db = store();
+  // What `add()` writes: the entry exists, the id does not.
+  db.upsertEntry({ accountId: "alpha", videoId: "aaaaaaaaaaa" });
+  expect(db.countEntriesMissingSetVideoId("alpha")).toBe(1);
+
+  // What a walk writes when it sees the entry on a page.
+  db.upsertEntry({
+    accountId: "alpha",
+    setVideoId: "set-one",
+    videoId: "aaaaaaaaaaa",
+  });
+  expect(db.countEntriesMissingSetVideoId("alpha")).toBe(0);
+
+  // Something already removed from the list is not something to repair.
+  db.upsertEntry({ accountId: "alpha", videoId: "bbbbbbbbbbb" });
+  db.removeEntry("alpha", "bbbbbbbbbbb");
+  expect(db.countEntriesMissingSetVideoId("alpha")).toBe(0);
+  db.close();
+});

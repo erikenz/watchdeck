@@ -92,6 +92,13 @@ export interface WatchLaterState {
     error?: string;
   };
   totalEntries: number;
+  /**
+   * Why the walk that is running now was started (`manual`, `menu`, `interval`, `start/…`,
+   * `reconcile`, `repair`), so the toolbar can name it for what it is.
+   */
+  syncReason?: string;
+  /** What the site says the list holds, learned from the running walk's first page. */
+  expectedTotal?: number;
   /** Set when the app has no usable session cookies. */
   needsAuth: boolean;
 }

@@ -52,15 +52,15 @@ plugins for YouTube.
 | D3 | Plugin inventory | Delete the YTM-only plugins; ship a documented plugin API + authoring guide in P0 so contributors can add their own | **yes — Q2** |
 | D4 | Watch Later storage | SQLite via built-in `node:sqlite` (FTS5 verified on Node 24); DB owned by the main process | no (impl detail) |
 | D5 | Watch Later sync | Main process, `youtubei.js` + session cookies (same pattern as the inherited downloader); mutations may go page-side via `window.ytcfg` if account handling requires it | no (impl detail, §4.2) |
-| D6 | Watch Later UI | Dedicated "Library" window (SolidJS + mdui + `virtua`) for v1; in-page takeover of `/playlist?list=WL` later | **yes — Q3** |
-| D7 | Hover "add to Watch Later" button | Injected into every thumbnail card (both `ytd-thumbnail` and the newer view-model cards); bottom-right over the duration-badge corner; 40×40 player-control look or the ~28 px overlay look — see Q4 | **yes — Q4** |
+| D6 | Watch Later UI | **In-page, in v1** (rev 9): a toolbar above the page's own sort control, filters that hide the page's own rows, per-row context lines. No separate Library window. | no (Q3 answered) |
+| D7 | Hover "add to Watch Later" button | Hosted on the **card** (the inline preview lives outside the thumbnail link), bottom-right **above** the duration badge, one offset in every state, always visible once saved, clock glyph filled/outline for state, skipped on the Watch Later page itself | no (Q4 answered) |
 | D8 | SponsorBlock | Load the **official extension release at runtime** with a small compat shim (**revised** — see §5.1); native client only as fallback | **yes — Q7** |
 | D9 | Disable autoplay | One-shot capturing `play` listener → `video.pause()`, armed on `yt-navigate-finish`/`popstate`; plus click YouTube's toggle to enforce off (`aria-checked` flip verified — `setAutonavState()` is a **no-op**) | no (verified) |
 | D10b | Watch progress source | `max(local high-water mark, YouTube's own resume %)` — the resume % is available per item as `thumbnailOverlays[].thumbnailOverlayResumePlaybackRenderer.percentDurationWatched` (**revised** — see §4.3) | no (evidence-backed) |
 | D10 | Gestures | Own pointer-state tracking + wheel/pointer movement; right-drag = volume, right-drag horizontal = seek, shift+right-drag = speed | **yes — Q6** |
 | D11 | Lint/format | `pnpm dlx ultracite init --linter oxlint --pm pnpm --frameworks solid --type-aware` (command you specified), replacing `.oxlintrc.json`/`.oxfmtrc.json`; documented suppression list for type-aware rules that even the prototype had to disable | no (Q8 answered) |
 | D12 | Versions | Exact pins everywhere (already the case) + `save-exact=true`; no pre-release pins — stable equivalents exist for all of them | no — resolved in §5.5 |
-| D13 | Git history | **Done**: fresh repo `main` @ `6007aa4` in `~/Projects/youtube-client`, no remotes, upstream `.git` backed up; project-folder rename to `~/Projects/watchdeck` pending (§11) | no (Q10 done) |
+| D13 | Git history | **Done**: fresh repo `main`, upstream `.git` backed up, folder renamed to `~/Projects/watchdeck`, published to `origin` (§11) | no (Q10 done) |
 
 ---
 
@@ -437,10 +437,15 @@ Data flow for the quick-add button (the round trip that must feel instant):
 
 ### R1 — Enhanced Watch Later
 
-> **Status (rev 8): implemented as `src/plugins/watch-later/`** — schema (account-scoped, see below), sync engine with
-> resumable paging, metadata enrichment, YouTube-resume capture, the quick-add hover button (R4) and account switching.
-> Covered by unit tests for the store, the page parsers and the sync engine. The **Library window** (search/filter/group)
-> is the remaining piece, and it is the next thing to build.
+> **Status (rev 9): implemented as `src/plugins/watch-later/`, in the page.** Schema (account-scoped), sync engine with
+> resumable paging, metadata enrichment, YouTube-resume capture, the quick-add hover button (R4). The Watch Later page
+> itself is enhanced in place: a toolbar above the site's own sort control (search, filter chips with live counts, sync
+> controls, progress), per-row context lines (bucket · watched % · saved date) and filters that **hide the page's own rows**
+> rather than render a list of ours. Rev 9 also overturns rev 8's account handling: **no Library window, no account picker,
+> no account submenu** — accounts are switched only through the site's own avatar menu, and the plugin follows the account
+> the page is browsing as (it reports `SESSION_INDEX`, which the backend adopts). Covered by unit tests for the store, the
+> page parsers and the sync engine; the in-page surface has no automated tests yet and is checked against the live page
+> (a fixture harness for it is queued in §15). Remaining: OS-level entry points and the P4 polish list (§8).
 
 **Database schema (SQLite, main process, `userData/watch-later.db`)**
 
@@ -581,31 +586,34 @@ the plugin cleanly loads/unloads the extension (or unregisters our listeners) wi
 **Hosts:** every thumbnail card — classic `ytd-thumbnail` (`ytd-rich-item-renderer` on home/subscriptions,
 `ytd-video-renderer` in search, `ytd-grid-video-renderer` on channels, `ytd-compact-video-renderer` in the watch-page
 sidebar, `ytd-playlist-video-renderer` in playlists) **and** the newer view-model cards (`yt-thumbnail-view-model`,
-`a.ytLockupViewModelContentImage`, `ytThumbnailViewModelHost`) that YouTube already serves on some surfaces — the
-prototype needed both generations, so plan for both. Shorts (`ytd-reel-item-renderer`) excluded in v1. Implementation: one
-`MutationObserver` + a light custom element (`<wl-save-button>`) reused for all hosts, so a host's re-render does not
-duplicate buttons.
+`a.ytLockupViewModelContentImage`, `ytThumbnailViewModelHost`) that YouTube already serves on some surfaces. Shorts
+(`ytd-reel-item-renderer`) excluded in v1. Implementation (rev 9): one `MutationObserver`, **one button per card**, hosted
+on the card itself (marked `wd-wl-anchor`) — *not* on the thumbnail link, which the site's inline preview replaces with a
+surface outside it, and *not* inside the overlay, which is `pointer-events: none` until it plays and carries no `z-index`
+for a button inside it to beat.
 
-**Placement (measured):** bottom-right of the thumbnail, **8 px inset** (same as the duration badge). The duration badge
-occupies exactly that spot (68×20 px), which is why the interaction needs a decision (Q4):
-(a) overlay and hide the badge while the button is shown, (b) keep the badge and shift it left by the button width,
-(c) draw the button on top of the badge semi-transparently. My recommendation: **(b)** — the badge stays readable,
-which matches YouTube's own habit of keeping the duration visible and is the least surprising in a list of thumbnails.
-One extra wrinkle worth knowing up front: when YouTube starts its inline hover **preview**, the preview surface replaces
-the thumbnail, so the button has to follow it (the prototype re-offsets the button by the delta between the preview rect
-and the thumbnail rect) — that logic belongs in the shared button module, not in each host.
+**Placement (rev 9):** bottom-right of the video box, **36 px above its bottom edge** — clear of the duration badge, and the
+**same offset while the site's inline preview plays**. The overlay moves onto the card and takes the pointer, so the card
+stops being hovered; the card is *marked* while the overlay covers it, and the mark is what keeps the button visible. The
+video box is measured from the card's thumbnail-ish children, skipping any candidate too small to be the video.
 
-**Size (measured):** 40×40 hit area with a 24 px icon inside, translucent dark circle, hover states matching YouTube's
-own `rgba(0,0,0,.6)`-style overlays. If you prefer the *thumbnail-overlay* look instead of the *player-control* look,
-28×28 is the alternative (Q4).
+**The overlay's own state (rev 9):** it is one shared element (`ytd-video-preview`) that shows and hides itself through its
+`active`/`playing` attributes and keeps its last geometry when put away, so “is it up” is read from those attributes (with
+size and opacity as a fallback), never from size alone.
 
-**States:** not-saved (clock-plus) / saved (filled clock or check) / pending (spinner) / error (retry). Tooltip and
-`aria-label` localized (`Save to Watch Later` / `Remove from Watch Later`), keyboard focusable, click never navigates
-(`preventDefault` + `stopPropagation` on both `mousedown` and `click`).
+**Size (rev 9):** 36×36 translucent dark circle with a 22 px glyph, matching YouTube's own overlay buttons.
 
-**Acceptance:** the button appears on hover for all listed hosts (verified by screenshot on home/search/channel/sidebar/
-watch-page playlist), the icon reflects real WL membership (including changes made on youtube.com), clicking adds/removes
-within ≈1 s with optimistic feedback, and holding a click on it never opens the video or the inline preview.
+**States:** not-saved (**outline clock**, the site's own Watch Later glyph) / saved (**the same clock, filled**) / pending
+(spinner) / error (red circle). Tooltip and `aria-label` localized (`Save to Watch Later` / `Remove from Watch Later`) with
+`aria-pressed`; keyboard focusable; a click never navigates (`preventDefault` + `stopPropagation` on `mousedown`,
+`pointerdown`, `auxclick` and `click`). A saved video's button is visible without hovering; an unsaved one appears on hover
+(and while the preview covers that card). On the Watch Later page itself the buttons are **not** added — every row there is
+already in the list.
+
+**Acceptance:** the button appears on hover for the listed hosts (verified on the live home feed and the watch-page
+sidebar), the icon reflects real membership (including changes made on youtube.com), the offset does **not** change when
+the inline preview starts, clicking adds/removes within ≈1 s with optimistic feedback, and holding a click on it never
+opens the video or the inline preview.
 
 ### R5 — Plugins: what happens to the 41 inherited ones
 
@@ -689,12 +697,19 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 |-------|---------|---------------|
 | **P0 — Reset** (small) | git re-init (in your checkout, §11), debrand (R8) **including the update feed**, delete plugin inventory (R5), Ultracite via `ultracite init` + rewired scripts (§5.3), `.npmrc`, version sweep to stable, README + plugin authoring guide, CI that runs `ultracite check` + `typecheck` + build | app boots to `www.youtube.com`, `pnpm dev` works, `ultracite check` passes, and the R8 grep gate finds upstream names only in the attribution section |
 | **P1 — YouTube base** | base providers rework (`video-info` replacing `song-info` on the YT DOM: `videodatachange`, `.ytp-progress-bar`/`video.timeupdate`, metadata), autoplay plugin, gesture controller, minimal window/menu/tray, smoke test against youtube.com | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green |
-| **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, Library window (search/filter/group), OS-level entry points | all R1/R4 acceptance criteria |
+| **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), OS-level entry points | R1/R4 acceptance criteria; all delivered except the OS-level entry points |
 | **P3 — SponsorBlock** | spike: load the official release with the storage.sync shim (verify SW, player UI, config persistence, offline behaviour); ship that if it passes, else the native client (skip/mute/full/poi, categories, cache, menu) | R2 acceptance criteria |
 | **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
 
 Order rationale: P0 shrinks the codebase before Ultracite runs over it and before any release identity exists; P1 gives a
 usable player; P2 is the requested core feature; P3 is independent and can be parallelised after P1.
+
+**CI, as of rev 9.** Push and pull requests run the checks (`pnpm check`, the identity gate, `pnpm build`) on all three
+platforms, plus the launch test on the Linux runner — the only one with `xvfb`. **Releases are cut by hand**
+(`workflow_dispatch`): the packaging jobs need toolchains and signing identities that belong to P4, and running them on
+every push is what kept CI red (the Windows target asked for `win32-ia32`, which Electron 44 no longer publishes). Four
+workflows are parked next to `build.yml` as `.yml.disabled`, each with its reason in the file; packaging work re-enables
+them.
 
 ---
 
@@ -748,6 +763,8 @@ usable player; P2 is the requested core feature; P3 is independent and can be pa
   skeleton) and `.youtube-client-git-backup-pear-desktop/` (above).
 - Keep the upstream MIT attribution (`license`, `NOTICE`), this repository's own copyright line, and the
   `tools/identity-gate.sh` check when publishing.
+- CI runs the checks only; releases are manual (`workflow_dispatch`), and four workflows sit parked as `.yml.disabled`
+  (dependency-review, pr-build-artifacts, winget-cla, winget-submission) with their reasons in the files — see §8.
 
 ## 12. Name recommendations (revised for your criteria)
 
@@ -799,25 +816,24 @@ review already settled it; "open" means I need an answer — a single "yes to th
 - **Q2 Plugin inventory → keep them (rev 6).** The 15 music-only plugins are deleted; the remaining 24 stay in tree for now,
   as reference material and to be reworked or dropped deliberately as P1/P2 reach them. The price is visible and accepted:
   Ultracite's strict defaults are documented as per-rule deviations in `oxlint.config.ts` instead of being satisfied.
+- **Q3 Watch Later UI → in-page (rev 9).** No Library window: `/playlist?list=WL` keeps its own list, and the plugin adds a
+  toolbar above the site's sort control, filters that hide the page's own rows, and one context line per row. The same
+  decision removed the account picker from the toolbar, the menu and the IPC surface — accounts are switched only through
+  the site's own avatar menu, and the plugin follows the account the page is browsing as.
+- **Q4 Hover button → as shipped in §R4 (rev 9).** Hosted on the card, above the duration badge, one offset in every state,
+  the saved state always visible, outline/filled clock for state, none on the Watch Later page.
+- **Q5 Thresholds → configurable, mixed units (rev 9).** Each side of the band takes a percentage **or** minutes,
+  independently of the other; minutes on the *max* side count back from the video's end. Defaults stay: continue watching
+  ≥2 min or ≥5 %, watched ≥90 % or the site's badge, with the `max(local, YouTube)` merge of §4.3.
+- **Q9 Metadata enrichment → yes, batched and rate-limited (rev 9).** `sync.enrich` fetches details behind the same 1 req/s
+  limiter, capped per run and behind a config toggle (`enrichMetadata`).
+- **Q12 Accounts → overturned (rev 9).** No account switching and no account submenu: the session's account list is read
+  only to know which Watch Later the page is showing, and switching happens in the site's own avatar menu.
 
 **Open:**
 
-2. **Q3 — Watch Later UI.** My recommendation: a dedicated Library window for v1 plus a small in-page surface (hover
-   button, progress reporting), and the `/playlist?list=WL` takeover in a later phase. Your prototype went in-page first —
-   confirm or override.
-3. **Q4 — Hover button.** Reference size: player-control look (40×40, measured on the live page) or thumbnail-overlay look
-   (~28 px with a 24 px icon, as the prototype built)? And the duration badge: shift it left (my recommendation) or cover it?
-4. **Q5 — Thresholds and progress merge.** Confirm defaults (continue watching ≥2 min or ≥5 %; watched ≥90 % or the
-   "Watched" badge) and the `max(local, YouTube)` merge rule of §4.3 — or tell me to prefer one source only (e.g. local
-   only, so another device cannot mark your items watched).
-5. **Q6 — Gestures.** Confirm right+wheel → volume (the one you named) plus right-drag vertical → volume, right-drag
+1. **Q6 — Gestures.** Confirm right+wheel → volume (the one you named) plus right-drag vertical → volume, right-drag
    horizontal → seek, shift+right-drag → speed. Anything else from "and others"?
-6. **Q9 — Metadata enrichment.** OK to fetch full details (description, tags, channel, duration) for every Watch Later video
-   via InnerTube, batched and rate-limited, or should descriptions be lazy?
-7. **Q12 — Accounts → account switching required (rev 8).** Not "active account only": the plugin discovers the accounts
-   signed into the session (the account switcher's list), stores one row set per account, and switches by setting the
-   InnerTube account index, which every following request carries as `X-Goog-Authuser`. The menu has an account submenu, and
-   switching clears the resumable cursor so a half-synced list is never shown as another account's.
 
 ---
 
@@ -849,9 +865,8 @@ conversation. The research behind it happened in one Delta thread, which was clo
 - **Where the code lived during research:** a Delta managed checkout inside the project folder
   (`~/Projects/youtube-client/.delta/worktrees/…/pear-desktop`). That is why §11 sequences the folder rename *after* this
   thread's work ends: the checkout and its clone are keyed by absolute paths.
-- **Repo state handed over:** branch `main` at `66345e8` (initial commit `6007aa4` plus the commit that added this handoff
-  note), primary checkout `~/Projects/watchdeck`, `origin` = `https://github.com/erikenz/watchdeck` (private, default branch
-  `main`, pushed). See §11.
+- **Repo state handed over:** branch `main`, published to `origin` = `https://github.com/erikenz/watchdeck` (private, default
+  branch `main`). The Watch Later feature (P2/R1/R4) is merged, most recently as `77d9b1f`. See §11.
 - **Upstream history backup (safe to delete):** `~/Projects/.youtube-client-git-backup-pear-desktop` (25 MB) — the only
   remaining copy of the pear-desktop/YouTube-Music history that was deliberately dropped.
 - **Discarded prototype (read-only reference):** `~/Projects/watchdeck-old` (formerly `~/Projects/watchdeck`), reviewed in
@@ -864,9 +879,9 @@ conversation. The research behind it happened in one Delta thread, which was clo
   the official release at runtime with a compat shim, native client as fallback after a spike (§5.1); Ultracite through
   `ultracite init` with the verified toolchain set (§5.3, §5.5); debrand as a phase-0 gate including the update feed (§R8);
   watch progress = `max(local high-water mark, YouTube resume %)` (§4.3); autoplay by a one-shot capturing `play` listener
-  (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11).
-- **Still open:** §13 Q3–Q6, Q9, Q12 — Watch Later UI surface, hover-button size/badge handling,
-  thresholds and progress merge, gesture set, metadata enrichment policy, single-account assumption.
+  (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11); **Watch Later enhanced in the page, no
+  Library window and no account picker** (§R1, Q3); **the hover button as shipped in §R4** (Q4).
+- **Still open:** §13 Q6 (the gesture set). Everything else in §13 is answered.
 - **Next step:** **P1 — YouTube base** in §8: rework the providers (`video-info` replacing the music-era `song-info`), the
   autoplay plugin, the gesture controller and the minimal window/menu/tray, then a smoke test against the real site.
 - **P0 progress (revision 5).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, replaced icon
@@ -875,7 +890,8 @@ conversation. The research behind it happened in one Delta thread, which was clo
   `.npmrc` with `save-exact=true`; `pnpm typecheck`, `pnpm build` and `pnpm test` (smoke test against `www.youtube.com`)
   verified locally. After owner review the escapes were restored in code/metadata (§R8), `auto-changelog` and the
   upstream-shaped CI (matrix build + release job, `winget-*` workflows) came back, and the README follows the upstream
-  section layout. The Ultracite migration is in as well (toolchain pinned to the set in §5.3, `ultracite fix` over the
+  section layout — as of rev 9 that CI runs checks on push and pull requests only, with releases cut by hand and four
+  workflows parked (§8). The Ultracite migration is in as well (toolchain pinned to the set in §5.3, `ultracite fix` over the
   tree, `oxlint.config.ts` keeps Ultracite's presets with a measured 117-rule deviation list). The version sweep (§R6) is
   done — latest stable everywhere except four packages whose majors need the plugin rewrites P1/P2 do, each with its
   reason in `TODO.md`, and `electron-vite`, where 6.0.0 stable cannot load the project tsconfig at all. `docs/plugins.md`

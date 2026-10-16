@@ -1,6 +1,7 @@
 import type { BrowserWindow } from "electron";
 import { Innertube } from "youtubei.js";
 
+import { SITE_ORIGIN } from "../site";
 import type { WatchLaterAccount } from "../types";
 import {
   accountsListPayload,
@@ -20,9 +21,7 @@ import type {
   WatchLaterPage,
 } from "./inner-tube";
 
-/** Kept escaped on purpose: see the note about the de-trademarking pass in the PRD. */
-export const SITE_ORIGIN =
-  "https://www.\u0079\u006f\u0075\u0074\u0075\u0062\u0065.com";
+export { SITE_ORIGIN };
 
 const AUTH_COOKIES = ["SAPISID", "SID"];
 
@@ -86,25 +85,17 @@ export class WatchLaterSession {
   async listAccounts(): Promise<WatchLaterAccount[]> {
     const probed = await probeAccounts((index) => this.#identityAt(index));
 
-    this.#accounts =
-      probed.length > 0
-        ? probed.map(({ identity, index }) => ({
-            byline: identity.byline,
-            handle: identity.handle,
-            id: identity.handle ?? `account-${index}`,
-            index,
-            isSelected: index === this.#accountIndex,
-            name: identity.name,
-            photoUrl: identity.photoUrl,
-          }))
-        : [
-            {
-              id: "default",
-              index: 0,
-              isSelected: true,
-              name: "Default account",
-            },
-          ];
+    // Nothing answered: there is no account. Callers see an empty list and say
+    // "no account", rather than a placeholder that looks like a real one.
+    this.#accounts = probed.map(({ identity, index }) => ({
+      byline: identity.byline,
+      handle: identity.handle,
+      id: identity.handle ?? `account-${index}`,
+      index,
+      isSelected: index === this.#accountIndex,
+      name: identity.name,
+      photoUrl: identity.photoUrl,
+    }));
 
     return this.#accounts;
   }

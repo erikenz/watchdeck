@@ -7,7 +7,8 @@ import { menu } from "./menu";
 import { renderer } from "./renderer";
 import type { WatchLaterPluginConfig } from "./types";
 
-import style from "./renderer/style.css?inline";
+import panelStyle from "./renderer/style.css?inline";
+import panelStyles from "./renderer/ui/style.css?inline";
 
 export type { WatchLaterPluginConfig } from "./types";
 
@@ -28,5 +29,5 @@ export default createPlugin<
   menu,
   name: () => t("plugins.watch-later.name"),
   renderer,
-  stylesheets: [style],
+  stylesheets: [panelStyle, panelStyles],
 });

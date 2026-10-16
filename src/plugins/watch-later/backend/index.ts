@@ -87,7 +87,6 @@ const broadcast = () => {
   );
 };
 
-/** Cookies are the source of truth for "who is signed in"; the DB only remembers. */
 const connect = async () => {
   if (!state.window) {
     return;

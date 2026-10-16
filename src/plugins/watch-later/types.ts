@@ -25,6 +25,8 @@ export interface WatchLaterPluginConfig {
   activeAccountId: string;
   /** Show the save button when hovering a thumbnail. */
   showHoverButton: boolean;
+  /** Show the panel on the site's own Watch Later page. */
+  showLibraryPanel: boolean;
 }
 
 export interface WatchLaterAccount {
@@ -94,6 +96,12 @@ export interface WatchLaterState {
 export type WatchLaterMutationResult =
   | { ok: true; inWatchLater: boolean }
   | { ok: false; error: string };
+
+export interface WatchLaterSyncProgress {
+  pages: number;
+  items: number;
+  totalItems?: number;
+}
 
 export interface WatchLaterProgressReport {
   videoId: string;

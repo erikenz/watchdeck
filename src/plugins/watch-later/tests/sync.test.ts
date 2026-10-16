@@ -105,8 +105,11 @@ test("parses a page into items, resume percent, badge and continuation", () => {
   expect(parsed.totalItems).toBe(2);
 });
 
-/** Taken from a real `VLWL` response, trimmed to the fields the parser reads. */
-const realPageFixture = {
+/**
+ * The shape of a `VLWL` response, trimmed to the fields the parser reads; the values
+ * are placeholders, not anyone's list.
+ */
+const pageFixture = {
   contents: {
     itemSectionRenderer: {
       contents: [
@@ -122,18 +125,17 @@ const realPageFixture = {
                       webCommandMetadata: { url: "/watch?v=aaaa" },
                     },
                   },
-                  setVideoId: "289F4A46CA11",
+                  setVideoId: "ExampleSet01",
                   shortBylineText: {
                     runs: [
                       {
                         navigationEndpoint: {
                           browseEndpoint: {
-                            browseId: "UCYEK6xds6eo-3tr4xRdflmQ",
-                            canonicalBaseUrl:
-                              "/channel/UCYEK6xds6eo-3tr4xRdflmQ",
+                            browseId: "UCExampleChannel000000",
+                            canonicalBaseUrl: "/channel/UCExampleChannel000000",
                           },
                         },
-                        text: "deadmau5",
+                        text: "Example Channel",
                       },
                     ],
                   },
@@ -164,7 +166,7 @@ const realPageFixture = {
                       },
                     },
                   ],
-                  title: { runs: [{ text: "deadmau5 Live Stream" }] },
+                  title: { runs: [{ text: "Example video" }] },
                   videoId: "aaaaaaaaaaa",
                 },
               },
@@ -176,14 +178,14 @@ const realPageFixture = {
   },
 };
 
-test("parses a real page: channel, duration from the overlay, resume percent", () => {
-  const [item] = parseWatchLaterPage(realPageFixture).items;
+test("parses a page: channel, duration from the overlay, resume percent", () => {
+  const [item] = parseWatchLaterPage(pageFixture).items;
 
   expect(item.videoId).toBe("aaaaaaaaaaa");
-  expect(item.title).toBe("deadmau5 Live Stream");
-  expect(item.channelTitle).toBe("deadmau5");
-  expect(item.channelId).toBe("UCYEK6xds6eo-3tr4xRdflmQ");
-  expect(item.setVideoId).toBe("289F4A46CA11");
+  expect(item.title).toBe("Example video");
+  expect(item.channelTitle).toBe("Example Channel");
+  expect(item.channelId).toBe("UCExampleChannel000000");
+  expect(item.setVideoId).toBe("ExampleSet01");
   // No lengthText in this response shape: the duration comes from the time-status overlay.
   expect(item.durationSeconds).toBe(3660);
   expect(item.ytPercentWatched).toBe(25);

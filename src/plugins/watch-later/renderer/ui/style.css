@@ -1,0 +1,196 @@
+/* The panel lives inside the site's Watch Later page, so every rule is scoped to our
+   host element: a bare `button` or `header` selector here would restyle YouTube's own
+   UI. */
+.wd-wl-panel-root {
+  background: rgb(var(--mdui-color-background, 18 18 20) / 0.98);
+  border-radius: 12px;
+  bottom: 14px;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 55%);
+  color: rgb(var(--mdui-color-on-background, 230 230 235));
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, "Helvetica Neue", system-ui, sans-serif;
+  overflow: hidden;
+  position: fixed;
+  right: 14px;
+  /* Below the site's masthead, which is taller than it looks and sits above us. */
+  top: calc(var(--ytd-masthead-height, 56px) + 12px);
+  width: 420px;
+  z-index: 3000;
+}
+
+.wd-wl-panel-root .app {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wd-wl-panel-root header {
+  align-items: center;
+  border-bottom: 1px solid rgb(var(--mdui-color-outline-variant, 60 60 66));
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+}
+
+.wd-wl-panel-root h1 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.wd-wl-panel-root .muted {
+  color: rgb(var(--mdui-color-on-surface-variant, 170 170 180));
+  font-size: 12px;
+  margin: 3px 0 0;
+}
+
+.wd-wl-panel-root .controls,
+.wd-wl-panel-root .toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wd-wl-panel-root .toolbar {
+  border-bottom: 1px solid rgb(var(--mdui-color-outline-variant, 60 60 66));
+  padding: 8px 14px;
+}
+
+.wd-wl-panel-root input[type="search"] {
+  background: rgb(var(--mdui-color-surface-container, 32 32 36));
+  border: 1px solid rgb(var(--mdui-color-outline-variant, 60 60 66));
+  border-radius: 8px;
+  color: inherit;
+  flex: 1 1 140px;
+  font-size: 13px;
+  padding: 7px 10px;
+}
+
+.wd-wl-panel-root select {
+  background: rgb(var(--mdui-color-surface-container, 32 32 36));
+  border: 1px solid rgb(var(--mdui-color-outline-variant, 60 60 66));
+  border-radius: 8px;
+  color: inherit;
+  font-size: 12px;
+  max-width: 100%;
+  padding: 6px;
+}
+
+.wd-wl-panel-root button {
+  background: transparent;
+  border: 1px solid rgb(var(--mdui-color-outline-variant, 60 60 66));
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.wd-wl-panel-root button.primary {
+  background: rgb(var(--mdui-color-primary, 140 160 255));
+  border-color: transparent;
+  color: rgb(var(--mdui-color-on-primary, 16 16 20));
+  font-weight: 500;
+}
+
+.wd-wl-panel-root button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.wd-wl-panel-root button.tab.active {
+  background: rgb(var(--mdui-color-secondary-container, 60 60 80));
+  border-color: transparent;
+}
+
+.wd-wl-panel-root .banner {
+  background: rgb(var(--mdui-color-surface-container-high, 40 40 46));
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 10px 14px 0;
+  padding: 8px 10px;
+}
+
+.wd-wl-panel-root .banner.error {
+  background: rgb(var(--mdui-color-error-container, 80 30 30));
+}
+
+.wd-wl-panel-root main {
+  flex: 1;
+  min-height: 0;
+}
+
+.wd-wl-panel-root .empty {
+  padding: 18px 14px;
+}
+
+.wd-wl-panel-root .row {
+  align-items: center;
+  border-bottom: 1px solid rgb(var(--mdui-color-surface-container, 32 32 36));
+  display: flex;
+  gap: 10px;
+  height: 76px;
+  padding: 0 12px;
+}
+
+.wd-wl-panel-root .row img {
+  background: rgb(var(--mdui-color-surface-container, 32 32 36));
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.wd-wl-panel-root .details {
+  flex: 1;
+  min-width: 0;
+}
+
+.wd-wl-panel-root .title {
+  color: inherit;
+  display: block;
+  font-size: 13px;
+  max-width: 100%;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wd-wl-panel-root .title:hover {
+  text-decoration: underline;
+}
+
+.wd-wl-panel-root .bar {
+  background: rgb(var(--mdui-color-surface-container-high, 44 44 50));
+  border-radius: 999px;
+  height: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+  width: 45%;
+}
+
+.wd-wl-panel-root .bar-fill {
+  background: rgb(var(--mdui-color-primary, 140 160 255));
+  height: 100%;
+}
+
+/* Collapsed: the whole panel becomes a pill in the corner. */
+.wd-wl-panel-root[data-open="false"] {
+  bottom: auto;
+  height: auto;
+  padding: 0;
+  top: auto;
+  width: auto;
+}
+
+.wd-wl-panel-root[data-open="false"] .app {
+  display: none;
+}
+
+.wd-wl-panel-root .toggle {
+  background: rgb(var(--mdui-color-surface-container-high, 40 40 46));
+}

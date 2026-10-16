@@ -22,6 +22,8 @@ These four are held at the version the current code is written against. Each one
 
 - [ ] **`pnpm test` cannot attach to the page without a window manager** (this sandbox): `firstWindow()` never resolves — for this app _and_ for the commit before it. The window is created and titled correctly, which the launch test asserts. The page load assertion is `test.fixme` in `tests/index.test.js`; drop the `.fixme` where `pnpm dev` shows the site (a real desktop, or xvfb in CI).
 
+- [ ] **Killing a running app needs the right name**: Electron renames its process to the app name, so `pkill -x electron` misses it (and `pkill -f "electron ."` can match the shell you are typing in). Use `pkill -x watchdeck`. A leftover instance holds the CDP port and the single-instance lock, which makes the next launch fail quietly.
+
 Resolved, and worth remembering:
 
 - A `pnpm dev` warning about a missing tsconfig base file came from the **primary checkout** above this worktree (esbuild resolved `../../../../tsconfig.json`), not from this tree; updating that checkout removed it.

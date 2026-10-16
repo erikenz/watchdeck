@@ -1,8 +1,15 @@
+import { render } from "solid-js/web";
+
 import { t } from "@/i18n";
 import type { RendererContext } from "@/types/contexts";
 import type { MusicPlayer } from "@/types/music-player";
 
-import type { WatchLaterPluginConfig, WatchLaterState } from "../types";
+import { isWatchLaterPage } from "../site";
+import type {
+  WatchLaterPluginConfig,
+  WatchLaterState,
+  WatchLaterSyncProgress,
+} from "../types";
 import {
   BUTTON_CLASS,
   createSaveButton,
@@ -13,6 +20,11 @@ import {
   videoIdFromHost,
 } from "./dom";
 import type { ButtonState } from "./dom";
+import Panel from "./ui/panel";
+import type { WatchLaterBridge } from "./ui/panel";
+
+/** The panel's host element in the page. */
+const PANEL_ROOT_CLASS = "wd-wl-panel-root";
 
 /** How often the local high-water mark is reported while something plays. */
 const PROGRESS_INTERVAL_MS = 5000;
@@ -29,15 +41,19 @@ export const renderer = {
   scanQueued: false,
   lastProgressSentAt: 0,
   sessionIndexAttempts: 0,
+  panel: null as HTMLElement | null,
+  context: null as RendererContext<WatchLaterPluginConfig> | null,
   videoDataListener: null as ((event: Event) => void) | null,
   timeUpdateListener: null as ((event: Event) => void) | null,
 
   async start(context: RendererContext<WatchLaterPluginConfig>) {
     this.ipc = context.ipc;
+    this.context = context;
     this.config = await context.getConfig();
 
     await this.hydrate();
     this.reportSessionIndex(context);
+    this.mountPanel(context);
 
     this.observer = new MutationObserver(() => this.queueScan());
     this.observer.observe(document.body, {
@@ -58,12 +74,72 @@ export const renderer = {
     this.videoDataListener = this.onVideoDataChange.bind(this);
     this.timeUpdateListener = this.onTimeUpdate.bind(this);
     document.addEventListener("videodatachange", this.videoDataListener);
+    this.navigateListener = this.onNavigate.bind(this);
+    document.addEventListener("yt-navigate-finish", this.navigateListener);
     document
       .querySelector("video")
       ?.addEventListener("timeupdate", this.timeUpdateListener);
   },
 
+  /** The site's own Watch Later page is where the panel belongs. */
+  mountPanel(context: RendererContext<WatchLaterPluginConfig>) {
+    if (!this.config?.showLibraryPanel || !isWatchLaterPage()) {
+      this.panel?.remove();
+      this.panel = null;
+      return;
+    }
+    if (document.querySelector(`.${PANEL_ROOT_CLASS}`)) {
+      return;
+    }
+
+    const root = document.createElement("div");
+    root.className = PANEL_ROOT_CLASS;
+    root.dataset.open = "true";
+    document.body.append(root);
+
+    const bridge: WatchLaterBridge = {
+      add: (videoId) =>
+        context.ipc.invoke("watchdeck:watch-later-add", videoId),
+      onChanged: (listener) =>
+        context.ipc.on(
+          "watchdeck:watch-later-changed",
+          (state: WatchLaterState) => listener(state)
+        ),
+      onProgress: (listener) =>
+        context.ipc.on(
+          "watchdeck:watch-later-sync-progress",
+          (progress: WatchLaterSyncProgress) => listener(progress)
+        ),
+      query: (query) =>
+        context.ipc.invoke("watchdeck:watch-later-query", query),
+      remove: (videoId) =>
+        context.ipc.invoke("watchdeck:watch-later-remove", videoId),
+      state: () => context.ipc.invoke("watchdeck:watch-later-state"),
+      switchAccount: (accountId) =>
+        context.ipc.invoke("watchdeck:watch-later-switch-account", accountId),
+      sync: () => context.ipc.invoke("watchdeck:watch-later-sync"),
+    };
+
+    this.panel = root;
+    render(() => <Panel bridge={bridge} />, root);
+  },
+
+  /** The site is a single-page app: the panel follows navigation. */
+  navigateListener: null as ((event: Event) => void) | null,
+
+  onNavigate() {
+    if (this.context) {
+      this.mountPanel(this.context);
+    }
+  },
+
   stop(context: RendererContext<WatchLaterPluginConfig>) {
+    this.panel?.remove();
+    this.panel = null;
+    if (this.navigateListener) {
+      document.removeEventListener("yt-navigate-finish", this.navigateListener);
+      this.navigateListener = null;
+    }
     this.observer?.disconnect();
     this.observer = null;
     for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) {

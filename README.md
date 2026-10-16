@@ -72,9 +72,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-`pnpm dev:remote` does the same with a Chrome DevTools Protocol endpoint open
-(`http://127.0.0.1:9223`), so you can attach DevTools or a CDP client to the running
-app — `WATCHDECK_REMOTE_DEBUG=<port> pnpm dev` if you want another port.
+`pnpm dev:debug` also turns on logging and opens a Chrome DevTools Protocol endpoint
+(`http://127.0.0.1:9223`), so you can attach DevTools or a CDP client to the running app;
+`WATCHDECK_REMOTE_DEBUG=<port> pnpm dev` picks another port, or leaves it out for none.
 
 Instead of installing pnpm on your system, you can also use [devcontainers](https://containers.dev/). You can use devcontainers either as a development environment in VS Code, or as a way to easily build the project without installing dependencies on your host system.
 

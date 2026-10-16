@@ -37,6 +37,12 @@ export const menu = async ({
       : []),
     { type: "separator" as const },
     {
+      checked: config.showLibraryPanel,
+      click: () => setConfig({ showLibraryPanel: !config.showLibraryPanel }),
+      label: t("plugins.watch-later.menu.library-panel"),
+      type: "checkbox" as const,
+    },
+    {
       checked: config.showHoverButton,
       click: () => setConfig({ showHoverButton: !config.showHoverButton }),
       label: t("plugins.watch-later.menu.hover-button"),

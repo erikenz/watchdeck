@@ -697,7 +697,8 @@
         "enrich-metadata": "Fetch descriptions and tags",
         "hover-button": "Show the save button on thumbnails",
         "sync-now": "Sync Watch Later now",
-        "sync-on-start": "Sync when the app starts"
+        "sync-on-start": "Sync when the app starts",
+        "library-panel": "Enhance the Watch Later page"
       },
       "name": "Watch Later"
     }

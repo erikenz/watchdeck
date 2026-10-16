@@ -343,6 +343,81 @@ export const parseWatchLaterPage = (data: unknown): WatchLaterPage => {
   };
 };
 
+export interface SessionIdentity {
+  handle?: string;
+  name: string;
+  /** Subscriber/membership line YouTube shows under the name, when it sends one. */
+  byline?: string;
+  photoUrl?: string;
+  selected?: boolean;
+}
+
+/**
+ * The account switcher's response, reduced to the identity it describes.
+ *
+ * `account/accounts_list` answers with the identity the request acted as, which is what
+ * makes it the probe for "who is `X-Goog-Authuser: n`": the list has no index of its own,
+ * and the array order of a multi-account list does *not* match the header.
+ */
+export const parseIdentity = (data: unknown): SessionIdentity | undefined => {
+  const stack: unknown[] = [data];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (Array.isArray(node)) {
+      stack.push(...node);
+      continue;
+    }
+    if (!isRecord(node)) {
+      continue;
+    }
+    const handle = textOf(child(node, "channelHandle"));
+    const name = textOf(child(node, "accountName"));
+    if (handle || name) {
+      return {
+        byline: textOf(child(node, "accountByline")),
+        handle,
+        name: name ?? handle ?? "",
+        photoUrl: lastUrl(child(node, "accountPhoto")),
+        selected: child(node, "isSelected") === true,
+      };
+    }
+    stack.push(...Object.values(node));
+  }
+  return undefined;
+};
+
+/**
+ * Walks the candidate indices and keeps the ones that answer.
+ *
+ * `X-Goog-Authuser` is the only way to ask "who is index n", so the indices are probed -
+ * bounded, and stopping once two in a row come back empty (a session with one account
+ * answers at 0, one with four answers at 0..3).
+ */
+export const probeAccounts = async (
+  identityAt: (index: number) => Promise<SessionIdentity | undefined>,
+  maxIndex = 5
+): Promise<{ index: number; identity: SessionIdentity }[]> => {
+  const found: { index: number; identity: SessionIdentity }[] = [];
+  let misses = 0;
+
+  for (let index = 0; index <= maxIndex && misses < 2; index += 1) {
+    const identity = await identityAt(index);
+    if (!identity) {
+      misses += 1;
+      continue;
+    }
+    misses = 0;
+    found.push({ identity, index });
+  }
+
+  return found;
+};
+
+export const accountsListPayload = () => ({
+  callCircumstance: "SWITCHING_USERS_FULL",
+  requestType: "ACCOUNTS_LIST_REQUEST_TYPE_CHANNEL_SWITCHER",
+});
+
 export const parseVideoDetails = (data: unknown): VideoDetails => {
   const details = firstOfType(data, "videoDetails");
   if (!isRecord(details)) {

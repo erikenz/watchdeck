@@ -3,15 +3,22 @@ import { Innertube } from "youtubei.js";
 
 import type { WatchLaterAccount } from "../types";
 import {
+  accountsListPayload,
   addVideoPayload,
   browsePayload,
+  parseIdentity,
   parseMutationResponse,
   parseVideoDetails,
   parseWatchLaterPage,
   playerPayload,
+  probeAccounts,
   removeVideoPayload,
 } from "./inner-tube";
-import type { VideoDetails, WatchLaterPage } from "./inner-tube";
+import type {
+  SessionIdentity,
+  VideoDetails,
+  WatchLaterPage,
+} from "./inner-tube";
 
 /** Kept escaped on purpose: see the note about the de-trademarking pass in the PRD. */
 export const SITE_ORIGIN =
@@ -30,14 +37,6 @@ export const readSessionCookies = async (
 
 export const looksSignedIn = (cookieString: string): boolean =>
   AUTH_COOKIES.some((name) => cookieString.includes(`${name}=`));
-
-interface InnertubeAccount {
-  account_name?: { text?: string };
-  account_byline?: { text?: string };
-  channel_handle?: { text?: string };
-  account_photo?: { thumbnails?: { url: string }[] };
-  is_selected?: boolean;
-}
 
 /**
  * Wraps one signed-in session. Account switching is a session-level concern in
@@ -78,40 +77,67 @@ export class WatchLaterSession {
   }
 
   /**
-   * The accounts signed into this session, in the order the account switcher shows
-   * them - that order is what `X-Goog-Authuser` indexes.
+   * The identities this session can act as, with the index each one answers to.
+   *
+   * There is no list to read: `account/accounts_list` answers with the identity the
+   * request acted as, and the order of a multi-account response does not match
+   * `X-Goog-Authuser` - assuming it did is what synced the wrong Watch Later list.
    */
   async listAccounts(): Promise<WatchLaterAccount[]> {
-    const raw = (await this.#yt.account.getInfo(true)) as unknown as
-      | InnertubeAccount[]
-      | undefined;
+    const probed = await probeAccounts((index) => this.#identityAt(index));
 
-    if (!Array.isArray(raw) || raw.length === 0) {
-      this.#accounts = [
-        {
-          id: "default",
-          index: 0,
-          isSelected: true,
-          name: "Default account",
-        },
-      ];
-      return this.#accounts;
-    }
-
-    this.#accounts = raw.map((account, index) => {
-      const handle = account.channel_handle?.text;
-      const name = account.account_name?.text ?? handle ?? `Account ${index}`;
-      return {
-        handle,
-        id: handle ?? `account-${index}`,
-        index,
-        isSelected: account.is_selected ?? index === this.#accountIndex,
-        name,
-        photoUrl: account.account_photo?.thumbnails?.at(-1)?.url,
-      } satisfies WatchLaterAccount;
-    });
+    this.#accounts =
+      probed.length > 0
+        ? probed.map(({ identity, index }) => ({
+            byline: identity.byline,
+            handle: identity.handle,
+            id: identity.handle ?? `account-${index}`,
+            index,
+            isSelected: index === this.#accountIndex,
+            name: identity.name,
+            photoUrl: identity.photoUrl,
+          }))
+        : [
+            {
+              id: "default",
+              index: 0,
+              isSelected: true,
+              name: "Default account",
+            },
+          ];
 
     return this.#accounts;
+  }
+
+  /** Asks the switcher who `X-Goog-Authuser: index` is; undefined when nobody answers. */
+  async #identityAt(index: number): Promise<SessionIdentity | undefined> {
+    const previous = this.#accountIndex;
+    this.setAccountIndex(index);
+    try {
+      const response = await this.#yt.actions.execute(
+        "/account/accounts_list",
+        accountsListPayload()
+      );
+      const identity = parseIdentity(response.data);
+      if (process.env.WATCHDECK_WL_DEBUG) {
+        console.log(
+          "[watch-later] probe",
+          index,
+          "->",
+          identity?.handle ?? "no identity",
+          "status",
+          response.status_code ?? "?"
+        );
+      }
+      return identity;
+    } catch (error) {
+      if (process.env.WATCHDECK_WL_DEBUG) {
+        console.log("[watch-later] probe", index, "failed:", error);
+      }
+      return undefined;
+    } finally {
+      this.setAccountIndex(previous);
+    }
   }
 
   async fetchPage(continuation?: string): Promise<WatchLaterPage> {

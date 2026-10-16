@@ -42,13 +42,14 @@ export const openNodeSqlite = (file: string): DbAdapter => {
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS account (
-  id            TEXT PRIMARY KEY,
-  name          TEXT NOT NULL,
-  handle        TEXT,
-  photo_url     TEXT,
-  index_in_list INTEGER NOT NULL DEFAULT 0,
-  is_selected   INTEGER NOT NULL DEFAULT 0,
-  last_seen_at  TEXT
+  id             TEXT PRIMARY KEY,
+  name           TEXT NOT NULL,
+  handle         TEXT,
+  photo_url      TEXT,
+  byline         TEXT,
+  auth_user_index INTEGER NOT NULL DEFAULT 0,
+  is_selected    INTEGER NOT NULL DEFAULT 0,
+  last_seen_at   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS video (
@@ -234,7 +235,34 @@ export class WatchLaterStore {
   constructor(db: DbAdapter) {
     this.#db = db;
     this.#db.exec(SCHEMA);
+    this.#migrateAccountTable();
     this.#ftsAvailable = this.#probeFts();
+  }
+
+  /**
+   * `index_in_list` used to hold the position in the switcher's array, which is not the
+   * `X-Goog-Authuser` index - so those rows pointed at the wrong account and are dropped
+   * rather than translated. Everything else here is a mirror of YouTube's own data, which
+   * the next sync refills.
+   */
+  #migrateAccountTable() {
+    const columns = this.#db.all<{ name: string }>(
+      "PRAGMA table_info(account)"
+    );
+    if (!columns.some((column) => column.name === "index_in_list")) {
+      return;
+    }
+    this.#db.exec("DROP TABLE account");
+    this.#db.exec(`CREATE TABLE account (
+      id              TEXT PRIMARY KEY,
+      name            TEXT NOT NULL,
+      handle          TEXT,
+      photo_url       TEXT,
+      byline          TEXT,
+      auth_user_index INTEGER NOT NULL DEFAULT 0,
+      is_selected     INTEGER NOT NULL DEFAULT 0,
+      last_seen_at    TEXT
+    );`);
   }
 
   #probeFts(): boolean {
@@ -255,19 +283,21 @@ export class WatchLaterStore {
   upsertAccount(account: WatchLaterAccount): void {
     const now = new Date().toISOString();
     this.#db.run(
-      `INSERT INTO account (id, name, handle, photo_url, index_in_list, is_selected, last_seen_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO account (id, name, handle, photo_url, byline, auth_user_index, is_selected, last_seen_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          name = excluded.name,
          handle = excluded.handle,
          photo_url = excluded.photo_url,
-         index_in_list = excluded.index_in_list,
+         byline = excluded.byline,
+         auth_user_index = excluded.auth_user_index,
          is_selected = excluded.is_selected,
          last_seen_at = excluded.last_seen_at`,
       accountId(account),
       account.name,
       account.handle ?? null,
       account.photoUrl ?? null,
+      account.byline ?? null,
       account.index,
       account.isSelected ? 1 : 0,
       now
@@ -280,15 +310,17 @@ export class WatchLaterStore {
       name: string;
       handle: string | null;
       photo_url: string | null;
-      index_in_list: number;
+      byline: string | null;
+      auth_user_index: number;
       is_selected: number;
       last_seen_at: string | null;
-    }>("SELECT * FROM account ORDER BY index_in_list ASC");
+    }>("SELECT * FROM account ORDER BY auth_user_index ASC");
 
     return rows.map((row) => ({
+      byline: row.byline ?? undefined,
       handle: row.handle ?? undefined,
       id: row.id,
-      index: row.index_in_list,
+      index: row.auth_user_index,
       isSelected: row.is_selected === 1,
       lastSeenAt: row.last_seen_at ?? undefined,
       name: row.name,

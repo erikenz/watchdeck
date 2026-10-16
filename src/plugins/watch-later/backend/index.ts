@@ -29,6 +29,8 @@ interface BackendState {
   activeAccountId: string | null;
   syncing: boolean;
   needsAuth: boolean;
+  /** `SESSION_INDEX` the page reports, i.e. the account the user is browsing as. */
+  sessionIndex: number | null;
   interval?: NodeJS.Timeout;
   window: BackendContext<WatchLaterPluginConfig>["window"] | null;
   config: WatchLaterPluginConfig | null;
@@ -40,6 +42,7 @@ const state: BackendState = {
   config: null,
   needsAuth: false,
   session: null,
+  sessionIndex: null,
   // Both are assigned in onMainLoad, before any IPC handler or menu click can use
   // them; the assertion is the module-private way of saying so.
   store: null!,
@@ -113,9 +116,11 @@ const connect = async () => {
     }
     state.accounts = state.store.listAccounts();
 
+    // Default to the account the *page* is acting as: with two identities under one
+    // login, "the first one" is a coin flip and the wrong list looks like a bug.
     const active =
       preferred ??
-      state.accounts.find((account) => account.isSelected) ??
+      state.accounts.find((account) => account.index === state.sessionIndex) ??
       state.accounts[0];
     if (active) {
       state.activeAccountId = active.id;
@@ -203,6 +208,43 @@ const scheduleInterval = () => {
   }
 };
 
+let startupSyncPending = false;
+
+/**
+ * Adopts the account the page is acting as, but only while the user has not picked one:
+ * an explicit choice (config or menu) always wins.
+ */
+const adoptSessionIndex = async (index: number) => {
+  if (!Number.isFinite(index)) {
+    return;
+  }
+  state.sessionIndex = index;
+
+  const active = state.activeAccountId
+    ? state.store.getAccount(state.activeAccountId)
+    : undefined;
+  if (!state.config?.activeAccountId && active && active.index !== index) {
+    const account = state.accounts.find((entry) => entry.index === index);
+    if (account) {
+      log(
+        `following the page's account: ${account.handle ?? account.name} (authuser ${index})`
+      );
+      await switchAccount(account.id);
+      state.store.clearCursor(account.id);
+    }
+  }
+
+  flushStartupSync("session-index");
+};
+
+const flushStartupSync = (reason: string) => {
+  if (!startupSyncPending) {
+    return;
+  }
+  startupSyncPending = false;
+  void runSync({ reason: `start/${reason}` });
+};
+
 export const onMainLoad = async ({
   window,
   ipc,
@@ -229,6 +271,10 @@ export const onMainLoad = async ({
       state.config!
     )
   );
+  ipc.on("watchdeck:watch-later-session-index", (index: number) => {
+    void adoptSessionIndex(index);
+  });
+
   ipc.handle("watchdeck:watch-later-sync", async () => {
     await runSync({ reason: "manual" });
     return currentState();
@@ -311,7 +357,14 @@ export const onMainLoad = async ({
   scheduleInterval();
 
   if (state.config.syncOnStart) {
-    void runSync({ reason: "start" });
+    if (state.config.activeAccountId) {
+      void runSync({ reason: "start" });
+    } else {
+      // The page has not told us which account it is on yet; syncing now would pull
+      // whichever identity happens to answer first.
+      startupSyncPending = true;
+      setTimeout(() => void flushStartupSync("timeout"), 20_000);
+    }
   }
 
   log(

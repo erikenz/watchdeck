@@ -17,7 +17,11 @@ import { app } from "electron";
  */
 export const ON_DISK_IDENTITY = "watchdeck";
 
-if (process.platform === "linux") {
+// `app` only exists in the main process. The preload and the injected renderer import the
+// config store, which imports this module - so outside the browser process it has to be a
+// no-op, or the preload bundle throws (`app` is undefined there) and the whole page-side
+// half of the app silently disappears.
+if (process.type === "browser" && process.platform === "linux") {
   // $XDG_CONFIG_HOME/watchdeck; without this Electron would use `productName`
   // ("Watchdeck") and the two would drift apart.
   app.setPath("userData", join(app.getPath("appData"), ON_DISK_IDENTITY));

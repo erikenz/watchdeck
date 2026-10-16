@@ -28,12 +28,18 @@ export interface WatchLaterPluginConfig {
 }
 
 export interface WatchLaterAccount {
+  /** Stable id: the channel handle when the session gives one, else `account-<index>`. */
   id: string;
   name: string;
   handle?: string;
   photoUrl?: string;
-  /** `X-Goog-AuthUser` index of this account in the session. */
+  /**
+   * The `X-Goog-Authuser` index this account answers to. It is *not* the position in any
+   * list the API returns - the two differ, which is why the index is probed.
+   */
   index: number;
+  /** Subscriber/membership line, the only thing that tells two "Erik Enz" apart. */
+  byline?: string;
   isSelected: boolean;
   lastSeenAt?: string;
 }

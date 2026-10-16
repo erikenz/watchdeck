@@ -98,6 +98,19 @@ protocol.registerSchemesAsPrivileged([
 // Ozone platform hint: Required for Wayland support
 app.commandLine.appendSwitch("ozone-platform-hint", "auto");
 
+// Remote debugging, on request only: `pnpm dev:remote` (or WATCHDECK_REMOTE_DEBUG=<port>)
+// starts Chromium with a CDP endpoint, so a tool - or a Chrome window on another
+// machine - can attach to the running app instead of guessing from logs.
+const remoteDebugPort = process.env.WATCHDECK_REMOTE_DEBUG;
+if (remoteDebugPort) {
+  app.commandLine.appendSwitch("remote-debugging-port", remoteDebugPort);
+  // Chrome 111+ refuses cross-origin CDP websockets without this.
+  app.commandLine.appendSwitch("remote-allow-origins", "*");
+  console.log(
+    `${LoggerPrefix} remote debugging on http://127.0.0.1:${remoteDebugPort}`
+  );
+}
+
 // SharedArrayBuffer: Required for downloader (@ffmpeg/core-mt)
 // OverlayScrollbar: Required for overlay scrollbars
 // UseOzonePlatform: Required for Wayland support

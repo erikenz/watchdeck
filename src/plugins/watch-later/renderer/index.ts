@@ -28,6 +28,7 @@ export const renderer = {
   pending: new Set<string>(),
   scanQueued: false,
   lastProgressSentAt: 0,
+  sessionIndexAttempts: 0,
   videoDataListener: null as ((event: Event) => void) | null,
   timeUpdateListener: null as ((event: Event) => void) | null,
 
@@ -36,6 +37,7 @@ export const renderer = {
     this.config = await context.getConfig();
 
     await this.hydrate();
+    this.reportSessionIndex(context);
 
     this.observer = new MutationObserver(() => this.queueScan());
     this.observer.observe(document.body, {
@@ -105,6 +107,27 @@ export const renderer = {
     } catch {
       // Not signed in yet, or the backend is still starting: the buttons simply
       // stay in their unsaved state.
+    }
+  },
+
+  /**
+   * Tells the backend which account the page is acting as - with two identities under one
+   * login this is the only signal that says which Watch Later to sync. `ytcfg` is the
+   * page's own global and is not there yet when the renderer starts, so this waits for it.
+   */
+  reportSessionIndex(context: RendererContext<WatchLaterPluginConfig>) {
+    const ytcfg = (
+      window as unknown as { ytcfg?: { get: (key: string) => unknown } }
+    ).ytcfg;
+    const index = Number(ytcfg?.get("SESSION_INDEX") ?? Number.NaN);
+
+    if (Number.isFinite(index)) {
+      context.ipc.send("watchdeck:watch-later-session-index", index);
+      return;
+    }
+    if (this.sessionIndexAttempts < 40) {
+      this.sessionIndexAttempts += 1;
+      setTimeout(() => this.reportSessionIndex(context), 500);
     }
   },
 

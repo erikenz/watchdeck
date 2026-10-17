@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { expect, test } from "@playwright/test";
@@ -74,6 +75,17 @@ const bundle = async (entry: string, name: "__dom" | "__rows") => {
 
 const domScript = await bundle("../renderer/dom.ts", "__dom");
 const rowsScript = await bundle("../renderer/ui/rows.ts", "__rows");
+
+/**
+ * The plugin's own stylesheet. The placement tests need it: whether the button is where it looks
+ * like it is depends on the cascade (`position: fixed` while the card is marked, `:hover`
+ * otherwise), and a test that only reads back the inline values it just wrote proves nothing
+ * about the screen.
+ */
+const pluginStyles = readFileSync(
+  path.join(import.meta.dirname, "../renderer/style.css"),
+  "utf-8"
+);
 
 /** A blank page with the real modules installed as `__dom` and `__rows`. */
 const openFixture = async (page: Page) => {
@@ -215,6 +227,7 @@ test("the button sits on the video box, at one offset in both states", async ({
   page,
 }) => {
   await openFixture(page);
+  await page.addStyleTag({ content: pluginStyles });
 
   const measured = await page.evaluate(async () => {
     const { __dom: dom } = window as unknown as {
@@ -223,7 +236,7 @@ test("the button sits on the video box, at one offset in both states", async ({
     };
     // A card shaped like the site's, with the avatar *before* the video box in document order.
     document.body.innerHTML = `
-      <div id="card" style="position:relative;width:527px;height:352px">
+      <div id="card" class="wd-wl-anchor" style="position:relative;width:527px;height:352px">
         <img id="avatar" style="position:absolute;left:0;top:310px;width:36px;height:36px">
         <yt-thumbnail-view-model id="video" style="position:absolute;left:0;top:0;width:527px;height:296px"></yt-thumbnail-view-model>
       </div>`;
@@ -265,31 +278,25 @@ test("the button sits on the video box, at one offset in both states", async ({
 
     dom.alignButton(button, card);
     const mediaRect = video.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
     const placed = { bottom: button.style.bottom, right: button.style.right };
     const realigns = await countMutations(() => {
       for (let index = 0; index < 5; index += 1) {
         dom.alignButton(button, card);
       }
     });
-    // What those two values mean on screen: the button's top-left corner.
-    const cornerWhileHovered = {
-      x: cardRect.right - Number.parseFloat(placed.right) - 36,
-      y: cardRect.bottom - Number.parseFloat(placed.bottom) - 36,
-    };
+    // Where that puts the button *on screen*, which is the only thing the user sees.
+    const hovered = button.getBoundingClientRect();
 
     card.classList.add(dom.MEDIA_HOVER_CLASS);
     dom.alignButton(button, card);
+    const marked = button.getBoundingClientRect();
     const whileMarked = { left: button.style.left, top: button.style.top };
 
     const picked = dom.mediaBoxOf(card);
     return {
       changed,
-      cornerWhileHovered,
-      cornerWhileMarked: {
-        x: Number.parseFloat(whileMarked.left),
-        y: Number.parseFloat(whileMarked.top),
-      },
+      cornerWhileHovered: { x: hovered.right, y: hovered.bottom },
+      cornerWhileMarked: { x: marked.right, y: marked.bottom },
       first,
       mediaEdge: { right: mediaRect.right, bottom: mediaRect.bottom },
       pickedBox: picked ? [picked.box.width, picked.box.height] : null,
@@ -299,6 +306,7 @@ test("the button sits on the video box, at one offset in both states", async ({
       repaints,
       whileMarkedClearedAbsolute:
         button.style.right === "" && button.style.bottom === "",
+      whileMarkedSet: whileMarked,
     };
   });
 
@@ -309,8 +317,16 @@ test("the button sits on the video box, at one offset in both states", async ({
   expect(measured.changed).toBeGreaterThan(0);
   // 36 px above the video's bottom edge and 8 px inside its right edge, hovered...
   expect(measured.placed).toEqual({ bottom: "92px", right: "8px" });
-  // ...and the same corner while the card is marked, where the button is placed against the
-  // viewport instead so it can sit above the site's preview overlay without raising the card.
+  expect(measured.cornerWhileHovered.x).toBeCloseTo(
+    measured.mediaEdge.right - 8,
+    0
+  );
+  expect(measured.cornerWhileHovered.y).toBeCloseTo(
+    measured.mediaEdge.bottom - 36,
+    0
+  );
+  // ...and the same corner while the card is marked, where the button is placed `fixed` so it can
+  // sit above the site's preview overlay without raising the card.
   expect(measured.whileMarkedClearedAbsolute).toBe(true);
   expect(measured.cornerWhileMarked.x).toBeCloseTo(
     measured.cornerWhileHovered.x,
@@ -320,18 +336,76 @@ test("the button sits on the video box, at one offset in both states", async ({
     measured.cornerWhileHovered.y,
     0
   );
-  expect(measured.cornerWhileMarked.x).toBeCloseTo(
-    measured.mediaEdge.right - 8 - 36,
-    0
-  );
-  expect(measured.cornerWhileMarked.y).toBeCloseTo(
-    measured.mediaEdge.bottom - 36 - 36,
-    0
-  );
   expect(measured.realigns).toBe(0);
   // The avatar is skipped: aligning to it parks the button in the metadata row.
   expect(measured.pickedIsVideo).toBe(true);
   expect(measured.pickedBox).toEqual([527, 296]);
+});
+
+/**
+ * The site's horizontal shelves wrap their cards in a scrolling element with an *identity*
+ * transform, and any transform makes that element the containing block for `position: fixed`
+ * descendants - which is how the button of a hovered shelf card ended up a card and a half to the
+ * right of its own video. Measured on the page, so it is in here.
+ */
+test("the button lands on its own video inside a transformed shelf", async ({
+  page,
+}) => {
+  await openFixture(page);
+  await page.addStyleTag({ content: pluginStyles });
+
+  const measured = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    document.body.innerHTML = `
+      <div id="shelf" style="position:static;transform:translateX(543px);width:1600px">
+        <div id="card" class="wd-wl-anchor" style="position:relative;width:527px;height:352px">
+          <yt-thumbnail-view-model id="video" style="position:absolute;left:0;top:0;width:527px;height:296px"></yt-thumbnail-view-model>
+        </div>
+      </div>`;
+    const card = document.querySelector("#card") as Element;
+    const video = document.querySelector("#video") as Element;
+    const button = dom.createSaveButton("vid00000001", () => undefined);
+    card.append(button);
+    dom.alignButton(button, card);
+    const hovered = button.getBoundingClientRect();
+
+    card.classList.add(dom.MEDIA_HOVER_CLASS);
+    dom.alignButton(button, card);
+    const marked = button.getBoundingClientRect();
+    const media = video.getBoundingClientRect();
+
+    return {
+      cornerWhileHovered: { x: hovered.right, y: hovered.bottom },
+      cornerWhileMarked: { x: marked.right, y: marked.bottom },
+      mediaEdge: { right: media.right, bottom: media.bottom },
+      wrapperTransform: getComputedStyle(document.querySelector("#shelf")!)
+        .transform,
+      wrapperShift: Math.round(
+        document.querySelector("#shelf")!.getBoundingClientRect().left
+      ),
+    };
+  });
+
+  // The wrapper really is shifted by a transform; without one this test would pass on the bug it
+  // is here to catch.
+  expect(measured.wrapperTransform).toBe("matrix(1, 0, 0, 1, 543, 0)");
+  expect(measured.wrapperShift).toBeGreaterThan(500);
+  expect(measured.cornerWhileMarked.x).toBeCloseTo(
+    measured.mediaEdge.right - 8,
+    0
+  );
+  expect(measured.cornerWhileMarked.y).toBeCloseTo(
+    measured.mediaEdge.bottom - 36,
+    0
+  );
+  expect(measured.cornerWhileMarked.x).toBeCloseTo(
+    measured.cornerWhileHovered.x,
+    0
+  );
+  expect(measured.cornerWhileMarked.y).toBeCloseTo(
+    measured.cornerWhileHovered.y,
+    0
+  );
 });
 
 test("the card under the pointer is the one whose video box holds it", async ({

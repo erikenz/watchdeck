@@ -15,22 +15,29 @@ import { test, expect, _electron as electron } from "@playwright/test";
 const appPath = path.resolve(import.meta.dirname, "..");
 
 /**
- * Every launch gets its own `userData` directory. Two reasons, both learned the hard way: the
- * app refuses a second instance while one holds the lock on the real one, which showed up as a
- * window that never loaded a URL; and a test has no business writing to the config, the Watch
- * Later database or an extension's storage that belongs to whoever runs it.
+ * Every launch gets its own config directory. That is `XDG_CONFIG_HOME`: the app sets its own
+ * `userData` to `$XDG_CONFIG_HOME/watchdeck` on purpose (`src/app-identity.ts`), so
+ * `--user-data-dir` is overridden, while this is the path the identity is derived from.
+ *
+ * Two reasons, both learned the hard way: the app refuses a second instance while one holds the
+ * lock on the real directory, which showed up as a window that never loaded a URL; and a test has
+ * no business writing to the config, the Watch Later database or an extension's storage that
+ * belongs to whoever runs it.
  */
 const launchApp = () =>
   electron.launch({
     args: [
       appPath,
-      `--user-data-dir=${mkdtempSync(path.join(tmpdir(), "watchdeck-smoke-"))}`,
       "--no-sandbox",
       "--disable-gpu",
       "--whitelisted-ips=",
       "--disable-dev-shm-usage",
     ],
     cwd: appPath,
+    env: {
+      ...process.env,
+      XDG_CONFIG_HOME: mkdtempSync(path.join(tmpdir(), "watchdeck-smoke-")),
+    },
   });
 
 test("Watchdeck App - launches, with a window titled after the app", async () => {

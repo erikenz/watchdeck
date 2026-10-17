@@ -151,6 +151,34 @@ export const cardUnderPoint = (x: number, y: number): Element | null => {
 export const BUTTON_SIZE = 36;
 
 /**
+ * Where a `position: fixed` box's 0,0 lands on screen.
+ *
+ * A fixed box is placed against the viewport - unless one of its ancestors has a `transform`,
+ * `filter`, `perspective`, `contain` or `will-change`, in which case *that* ancestor becomes its
+ * containing block instead. The site's horizontal shelves do exactly this: an identity
+ * `matrix(1, 0, 0, 1, 0, 0)` on the scrolling wrapper, which is enough, and which moved the button
+ * of a hovered shelf card onto the card next to it ("the button does not appear" - it was 256 px
+ * to the right). Measured, not guessed: listing which ancestors count gets half a fix.
+ */
+const fixedOrigin = (button: HTMLButtonElement): { x: number; y: number } => {
+  const saved = {
+    bottom: button.style.bottom,
+    left: button.style.left,
+    right: button.style.right,
+    top: button.style.top,
+  };
+
+  button.style.left = "0px";
+  button.style.top = "0px";
+  button.style.right = "";
+  button.style.bottom = "";
+  const rect = button.getBoundingClientRect();
+
+  Object.assign(button.style, saved);
+  return { x: rect.left, y: rect.top };
+};
+
+/**
  * Places the button at the bottom-right of the video box.
  *
  * While the card is marked - the pointer is on its video box - the button is placed `fixed` in the
@@ -169,8 +197,9 @@ export const alignButton = (button: HTMLButtonElement, host: Element) => {
   const { box } = media;
 
   if (host.classList.contains(MEDIA_HOVER_CLASS)) {
-    button.style.left = `${Math.round(box.right) - 8 - BUTTON_SIZE}px`;
-    button.style.top = `${Math.round(box.bottom) - BUTTON_LIFT - BUTTON_SIZE}px`;
+    const origin = fixedOrigin(button);
+    button.style.left = `${Math.round(box.right - origin.x) - 8 - BUTTON_SIZE}px`;
+    button.style.top = `${Math.round(box.bottom - origin.y) - BUTTON_LIFT - BUTTON_SIZE}px`;
     button.style.right = "";
     button.style.bottom = "";
     return;

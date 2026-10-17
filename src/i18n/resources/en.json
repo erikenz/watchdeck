@@ -197,7 +197,7 @@
         "submenu": {
           "back": "Back 10 seconds",
           "forward": "Forward 10 seconds",
-          "mute": "Mute",
+          "mute": "Mute/Unmute",
           "next": "Next video",
           "play-pause": "Play/Pause",
           "previous": "Previous video",

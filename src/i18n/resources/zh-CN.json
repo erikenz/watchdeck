@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "支持使用需要身份验证的代理",
-      "menu": {
-        "disable": "禁用代理适配",
-        "enable": "启用代理适配",
-        "hostname": {
-          "label": "主机名"
-        },
-        "port": {
-          "label": "端口"
-        }
-      },
-      "name": "认证代理适配",
-      "prompt": {
-        "hostname": {
-          "label": "请输入本地代理服务器的主机名（需要重启）：",
-          "title": "代理主机名"
-        },
-        "port": {
-          "label": "请输入本地代理服务器的端口号（需要重启）：",
-          "title": "代理端口"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "在歌曲间启用交叉淡化效果",
-      "menu": {
-        "advanced": "高级"
-      },
-      "name": "交叉淡化 [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "淡入持续时间（毫秒）",
-            "fade-out-duration": "淡出持续时间（毫秒）",
-            "fade-scaling": {
-              "label": "淡化尺度",
-              "linear": "线性",
-              "logarithmic": "对数"
-            },
-            "seconds-before-end": "歌曲结束前持续交叉淡化时长"
-          },
-          "title": "交叉淡化选项"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "配置歌曲的自定义输出媒体设备",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "均衡器"
     },
-    "exponential-volume": {
-      "description": "让音量滑块指数化以便选择更低的音量。",
-      "name": "指数化音量"
-    },
-    "in-app-menu": {
-      "description": "为菜单栏启用更精美的外观，可选暗色或专辑配色",
-      "menu": {
-        "hide-dom-window-controls": "隐藏 DOM 窗口控件"
-      },
-      "name": "应用内菜单"
-    },
-    "navigation": {
-      "description": "如同浏览器般，在应用界面内直接显示前进/后退导航按钮",
-      "name": "导航",
-      "templates": {
-        "back": {
-          "title": "转到上一页"
-        },
-        "forward": {
-          "title": "转到下一页"
-        }
-      }
-    },
     "notifications": {
       "description": "歌曲开始时显示通知（交互式通知仅适用于 Windows）",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "画中画",
       "templates": {
         "button": "画中画"
-      }
-    },
-    "playback-speed": {
-      "description": "快慢随心！为歌曲添加速度控制滑块",
-      "name": "回放速度",
-      "templates": {
-        "button": "速度"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "为 macOS 用户启用 TouchBar 支持",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "在播放器中添加可视化效果",
-      "menu": {
-        "visualizer-type": "可视化类型"
-      },
-      "name": "可视化效果"
     }
   }
 }

@@ -36,8 +36,7 @@ import {
   getAllLoadedMainPlugins,
   loadAllMainPlugins,
 } from "@/loader/main";
-import { refreshMenu, setApplicationMenu } from "@/menu";
-import { defaultAuthProxyConfig } from "@/plugins/auth-proxy-adapter/config";
+import { setApplicationMenu } from "@/menu";
 import { fileExists, injectCSSAsFile } from "@/plugins/utils/main";
 import { restart, setupAppControls } from "@/providers/app-controls";
 import {
@@ -146,24 +145,10 @@ if (disableHardwareAcceleration) {
 app.commandLine.appendSwitch("disable-features", disabledFeatures.join(","));
 
 if (config.get("options.proxy")) {
-  const authProxyEnabled = await config.plugins.isEnabled("auth-proxy-adapter");
+  const proxy = config.get("options.proxy");
 
-  let proxyToUse = "";
-  if (authProxyEnabled) {
-    // Use proxy from Auth-Proxy-Adapter plugin
-    const authProxyConfig = deepmerge(
-      defaultAuthProxyConfig,
-      config.get("plugins.auth-proxy-adapter") ?? {}
-    ) as typeof defaultAuthProxyConfig;
-
-    const { hostname, port } = authProxyConfig;
-    proxyToUse = `socks5://${hostname}:${port}`;
-  } else if (config.get("options.proxy")) {
-    // Use global proxy settings
-    proxyToUse = config.get("options.proxy");
-  }
-  console.log(LoggerPrefix, `Using proxy: ${proxyToUse}`);
-  app.commandLine.appendSwitch("proxy-server", proxyToUse);
+  console.log(LoggerPrefix, `Using proxy: ${proxy}`);
+  app.commandLine.appendSwitch("proxy-server", proxy);
 }
 
 // Adds debug features like hotkeys for triggering dev tools and reload
@@ -330,7 +315,6 @@ async function createMainWindow() {
   const windowSize = config.get("window-size");
   const windowMaximized = config.get("window-maximized");
   const windowPosition: Electron.Point = config.get("window-position");
-  const useInlineMenu = await config.plugins.isEnabled("in-app-menu");
 
   const defaultTitleBarOverlayOptions: Electron.TitleBarOverlay = {
     color: "#00000000",
@@ -340,20 +324,10 @@ async function createMainWindow() {
 
   const decorations: Partial<BrowserWindowConstructorOptions> = {
     autoHideMenuBar: config.get("options.hideMenu"),
-    frame: !is.macOS() && !useInlineMenu,
+    frame: !is.macOS(),
     titleBarOverlay: defaultTitleBarOverlayOptions,
-    titleBarStyle: useInlineMenu
-      ? "hidden"
-      : is.macOS()
-        ? "hiddenInset"
-        : "default",
+    titleBarStyle: is.macOS() ? "hiddenInset" : "default",
   };
-
-  // Note: on linux, for some weird reason, having these extra properties with 'frame: false' does not work
-  if (is.linux() && useInlineMenu) {
-    delete decorations.titleBarOverlay;
-    delete decorations.titleBarStyle;
-  }
 
   const electronWindowSettings: Electron.BrowserWindowConstructorOptions = {
     backgroundColor: "#000",
@@ -500,17 +474,6 @@ async function createMainWindow() {
 
   removeContentSecurityPolicy();
 
-  win.webContents.on("dom-ready", () => {
-    if (useInlineMenu && is.windows()) {
-      win.setTitleBarOverlay({
-        ...defaultTitleBarOverlayOptions,
-        height: Math.floor(
-          defaultTitleBarOverlayOptions.height! *
-            win.webContents.getZoomFactor()
-        ),
-      });
-    }
-  });
   win.webContents.loadURL(urlToLoad);
 
   return win;
@@ -819,7 +782,6 @@ app.whenReady().then(async () => {
 
   mainWindow = await createMainWindow();
   await setApplicationMenu(mainWindow);
-  await refreshMenu(mainWindow);
   setUpTray(app, mainWindow);
 
   setupProtocolHandler(mainWindow);

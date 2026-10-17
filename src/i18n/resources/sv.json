@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Stöd för autentiseringsproxytjänster",
-      "menu": {
-        "disable": "Inaktivera proxyadapter",
-        "enable": "Aktivera proxyadapter",
-        "hostname": {
-          "label": "Värdnamn"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adapter för autentiseringsproxy",
-      "prompt": {
-        "hostname": {
-          "label": "Ange värdnamnet för den lokala proxyservern (kräver omstart):",
-          "title": "Proxyserverns värdnamn"
-        },
-        "port": {
-          "label": "Ange porten för den lokala proxyservern (kräver omstart):",
-          "title": "Proxyport"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Övertona mellan låtar",
-      "menu": {
-        "advanced": "Avancerat"
-      },
-      "name": "Övertoning [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Intoningens längd (ms)",
-            "fade-out-duration": "Uttoningens längd (ms)",
-            "fade-scaling": {
-              "label": "Toningsskala",
-              "linear": "Linjär",
-              "logarithmic": "Logaritmisk"
-            },
-            "seconds-before-end": "Starta övertoningen N sekunder före slutet"
-          },
-          "title": "Inställningar för övertoning"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Konfigurera en anpassad ljudutgång för låtar",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Equalizer"
     },
-    "exponential-volume": {
-      "description": "Gör volymreglaget exponentiellt så att det blir lättare att välja lägre volymer.",
-      "name": "Exponentiell volym"
-    },
-    "in-app-menu": {
-      "description": "Ger menyrader ett snyggt, mörkt eller albumfärgat utseende",
-      "menu": {
-        "hide-dom-window-controls": "Dölj DOM-fönsterkontroller"
-      },
-      "name": "Meny i appen"
-    },
-    "navigation": {
-      "description": "Nästa- och tillbaka-pilar direkt i gränssnittet, precis som i din favoritwebbläsare",
-      "name": "Navigering",
-      "templates": {
-        "back": {
-          "title": "Gå till föregående sida"
-        },
-        "forward": {
-          "title": "Gå till nästa sida"
-        }
-      }
-    },
     "notifications": {
       "description": "Visa en notis när en låt börjar spelas (interaktiva notiser finns på Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Bild-i-bild",
       "templates": {
         "button": "Bild-i-bild"
-      }
-    },
-    "playback-speed": {
-      "description": "Lägger till ett reglage för att ändra uppspelningshastighet",
-      "name": "Uppspelningshastighet",
-      "templates": {
-        "button": "Hastighet"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Lägger till en TouchBar-widget för macOS-användare",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Lägger till en visualiserare i spelaren",
-      "menu": {
-        "visualizer-type": "Typ av visualiserare"
-      },
-      "name": "Visualiserare"
     }
   }
 }

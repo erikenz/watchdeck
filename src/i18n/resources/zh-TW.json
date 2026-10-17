@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "支援使用 Proxy 驗證服務",
-      "menu": {
-        "disable": "中斷 Proxy 連線",
-        "enable": "啟用 Proxy 連線",
-        "hostname": {
-          "label": "主機名稱"
-        },
-        "port": {
-          "label": "連接埠"
-        }
-      },
-      "name": "Proxy 連線驗證",
-      "prompt": {
-        "hostname": {
-          "label": "本地 Proxy 伺服器主機名稱（需要重啟應用）：",
-          "title": "Proxy 主機名稱"
-        },
-        "port": {
-          "label": "本地 Proxy 伺服器連接埠（需要重新啟動應用程式）：",
-          "title": "Proxy 連接埠"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "在歌曲之間使用交叉淡化",
-      "menu": {
-        "advanced": "進階"
-      },
-      "name": "交叉淡化 [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "淡入時間（毫秒）",
-            "fade-out-duration": "淡出時間（毫秒）",
-            "fade-scaling": {
-              "label": "淡化計算方式",
-              "linear": "線性",
-              "logarithmic": "對數"
-            },
-            "seconds-before-end": "交叉淡化持續時間 (秒)"
-          },
-          "title": "交叉淡化選項"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "為歌曲設定自訂輸出媒體裝置",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "等化器"
     },
-    "exponential-volume": {
-      "description": "使音量滑桿指數化，以便更容易選擇較低的音量。",
-      "name": "指數化音量調整"
-    },
-    "in-app-menu": {
-      "description": "使選單列變更為黑色或隨主題變色",
-      "menu": {
-        "hide-dom-window-controls": "隱藏 DOM 視窗控制"
-      },
-      "name": "程式內選單列"
-    },
-    "navigation": {
-      "description": "允許應用程式上方顯示上一頁／下一頁按鈕",
-      "name": "導覽列",
-      "templates": {
-        "back": {
-          "title": "回到上一頁"
-        },
-        "forward": {
-          "title": "前往下一頁"
-        }
-      }
-    },
     "notifications": {
       "description": "在歌曲播放時傳送一個系統通知 (可互動通知僅限 Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "子母畫面",
       "templates": {
         "button": "子母畫面"
-      }
-    },
-    "playback-speed": {
-      "description": "傷心的人別聽慢歌，新增一個滑桿控制歌曲速度",
-      "name": "控制歌曲速度",
-      "templates": {
-        "button": "速度"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "為 macOS 使用者新增觸控列支援",
       "name": "觸控列 (Touchbar) 支援"
-    },
-    "visualizer": {
-      "description": "在播放器新增視覺化效果",
-      "menu": {
-        "visualizer-type": "視覺化效果樣式"
-      },
-      "name": "視覺化效果"
     }
   }
 }

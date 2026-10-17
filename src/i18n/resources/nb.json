@@ -230,28 +230,6 @@
       },
       "name": "Omgivelsesmodus"
     },
-    "crossfade": {
-      "description": "Overgang mellom spor",
-      "menu": {
-        "advanced": "Avansert"
-      },
-      "name": "Overgang [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Inntoningsvarighet (ms)",
-            "fade-out-duration": "Uttoningsvarighet (ms)",
-            "fade-scaling": {
-              "label": "Overgangsskalering",
-              "linear": "Lineær",
-              "logarithmic": "Logaritmisk"
-            },
-            "seconds-before-end": "Overgang antall sekunder før slutt"
-          },
-          "title": "Overgangsalternativer"
-        }
-      }
-    },
     "disable-autoplay": {
       "description": "Merkerer sporstart i «pauset» modus",
       "menu": {
@@ -343,21 +321,6 @@
         "button": "Last ned"
       }
     },
-    "exponential-volume": {
-      "description": "Gjør lydstyrkekontrollen eksponentiell, slik at det er enklere velge lavere lydstyrker.",
-      "name": "Eksponentiell lydstyrke"
-    },
-    "in-app-menu": {
-      "description": "Gir menybjelkene stilig, mørk, eller albumfarget utseende",
-      "menu": {
-        "hide-dom-window-controls": "Skjul DOM-vinduskontroller"
-      },
-      "name": "Meny i programmet"
-    },
-    "navigation": {
-      "description": "Direkte integrering av neste/tilbake-navigasjonspilene i grensesnittet, som din favorittnettleser",
-      "name": "Navigasjon"
-    },
     "notifications": {
       "description": "Vis en merknad når et spor starter avspilling (interaktive merknader er tilgjengelig på Windows)",
       "menu": {
@@ -396,13 +359,6 @@
       "name": "Bilde-i-bilde",
       "templates": {
         "button": "Bilde-i-bilde"
-      }
-    },
-    "playback-speed": {
-      "description": "Legger til glidebryter som kontrollerer avspillingshastighet",
-      "name": "Avspillingshastighet",
-      "templates": {
-        "button": "Hastighet"
       }
     },
     "precise-volume": {
@@ -462,13 +418,6 @@
     "touchbar": {
       "description": "Legger til et pekefelt-miniprogram for macOS-brukere",
       "name": "Pekefelt"
-    },
-    "visualizer": {
-      "description": "Legger til en visualisator i avspilleren",
-      "menu": {
-        "visualizer-type": "Visualisatortype"
-      },
-      "name": "Visualisator"
     }
   }
 }

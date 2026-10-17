@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Podrška za upotrebu proxy servisa za autentifikaciju",
-      "menu": {
-        "disable": "Onemogući Proxy adapter",
-        "enable": "Omogući Proxy adapter",
-        "hostname": {
-          "label": "Ime host-a"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Proxy adapter za autentifikaciju",
-      "prompt": {
-        "hostname": {
-          "label": "Unesi ime host-a za lokalni proxy server (zahteva ponovno pokretanje):",
-          "title": "Ime host-a za Proxy"
-        },
-        "port": {
-          "label": "Unesi port za lokalni proxy server (zahteva ponovno pokretanje):",
-          "title": "Proxy Port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Ublaženi prelaz između numera",
-      "menu": {
-        "advanced": "Napredno"
-      },
-      "name": "Ublaženi prelaz [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Ulazno trajanje prelaza (ms)",
-            "fade-out-duration": "Izlazno trajanje prelaza (ms)",
-            "fade-scaling": {
-              "label": "Skaliranje prelaza",
-              "linear": "Linearno",
-              "logarithmic": "Logaritamsko"
-            },
-            "seconds-before-end": "Prelaz N sekundi pre kraja"
-          },
-          "title": "Opcije prelaza"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Konfigurišite prilagođeni izlazni medijski uređaj za pesme",
       "menu": {
@@ -496,29 +450,6 @@
       },
       "name": "Ekvilajzer"
     },
-    "exponential-volume": {
-      "description": "Postavlja slajder jačine kao eksponencijalan radi lakšeg izbora nižih jačina.",
-      "name": "Eksponencijalna jačina"
-    },
-    "in-app-menu": {
-      "description": "Daje izbornim trakama fensi, tamni ili izgled prema boji albuma",
-      "menu": {
-        "hide-dom-window-controls": "Sakrij kontrole DOM prozora"
-      },
-      "name": "Izborni menu unutar aplikacije"
-    },
-    "navigation": {
-      "description": "Strelice za navigaciju napred/nazad su direktno integrisane u interfejs, kao i u tvom omiljenom pregledaču",
-      "name": "Navigacija",
-      "templates": {
-        "back": {
-          "title": "Vrati se na prethodnu stranicu"
-        },
-        "forward": {
-          "title": "Idi na sledeću stranicu"
-        }
-      }
-    },
     "notifications": {
       "description": "Prikaži obaveštenje kada numera krene sa reprodukcijom (interaktivna obaveštenja su dostupna na Windows-u)",
       "menu": {
@@ -558,13 +489,6 @@
       "name": "Slika-u-slici",
       "templates": {
         "button": "Slika-u-slici"
-      }
-    },
-    "playback-speed": {
-      "description": "Slušaj brzo, slušaj sporo! Dodaje slajder koji kontroliše brzinu pesme",
-      "name": "Brzina reprodukcije",
-      "templates": {
-        "button": "Brzina"
       }
     },
     "precise-volume": {
@@ -624,13 +548,6 @@
     "touchbar": {
       "description": "Dodaje dodatak dodirne trake za macOS korisnike",
       "name": "Dodirna Traka"
-    },
-    "visualizer": {
-      "description": "Dodaje vizualizaciju u plejer",
-      "menu": {
-        "visualizer-type": "Tip vizualizacije"
-      },
-      "name": "Vizualizacija"
     }
   }
 }

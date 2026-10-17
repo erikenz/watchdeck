@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Podrška za korištenje usluga autentifikacijskog proxyja",
-      "menu": {
-        "disable": "Onemogući proxy adapter",
-        "enable": "Omogući proxy adapter",
-        "hostname": {
-          "label": "Naziv hosta"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Proxy adapter za autentifikaciju",
-      "prompt": {
-        "hostname": {
-          "label": "Unesite naziv hosta za lokalnog proxy poslužitelja (zahtijeva ponovno pokretanje):",
-          "title": "Naziv hosta proxyja"
-        },
-        "port": {
-          "label": "Unesite port za lokalni proxy poslužitelj (zahtijeva ponovno pokretanje):",
-          "title": "Port proxyja"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Pretapanje (cross-fade) između pjesama",
-      "menu": {
-        "advanced": "Napredno"
-      },
-      "name": "Pretapanje (cross-fade) [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Trajanje postepenog pojačavanja zvuka (Fade in) (ms)",
-            "fade-out-duration": "Trajanje postepenog smanjenje zvuka (Fade out) (ms)",
-            "fade-scaling": {
-              "label": "Skaliranje postepenog prijelaza (Fade scaling)",
-              "linear": "Linearno",
-              "logarithmic": "Logaritamsko"
-            },
-            "seconds-before-end": "Pretapanje (cross-fade) N sekundi prije kraja"
-          },
-          "title": "Opcije za pretapanje (cross-fade)"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Konfiguriraj prilagođeni izlazni medijski uređaj za pjesme",
       "menu": {
@@ -496,29 +450,6 @@
       },
       "name": "Ekvalizator"
     },
-    "exponential-volume": {
-      "description": "Čini klizač glasnoće (volume slider) eksponencijalnim za lakši odabir niže glasnoće.",
-      "name": "Eksponencijalna Glasnoća"
-    },
-    "in-app-menu": {
-      "description": "Daje izbornicima fensi, tamni ili prema boji albuma izgled",
-      "menu": {
-        "hide-dom-window-controls": "Sakrij kontrole prozora DOM-a"
-      },
-      "name": "Izbornik unutar aplikacije"
-    },
-    "navigation": {
-      "description": "Naprijed/Nazad navigacijske strelice su izravno integrirane u sučelje, kao i u vašem omiljenom pregledniku",
-      "name": "Navigacija",
-      "templates": {
-        "back": {
-          "title": "Vrati se na prijethodnu stranicu"
-        },
-        "forward": {
-          "title": "Idi na sljedeću stranicu"
-        }
-      }
-    },
     "notifications": {
       "description": "Prikažite obavijest kada pjesma počne svirati (interaktivne obavijesti dostupne su na Windowsu)",
       "menu": {
@@ -558,13 +489,6 @@
       "name": "Slika-u-slici",
       "templates": {
         "button": "Slika-u-slici"
-      }
-    },
-    "playback-speed": {
-      "description": "Slušajte brzo, slušajte sporo! Ovo će dodat klizač koji kontrolira brzinu pjesme",
-      "name": "Brzina pokretanja",
-      "templates": {
-        "button": "Brzina"
       }
     },
     "precise-volume": {
@@ -624,13 +548,6 @@
     "touchbar": {
       "description": "Dodaje dodatak dodirne trake za macOS korisnike",
       "name": "Dodirna Traka"
-    },
-    "visualizer": {
-      "description": "Dodaje vizualizator u plejer",
-      "menu": {
-        "visualizer-type": "Tip vizualizacije"
-      },
-      "name": "Vizualizacija"
     }
   }
 }

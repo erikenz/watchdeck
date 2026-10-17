@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "autentifikavimo „proxy“ paslaugų naudojimo palaikymas",
-      "menu": {
-        "disable": "Išjungti „Proxy“ adapterį",
-        "enable": "Įjungti „Proxy“ adapterį",
-        "hostname": {
-          "label": "Sistemos pavadinimas"
-        },
-        "port": {
-          "label": "Prievadas"
-        }
-      },
-      "name": "Autentifikavimo „Proxy“ adapteris",
-      "prompt": {
-        "hostname": {
-          "label": "Įveskite sistemos vardą vietiniui „Proxy“ serveriui (reikalingas perkrovimas):",
-          "title": "„Proxy“ Sistemos pavadinimas"
-        },
-        "port": {
-          "label": "Įveskite vietinio „Proxy“ serverio prievadą (reikalingas perkrovimas):",
-          "title": "„Proxy“ Prievadas"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Perliejimas tarp dainų",
-      "menu": {
-        "advanced": "Išplėsti Nustatymai"
-      },
-      "name": "Perliejimas [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Pasirodymo trukmė (ms)",
-            "fade-out-duration": "Išnykimo trukmė (ms)",
-            "fade-scaling": {
-              "label": "Išblukimo stiprumas",
-              "linear": "Linijinis",
-              "logarithmic": "Logaritminis"
-            },
-            "seconds-before-end": "Pradėti lieti dainas N sekundžių prieš pabaigą"
-          },
-          "title": "Perliejimo nustatymai"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Konfigūruoti pasirinktiną medijos išvesties įrenginį dainoms",
       "menu": {
@@ -496,29 +450,6 @@
       },
       "name": "Vienodintuvas"
     },
-    "exponential-volume": {
-      "description": "Padaro garsumo slankiklį eksponentinį, kad būtų lengviau pasirinkti mažesnį garsumą.",
-      "name": "Eksponentinis garsas"
-    },
-    "in-app-menu": {
-      "description": "Duoda meniu lentoms įmantrią, tamsią ar albumo spalvos išvaizdą",
-      "menu": {
-        "hide-dom-window-controls": "Slėpti „DOM“ lango kontroles"
-      },
-      "name": "Programos Meniu"
-    },
-    "navigation": {
-      "description": "Kitas/Ankstenis navigacijos rodyklės tiesiogiai integruotos sąsajoje, kaip tavo mėgstamiausioje naršyklėje",
-      "name": "Navigacija",
-      "templates": {
-        "back": {
-          "title": "Eiti į praeitą puslapį"
-        },
-        "forward": {
-          "title": "Eiti į kitą puslapį"
-        }
-      }
-    },
     "notifications": {
       "description": "Rodyti pranešimą, kai pradeda groti daina (interaktyvūs pranešimai pasiekiami sistemoje „Windows“)",
       "menu": {
@@ -558,13 +489,6 @@
       "name": "Nuotrauka-nuotraukoje",
       "templates": {
         "button": "Nuotrauka-nuotraukoje"
-      }
-    },
-    "playback-speed": {
-      "description": "Klausyk greitai, klausyk lėtai! Prideda slankiklį, kuris valdo dainos greitį",
-      "name": "Atkūrimo Greitis",
-      "templates": {
-        "button": "Greitis"
       }
     },
     "precise-volume": {
@@ -624,13 +548,6 @@
     "touchbar": {
       "description": "Pridedamas jutiklinės juostos valdiklis „MacOS“ vartotojams",
       "name": "„TouchBar“"
-    },
-    "visualizer": {
-      "description": "Prie grotuvo pridedamas vizualizatorius",
-      "menu": {
-        "visualizer-type": "Vizualizatoriaus tipas"
-      },
-      "name": "Vizualizatorius"
     }
   }
 }

@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Sokongan untuk penggunaan perkhidmatan proksi pengesahan",
-      "menu": {
-        "disable": "Matikan adapter proksi",
-        "enable": "Nyalakan adapter proksi",
-        "hostname": {
-          "label": "Nama perumah"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adapter Auth Proksi",
-      "prompt": {
-        "hostname": {
-          "label": "Nyatakan nama hos untuk server proksi tempatan (memerlukan mulakan semula):",
-          "title": "Nama hos proksi"
-        },
-        "port": {
-          "label": "Masukkan port untuk server proksi tempatan (memerlukan restart):",
-          "title": "Port Proksi"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Pudar silang antara lagu",
-      "menu": {
-        "advanced": "Maju"
-      },
-      "name": "Pudar Selang [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Pudar dalam tempoh (ms)",
-            "fade-out-duration": "Tempoh pudar (ms)",
-            "fade-scaling": {
-              "label": "Penskalaan pudar",
-              "linear": "Linear",
-              "logarithmic": "Logaritma"
-            },
-            "seconds-before-end": "Pudar silang N saat sebelum tamat"
-          },
-          "title": "Opsi pudar silang"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Konfigurasikan peranti media output tersuai untuk lagu",
       "menu": {
@@ -502,19 +456,6 @@
         }
       },
       "name": "Penyama Bunyi"
-    },
-    "exponential-volume": {
-      "description": "Menjadikan gelangsar kelantangan eksponen supaya lebih mudah memilih kelantangan yang lebih rendah."
-    },
-    "in-app-menu": {
-      "description": "Memberi bar menu rupa yang mewah, gelap atau warna album",
-      "menu": {
-        "hide-dom-window-controls": "Sembunyikan kawalan tetingkap DOM"
-      },
-      "name": "Menu Dalam Apl"
-    },
-    "navigation": {
-      "name": "Navigasi"
     },
     "notifications": {
       "name": "Notifikasi"

@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Suporte para serviços de proxy de autenticação",
-      "menu": {
-        "disable": "Desativar adaptador proxy",
-        "enable": "Ativar adaptador proxy",
-        "hostname": {
-          "label": "Nome do anfitrião"
-        },
-        "port": {
-          "label": "Porta"
-        }
-      },
-      "name": "Adaptador do proxy de autenticação",
-      "prompt": {
-        "hostname": {
-          "label": "Introduza o nome do anfitrião para o servidor proxy local (tem que reiniciar):",
-          "title": "Nome do anfitrião do proxy"
-        },
-        "port": {
-          "label": "Introduza a porta para o servidor proxy local (tem que reiniciar):",
-          "title": "Porta do proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Transição entre faixas",
-      "menu": {
-        "advanced": "Avançado"
-      },
-      "name": "Transição entre faixas [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Duração da transição no início (ms)",
-            "fade-out-duration": "Duração da transição no fim (ms)",
-            "fade-scaling": {
-              "label": "Escala da transição",
-              "linear": "Linear",
-              "logarithmic": "Logarítmica"
-            },
-            "seconds-before-end": "Realizar transição N segundos antes do fim"
-          },
-          "title": "Opções da transição"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configurar um dispositivo de saída padrão para as músicas",
       "menu": {
@@ -496,29 +450,6 @@
       },
       "name": "Equalizador"
     },
-    "exponential-volume": {
-      "description": "Controlo do volume exponencial para que seja mais fácil selecionar volumes mais baixos",
-      "name": "Volume exponencial"
-    },
-    "in-app-menu": {
-      "description": "Barras de menu com aparência sofisticada, escura ou com a cor do álbum",
-      "menu": {
-        "hide-dom-window-controls": "Ocultar controlos da janela DOM"
-      },
-      "name": "Menu da aplicação"
-    },
-    "navigation": {
-      "description": "Setas de navegação Avançar/Recuar integradas na interface tal como acontece nos navegadores web",
-      "name": "Navegação",
-      "templates": {
-        "back": {
-          "title": "Ir para a página anterior"
-        },
-        "forward": {
-          "title": "Ir para a página seguinte"
-        }
-      }
-    },
     "notifications": {
       "description": "Mostrar uma notificação ao iniciar a reprodução de uma música (notificações interativas em sistemas Windows)",
       "menu": {
@@ -558,13 +489,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Adiciona um controlo deslizante para controlar a velocidade de reprodução",
-      "name": "Velocidade de reprodução",
-      "templates": {
-        "button": "Velocidade"
       }
     },
     "precise-volume": {
@@ -624,13 +548,6 @@
     "touchbar": {
       "description": "Adicionar widget TouchBar para utilizadores macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Adiciona um visualizador ao reprodutor",
-      "menu": {
-        "visualizer-type": "Tipo de visualizador"
-      },
-      "name": "Visualizador"
     }
   }
 }

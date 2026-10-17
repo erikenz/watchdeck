@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Hitelesítési proxy szolgáltatások használatának támogatása",
-      "menu": {
-        "disable": "Proxy adapder kikapcsolása",
-        "enable": "Proxy adapter bekapcsolása",
-        "hostname": {
-          "label": "Gazdanév"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Auth Proxy Adapter",
-      "prompt": {
-        "hostname": {
-          "label": "Adjon meg egy hosztnevet a lokális proxy szerverhez (újraindítást igényel):",
-          "title": "Proxy hosztnév"
-        },
-        "port": {
-          "label": "Adjon meg egy portot a lokális proxy szerverhez (újraindátást igényel):",
-          "title": "Proxy Port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Áttünést biztosít a dalok között, ami folytonossá teszi a zenehallgatást anélkül, hogy érezhető lenne a váltás",
-      "menu": {
-        "advanced": "Haladó"
-      },
-      "name": "Áttünés [Béta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Áttünés időtartama (ms)",
-            "fade-out-duration": "Fokozatos halkítás időtartama (ms)",
-            "fade-scaling": {
-              "label": "Áttünés mértéke",
-              "linear": "Lineáris",
-              "logarithmic": "Logaritmikus"
-            },
-            "seconds-before-end": "Áttünés N másodperccel a vége előtt"
-          },
-          "title": "Áttünési beállítások"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Egyéni kimeneti hangeszköz beállítása a zenékhez",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Hangszínszabályzó"
     },
-    "exponential-volume": {
-      "description": "Az hangerő csúszka exponenciálissá tételével könnyebbé válik az alacsony hangerő kiválasztása.",
-      "name": "Exponenciális hangerő"
-    },
-    "in-app-menu": {
-      "description": "Menüsávok stílusos, sötét vagy album-színű megjelenítése",
-      "menu": {
-        "hide-dom-window-controls": "DOM ablakvezérlők elrejtése"
-      },
-      "name": "Alkalmazáson belüli menü"
-    },
-    "navigation": {
-      "description": "Következő/Vissza navigációs nyilak közvetlenül az interfészbe integrálva, mint a kedvenc böngésződben",
-      "name": "Navigáció",
-      "templates": {
-        "back": {
-          "title": "Előző oldal"
-        },
-        "forward": {
-          "title": "Következő oldal"
-        }
-      }
-    },
     "notifications": {
       "description": "Értesítés megjelenítése, amikor egy dal elindul (interaktív értesítések elérhetők Windows-on)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Kép a képben",
       "templates": {
         "button": "Kép a képben"
-      }
-    },
-    "playback-speed": {
-      "description": "Hallgassd gyorsan, hallgassd lassan! Hozzáad egy csúszkát, amely szabályozza a dal sebességét",
-      "name": "Lejátszás sebessége",
-      "templates": {
-        "button": "Sebesség"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "macOS felhasználók számára hozzáad egy widgetet a TouchBar-hoz",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Vizualizációt ad a lejátszóhoz",
-      "menu": {
-        "visualizer-type": "Vizualizáció típus"
-      },
-      "name": "Vizualizáció"
     }
   }
 }

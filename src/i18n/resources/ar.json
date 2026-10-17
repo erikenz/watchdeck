@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "دعم استخدام خدمات proxy للإثبات",
-      "menu": {
-        "disable": "تعطيل مكيف الوكيل",
-        "enable": "تفعيل مكيف proxy للصداقة",
-        "hostname": {
-          "label": "إسم المستضيف"
-        },
-        "port": {
-          "label": "المدخل"
-        }
-      },
-      "name": "مكيّف proxy للمصادقة",
-      "prompt": {
-        "hostname": {
-          "label": "أدخل اسم المستضيف لخادم proxy المحلي (يتطلب إعادة التشغيل):",
-          "title": "إسم مستضيف proxy"
-        },
-        "port": {
-          "label": "أدخل مدخلًا لخادم proxy المحلي (يتطلب إعادة التشغيل):",
-          "title": "مدخل proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "التداخل بين الأغاني",
-      "menu": {
-        "advanced": "متقدم"
-      },
-      "name": "التداخل بين الأغاني [تجريبي]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "مدة التداخل (بأجزاء الثانية)",
-            "fade-out-duration": "مدة التلاشي (بأجزاء الثانية)",
-            "fade-scaling": {
-              "label": "توسيع التداخل",
-              "linear": "خطي",
-              "logarithmic": "لوغاريتمي"
-            },
-            "seconds-before-end": "التداخل قبل النهاية بـ N ثوانٍ"
-          },
-          "title": "خيارات التداخل"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "ضبط مخرج جهاز وسائط مخصص للأغاني",
       "menu": {
@@ -502,29 +456,6 @@
       },
       "name": "معادل صوتي"
     },
-    "exponential-volume": {
-      "description": "يجعل شريط تمرير مستوى الصوت أسيًا بحيث يسهل تحديد مستويات الصوت الأقل.",
-      "name": "الصوت الأسي"
-    },
-    "in-app-menu": {
-      "description": "يعطي أشرطة القوائم مظهرًا أنيقًا و داكنًا أو بلون الألبوم",
-      "menu": {
-        "hide-dom-window-controls": "إخفاء عناصر التحكم في نافذة DOM"
-      },
-      "name": "قائمة التي داخل التطبيق"
-    },
-    "navigation": {
-      "description": "أسهم التنقل \"التالي/السابق\" مدمجة مباشرة في الواجهة، كما في متصفحك المفضل",
-      "name": "التنقل",
-      "templates": {
-        "back": {
-          "title": "العودة إلى الصفحة السابقة"
-        },
-        "forward": {
-          "title": "إذهب إلى الصفحة المقبلة"
-        }
-      }
-    },
     "notifications": {
       "description": "عرض إشعار عندما تبدأ الأغنية (الإشعارات التفاعلية متوفرة على ويندوز)",
       "menu": {
@@ -564,13 +495,6 @@
       "name": "وضع الصورة داخل الصورة",
       "templates": {
         "button": "وضع الصورة داخل الصورة"
-      }
-    },
-    "playback-speed": {
-      "description": "استمع بسرعة، استمع ببطء! يضيف شريط تمرير يتحكم في سرعة الأغنية",
-      "name": "سرعة التشغيل",
-      "templates": {
-        "button": "السرعة"
       }
     },
     "precise-volume": {
@@ -630,13 +554,6 @@
     "touchbar": {
       "description": "يضيف أداة TouchBar لمستخدمي macOS",
       "name": "شريط اللمس (TouchBar)"
-    },
-    "visualizer": {
-      "description": "يضيف معاينًا بصريًا للمشغل",
-      "menu": {
-        "visualizer-type": "نوع المعاين البصري"
-      },
-      "name": "معاين بصري"
     }
   }
 }

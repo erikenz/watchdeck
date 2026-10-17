@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "認証プロキシサービスの利用サポート",
-      "menu": {
-        "disable": "プロキシアダプターを無効にする",
-        "enable": "プロキシアダプターを有効にする",
-        "hostname": {
-          "label": "ホスト名"
-        },
-        "port": {
-          "label": "ポート"
-        }
-      },
-      "name": "認証プロキシアダプタ",
-      "prompt": {
-        "hostname": {
-          "label": "ローカルプロキシサーバのホスト名を入力します（再起動が必要です）：",
-          "title": "プロキシホスト名"
-        },
-        "port": {
-          "label": "ローカルプロキシサーバのポートを入力します（再起動が必要です）：",
-          "title": "プロキシポート"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "曲の間にクロスフェード効果を適用します",
-      "menu": {
-        "advanced": "詳細設定"
-      },
-      "name": "クロスフェード [ベータ]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "フェードイン持続時間(ミリ秒)",
-            "fade-out-duration": "フェードアウト持続時間(ミリ秒)",
-            "fade-scaling": {
-              "label": "フェードスケーリング",
-              "linear": "線形",
-              "logarithmic": "対数スケール"
-            },
-            "seconds-before-end": "終了N秒前にクロスフェードを適用"
-          },
-          "title": "クロスフェード設定"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "曲用のカスタム出力メディアデバイスを構成する",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "イコライザー"
     },
-    "exponential-volume": {
-      "description": "音量スライダを指数関数的にさせ、低い音量に設定しやすくなります。",
-      "name": "指数音量"
-    },
-    "in-app-menu": {
-      "description": "メニューバーをファンシー、ダーク、またはアルバムカラーの外観にする",
-      "menu": {
-        "hide-dom-window-controls": "DOMウィンドウコントロールを隠す"
-      },
-      "name": "アプリ内メニュー"
-    },
-    "navigation": {
-      "description": "ブラウザの戻る・進むボタンのようにUIからコントロールできるボタン",
-      "name": "ナビゲーション",
-      "templates": {
-        "back": {
-          "title": "前のページに戻ります"
-        },
-        "forward": {
-          "title": "次のページに進みます"
-        }
-      }
-    },
     "notifications": {
       "description": "曲の再生開始時に通知を表示する(Windowsではインタラクティブ通知が利用可能)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "ピクチャインピクチャ",
       "templates": {
         "button": "ピクチャインピクチャ"
-      }
-    },
-    "playback-speed": {
-      "description": "速く聴く、遅く聴く！曲のスピードをコントロールするスライダーを追加",
-      "name": "再生速度",
-      "templates": {
-        "button": "速度"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "masOSユーザー向けにTouchBarウィジェットを追加",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "視覚効果(ビジュアライザー)をプレイヤーに追加します",
-      "menu": {
-        "visualizer-type": "ビジュアライザーの種類"
-      },
-      "name": "視覚効果"
     }
   }
 }

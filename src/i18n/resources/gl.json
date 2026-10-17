@@ -272,12 +272,6 @@
           "label": "Porto"
         }
       }
-    },
-    "auth-proxy-adapter": {
-      "menu": {
-        "disable": "Desabilitar adaptador Proxy",
-        "enable": "Habilitar adaptador Proxy"
-      }
     }
   }
 }

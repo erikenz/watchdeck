@@ -288,28 +288,6 @@
         }
       }
     },
-    "crossfade": {
-      "description": "Bledenje med pesmimi",
-      "menu": {
-        "advanced": "Dodatno"
-      },
-      "name": "Bledenje med pesmimi [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Čas zbledenja (v pesem) (ms)",
-            "fade-out-duration": "Čas zbledenja (izven pesemi) (ms)",
-            "fade-scaling": {
-              "label": "Zbledi skaliranje",
-              "linear": "Linearno",
-              "logarithmic": "Logaritmično"
-            },
-            "seconds-before-end": "Bledenje (crossfade) N sekund pred koncem"
-          },
-          "title": "Možnosti zbledenja"
-        }
-      }
-    },
     "disable-autoplay": {
       "description": "Začne pesem v zaustavljenem načinu",
       "menu": {
@@ -415,17 +393,6 @@
       "templates": {
         "button": "Prenos"
       }
-    },
-    "exponential-volume": {
-      "description": "Drsnik za glasnost naredi eksponenten, da bo lažje izbrati nižje glasnosti.",
-      "name": "Eksponentna glasnost"
-    },
-    "in-app-menu": {
-      "description": "Menijem doda eleganten videz v temnih barvah ali barvah albuma",
-      "menu": {
-        "hide-dom-window-controls": "Skrije DOM gumbe za okno"
-      },
-      "name": "Meni v aplikaciji"
     }
   }
 }

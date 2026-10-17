@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Soporte para el uso de servicios de proxy de autenticación",
-      "menu": {
-        "disable": "Deshabilitar el adaptador proxy",
-        "enable": "Habilitar el adaptador proxy",
-        "hostname": {
-          "label": "Nombre de host"
-        },
-        "port": {
-          "label": "Puerto"
-        }
-      },
-      "name": "Adaptador de proxy de autenticación",
-      "prompt": {
-        "hostname": {
-          "label": "Ingrese el nombre de host del servidor proxy local (requiere reinicio):",
-          "title": "Nombre de host del proxy"
-        },
-        "port": {
-          "label": "Ingrese el puerto para el servidor de proxy local (requiere reinicio):",
-          "title": "Puerto de proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Crossfade entre canciones",
-      "menu": {
-        "advanced": "Avanzado"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Duración del fundido de entrada (ms)",
-            "fade-out-duration": "Duración del fundido de salida (ms)",
-            "fade-scaling": {
-              "label": "Escala del fundido",
-              "linear": "Lineal",
-              "logarithmic": "Logarítmico"
-            },
-            "seconds-before-end": "Activar Crossfade N segundos antes del final"
-          },
-          "title": "Opciones de Crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configura un dispositivo de salida de audio personalizado para las canciones",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Ecualizador"
     },
-    "exponential-volume": {
-      "description": "Hace que la barra de volumen sea exponencial para que sea más fácil seleccionar volúmenes más bajos.",
-      "name": "Volumen exponencial"
-    },
-    "in-app-menu": {
-      "description": "Da a las barras de menú un aspecto elegante, oscuro o del color de un álbum",
-      "menu": {
-        "hide-dom-window-controls": "Ocultar controles de ventana DOM"
-      },
-      "name": "Menú de aplicación"
-    },
-    "navigation": {
-      "description": "Flechas de navegación Siguiente/Atrás directamente integradas en la interfaz, como en tu navegador favorito",
-      "name": "Navegación",
-      "templates": {
-        "back": {
-          "title": "Volver a la página anterior"
-        },
-        "forward": {
-          "title": "Ir a la siguiente página"
-        }
-      }
-    },
     "notifications": {
       "description": "Mostrar una notificación cuando empiece a sonar una canción (las notificaciones interactivas están disponibles en Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Escucha rápido, escucha despacio! Añade un control deslizante que ajusta la velocidad de la canción",
-      "name": "Velocidad de reproducción",
-      "templates": {
-        "button": "Velocidad"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Añade un widget TouchBar para los usuarios de macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Añadir un visualizador al reproductor",
-      "menu": {
-        "visualizer-type": "Tipo de visualizador"
-      },
-      "name": "Visualizador"
     }
   }
 }

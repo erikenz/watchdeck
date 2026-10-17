@@ -288,28 +288,6 @@
         }
       }
     },
-    "crossfade": {
-      "description": "Krossfæra á milli lög",
-      "menu": {
-        "advanced": "Háþróaður"
-      },
-      "name": "Krossfæra [Prófunarútgáfa]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Dvína í lengd (ms)",
-            "fade-out-duration": "Dvína út lengd (ms)",
-            "fade-scaling": {
-              "label": "Fölunarskala",
-              "linear": "Línulegt",
-              "logarithmic": "Logaritmískt"
-            },
-            "seconds-before-end": "Krossfæra N sekúndum fyrir enda"
-          },
-          "title": "Krossfæravalkosti"
-        }
-      }
-    },
     "disable-autoplay": {
       "description": "Gerir lag að byrja í \"hlé\" ham",
       "menu": {
@@ -416,21 +394,6 @@
         "button": "Sækja"
       }
     },
-    "exponential-volume": {
-      "description": "Gerir hljóðstyrkssleðann veldisvísis svo það er auðveldara að velja lægra hljóðstyrk.",
-      "name": "Veldibundiðrúmmál"
-    },
-    "in-app-menu": {
-      "description": "Gefur valmyndastikum glæsilegt, dökkt eða albúmslitsjáðu",
-      "menu": {
-        "hide-dom-window-controls": "Fela DOM gluggastýringar"
-      },
-      "name": "Valmynd í forriti"
-    },
-    "navigation": {
-      "description": "Næsta/Til baka leiðsagnarörvar beint samþættar í viðmótinu, eins og í uppáhalds vafranum þínum",
-      "name": "Leiðsögn"
-    },
     "notifications": {
       "description": "Birta tilkynningu þegar lag byrjar að spila (gagnvirkartilkynningar eru fáanlegar á Windows)",
       "menu": {
@@ -470,13 +433,6 @@
       "name": "Mynd-í-mynd",
       "templates": {
         "button": "Mynd-í-mynd"
-      }
-    },
-    "playback-speed": {
-      "description": "Hlustaðu hratt, hlustaðu hægt! Bætir við sleða sem stjórnar lagahraðanum",
-      "name": "Spilunarhraði",
-      "templates": {
-        "button": "Hraði"
       }
     },
     "precise-volume": {
@@ -536,13 +492,6 @@
     "touchbar": {
       "description": "Bætir við Snertistiku græju fyrir macOS notendur",
       "name": "Snertistiku"
-    },
-    "visualizer": {
-      "description": "Bætir sýndarstýringar við spilarann",
-      "menu": {
-        "visualizer-type": "Sýndarstýringartegund"
-      },
-      "name": "Sýndarstýringar"
     }
   }
 }

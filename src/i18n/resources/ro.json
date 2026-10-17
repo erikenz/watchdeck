@@ -307,52 +307,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Suport pentru utilizarea serviciilor proxy de autentificare",
-      "menu": {
-        "disable": "Dezactivează Adaptorul Proxy",
-        "enable": "Activează Adaptorul Proxy",
-        "hostname": {
-          "label": "Nume host"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adaptor Proxy de Autentificare",
-      "prompt": {
-        "hostname": {
-          "label": "Introduceți numele de gazdă pentru serverul proxy local (necesită repornire):",
-          "title": "Nume host proxy"
-        },
-        "port": {
-          "label": "Introduceți portul pentru serverul proxy local (necesită repornire):",
-          "title": "Port Proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Tranziționează între melodii",
-      "menu": {
-        "advanced": "Avansat"
-      },
-      "name": "Tranziție [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Durată tranziție de început (ms)",
-            "fade-out-duration": "Durată tranziției de sfârșit (ms)",
-            "fade-scaling": {
-              "label": "Scalare de estompare",
-              "linear": "Liniar",
-              "logarithmic": "Logaritmic"
-            },
-            "seconds-before-end": "Tranziție N secunde înainte de final"
-          },
-          "title": "Opțiuni de tranziție"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configurați un dispozitiv de ieșire personalizat pentru melodii",
       "menu": {
@@ -492,29 +446,6 @@
       },
       "name": "Egalizator"
     },
-    "exponential-volume": {
-      "description": "Face glisorul de volum exponențial pentru a fi mai ușor de selectat volume reduse.",
-      "name": "Volum exponențial"
-    },
-    "in-app-menu": {
-      "description": "Oferă barelor de meniu un aspect extravagant, întunecat sau de culoarea albumului",
-      "menu": {
-        "hide-dom-window-controls": "Ascunde controalele ferestrei DOM"
-      },
-      "name": "Meniul aplicației"
-    },
-    "navigation": {
-      "description": "Săgețile pentru Următorul/Anteriorul integrate direct în interfață, ca în browser-ul tău preferat",
-      "name": "Navigație",
-      "templates": {
-        "back": {
-          "title": "Inapoi la pagina anterioara"
-        },
-        "forward": {
-          "title": "Urmatoarea pagina"
-        }
-      }
-    },
     "notifications": {
       "description": "Afișează o notificare când începe să cânte o piesă (notificările interactive sunt disponibile pe Windows)",
       "menu": {
@@ -554,13 +485,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Ascultă rapid, ascultă lent! Adaugă un slider pentru viteza de redare a melodiei",
-      "name": "Viteza de redare",
-      "templates": {
-        "button": "Viteză"
       }
     },
     "precise-volume": {
@@ -620,13 +544,6 @@
     "touchbar": {
       "description": "Adaugă un widget TouchBar pentru utilizatorii macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Adaugă un vizualizator la player",
-      "menu": {
-        "visualizer-type": "Tip de vizualizator"
-      },
-      "name": "Vizualizator"
     }
   }
 }

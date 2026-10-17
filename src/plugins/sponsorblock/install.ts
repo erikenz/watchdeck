@@ -194,8 +194,8 @@ const install = async ({
       // `config.plugins.isEnabled` at module scope, which reaches every plugin module through
       // `allPlugins()`, so a static import from a plugin is a cycle with a pending top-level await
       // - the main process never finishes starting and says nothing at all.
-      const { refreshMenu } = await import("@/menu");
-      await refreshMenu(win).catch(() => undefined);
+      const { setApplicationMenu } = await import("@/menu");
+      await setApplicationMenu(win).catch(() => undefined);
       return;
     }
 

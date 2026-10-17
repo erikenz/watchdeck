@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Kimlik doğrulama proxy hizmetlerinin kullanımına destek",
-      "menu": {
-        "disable": "Proxy Bağdaştırıcısını Devre Dışı Bırak",
-        "enable": "Proxy Bağdaştırıcısını Etkinleştir",
-        "hostname": {
-          "label": "Ana makine adı"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Ara Sunucu Doğrulama Bağdaştırıcısı",
-      "prompt": {
-        "hostname": {
-          "label": "Yerel proxy sunucusu için ana makine adını girin (yeniden başlatma gerektirir):",
-          "title": "Proxy Ana Makine Adı"
-        },
-        "port": {
-          "label": "Yerel proxy sunucusu için bağlantı noktasını girin (yeniden başlatma gerektirir):",
-          "title": "Proxy Bağlantı Noktası"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Şarkılar arasında Çapraz Geçiş",
-      "menu": {
-        "advanced": "Gelişmiş"
-      },
-      "name": "Çapraz Geçiş [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Güçlenme süresi (ms)",
-            "fade-out-duration": "Zayıflama süresi (ms)",
-            "fade-scaling": {
-              "label": "Zayıflama Ölçeği",
-              "linear": "Doğrusal",
-              "logarithmic": "Logaritmik"
-            },
-            "seconds-before-end": "Bitişten N saniye önce çapraz geçiş"
-          },
-          "title": "Çapraz Geçiş ayarları"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Şarkılar için özel bir medya çıkış aygıtı ayarlayın",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Ekolayzer"
     },
-    "exponential-volume": {
-      "description": "Ses seviyesi kaydırıcısını üstel hale getirir, böylece daha düşük ses seviyelerini seçmek daha kolay olur.",
-      "name": "Üstel Ses Seviyesi"
-    },
-    "in-app-menu": {
-      "description": "Menü çubuklarına süslü, koyu veya albüm renginde bir görünüm verir",
-      "menu": {
-        "hide-dom-window-controls": "DOM penceresi kontrollerini gizle"
-      },
-      "name": "Uygulama İçi Menü"
-    },
-    "navigation": {
-      "description": "Favori tarayıcınızdaki gibi doğrudan arayüze entegre edilmiş İleri/Geri gezinme okları",
-      "name": "Navigasyon",
-      "templates": {
-        "back": {
-          "title": "Önceki sayfaya git"
-        },
-        "forward": {
-          "title": "Sonraki sayfaya geç"
-        }
-      }
-    },
     "notifications": {
       "description": "Bir şarkı çalmaya başladığında bir bildirim görüntüler (etkileşimli bildirimler Windows'ta mevcuttur)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Resim-içinde-resim",
       "templates": {
         "button": "Resim-içinde-resim"
-      }
-    },
-    "playback-speed": {
-      "description": "Hızlı dinle, yavaş dinle! Şarkı hızını kontrol eden bir kaydırıcı ekler",
-      "name": "Oynatma Hızı",
-      "templates": {
-        "button": "Hız"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "macOS kullanıcıları için bir TouchBar widget'ı ekler",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Oynatıcıya bir görselleştirici ekler",
-      "menu": {
-        "visualizer-type": "Görselleştirici Tipi"
-      },
-      "name": "Görselleştirici"
     }
   }
 }

@@ -22,9 +22,20 @@ import { expect, test, _electron as electron } from "@playwright/test";
  * `dialog.showMessageBox` is replaced inside the main process; everything around the click is the
  * real thing, including the config store and the extension loader.
  */
+/**
+ * @typedef {import("@playwright/test").ElectronApplication} ElectronApp
+ * @typedef {{ buttons: string[], detail: string, title: string }} AskedDialog
+ * @typedef {{ consentGiven: boolean, enabled: boolean, mode: string }} PluginConfig
+ */
+
 const appPath = path.resolve(import.meta.dirname, "..");
 const installDir = "sponsorblock-extension-wd1";
 
+/**
+ * @param {PluginConfig} pluginConfig The plugin's entry in the app's config file.
+ * @param {number} answer The response every dialog reports, as a button index.
+ * @returns {Promise<{ app: ElectronApp, userData: string }>} The launched app, and its config dir.
+ */
 const launchWith = async (pluginConfig, answer) => {
   // Same reasoning as the smoke test: a scratch `XDG_CONFIG_HOME` is the app's `userData`, so this
   // neither reads nor writes the config, the Watch Later database or an extension install that
@@ -45,8 +56,11 @@ const launchWith = async (pluginConfig, answer) => {
 
   await app.evaluate(({ dialog }, response) => {
     globalThis.__asked = [];
+
+    const asked = /** @type {AskedDialog[]} */ (globalThis.__asked);
+
     dialog.showMessageBox = async (...args) => {
-      globalThis.__asked.push(args.at(-1));
+      asked.push(args.at(-1));
       return { checkboxChecked: false, response };
     };
   }, answer);
@@ -54,11 +68,18 @@ const launchWith = async (pluginConfig, answer) => {
   return { app, userData };
 };
 
-const dialogs = (app) => app.evaluate(() => globalThis.__asked);
+/** @param {ElectronApp} app The launched app to ask. */
+const dialogs = (app) =>
+  app.evaluate(() => /** @type {AskedDialog[]} */ (globalThis.__asked));
 
-const storedPluginConfig = (userData) =>
-  JSON.parse(readFileSync(path.join(userData, "config.json"), "utf-8")).plugins
-    .sponsorblock;
+/** @param {string} userData The app's own directory, which holds `config.json`. */
+const storedPluginConfig = (userData) => {
+  const config = /** @type {{ plugins: { sponsorblock: PluginConfig } }} */ (
+    JSON.parse(readFileSync(path.join(userData, "config.json"), "utf-8"))
+  );
+
+  return config.plugins.sponsorblock;
+};
 
 test("SponsorBlock is not downloaded until the user agrees to it", async () => {
   const { app, userData } = await launchWith(
@@ -79,7 +100,6 @@ test("SponsorBlock is not downloaded until the user agrees to it", async () => {
       "Not now",
     ]);
     expect(consent.detail).toContain("releases/tag/6.1.7");
-
     // Declining switches the plugin off, and nothing reached the disk.
     await expect
       .poll(() => storedPluginConfig(userData).enabled, { timeout: 10_000 })

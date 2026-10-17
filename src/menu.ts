@@ -52,9 +52,6 @@ const showAboutDialog = async (win: Electron.BrowserWindow) => {
   }
 };
 
-// True only if in-app-menu was loaded on launch
-const inAppMenuActive = await config.plugins.isEnabled("in-app-menu");
-
 const pluginEnabledMenu = async (
   plugin: string,
   label = "",
@@ -81,17 +78,10 @@ const pluginEnabledMenu = async (
   type: "checkbox",
 });
 
-export const refreshMenu = async (win: BrowserWindow) => {
-  await setApplicationMenu(win);
-  if (inAppMenuActive) {
-    win.webContents.send("refresh-in-app-menu");
-  }
-};
-
 export const mainMenuTemplate = async (
   win: BrowserWindow
 ): Promise<MenuTemplate> => {
-  const innerRefreshMenu = async () => refreshMenu(win);
+  const innerRefreshMenu = async () => setApplicationMenu(win);
   const { navigationHistory } = win.webContents;
   const controls = getVideoControls(win);
   await loadAllMenuPlugins(win);
@@ -509,8 +499,8 @@ export const mainMenuTemplate = async (
                 checked: (config.get("options.language") ?? "en") === lang,
                 click() {
                   config.setMenuOption("options.language", lang);
-                  refreshMenu(win);
-                  setLanguage(lang);
+                  void setApplicationMenu(win);
+                  void setLanguage(lang);
                   dialog.showMessageBox(win, {
                     title: t("main.menu.options.submenu.language.dialog.title"),
                     message: t(

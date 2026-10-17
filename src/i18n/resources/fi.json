@@ -295,52 +295,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Tukee todennusvälipalvelinten käyttöä",
-      "menu": {
-        "disable": "Poista välipalvelimen adapteri pois käytöstä",
-        "enable": "Aseta välipalvelimen adapteri käyttöön",
-        "hostname": {
-          "label": "Isäntänimi"
-        },
-        "port": {
-          "label": "Portti"
-        }
-      },
-      "name": "Todennusvälipalvelinadapteri",
-      "prompt": {
-        "hostname": {
-          "label": "Syötä paikallisen välipalvelimen isäntänimi (vaatii uudelleenkäynnistyksen):",
-          "title": "Välipalvelimen isäntänimi"
-        },
-        "port": {
-          "label": "Syötä paikallisen välipalvelimen portti (vaatii uudelleenkäynnistyksen):",
-          "title": "Välipalvelimen portti"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Ristihäivytä kappaleet",
-      "menu": {
-        "advanced": "Edistynyt"
-      },
-      "name": "Ristihäivytys [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Sisään häivytyksen kesto (ms)",
-            "fade-out-duration": "Ulos häivytyksen kesto (ms)",
-            "fade-scaling": {
-              "label": "Häivytyksen skaalaus",
-              "linear": "Lineaarinen",
-              "logarithmic": "Logaritminen"
-            },
-            "seconds-before-end": "Ristihäivytä N sekuntia ennen loppua"
-          },
-          "title": "Ristihäivytyksen asetukset"
-        }
-      }
-    },
     "disable-autoplay": {
       "description": "Kappaleet alkavat \"pysäytetty\" tilassa",
       "menu": {
@@ -459,29 +413,6 @@
       },
       "name": "Taajuuskorjain"
     },
-    "exponential-volume": {
-      "description": "Tekee äänenvoimakkuuden säätimestä eksponentiaalisen, jotta matalampien äänenvoimakkuuksien valinta on helpompaa.",
-      "name": "Eksponentiaalinen Äänenvoimakkuus"
-    },
-    "in-app-menu": {
-      "description": "Antaa valikkopalkeille hienon tumman tai albumin värisen ulkonäön",
-      "menu": {
-        "hide-dom-window-controls": "Piilota ikkunan DOM ohjaimet"
-      },
-      "name": "Sovelluksen sisäinen valikko"
-    },
-    "navigation": {
-      "description": "Eteen- ja taaksepäin vievät nuolet suoraan integroituna käyttöliittymään. Juuri niin kuin lempiselaimessasi",
-      "name": "Siirtyminen",
-      "templates": {
-        "back": {
-          "title": "Palaa edelliselle sivulle"
-        },
-        "forward": {
-          "title": "Siirry seuraavalle sivulle"
-        }
-      }
-    },
     "notifications": {
       "description": "Näytä ilmoitus, kun kappale alkaa soida (interaktiiviset ilmoitukset ovat käytettävissä Windowsilla)",
       "menu": {
@@ -521,13 +452,6 @@
       "name": "Kuva kuvassa",
       "templates": {
         "button": "Kuva kuvassa"
-      }
-    },
-    "playback-speed": {
-      "description": "Kuuntele nopeasti, kuuntele hitaasti! Lisää säätimen, jolla voit säätää kappaleen toistonopeutta",
-      "name": "Toistonopeus",
-      "templates": {
-        "button": "Nopeus"
       }
     },
     "precise-volume": {

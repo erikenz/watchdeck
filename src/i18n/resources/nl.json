@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Ondersteuning voor het gebruik van authenticatie proxy diensten",
-      "menu": {
-        "disable": "Proxy adapter uitschakelen",
-        "enable": "Proxy adapter inschakelen",
-        "hostname": {
-          "label": "Hostnaam"
-        },
-        "port": {
-          "label": "Poort"
-        }
-      },
-      "name": "Proxy-authenticatieadapter",
-      "prompt": {
-        "hostname": {
-          "label": "Hostname voor lokale proxy server (vereist herstart):",
-          "title": "Proxy hostnaam"
-        },
-        "port": {
-          "label": "Poort voor lokale proxy server (herstart vereist):",
-          "title": "Proxy poort"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Vervagen tussen nummers",
-      "menu": {
-        "advanced": "Geavanceerd"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Fade-in-duur (ms)",
-            "fade-out-duration": "Fade-out-duur (ms)",
-            "fade-scaling": {
-              "label": "Vervagingschaal",
-              "linear": "Lineair",
-              "logarithmic": "Logaritmisch"
-            },
-            "seconds-before-end": "Vervagen N seconden voor het einde"
-          },
-          "title": "Crossfade-opties"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configureer een aangepast media uitvoerapparaat voor liedjes",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Equalizer"
     },
-    "exponential-volume": {
-      "description": "Maakt de volumeschuif exponentieel zodat het gemakkelijker is om lagere volumes te selecteren.",
-      "name": "Exponentieel Volume"
-    },
-    "in-app-menu": {
-      "description": "Geeft menubalken een chique, donkere of albumkleurige uitstraling",
-      "menu": {
-        "hide-dom-window-controls": "Verberg DOM-vensterbedieningselementen"
-      },
-      "name": "In-App Menu"
-    },
-    "navigation": {
-      "description": "Volgende/Vorige navigatiepijlen rechtstreeks geïntegreerd in de interface, zoals in je favoriete browser",
-      "name": "Navigatie",
-      "templates": {
-        "back": {
-          "title": "Ga naar de vorige pagina"
-        },
-        "forward": {
-          "title": "Ga naar de volgende pagina"
-        }
-      }
-    },
     "notifications": {
       "description": "Toont een melding wanneer een nummer begint te spelen (interactieve meldingen zijn beschikbaar op Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Luister snel, luister langzaam! Voegt een schuifregelaar toe die de muzieksnelheid regelt",
-      "name": "Afspeelsnelheid",
-      "templates": {
-        "button": "Snelheid"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Voegt een TouchBar-widget toe voor macOS-gebruikers",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Voegt een visualisator toe aan de speler",
-      "menu": {
-        "visualizer-type": "Visualisatietype"
-      },
-      "name": "Visualisator"
     }
   }
 }

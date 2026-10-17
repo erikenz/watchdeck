@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Supporto per l'utilizzo di servizi proxy di autenticazione",
-      "menu": {
-        "disable": "Disattiva adattatore proxy",
-        "enable": "Attiva adattatore proxy",
-        "hostname": {
-          "label": "Nome host"
-        },
-        "port": {
-          "label": "Porta"
-        }
-      },
-      "name": "Adattatore proxy di autenticazione",
-      "prompt": {
-        "hostname": {
-          "label": "Inserire hostname del server proxy locale (richiede riavvio):",
-          "title": "Nome host del proxy"
-        },
-        "port": {
-          "label": "Inserire porta del server proxy locale (richiede riavvio):",
-          "title": "Porta Proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Crossfade tra i brani",
-      "menu": {
-        "advanced": "Impostazioni avanzate"
-      },
-      "name": "Crossfade [beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Durata dissolvenza in entrata (ms)",
-            "fade-out-duration": "Durata dissolvenza in uscita (ms)",
-            "fade-scaling": {
-              "label": "Transizione dissolvenza",
-              "linear": "Lineare",
-              "logarithmic": "Logaritmica"
-            },
-            "seconds-before-end": "N° secondi di crossfade prima della fine"
-          },
-          "title": "Opzioni crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Scegli da quale uscita audio vuoi riprodurre i brani",
       "menu": {
@@ -496,29 +450,6 @@
       },
       "name": "Equalizzatore"
     },
-    "exponential-volume": {
-      "description": "Rende esponenziale il cursore del volume, in modo da facilitare la selezione di volumi più bassi.",
-      "name": "Volume esponenziale"
-    },
-    "in-app-menu": {
-      "description": "Migliora l'aspetto delle barre del menu con un look scuro o basato sul colore dell'album",
-      "menu": {
-        "hide-dom-window-controls": "Nascondi i controlli delle finestre DOM"
-      },
-      "name": "Menu In-App"
-    },
-    "navigation": {
-      "description": "Frecce di navigazione Avanti/Indietro integrate direttamente nell'interfaccia, come nel tuo browser preferito",
-      "name": "Navigazione",
-      "templates": {
-        "back": {
-          "title": "Vai alla pagina precedente"
-        },
-        "forward": {
-          "title": "Vai alla pagina successiva"
-        }
-      }
-    },
     "notifications": {
       "description": "Mostra una notifica quando viene riprodotto un brano (le notifiche interattive sono disponibili su Windows)",
       "menu": {
@@ -558,13 +489,6 @@
       "name": "Picture-in-Picture",
       "templates": {
         "button": "Picture-in-Picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Ascolto veloce, ascolto lento! Aggiunge un cursore che controlla la velocità di riproduzione del brano",
-      "name": "Velocità riproduzione",
-      "templates": {
-        "button": "Velocità"
       }
     },
     "precise-volume": {
@@ -624,13 +548,6 @@
     "touchbar": {
       "description": "Aggiunge un widget TouchBar per gli utenti macOS",
       "name": "Touch Bar (per MacOS)"
-    },
-    "visualizer": {
-      "description": "Sostituisce al Video un visualizzatore grafico",
-      "menu": {
-        "visualizer-type": "Tipo di visualizzazione"
-      },
-      "name": "Visualizzatore grafico"
     }
   }
 }

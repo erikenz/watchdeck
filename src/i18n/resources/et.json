@@ -307,46 +307,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "menu": {
-        "disable": "Lülita proksi adapter välja",
-        "enable": "Lülita proksi adapter sisse",
-        "hostname": {
-          "label": "Hostinimi"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Auth proksi adapter",
-      "prompt": {
-        "hostname": {
-          "label": "Sisesta kohaliku serveri proksinimi (vajab taaskävitamist):",
-          "title": "Proksi hostinimi"
-        },
-        "port": {
-          "title": "Proksi port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Sujuv üleminek lugude vahel",
-      "menu": {
-        "advanced": "Edasijõudnutele"
-      },
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Ülemineku kestus (ms)",
-            "fade-out-duration": "Vaibumise kestus (ms)",
-            "fade-scaling": {
-              "linear": "Lineaarne",
-              "logarithmic": "Logaritmiline"
-            }
-          }
-        }
-      }
-    },
     "custom-output-device": {
       "menu": {
         "device-selector": "Vali seade"
@@ -467,20 +427,6 @@
       },
       "name": "Ekvalaiser"
     },
-    "in-app-menu": {
-      "name": "Rakendusesisene menüü"
-    },
-    "navigation": {
-      "name": "Liikumine",
-      "templates": {
-        "back": {
-          "title": "Mine eelmisele lehele"
-        },
-        "forward": {
-          "title": "Mine järgmisele lehele"
-        }
-      }
-    },
     "notifications": {
       "menu": {
         "interactive-settings": {
@@ -512,12 +458,6 @@
       "name": "Pilt pildis",
       "templates": {
         "button": "Pilt pildis"
-      }
-    },
-    "playback-speed": {
-      "name": "Esitamise kiirus",
-      "templates": {
-        "button": "Kiirus"
       }
     },
     "precise-volume": {
@@ -558,13 +498,6 @@
     },
     "sponsorblock": {
       "name": "Sponsorite blokeerimine"
-    },
-    "visualizer": {
-      "description": "Lisab pleierile visualiseerija",
-      "menu": {
-        "visualizer-type": "Visualiseerija liik"
-      },
-      "name": "Visualiseerija"
     }
   }
 }

@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "인증이 필요한 프록시를 지원합니다",
-      "menu": {
-        "disable": "프록시 어댑터 비활성화",
-        "enable": "프록시 어댑터 활성화",
-        "hostname": {
-          "label": "호스트 명"
-        },
-        "port": {
-          "label": "포트"
-        }
-      },
-      "name": "권한 프록시 어댑터",
-      "prompt": {
-        "hostname": {
-          "label": "로컬 프록시 서버의 호스트명을 입력해주세요 (재시작이 필요합니다):",
-          "title": "프록시 호스트명"
-        },
-        "port": {
-          "label": "로컬 프록시 서버의 포트를 입력 해주세요 (재시작이 필요합니다):",
-          "title": "프록시 포트"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "노래 사이에 크로스페이드 효과를 적용합니다",
-      "menu": {
-        "advanced": "고급 설정"
-      },
-      "name": "크로스페이드 [베타]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "페이드인 지속 시간 (밀리초)",
-            "fade-out-duration": "페이드아웃 지속 시간 (밀리초)",
-            "fade-scaling": {
-              "label": "페이드 스케일링",
-              "linear": "선형",
-              "logarithmic": "로그스케일"
-            },
-            "seconds-before-end": "종료되기 N초 전에 크로스페이드 적용"
-          },
-          "title": "크로스페이드 설정"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "미디어를 출력할­ 장치 구성하기",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "이퀄라이저"
     },
-    "exponential-volume": {
-      "description": "음량 슬라이더를 지수적으로 만들어 더 낮은 음량을 쉽게 선택할 수 있도록 합니다.",
-      "name": "지수 음량"
-    },
-    "in-app-menu": {
-      "description": "메뉴 표시줄을 더 멋지게, 그리고 다크 또는 앨범의 색상으로 만듭니다",
-      "menu": {
-        "hide-dom-window-controls": "DOM 윈도우 컨트롤 숨기기"
-      },
-      "name": "인앱 메뉴"
-    },
-    "navigation": {
-      "description": "브라우저에서처럼, UI에 직접 통합된 앞으로/뒤로 탐색하는 화살표",
-      "name": "탐색",
-      "templates": {
-        "back": {
-          "title": "이전 페이지로 이동"
-        },
-        "forward": {
-          "title": "다음 페이지로 이동"
-        }
-      }
-    },
     "notifications": {
       "description": "노래 재생이 시작되면 알림을 표시 (Windows에서는 대화형 알림 사용 가능)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "PiP",
       "templates": {
         "button": "PiP"
-      }
-    },
-    "playback-speed": {
-      "description": "빨리 듣거나, 천천히 들어보세요! 노래 속도를 제어하는 슬라이더를 추가합니다",
-      "name": "재생 속도",
-      "templates": {
-        "button": "배속"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "macOS 사용자를 위한 TouchBar 위젯을 추가합니다",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "플레이어에 시각화 도구 추가",
-      "menu": {
-        "visualizer-type": "비주얼라이저 타입"
-      },
-      "name": "비주얼라이저"
     }
   }
 }

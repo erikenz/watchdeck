@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Wparcie dla uwierzytalniających usług proxy",
-      "menu": {
-        "disable": "Wyłącz adapter proxy",
-        "enable": "Włącz adapter proxy",
-        "hostname": {
-          "label": "Nazwa hosta"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Uwierzytelnij adapter proxy",
-      "prompt": {
-        "hostname": {
-          "label": "Wpisz nazwę hosta dla lokalnego serwera proxy (wymaga restaru):",
-          "title": "Nazwa hosta proxy"
-        },
-        "port": {
-          "label": "Wpisz port dla lokalnego serwera proxy (wymaga restartu):",
-          "title": "Port proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Pozwól odtwarzaczowi płynnie przechodzić między utworami",
-      "menu": {
-        "advanced": "Zaawansowane"
-      },
-      "name": "Płynne przejście [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Czas wnikania (ms)",
-            "fade-out-duration": "Czas zanikania (ms)",
-            "fade-scaling": {
-              "label": "Skalowanie zanikania",
-              "linear": "Liniowe",
-              "logarithmic": "Logarytmiczne"
-            },
-            "seconds-before-end": "Przenikanie N sekund przed końcem"
-          },
-          "title": "Opcje przenikania"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Skonfiguruj niestandardowe wyjście audio dla odtwarzanych utworów",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Korektor"
     },
-    "exponential-volume": {
-      "description": "Sprawia, że suwak głośności jest proporcjonalna, dzięki czemu łatwiej jest wybrać niższą głośność.",
-      "name": "Proporcjonalna głośność"
-    },
-    "in-app-menu": {
-      "description": "Nadaje paskom menu elegancki, ciemny lub albumowy wygląd",
-      "menu": {
-        "hide-dom-window-controls": "Ukryj kontrolki okna DOM"
-      },
-      "name": "Menu w aplikacji"
-    },
-    "navigation": {
-      "description": "Strzałki nawigacyjne Dalej/Wstecz zintegrowane bezpośrednio z interfejsem, tak jak w Twojej ulubionej przeglądarce",
-      "name": "Nawigacja",
-      "templates": {
-        "back": {
-          "title": "Przejdź do poprzedniej strony"
-        },
-        "forward": {
-          "title": "Przejdź do następnej strony"
-        }
-      }
-    },
     "notifications": {
       "description": "Wyświetl powiadomienie, gdy rozpocznie się odtwarzanie utworu (interaktywne powiadomienia są dostępne w systemie Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Obraz w obrazie",
       "templates": {
         "button": "Obraz w obrazie"
-      }
-    },
-    "playback-speed": {
-      "description": "Słuchaj szybko, słuchaj powoli! Dodaje suwak kontrolujący prędkość utworu",
-      "name": "Szybkość odtwarzania",
-      "templates": {
-        "button": "Szybkość"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Dodaje widżet do paska dotykowego dla użytkowników systemu macOS",
       "name": "Pasek dotykowy"
-    },
-    "visualizer": {
-      "description": "Dodaje wizualizator do odtwarzacza",
-      "menu": {
-        "visualizer-type": "Typ wizualizatora"
-      },
-      "name": "Wizualizator"
     }
   }
 }

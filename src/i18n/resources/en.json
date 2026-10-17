@@ -335,52 +335,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Support for the use of authentication proxy services",
-      "menu": {
-        "disable": "Disable Proxy Adapter",
-        "enable": "Enable Proxy Adapter",
-        "hostname": {
-          "label": "Hostname"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Auth Proxy Adapter",
-      "prompt": {
-        "hostname": {
-          "title": "Proxy Hostname",
-          "label": "Enter hostname for local proxy server (requires restart):"
-        },
-        "port": {
-          "title": "Proxy Port",
-          "label": "Enter port for local proxy server (requires restart):"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Crossfade between songs",
-      "menu": {
-        "advanced": "Advanced"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Fade in duration (ms)",
-            "fade-out-duration": "Fade out duration (ms)",
-            "fade-scaling": {
-              "label": "Fade scaling",
-              "linear": "Linear",
-              "logarithmic": "Logarithmic"
-            },
-            "seconds-before-end": "Crossfade N seconds before end"
-          },
-          "title": "Crossfade options"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configure a custom output media device for songs",
       "menu": {
@@ -530,29 +484,6 @@
       },
       "name": "Equalizer"
     },
-    "exponential-volume": {
-      "description": "Makes the volume slider exponential so it's easier to select lower volumes.",
-      "name": "Exponential Volume"
-    },
-    "in-app-menu": {
-      "description": "Gives menu-bars a fancy, dark or album-color look",
-      "menu": {
-        "hide-dom-window-controls": "Hide DOM window controls"
-      },
-      "name": "In-App Menu"
-    },
-    "navigation": {
-      "description": "Next/Back navigation arrows directly integrated in the interface, like in your favorite browser",
-      "name": "Navigation",
-      "templates": {
-        "back": {
-          "title": "Go to previous page"
-        },
-        "forward": {
-          "title": "Go to next page"
-        }
-      }
-    },
     "notifications": {
       "description": "Display a notification when a song starts playing (interactive notifications are available on Windows)",
       "menu": {
@@ -592,13 +523,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Listen fast, listen slow! Adds a slider that controls song speed",
-      "name": "Playback Speed",
-      "templates": {
-        "button": "Speed"
       }
     },
     "precise-volume": {
@@ -687,13 +611,6 @@
     "touchbar": {
       "description": "Adds a TouchBar widget for macOS users",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Adds a visualizer to the player",
-      "menu": {
-        "visualizer-type": "Visualizer Type"
-      },
-      "name": "Visualizer"
     },
     "watch-later": {
       "button": {

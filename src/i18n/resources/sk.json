@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Podpora používania autentifikačných proxy služieb",
-      "menu": {
-        "disable": "Vypnúť Proxy Adaptér",
-        "enable": "Zapnúť Proxy Adaptér",
-        "hostname": {
-          "label": "Hostname"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adaptér autentifikačného proxy servera",
-      "prompt": {
-        "hostname": {
-          "label": "Zadajte hostname pre lokálny proxy server (vyžaduje reštart):",
-          "title": "Proxy Hostname"
-        },
-        "port": {
-          "label": "Zadajte port pre lokálny proxy server (vyžaduje reštart):",
-          "title": "Proxy Port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Prelínanie medzi skladbami",
-      "menu": {
-        "advanced": "Pokročilé"
-      },
-      "name": "Prelínanie [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Trvanie nábehu (ms)",
-            "fade-out-duration": "Trvanie doznievania (ms)",
-            "fade-scaling": {
-              "label": "Škálovanie prelínania",
-              "linear": "Lineárny",
-              "logarithmic": "Logaritmický"
-            },
-            "seconds-before-end": "Prechod N sekúnd pred koncom"
-          },
-          "title": "Možnosti prelínania"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Nastavte vlastné výstupné médium pre skladby",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Ekvalizér"
     },
-    "exponential-volume": {
-      "description": "Zmení slider hlasitosti na exponenciálny, aby bolo ľahšie vybrať nižšiu hlasitosť.",
-      "name": "Exponenciálna hlasitosť"
-    },
-    "in-app-menu": {
-      "description": "Dodáva lištám ponúk elegantný, tmavý alebo farebný vzhľad albumu",
-      "menu": {
-        "hide-dom-window-controls": "Skryť ovládacie prvky DOM"
-      },
-      "name": "Aplikačné menu"
-    },
-    "navigation": {
-      "description": "Šípky pre navigáciu vpred/vzad sú priamo integrované do rozhrania, rovnako ako vo vašom obľúbenom prehliadači",
-      "name": "Navigácia",
-      "templates": {
-        "back": {
-          "title": "Prejsť na predchádzajúcu stránku"
-        },
-        "forward": {
-          "title": "Prejsť na nasledujúcu stránku"
-        }
-      }
-    },
     "notifications": {
       "description": "Zobraziť upozornenie pri spustení prehrávania skladby (interaktívne upozornenia sú k dispozícii v systéme Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Obraz v obraze",
       "templates": {
         "button": "Obraz v obraze"
-      }
-    },
-    "playback-speed": {
-      "description": "Počúvajte rýchlo, počúvajte pomaly! Pridáva slider, ktorý ovláda rýchlosť skladby",
-      "name": "Rýchlosť prehrávania",
-      "templates": {
-        "button": "Rýchlosť"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Pridáva TouchBar widget pre používateľov MacOS",
       "name": "Dotykový Panel"
-    },
-    "visualizer": {
-      "description": "Pridá do prehrávača vizualizér",
-      "menu": {
-        "visualizer-type": "Typ Vizualizéra"
-      },
-      "name": "Vizualizér"
     }
   }
 }

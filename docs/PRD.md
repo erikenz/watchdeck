@@ -722,6 +722,26 @@ opens the video or the inline preview.
 
 ### R5 — Plugins: what happens to the 41 inherited ones
 
+**Where this landed (rev 13).** `src/plugins` now holds **18 plugins**, and the plan below is the record of
+how they were triaged rather than a to-do list:
+
+- P0 deleted the 15 music-only ones; P1/P2 reworked the providers underneath the rest.
+- Rev 12 deleted `performance-improvement` (no evidence it helps on this site) and fixed `do-not-track` and
+  `custom-output-device` at the owner's request.
+- **Rev 13 deleted seven more**, each of which cannot do anything on `www.youtube.com`: `playback-speed`
+  (a slider in the retired music menu), `crossfade` (gapless *songs*, plus `howler`), `exponential-volume`
+  (a music-player volume curve), `visualizer` (music-player visuals, and it needs the audio graph P1
+  removed), `in-app-menu` (a DOM menu bar for a menu this app already has natively), `navigation` (buttons
+  rendered into the music app's header), `auth-proxy-adapter` (it existed to feed the api-server's auth).
+  Four plugins the owner has not ruled on stayed: `precise-volume`, `picture-in-picture`,
+  `taskbar-mediacontrol` (Windows-only), `touchbar` (macOS-only) - the last two were reworked onto the new
+  providers in P1 and would work if those platforms are ever packaged, and window-level PiP is a feature
+  this app has no browser button for.
+- What it bought, measured: the page bundle halved (2.70 MB → 1.35 MB of injected script), the main
+  process went from 140 to 112 chunks, 11 dependencies left `package.json`, and the lint deviation list
+  went from 117 rules / ~2008 findings to **105 rules / ~1775** (12 entries had nothing left to cover and
+  were deleted; the rest were re-measured).
+
 Rule of thumb: **keep the framework, delete the inventory**, then re-add deliberately. Measured YTM-coupling per plugin
 (`ytmusic-*` selector count) supports this: `in-app-menu` 39, `album-color-theme` 33, `picture-in-picture` 30,
 `synced-lyrics` 18, `downloader` 16, `music-together` 16, `unobtrusive-player` 13, `video-toggle` 11, `album-actions` 10 —

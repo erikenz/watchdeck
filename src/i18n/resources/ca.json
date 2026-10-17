@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Suport per l'ús de servidors d'autenticació proxy",
-      "menu": {
-        "disable": "Desactivar adaptador Proxy",
-        "enable": "Activar adaptador Proxy",
-        "hostname": {
-          "label": "Hostname"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adaptador de proxy d'autenticació",
-      "prompt": {
-        "hostname": {
-          "label": "Posa hostname pel servidor del proxy local (requereix reiniciar):",
-          "title": "Hostname del proxy"
-        },
-        "port": {
-          "label": "Entra un port pel servidor local del proxy (requereix reiniciar):",
-          "title": "Port proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Transició creuada (crossfade) entre cançons",
-      "menu": {
-        "advanced": "Avançat"
-      },
-      "name": "Transició creuada [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Durada de la transició d'entrada (ms)",
-            "fade-out-duration": "Durada de la transició de sortida (ms)",
-            "fade-scaling": {
-              "label": "Escala de la transició",
-              "linear": "Linear",
-              "logarithmic": "Logarítmica"
-            },
-            "seconds-before-end": "Transiciona N segons abans del final"
-          },
-          "title": "Opcions de transició creuada"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configura un dispositiu multimèdia de sortida personalitzat per a cançons",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Equalitzador"
     },
-    "exponential-volume": {
-      "description": "Fa que el control lliscant del volum sigui exponencial per que sigui més fàcil seleccionar volums més baixos.",
-      "name": "Volum exponencial"
-    },
-    "in-app-menu": {
-      "description": "Fa que la barra de menú superior tingui un elegant aspecte fosc o basat en el color de l'àlbum",
-      "menu": {
-        "hide-dom-window-controls": "Amaga els controls de la finestra del DOM"
-      },
-      "name": "Menú integrat In-App"
-    },
-    "navigation": {
-      "description": "Fletxes de navegació Següent / Enrere integrades directament a la interfície, com al teu navegador preferit",
-      "name": "Navegació",
-      "templates": {
-        "back": {
-          "title": "Pàgina anterior"
-        },
-        "forward": {
-          "title": "Pàgina següent"
-        }
-      }
-    },
     "notifications": {
       "description": "Mostra una notificació quan una cançó es comença a reproduir (les notificacions interactives estan disponibles a Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Imatge en imatge (PiP)",
       "templates": {
         "button": "Imatge en imatge (PiP)"
-      }
-    },
-    "playback-speed": {
-      "description": "Escolta-ho ràpid, escolta-ho lent! Afegeix un control lliscant per canviar la velocitat de la cançó",
-      "name": "Velocitat de la reproducció",
-      "templates": {
-        "button": "Velocitat"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Afegeix un giny a la Touch Bar per usuaris de macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Afegeix un visualitzador al reproductor",
-      "menu": {
-        "visualizer-type": "Tipus de visualitzador"
-      },
-      "name": "Visualitzador"
     }
   }
 }

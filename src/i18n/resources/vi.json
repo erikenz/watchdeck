@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Ủng hộ cho mục đích duy trì dịch vụ xác minh proxy",
-      "menu": {
-        "disable": "Vô hiệu bộ chuyển đổi Proxy",
-        "enable": "Kích hoạt bộ chuyển đổi Proxy",
-        "hostname": {
-          "label": "Tên máy chủ"
-        },
-        "port": {
-          "label": "Cổng"
-        }
-      },
-      "name": "Bộ chuyển đổi xác minh máy chủ Proxy",
-      "prompt": {
-        "hostname": {
-          "label": "Nhập tên của máy chủ proxy lân cận (yêu cầu khởi động lại ứng dụng):",
-          "title": "Tên máy chủ Proxy"
-        },
-        "port": {
-          "label": "Nhập cổng của máy chủ proxy lận cận (bắt buộc khởi động lại ứng dụng):",
-          "title": "Cổng máy chủ Proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Chuyển tiếp giữa các bài hát",
-      "menu": {
-        "advanced": "Nâng cao"
-      },
-      "name": "Xen kẽ [Thử nghiệm]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Thời lượng mờ dần vào (ms)",
-            "fade-out-duration": "Thời lượng mờ dần ra (ms)",
-            "fade-scaling": {
-              "label": "Làm mờ theo tỉ lệ",
-              "linear": "Trực tuyến",
-              "logarithmic": "Logarit"
-            },
-            "seconds-before-end": "Xen kẽ N giây trước khi kết thúc"
-          },
-          "title": "Tùy chọn xen kẽ"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Cài đặt cho thiết bị đầu ra tùy chỉnh cho bài hát",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Bộ chỉnh âm"
     },
-    "exponential-volume": {
-      "description": "Làm cho thanh trượt âm lượng theo cấp số nhân để dễ dàng chọn âm lượng thấp hơn.",
-      "name": "Âm lượng theo cấp số nhân"
-    },
-    "in-app-menu": {
-      "description": "Mang lại cho thanh menu một giao diện lạ mắt, tối màu hoặc màu album",
-      "menu": {
-        "hide-dom-window-controls": "Ẩn cửa sổ điều khiển DOM"
-      },
-      "name": "Menu trong ứng dụng"
-    },
-    "navigation": {
-      "description": "Mũi tên điều hướng Tiếp theo/Quay lại được tích hợp trực tiếp trong giao diện, giống như trong trình duyệt yêu thích của bạn",
-      "name": "Điều hướng",
-      "templates": {
-        "back": {
-          "title": "Đi đến trang trước"
-        },
-        "forward": {
-          "title": "Đi đến trang tiếp theo"
-        }
-      }
-    },
     "notifications": {
       "description": "Hiển thị thông báo khi bài hát bắt đầu phát (thông báo tương tác có sẵn trên Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Ảnh trong ảnh",
       "templates": {
         "button": "Ảnh trong ảnh"
-      }
-    },
-    "playback-speed": {
-      "description": "Nghe nhanh, nghe chậm! Thêm thanh trượt kiểm soát tốc độ bài hát",
-      "name": "Tốc độ phát lại",
-      "templates": {
-        "button": "Tốc độ"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Thêm tiện ích TouchBar cho người dùng macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Hiển thị sóng nhạc thay thế cho video (hay \"Music visualizer\")",
-      "menu": {
-        "visualizer-type": "Loại Sóng nhạc"
-      },
-      "name": "Sóng nhạc"
     }
   }
 }

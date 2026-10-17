@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Prise en charge de l'utilisation des services de proxy d'authentification",
-      "menu": {
-        "disable": "Désactiver l'Adaptateur Proxy",
-        "enable": "Activer l'Adaptateur Proxy",
-        "hostname": {
-          "label": "Nom d'hôte"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adaptateur de Proxy d'Authentification",
-      "prompt": {
-        "hostname": {
-          "label": "Saisir le nom d'hôte pour le serveur proxy local (nécessite un redémarrage) :",
-          "title": "Nom d'hôte du proxy"
-        },
-        "port": {
-          "label": "Saisir le port pour le serveur proxy local (nécessite un redémarrage) :",
-          "title": "Port du proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Fondu enchaîné entre les chansons",
-      "menu": {
-        "advanced": "Avancé"
-      },
-      "name": "Fondu enchaîné [Bêta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Durée du début du fondu (ms)",
-            "fade-out-duration": "Durée de sortie du fondu (ms)",
-            "fade-scaling": {
-              "label": "Mise à l'échelle du fondu",
-              "linear": "Linéaire",
-              "logarithmic": "Logarithmique"
-            },
-            "seconds-before-end": "Fondu enchaîné N secondes avant la fin"
-          },
-          "title": "Options de fondu enchaîné"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configurer un périphérique de sortie personnalisé pour les morceaux",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Égaliseur"
     },
-    "exponential-volume": {
-      "description": "Rend le curseur de volume exponentiel afin qu'il soit plus facile de sélectionner des volumes plus faibles.",
-      "name": "Volume exponentiel"
-    },
-    "in-app-menu": {
-      "description": "Donne aux barres de menus un aspect élégant, sombre ou aux couleurs de l'album",
-      "menu": {
-        "hide-dom-window-controls": "Masquer les contrôles de la fenêtre DOM"
-      },
-      "name": "Menu intégré à l'application"
-    },
-    "navigation": {
-      "description": "Flèches de navigation Suivant/Retour directement intégrées dans l'interface, comme dans votre navigateur préféré",
-      "name": "Navigation",
-      "templates": {
-        "back": {
-          "title": "Aller à la page précédente"
-        },
-        "forward": {
-          "title": "Aller à la page suivante"
-        }
-      }
-    },
     "notifications": {
       "description": "Afficher une notification quand une chanson commence à jouer (les notifications interactives sont disponibles sur Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Écoutez vite, écoutez lentement ! Ajoute un curseur qui contrôle la vitesse de la chanson",
-      "name": "Vitesse de lecture",
-      "templates": {
-        "button": "Vitesse"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Ajoute un widget TouchBar pour les utilisateurs de macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Ajoute un visualiseur au lecteur",
-      "menu": {
-        "visualizer-type": "Type de visualiseur"
-      },
-      "name": "Visualiseur"
     }
   }
 }

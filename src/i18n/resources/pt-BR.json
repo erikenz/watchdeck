@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Suporte para o uso de serviços de proxy de autenticação",
-      "menu": {
-        "disable": "Desativar adaptador proxy",
-        "enable": "Ativar adaptador proxy",
-        "hostname": {
-          "label": "Nome do host"
-        },
-        "port": {
-          "label": "Porta"
-        }
-      },
-      "name": "Adaptador de proxy de autenticação",
-      "prompt": {
-        "hostname": {
-          "label": "Entre o nome do host do servidor proxy local (necessário reiniciar):",
-          "title": "Nome do host do proxy"
-        },
-        "port": {
-          "label": "Entre a porta do servidor proxy local (necessário reiniciar):",
-          "title": "Porta do proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Crossfade entre músicas",
-      "menu": {
-        "advanced": "Avançado"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Duração do fade (ms)",
-            "fade-out-duration": "Duração do fade out (ms)",
-            "fade-scaling": {
-              "label": "Escala do fade",
-              "linear": "Linear",
-              "logarithmic": "Logarítmico"
-            },
-            "seconds-before-end": "Crossfade N segundos antes do fim"
-          },
-          "title": "Opções de crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Configure um dispositivo de saída de mídia personalizado para músicas",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Equalizador"
     },
-    "exponential-volume": {
-      "description": "Torna o controle deslizante de volume exponencial para que seja mais fácil selecionar volumes mais baixos.",
-      "name": "Volume Exponencial"
-    },
-    "in-app-menu": {
-      "description": "Dá às barras de menu uma aparência elegante, escura ou com a cor do álbum",
-      "menu": {
-        "hide-dom-window-controls": "Ocultar controles da janela DOM"
-      },
-      "name": "Menu no aplicativo"
-    },
-    "navigation": {
-      "description": "Setas de navegação para avançar/retornar diretamente integradas na interface, como no seu navegador favorito",
-      "name": "Navegação",
-      "templates": {
-        "back": {
-          "title": "Ir para a página anterior"
-        },
-        "forward": {
-          "title": "Ir para a próxima página"
-        }
-      }
-    },
     "notifications": {
       "description": "Exibir uma notificação quando uma música começar a tocar (notificações interativas estão disponíveis no Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Picture-in-picture",
       "templates": {
         "button": "Picture-in-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Ouça rápido, ouça devagar! Adiciona um controle deslizante que controla a velocidade da música",
-      "name": "Velocidade de reprodução",
-      "templates": {
-        "button": "Velocidade"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Adiciona um widget TouchBar para usuários do macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Adiciona um visualizador ao player",
-      "menu": {
-        "visualizer-type": "Tipo de visualizador"
-      },
-      "name": "Visualizador"
     }
   }
 }

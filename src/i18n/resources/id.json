@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Dukungan untuk penggunaan layanan proxy autentikasi",
-      "menu": {
-        "disable": "Nonaktifkan Adapter Proxy",
-        "enable": "Aktifkan Adapter Proxy",
-        "hostname": {
-          "label": "Nama host"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Adapter Proxy Autentikasi",
-      "prompt": {
-        "hostname": {
-          "label": "Masukkan nama host untuk server proxy lokal (memerlukan restart):",
-          "title": "Proxy Nama host"
-        },
-        "port": {
-          "label": "Masukkan port untuk server proxy lokal (memerlukan restart):",
-          "title": "Port Proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Crossfade antar lagu",
-      "menu": {
-        "advanced": "Lanjutan"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Durasi fade in (ms)",
-            "fade-out-duration": "Durasi fade out (ms)",
-            "fade-scaling": {
-              "label": "Skala fade",
-              "linear": "Linear",
-              "logarithmic": "Logaritmik"
-            },
-            "seconds-before-end": "Crossfade N detik sebelum berakhir"
-          },
-          "title": "Pilihan crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Atur perangkat media keluaran khusus untuk lagu-lagu",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Ekualiser"
     },
-    "exponential-volume": {
-      "description": "Buat penggeser volume menjadi eksponen sehingga memudahkan memilih volume yang lebih rendah.",
-      "name": "Volume Eksponen"
-    },
-    "in-app-menu": {
-      "description": "Buat bilah-menu terlihat indah, gelap atau serupa dengan album",
-      "menu": {
-        "hide-dom-window-controls": "Sembunyikan DOM pengendali jendela"
-      },
-      "name": "Menu di Aplikasi"
-    },
-    "navigation": {
-      "description": "panah navigasi Selanjutnya/Sebelumnya terintegrasi pada antarmuka, layaknya peramban kesukaan Anda",
-      "name": "Navigasi",
-      "templates": {
-        "back": {
-          "title": "Kunjungi halaman sebelumnya"
-        },
-        "forward": {
-          "title": "pergi ke halaman berikutnya"
-        }
-      }
-    },
     "notifications": {
       "description": "Tampilkan pemberitahuan saat lagu dimainkan (pemberitahuan interaktif tersedia di Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Gambar-dalam-gambar",
       "templates": {
         "button": "Gambar-dalam-gambar"
-      }
-    },
-    "playback-speed": {
-      "description": "Dengarkan cepat, dengarkan perlahan! Tambahkan penggeser untuk mengendalikan kecepatan lagu",
-      "name": "Kecepatan Pemutar",
-      "templates": {
-        "button": "Kecepatan"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Tambahkan widget TouchBar untuk pengguna macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Tambahkan visualisator ke pemutar",
-      "menu": {
-        "visualizer-type": "Tipe Visualisator"
-      },
-      "name": "Visualisator"
     }
   }
 }

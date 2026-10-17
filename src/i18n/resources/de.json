@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Unterstützung für Proxy-Authentifizierungsdienste",
-      "menu": {
-        "disable": "Proxy-Adapter deaktivieren",
-        "enable": "Proxy-Adapter aktivieren",
-        "hostname": {
-          "label": "Hostname"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Authentifizierungs-Proxyadapter",
-      "prompt": {
-        "hostname": {
-          "label": "Hostnamen eingeben für lokalen Proxy-Server (Neustart erforderlich):",
-          "title": "Proxy Hostname"
-        },
-        "port": {
-          "label": "Geben Sie den Port für den lokalen Proxyserver ein (Neustart erforderlich):",
-          "title": "Proxy Port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Übergang zwischen Liedern",
-      "menu": {
-        "advanced": "Erweitert"
-      },
-      "name": "Übergang [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Einblendezeit (Millisekunden)",
-            "fade-out-duration": "Ausblendezeit (Millisekunden)",
-            "fade-scaling": {
-              "label": "Übergangsskalierung",
-              "linear": "Linear",
-              "logarithmic": "Logarithmisch"
-            },
-            "seconds-before-end": "Übergang N Sekunden vor dem Ende starten"
-          },
-          "title": "Übergangseinstellungen"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Einen maßgeschneiderten Ausgabemedienträger für Lieder einrichten",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "Equalizer"
     },
-    "exponential-volume": {
-      "description": "Macht den Lautstärkeregler exponentiell, damit es einfacher ist leise Lautstärken zu wählen.",
-      "name": "Exponentielle Lautstärke"
-    },
-    "in-app-menu": {
-      "description": "Verleiht den Menüleisten ein schickes, dunkles oder albumfarbenes Aussehen",
-      "menu": {
-        "hide-dom-window-controls": "DOM-Fenster-Steuerelemente ausblenden"
-      },
-      "name": "In-App Menü"
-    },
-    "navigation": {
-      "description": "Vorwärts/Zurück Navigationspfeile direkt in die Oberfläche integriert - wie in deinem geliebten Browser",
-      "name": "Navigation",
-      "templates": {
-        "back": {
-          "title": "Zur vorherigen Seite gehen"
-        },
-        "forward": {
-          "title": "Zur nächsten Seite gehen"
-        }
-      }
-    },
     "notifications": {
       "description": "Zeige eine Benachrichtigung, wenn ein Lied beginnt zu spielen (interaktive Benachrichtigungen sind unter Windows verfügbar)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "Bild-im-Bild",
       "templates": {
         "button": "Bild-im-Bild"
-      }
-    },
-    "playback-speed": {
-      "description": "Schnell hören, langsam hören! Fügt einen Schieberegler zur Steuerung der Songgeschwindigkeit hinzu",
-      "name": "Wiedergabegeschwindigkeit",
-      "templates": {
-        "button": "Geschwindigkeit"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "Fügt ein TouchBar-Widget für macOS-Benutzer hinzu",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "Fügt einen Visualisierer zum Player hinzu",
-      "menu": {
-        "visualizer-type": "Visualisierertyp"
-      },
-      "name": "Visualisierer"
     }
   }
 }

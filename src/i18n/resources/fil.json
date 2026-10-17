@@ -311,43 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Suporta para sa paggamit ng authentication proxy services",
-      "menu": {
-        "disable": "Huwag paganahin ang Proxy Adapter",
-        "enable": "Paganahin ang Proxy Adapter",
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "Auth Proxy Adapter",
-      "prompt": {
-        "hostname": {
-          "label": "Ilagay ang pangalan ng host para sa local proxy server (kinailangang mag-restart):",
-          "title": "Hostname ng Proxy"
-        },
-        "port": {
-          "label": "Ilagay ang port para sa local proxy server (kinailangang mag-restart):",
-          "title": "Port ng Proxy"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "I-crossfade kada kanta",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Tagal ng pag-fade in (ms)",
-            "fade-out-duration": "Tagal ng pag-fade out (ms)",
-            "fade-scaling": {
-              "label": "Scaling ng pag-fade"
-            },
-            "seconds-before-end": "I-crossfade sa loob ng N segundo bago ang katapusan"
-          },
-          "title": "Pagpipilian sa crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "I-configure ang custom na output media device para sa mga kanta",
       "menu": {
@@ -492,29 +455,6 @@
       },
       "name": "Equalizer"
     },
-    "exponential-volume": {
-      "description": "Ginagawang exponential ang volume slider para mas madaling pumili ng mas mababang volume.",
-      "name": "Exponential na Volume"
-    },
-    "in-app-menu": {
-      "description": "Nagbibigay sa mga menu-bar ng magarbo, madilim o kulay ng album",
-      "menu": {
-        "hide-dom-window-controls": "Itago ang mga DOM window control"
-      },
-      "name": "In-App na Menu"
-    },
-    "navigation": {
-      "description": "Ang Next/Back navigation na arrow ay direktang magamit sa interface, katulad sa iyong paboritong browser",
-      "name": "Nabigasyon",
-      "templates": {
-        "back": {
-          "title": "Pumunta sa nakaraang page"
-        },
-        "forward": {
-          "title": "Pumunta sa susunod na page"
-        }
-      }
-    },
     "notifications": {
       "description": "Magpakita ng notification kapag nagsimulang tumugtog ang kanta (magagamit ang mga interactive na notification sa Windows)",
       "menu": {
@@ -550,13 +490,6 @@
       "name": "Picture-na-picture",
       "templates": {
         "button": "Picture-na-picture"
-      }
-    },
-    "playback-speed": {
-      "description": "Makinig na mabilisan, makinig na mabagalan! Nagdaragdag ito ng slider upang makontrol ang bilis ng kanta",
-      "name": "Bilis ng Playback",
-      "templates": {
-        "button": "Bilis"
       }
     },
     "precise-volume": {
@@ -611,13 +544,6 @@
     },
     "touchbar": {
       "description": "Idaragdag ang TouchBar na widget para sa mga user ng macOS"
-    },
-    "visualizer": {
-      "description": "Idaragdag ng visualizer sa player",
-      "menu": {
-        "visualizer-type": "Uri ng Visualizer"
-      },
-      "name": "Taga-visualize"
     }
   }
 }

@@ -274,13 +274,6 @@
           "title": "Port"
         }
       }
-    },
-    "crossfade": {
-      "description": "Fade imellem sange",
-      "menu": {
-        "advanced": "Avanceret"
-      },
-      "name": "Fade [Beta]"
     }
   }
 }

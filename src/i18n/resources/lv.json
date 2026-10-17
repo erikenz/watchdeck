@@ -295,52 +295,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "Atbalsts priekš proxy servisu autentifikācijas",
-      "menu": {
-        "disable": "Izslēgt Proxy Adapteri",
-        "enable": "Ieslēgt Proxy Adapteri",
-        "hostname": {
-          "label": "Hosta vārds"
-        },
-        "port": {
-          "label": "Ports"
-        }
-      },
-      "name": "Autorizācijas Proxy Adapteris",
-      "prompt": {
-        "hostname": {
-          "label": "Ievadiet hosta vārdu priekš lokālā proxy servera (nepieciešama restartēšana):",
-          "title": "Proxy hosta vārds"
-        },
-        "port": {
-          "label": "Ievadiet portu priekš lokālā proxy servera (nepieciešams restartēt):",
-          "title": "Proxy Ports"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "Maiga pāreja starp dziesmām",
-      "menu": {
-        "advanced": "Paplašināts"
-      },
-      "name": "Maiga pāreja [BETA]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "Ieplūšanas ilgums (ms)",
-            "fade-out-duration": "Izplūšanas ilgums (ms)",
-            "fade-scaling": {
-              "label": "Pārejas stiprums",
-              "linear": "Lineārs",
-              "logarithmic": "Logaritmisks"
-            },
-            "seconds-before-end": "Maigas pārejas N sekundes pirms beigām"
-          },
-          "title": "Maigas pārejas iestatījumi"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "Pielāgotas izvades multivides ierīces konfigurēšana dziesmām",
       "menu": {
@@ -478,17 +432,6 @@
         }
       },
       "name": "Ekvalaizers"
-    },
-    "exponential-volume": {
-      "description": "Padara skaļuma slīdni eksponenciālu, lai būtu vieglāk izvēlēties zemākus skaļumus.",
-      "name": "Eksponenciālais apjoms"
-    },
-    "in-app-menu": {
-      "description": "Piešķir izvēļņu joslām greznu, tumšu vai albuma krāsas izskatu",
-      "menu": {
-        "hide-dom-window-controls": "Slēpt DOM loga vadīklas"
-      },
-      "name": "Lietotnes izvēlne"
     }
   }
 }

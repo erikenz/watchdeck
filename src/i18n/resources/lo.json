@@ -311,52 +311,6 @@
         }
       }
     },
-    "auth-proxy-adapter": {
-      "description": "ຮອງຮັບການໃຊ້ບໍລິການພຣັອກຊີສຳລັບການຢືນຢັນຕົວຕົນ",
-      "menu": {
-        "disable": "ປິດໃຊ້ງານຕົວປັບພຣັອກຊີ",
-        "enable": "ເປີດໃຊ້ງານຕົວປັບພຣັອກຊີ",
-        "hostname": {
-          "label": "Hostname"
-        },
-        "port": {
-          "label": "Port"
-        }
-      },
-      "name": "ຕົວປັບພຣັອກຊີການຢືນຢັນຕົວຕົນ",
-      "prompt": {
-        "hostname": {
-          "label": "ປ້ອນ hostname ສຳລັບເຊີເວີພຣັອກຊີທ້ອງຖິ່ນ (ຕ້ອງໄດ້ເລີ່ມລະບົບໃໝ່):",
-          "title": "Proxy Hostname"
-        },
-        "port": {
-          "label": "ປ້ອນ port ສຳລັບເຊີເວີພຣັອກຊີທ້ອງຖິ່ນ (ຕ້ອງໄດ້ເລີ່ມລະບົບໃໝ່):",
-          "title": "Proxy Port"
-        }
-      }
-    },
-    "crossfade": {
-      "description": "ຫຼິ້ນສຽງເຊື່ອມຕໍ່ລະຫວ່າງເພງ",
-      "menu": {
-        "advanced": "ຂັ້ນສູງ"
-      },
-      "name": "Crossfade [Beta]",
-      "prompt": {
-        "options": {
-          "multi-input": {
-            "fade-in-duration": "ໄລຍະເວລາສຽງຄ່ອຍໆດັງຂຶ້ນ (ms)",
-            "fade-out-duration": "ໄລຍະເວລາສຽງຄ່ອຍໆເບົາລົງ (ms)",
-            "fade-scaling": {
-              "label": "ການປັບລະດັບສຽງ",
-              "linear": "ແບບເສັ້ນຊື່",
-              "logarithmic": "ແບບລໍກາຣິດ"
-            },
-            "seconds-before-end": "ເລີ່ມ Crossfade N ວິນາທີກ່ອນຈົບເພງ"
-          },
-          "title": "ຕົວເລືອກ Crossfade"
-        }
-      }
-    },
     "custom-output-device": {
       "description": "ຕັ້ງຄ່າອຸປະກອນສຽງອອກແບບກຳນົດເອງສຳລັບເພງ",
       "menu": {
@@ -503,29 +457,6 @@
       },
       "name": "ອີຄວໍໄລເຊີ"
     },
-    "exponential-volume": {
-      "description": "ເຮັດໃຫ້ແຖບປັບລະດັບສຽງເປັນແບບເອັກສ໌ໂປເນນຊຽວ ເພື່ອໃຫ້ເລືອກລະດັບສຽງທີ່ເບົາໄດ້ງ່າຍຂຶ້ນ.",
-      "name": "ລະດັບສຽງແບບເອັກສ໌ໂປເນນຊຽວ"
-    },
-    "in-app-menu": {
-      "description": "ເຮັດໃຫ້ແຖບເມນູເບິ່ງສວຍງາມ, ເປັນໂໝດມືດ ຫຼື ຕາມສີອັລບັ້ມ",
-      "menu": {
-        "hide-dom-window-controls": "ເຊື່ອງປຸ່ມຄວບຄຸມໜ້າຕ່າງ DOM"
-      },
-      "name": "ເມນູພາຍໃນແອັບ"
-    },
-    "navigation": {
-      "description": "ລູກສອນນຳທາງ ໄປໜ້າ/ກັບຄືນ ທີ່ລວມເຂົ້າໃນໜ້າຕ່າງແອັບໂດຍກົງ ເໝືອນກັບໃນບຣາວເຊີຂອງທ່ານ",
-      "name": "ການນຳທາງ",
-      "templates": {
-        "back": {
-          "title": "ກັບໄປໜ້າກ່ອນໜ້າ"
-        },
-        "forward": {
-          "title": "ໄປໜ້າຕໍ່ໄປ"
-        }
-      }
-    },
     "notifications": {
       "description": "ສະແດງການແຈ້ງເຕືອນເມື່ອເພງເລີ່ມຫຼິ້ນ (ການແຈ້ງເຕືອນແບບໂຕ້ຕອບມີໃຫ້ໃຊ້ໃນ Windows)",
       "menu": {
@@ -565,13 +496,6 @@
       "name": "ຮູບຊ້ອນຮູບ (PiP)",
       "templates": {
         "button": "ຮູບຊ້ອນຮູບ (PiP)"
-      }
-    },
-    "playback-speed": {
-      "description": "ຟັງໄວ, ຟັງຊ້າ! ເພີ່ມແຖບເລື່ອນທີ່ຄວບຄຸມຄວາມໄວຂອງເພງ",
-      "name": "ຄວາມໄວໃນການຫຼິ້ນ",
-      "templates": {
-        "button": "ຄວາມໄວ"
       }
     },
     "precise-volume": {
@@ -631,13 +555,6 @@
     "touchbar": {
       "description": "ເພີ່ມວິດເຈັດ TouchBar ສຳລັບຜູ້ໃຊ້ macOS",
       "name": "TouchBar"
-    },
-    "visualizer": {
-      "description": "ເພີ່ມເຄື່ອງສະແດງຄື້ນສຽງ (visualizer) ໃສ່ເຄື່ອງຫຼິ້ນ",
-      "menu": {
-        "visualizer-type": "ປະເພດເຄື່ອງສະແດງຄື້ນສຽງ"
-      },
-      "name": "ເຄື່ອງສະແດງຄື້ນສຽງ (Visualizer)"
     }
   }
 }

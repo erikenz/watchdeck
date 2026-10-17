@@ -13,6 +13,14 @@ first real bug the reset caused (the store typing behind `config.get`) is fixed.
 **Revision 8** — the owner re-prioritised: **Watch Later first**, not the P1 base. The service, the account-aware schema,
 the sync engine with resumable paging, the quick-add hover button and account switching (which replaces the single-account
 assumption of Q12) are in as a plugin, with unit tests. The Library window is next; P1's provider rework follows.
+**Revision 11** — **P1 is done**, and the hover button was reworked twice to get there. The player bridge (`video-info` /
+`video-controls`) replaced the music-era providers; the window gained a Playback menu (the app's own UI for
+play/pause, seek, volume, mute); autoplay stays off by default and a navigation the user asked for is left alone; gestures
+(right-drag volume/seek, shift+right-drag speed, right+wheel volume) ship with a readout; the smoke test asserts the page
+instead of skipping it. R4's placement is now pointer-driven and the button, not the card, is what floats above the site's
+inline preview — rev 10 raised the card and hid the preview behind it, which is recorded in R4 because it is the kind of
+mistake that gets made twice. **Q6 is answered** (§13), so no question in this document is open any more. What P1 knowingly
+left behind lives in `TODO.md`, not here.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -55,9 +63,9 @@ plugins for YouTube.
 | D6 | Watch Later UI | **In-page, in v1** (rev 9): a toolbar above the page's own sort control, filters that hide the page's own rows, per-row context lines. No separate Library window. | no (Q3 answered) |
 | D7 | Hover "add to Watch Later" button | Hosted on the **card** (the inline preview lives outside the thumbnail link), bottom-right **above** the duration badge, one offset in every state, always visible once saved, clock glyph filled/outline for state, skipped on the Watch Later page itself | no (Q4 answered) |
 | D8 | SponsorBlock | Load the **official extension release at runtime** with a small compat shim (**revised** — see §5.1); native client only as fallback | **yes — Q7** |
-| D9 | Disable autoplay | One-shot capturing `play` listener → `video.pause()`, armed on `yt-navigate-finish`/`popstate`; plus click YouTube's toggle to enforce off (`aria-checked` flip verified — `setAutonavState()` is a **no-op**) | no (verified) |
+| D9 | Disable autoplay | One-shot capturing `play` listener → `video.pause()`, armed on `yt-navigate-finish`/`popstate`; plus click YouTube's toggle to enforce off (`aria-checked` flip verified — `setAutonavState()` is a **no-op**). Since rev 11: a navigation the user asked for (a click on a link or thumbnail, or one of the app's own playback commands) is not blocked | no (shipped) |
 | D10b | Watch progress source | `max(local high-water mark, YouTube's own resume %)` — the resume % is available per item as `thumbnailOverlays[].thumbnailOverlayResumePlaybackRenderer.percentDurationWatched` (**revised** — see §4.3) | no (evidence-backed) |
-| D10 | Gestures | Own pointer-state tracking + wheel/pointer movement; right-drag = volume, right-drag horizontal = seek, shift+right-drag = speed | **yes — Q6** |
+| D10 | Gestures | Own pointer-state tracking + wheel/pointer movement; right-drag = volume, right-drag horizontal = seek, shift+right-drag = speed, right+wheel = volume (shipped in P1 with a readout) | no (Q6 answered) |
 | D11 | Lint/format | `pnpm dlx ultracite init --linter oxlint --pm pnpm --frameworks solid --type-aware` (command you specified), replacing `.oxlintrc.json`/`.oxfmtrc.json`; documented suppression list for type-aware rules that even the prototype had to disable | no (Q8 answered) |
 | D12 | Versions | Exact pins everywhere (already the case) + `save-exact=true`; no pre-release pins — stable equivalents exist for all of them | no — resolved in §5.5 |
 | D13 | Git history | **Done**: fresh repo `main`, upstream `.git` backed up, folder renamed to `~/Projects/watchdeck`, published to `origin` (§11) | no (Q10 done) |
@@ -592,14 +600,22 @@ on the card itself (marked `wd-wl-anchor`) — *not* on the thumbnail link, whic
 surface outside it, and *not* inside the overlay, which is `pointer-events: none` until it plays and carries no `z-index`
 for a button inside it to beat.
 
-**Placement (rev 9):** bottom-right of the video box, **36 px above its bottom edge** — clear of the duration badge, and the
-**same offset while the site's inline preview plays**. The overlay moves onto the card and takes the pointer, so the card
-stops being hovered; the card is *marked* while the overlay covers it, and the mark is what keeps the button visible. The
-video box is measured from the card's thumbnail-ish children, skipping any candidate too small to be the video.
+**Placement (rev 11):** bottom-right of the video box, **36 px above its bottom edge** — clear of the duration badge, and the
+**same offset while the site's inline preview plays**. The overlay takes the pointer while it plays, so the card stops being
+hovered exactly then; the card whose *video box* holds the pointer is marked on `pointermove` (rAF-coalesced, plus scroll and
+resize), and that mark is what keeps the button up. While marked, the button is placed `position: fixed` against the viewport
+at `z-index: 1`: the site's overlay is a fixed element at `z-index: auto`, so one is enough to put the button above it —
+visible *and* clickable — and the site's own layers start at 2020, so nothing of theirs ends up underneath a card. The video
+box is measured from the card's thumbnail-ish children, skipping any candidate too small to be the video.
 
-**The overlay's own state (rev 9):** it is one shared element (`ytd-video-preview`) that shows and hides itself through its
-`active`/`playing` attributes and keeps its last geometry when put away, so “is it up” is read from those attributes (with
-size and opacity as a fallback), never from size alone.
+**What must not be moved (rev 11):** the card. Rev 10 raised the marked card to `z-index: 1` instead, which puts the card
+above the overlay as well — the preview then starts, plays and is painted underneath the still picture, which reads as "the
+preview is broken". Only the button may leave the card's stacking context.
+
+**Why the preview's own state is not read (rev 11):** the overlay is one shared element (`ytd-video-preview`) the site moves
+between cards; put away, its container is `display: none` and it reports a 0×0 box, and given geometry only while it plays.
+Rev 9 read those attributes to decide the button's visibility, which made the button vanish in exactly the state it was
+needed. The mark follows the pointer instead: the same card in every state, whatever the site paints over it.
 
 **Size (rev 9):** 36×36 translucent dark circle with a 22 px glyph, matching YouTube's own overlay buttons.
 
@@ -696,7 +712,7 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 | Phase | Content | Exit criteria |
 |-------|---------|---------------|
 | **P0 — Reset** (small) | git re-init (in your checkout, §11), debrand (R8) **including the update feed**, delete plugin inventory (R5), Ultracite via `ultracite init` + rewired scripts (§5.3), `.npmrc`, version sweep to stable, README + plugin authoring guide, CI that runs `ultracite check` + `typecheck` + build | app boots to `www.youtube.com`, `pnpm dev` works, `ultracite check` passes, and the R8 grep gate finds upstream names only in the attribution section |
-| **P1 — YouTube base** | base providers rework (`video-info` replacing `song-info` on the YT DOM: `videodatachange`, `.ytp-progress-bar`/`video.timeupdate`, metadata), autoplay plugin, gesture controller, minimal window/menu/tray, smoke test against youtube.com | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green |
+| **P1 — YouTube base** | **Done (rev 11).** The player bridge (`video-info` / `video-controls` in main and in the page, replacing `song-info`/`song-controls`), a Playback menu as the app's own UI, the autoplay plugin reworked around the site's own toggle plus a user-intent rule, a gestures plugin (right-drag volume/seek, shift+right-drag speed, right+wheel volume, with a readout), and a smoke test that asserts the site and the app's page half | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green — all four verified live (MPRIS-driven controls, a cold load paused at 0.4 s, gesture values measured, and the launch test's page assertion green in CI) |
 | **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), OS-level entry points | R1/R4 acceptance criteria; all delivered except the OS-level entry points |
 | **P3 — SponsorBlock** | spike: load the official release with the storage.sync shim (verify SW, player UI, config persistence, offline behaviour); ship that if it passes, else the native client (skip/mute/full/poi, categories, cache, menu) | R2 acceptance criteria |
 | **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
@@ -758,7 +774,7 @@ them.
 **Remaining:**
 
 - Flip the GitHub repository to public when the tree is ready to be read by strangers — the §R8 debrand gate passes as of
-  revision 4, but P1 has not started (§8).
+  revision 4, and P1 landed in rev 11 (§8).
 - Two stray leftovers in `~/Projects`, both safe to remove after a look: `youtube-client/` (only an empty `.git/objects`
   skeleton) and `.youtube-client-git-backup-pear-desktop/` (above).
 - Keep the upstream MIT attribution (`license`, `NOTICE`), this repository's own copyright line, and the
@@ -832,8 +848,10 @@ review already settled it; "open" means I need an answer — a single "yes to th
 
 **Open:**
 
-1. **Q6 — Gestures.** Confirm right+wheel → volume (the one you named) plus right-drag vertical → volume, right-drag
-   horizontal → seek, shift+right-drag → speed. Anything else from "and others"?
+- **Q6 — Gestures → answered (rev 11).** The shipped set: right+wheel → volume, right-drag vertical → volume,
+  right-drag horizontal → seek, shift+right-drag → playback speed, each switchable in the plugin's menu with the drag
+  lengths and step sizes in its config. Everything else (frame step, mute, zoom, nothing) stays a mapping-table idea
+  until asked for. Nothing in this document is open.
 
 ---
 
@@ -866,7 +884,10 @@ conversation. The research behind it happened in one Delta thread, which was clo
   (`~/Projects/youtube-client/.delta/worktrees/…/pear-desktop`). That is why §11 sequences the folder rename *after* this
   thread's work ends: the checkout and its clone are keyed by absolute paths.
 - **Repo state handed over:** branch `main`, published to `origin` = `https://github.com/erikenz/watchdeck` (private, default
-  branch `main`). The Watch Later feature (P2/R1/R4) is merged, most recently as `77d9b1f`. See §11.
+  branch `main`). P2 (R1/R4) and P1 both landed on it; the thread's most recent commit is `0de6eb6`. See §11.
+- **What is left:** P3 (the SponsorBlock spike, §5.1), P4 (polish and packaging), and the P2 exit criterion the PRD names
+  but never defined — "OS-level entry points" (add/remove the current video from outside the page). `TODO.md` carries the
+  debt P1 knowingly took, including the test-only sandbox configuration that cannot load a page at all.
 - **Upstream history backup (safe to delete):** `~/Projects/.youtube-client-git-backup-pear-desktop` (25 MB) — the only
   remaining copy of the pear-desktop/YouTube-Music history that was deliberately dropped.
 - **Discarded prototype (read-only reference):** `~/Projects/watchdeck-old` (formerly `~/Projects/watchdeck`), reviewed in
@@ -881,9 +902,11 @@ conversation. The research behind it happened in one Delta thread, which was clo
   watch progress = `max(local high-water mark, YouTube resume %)` (§4.3); autoplay by a one-shot capturing `play` listener
   (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11); **Watch Later enhanced in the page, no
   Library window and no account picker** (§R1, Q3); **the hover button as shipped in §R4** (Q4).
-- **Still open:** §13 Q6 (the gesture set). Everything else in §13 is answered.
-- **Next step:** **P1 — YouTube base** in §8: rework the providers (`video-info` replacing the music-era `song-info`), the
-  autoplay plugin, the gesture controller and the minimal window/menu/tray, then a smoke test against the real site.
+- **Still open:** nothing. §13's Q6 was answered by the shipped gesture set (rev 11).
+- **Next step:** **P3 — SponsorBlock** (§8): the bounded spike from §5.1 — load the official release at runtime with the
+  `chrome.storage.sync → storage.local` shim, and check the service worker, the in-player button and skipping, config
+  persistence, enable/disable without a restart, and a usable cold start with no network. Pass → Option A ships; fail → the
+  native client. P1 is done (rev 11), so the base it needed is there.
 - **P0 progress (revision 5).** Landed: the §R8 debrand (identity, IPC/DOM prefixes, updater feed removed, replaced icon
   set, `NOTICE` + MIT attribution kept) with `tools/identity-gate.sh` green; the music-only plugin inventory deleted
   (R5 "delete outright" + the orphan `audio-compressor.ts`) together with its i18n blocks and the code that referenced it;

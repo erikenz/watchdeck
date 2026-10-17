@@ -652,6 +652,15 @@ box is measured from the card's thumbnail-ish children, skipping any candidate t
 above the overlay as well — the preview then starts, plays and is painted underneath the still picture, which reads as "the
 preview is broken". Only the button may leave the card's stacking context.
 
+**`fixed` is not always the viewport (rev 12):** the home feed's "Explore more topics" row wraps its cards in a
+horizontally scrolled element carrying an *identity* `transform` (`matrix(1, 0, 0, 1, 0, 0)`), and any transform makes that
+element the containing block for `position: fixed` descendants. The button was therefore drawn 256 px to the right of its
+own video — which the user reported as "the videos in that row do not get the button". `alignButton` now *measures* where
+a `fixed` 0,0 lands (zero the insets, read the rect, restore them) and subtracts it, rather than testing a hand-written
+list of the properties that create a containing block. The renderer tests now load `style.css` and compare screen
+rectangles, because the previous placement test read back the inline values it had just written and never actually made
+the button `fixed`.
+
 **Why the preview's own state is not read (rev 11):** the overlay is one shared element (`ytd-video-preview`) the site moves
 between cards; put away, its container is `display: none` and it reports a 0×0 box, and given geometry only while it plays.
 Rev 9 read those attributes to decide the button's visibility, which made the button vanish in exactly the state it was

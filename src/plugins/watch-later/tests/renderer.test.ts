@@ -19,14 +19,14 @@ interface DomApi {
     videoId: string,
     onToggle: (button: HTMLButtonElement) => void
   ) => HTMLButtonElement;
+  cardUnderPoint: (x: number, y: number) => Element | null;
   mediaBoxOf: (card: Element) => { box: DOMRect; element: Element } | undefined;
+  MEDIA_HOVER_CLASS: string;
   paintButton: (
     button: HTMLButtonElement,
     state: string,
     labels: { remove: string; save: string }
   ) => void;
-  PREVIEW_OPEN_CLASS: string;
-  shownPreview: () => Element | undefined;
 }
 
 interface RowsApi {
@@ -270,7 +270,7 @@ test("the button sits on the video box, at one offset in both states", async ({
         dom.alignButton(button, card);
       }
     });
-    card.classList.add(dom.PREVIEW_OPEN_CLASS);
+    card.classList.add(dom.MEDIA_HOVER_CLASS);
     dom.alignButton(button, card);
     const whileCovered = {
       bottom: button.style.bottom,
@@ -304,7 +304,9 @@ test("the button sits on the video box, at one offset in both states", async ({
   expect(measured.pickedBox).toEqual([527, 296]);
 });
 
-test("a preview the site has put away is not on screen", async ({ page }) => {
+test("the card under the pointer is the one whose video box holds it", async ({
+  page,
+}) => {
   await openFixture(page);
 
   const seen = await page.evaluate(() => {
@@ -312,22 +314,38 @@ test("a preview the site has put away is not on screen", async ({ page }) => {
       __dom: DomApi;
       __rows: RowsApi;
     };
-    // Hidden, the overlay keeps the geometry it last had (the live one held 551x320 for minutes
-    // after the pointer left) and only fades - and the player inside it keeps its own size and
-    // opacity, which is what made a size-and-opacity read call it "on screen" when it was not.
+    // Two cards side by side, one of them with an avatar before its video box. The site's inline
+    // preview is a fixed overlay at `z-index: auto` painted over the card it plays on, and it takes
+    // the pointer - so the mark has to be decided by where the pointer is, not by what it hits.
     document.body.innerHTML = `
-      <div id="video-preview" style="display:block">
-        <ytd-video-preview style="position:absolute;width:551px;height:320px;opacity:0">
-          <div id="inline-preview-player" style="position:relative;width:530px;height:298px"></div>
-        </ytd-video-preview>
-      </div>`;
-    const stale = Boolean(dom.shownPreview());
-    const preview = document.querySelector("ytd-video-preview") as HTMLElement;
-    preview.setAttribute("active", "");
-    preview.style.opacity = "1";
-    return { playing: Boolean(dom.shownPreview()), stale };
+      <div id="one" class="${dom.MEDIA_HOVER_CLASS}-host">
+        <img style="position:absolute;left:0;top:310px;width:36px;height:36px">
+        <yt-thumbnail-view-model style="position:absolute;left:0;top:0;width:320px;height:180px"></yt-thumbnail-view-model>
+      </div>
+      <div id="two">
+        <yt-thumbnail-view-model style="position:absolute;left:400px;top:0;width:320px;height:180px"></yt-thumbnail-view-model>
+      </div>
+      <div id="overlay" style="position:fixed;left:0;top:0;width:320px;height:180px"></div>`;
+    const one = document.querySelector("#one") as Element;
+    const two = document.querySelector("#two") as Element;
+    for (const card of [one, two]) {
+      card.classList.add("wd-wl-anchor");
+    }
+
+    return {
+      avatar: dom.cardUnderPoint(10, 330)?.id ?? null,
+      firstVideo: dom.cardUnderPoint(100, 60)?.id ?? null,
+      gap: dom.cardUnderPoint(360, 60)?.id ?? null,
+      secondVideo: dom.cardUnderPoint(500, 60)?.id ?? null,
+      outside: dom.cardUnderPoint(10, 700)?.id ?? null,
+    };
   });
 
-  expect(seen.stale).toBe(false);
-  expect(seen.playing).toBe(true);
+  // Only our own cards are considered, and only their video boxes: the avatar in `one` is not a
+  // video, and the gap between the two cards belongs to neither.
+  expect(seen.firstVideo).toBe("one");
+  expect(seen.secondVideo).toBe("two");
+  expect(seen.avatar).toBeNull();
+  expect(seen.gap).toBeNull();
+  expect(seen.outside).toBeNull();
 });

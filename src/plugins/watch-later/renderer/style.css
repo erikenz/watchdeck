@@ -25,13 +25,20 @@
     background-color 120ms ease;
 }
 
-/* Hovering the card shows the button; so does the site's preview playing over it, because that
-   overlay takes the pointer and the card stops being hovered while it is up. The button itself
-   keeps one position in both states. */
+/* Hovering the card shows the button; so does having the pointer on its video box while the
+   site's inline preview plays over it, because that overlay takes the pointer and the card stops
+   being hovered exactly then. The button keeps one position in every state. */
 .wd-wl-anchor:hover .wd-wl-save,
-.wd-wl-anchor.wd-wl-preview-open .wd-wl-save,
+.wd-wl-anchor.wd-wl-media-hover .wd-wl-save,
 .wd-wl-save:focus-visible {
   opacity: 1;
+}
+
+/* Raising the marked card is what keeps that button clickable: the inline preview is a fixed
+   overlay at `z-index: auto`, so a card at 1 paints above it - and the site's own layers start at
+   2020 (masthead), so nothing of theirs ends up underneath a card. */
+.wd-wl-anchor.wd-wl-media-hover {
+  z-index: 1;
 }
 
 /* A saved video says so without being hovered: that is the point of the button. */

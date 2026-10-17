@@ -117,32 +117,32 @@ export const mediaBoxOf = (
 };
 
 /**
- * The site's inline preview. Hidden, it is still in the document, keeps the geometry it last had
- * and reports `opacity: 0`; it becomes visible and interactive - `pointer-events: auto` - through
- * its own `active` attribute. It is one shared element the site moves over whichever card is
- * hovered, never part of the card's markup, which is why it gets no button of its own: a button
- * inside it would be painted by the site's player instead of above it, and until the preview
- * plays the overlay does not even take the pointer.
+ * Set on the card whose video box the pointer is on, for as long as it is there. The site's
+ * inline preview is a fixed overlay that takes the pointer while it plays, so the card stops
+ * being `:hover`ed exactly when its button matters (docs/PRD.md R4). This mark is what keeps
+ * the button up - read off the pointer rather than off the preview, because the preview's own
+ * state is the site's business and it changes shape between surfaces.
  */
-export const PREVIEW_SELECTOR = "ytd-video-preview";
+export const MEDIA_HOVER_CLASS = "wd-wl-media-hover";
 
-/** Set on the card the preview is covering, for as long as it covers it. */
-export const PREVIEW_OPEN_CLASS = "wd-wl-preview-open";
+/**
+ * The card whose video box contains the point. Only our own cards are considered: they are the
+ * only ones that can carry a button, and this runs on every pointer move.
+ */
+export const cardUnderPoint = (x: number, y: number): Element | null => {
+  for (const card of document.querySelectorAll(`.${HOST_CLASS}`)) {
+    const media = mediaBoxOf(card);
+    if (!media) {
+      continue;
+    }
 
-/** The preview while it is actually on screen, `undefined` when there is none. */
-export const shownPreview = (): Element | undefined => {
-  const preview = document.querySelector(PREVIEW_SELECTOR);
-  if (!preview) {
-    return undefined;
+    const { box } = media;
+    if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) {
+      return card;
+    }
   }
-  // The site's own signal first, then what it looks like: a preview the site has put away keeps
-  // its last geometry and is only faded out, so size alone would say it is still there.
-  if (preview.matches("[active], [playing]")) {
-    return preview;
-  }
-  const box = preview.getBoundingClientRect();
-  const painted = Number.parseFloat(getComputedStyle(preview).opacity) > 0;
-  return painted && box.width > 60 && box.height > 60 ? preview : undefined;
+
+  return null;
 };
 
 /**

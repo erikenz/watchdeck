@@ -26,7 +26,12 @@ export interface TrackerBlockerConfig {
   cache: boolean;
   /**
    * Which tracker blocker to use.
-   * @default blockers.InPlayer
+   *
+   * `WithBlocklists` is the one that works on youtube.com: it loads the filter lists into the
+   * session and blocks requests (verified: `/api/stats/qoe`, `/api/stats/playback`, `/ptracking`).
+   * `InPlayer` is the YouTube Music path - a preload that prunes the music player's own data, the
+   * `_pruner` hack below - and it is kept only for that history.
+   * @default blockers.WithBlocklists
    */
   blocker: (typeof blockers)[keyof typeof blockers];
   /**
@@ -52,7 +57,7 @@ export default createPlugin({
   config: {
     enabled: false,
     cache: true,
-    blocker: blockers.InPlayer,
+    blocker: blockers.WithBlocklists,
     additionalBlockLists: [],
     disableDefaultLists: false,
   } as TrackerBlockerConfig,

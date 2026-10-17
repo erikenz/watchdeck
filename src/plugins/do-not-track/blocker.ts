@@ -7,6 +7,8 @@ import * as z from "zod";
 
 let blocker: ElectronBlocker | undefined;
 
+const LOG_PREFIX = "[Watchdeck]";
+
 const TbSourcesSchema = z.object({
   tb: z.array(z.string()),
 });
@@ -47,6 +49,18 @@ export const loadTrackerBlockerEngine = async (
     ...additionalBlockLists,
   ];
 
+  // Nothing about this plugin was observable: it loaded lists from a fixed URL, built an engine and
+  // said nothing, so "it does not seem to block anything" could mean an empty list set, an engine
+  // that never saw the request, or a request nothing matched. These lines answer that.
+  if (!tbSources.success) {
+    console.error(
+      `${LOG_PREFIX} do-not-track: the default blocklist index could not be read`
+    );
+  }
+  console.log(
+    `${LOG_PREFIX} do-not-track: loading ${lists.length} blocklist(s)`
+  );
+
   try {
     blocker = await ElectronBlocker.fromLists(
       async (url: string) => net.fetch(url),
@@ -63,6 +77,22 @@ export const loadTrackerBlockerEngine = async (
     if (session) {
       blocker.enableBlockingInSession(session);
     }
+    console.log(
+      `${LOG_PREFIX} do-not-track: engine ready, blocking ${
+        session && blocker.isBlockingEnabled(session) ? "on" : "off"
+      }`
+    );
+
+    // The first few blocks, with the host, so a run can be checked without a debugger attached.
+    let seen = 0;
+    blocker.on("request-blocked", (request) => {
+      seen += 1;
+      if (seen <= 3) {
+        console.log(
+          `${LOG_PREFIX} do-not-track: blocked ${request.url.slice(0, 90)}`
+        );
+      }
+    });
   } catch (error) {
     console.error("Error loading blocker engine", error);
   }

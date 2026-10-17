@@ -50,5 +50,7 @@ export default createPlugin({
   },
   name: () => t("plugins.custom-output-device.name"),
   renderer,
-  restartNeeded: true,
+  // A page reload is enough: the sink is applied to the page's media element, not to anything
+  // the app has to restart for.
+  restartNeeded: false,
 });

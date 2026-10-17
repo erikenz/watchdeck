@@ -544,10 +544,6 @@
       },
       "name": "Notiser"
     },
-    "performance-improvement": {
-      "description": "Förbättra prestanda genom att aktivera experimentella skript",
-      "name": "Prestandaförbättringar [Beta]"
-    },
     "picture-in-picture": {
       "description": "Gör det möjligt att växla appen till bild-i-bild-läge",
       "menu": {

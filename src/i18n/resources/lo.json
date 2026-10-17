@@ -544,10 +544,6 @@
       },
       "name": "ການແຈ້ງເຕືອນ"
     },
-    "performance-improvement": {
-      "description": "ປັບປຸງປະສິດທິພາບໂດຍການເປີດໃຊ້ງານສະຄຣິບທົດລອງ",
-      "name": "ການປັບປຸງປະສິດທິພາບ [Beta]"
-    },
     "picture-in-picture": {
       "description": "ອະນຸຍາດໃຫ້ປ່ຽນແອັບເປັນໂໝດຮູບຊ້ອນຮູບ (PiP)",
       "menu": {

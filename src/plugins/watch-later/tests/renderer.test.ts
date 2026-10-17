@@ -21,6 +21,8 @@ interface DomApi {
     onToggle: (button: HTMLButtonElement) => void
   ) => HTMLButtonElement;
   cardUnderPoint: (x: number, y: number) => Element | null;
+  BUTTON_CLASS: string;
+  FLOATING_LAYER_CLASS: string;
   mediaBoxOf: (card: Element) => { box: DOMRect; element: Element } | undefined;
   MEDIA_HOVER_CLASS: string;
   paintButton: (
@@ -344,11 +346,12 @@ test("the button sits on the video box, at one offset in both states", async ({
 
 /**
  * The site's horizontal shelves wrap their cards in a scrolling element with an *identity*
- * transform, and any transform makes that element the containing block for `position: fixed`
- * descendants - which is how the button of a hovered shelf card ended up a card and a half to the
- * right of its own video. Measured on the page, so it is in here.
+ * transform **and** `overflow: clip`. Any transform makes that element the containing block for
+ * `position: fixed` descendants, and `clip` then cuts them off - which is how the button of a
+ * hovered shelf card ended up half outside the wrapper, and then gone entirely once the preview
+ * moved the video box. Measured on the page, so it is in here.
  */
-test("the button lands on its own video inside a transformed shelf", async ({
+test("the button stays visible inside a transformed, clipping shelf", async ({
   page,
 }) => {
   await openFixture(page);
@@ -357,7 +360,7 @@ test("the button lands on its own video inside a transformed shelf", async ({
   const measured = await page.evaluate(() => {
     const { __dom: dom } = window as unknown as { __dom: DomApi };
     document.body.innerHTML = `
-      <div id="shelf" style="position:static;transform:translateX(543px);width:1600px">
+      <div id="shelf" style="position:static;transform:translateX(543px);overflow:clip;width:300px;height:400px">
         <div id="card" class="wd-wl-anchor" style="position:relative;width:527px;height:352px">
           <yt-thumbnail-view-model id="video" style="position:absolute;left:0;top:0;width:527px;height:296px"></yt-thumbnail-view-model>
         </div>
@@ -374,22 +377,39 @@ test("the button lands on its own video inside a transformed shelf", async ({
     const marked = button.getBoundingClientRect();
     const media = video.getBoundingClientRect();
 
+    // What is painted where the button is. Inside the circle, not at the corners of its bounding
+    // box: the button is round, and a round element is not hit at its corners.
+    const probe = (dx: number, dy: number) => {
+      const el = document.elementFromPoint(
+        Math.round(marked.left + dx),
+        Math.round(marked.top + dy)
+      );
+      return el?.closest(`.${dom.BUTTON_CLASS}`)
+        ? "button"
+        : (el?.tagName ?? "none");
+    };
+
     return {
       cornerWhileHovered: { x: hovered.right, y: hovered.bottom },
       cornerWhileMarked: { x: marked.right, y: marked.bottom },
       mediaEdge: { right: media.right, bottom: media.bottom },
+      probes: [probe(18, 3), probe(18, 33), probe(3, 18), probe(33, 18)],
+      parent: (button.parentElement?.className ?? "").slice(0, 40),
+      wrapperOverflow: getComputedStyle(document.querySelector("#shelf")!)
+        .overflow,
       wrapperTransform: getComputedStyle(document.querySelector("#shelf")!)
         .transform,
-      wrapperShift: Math.round(
-        document.querySelector("#shelf")!.getBoundingClientRect().left
-      ),
     };
   });
 
-  // The wrapper really is shifted by a transform; without one this test would pass on the bug it
+  // The wrapper really is shifted and clipping; without either this test would pass on the bug it
   // is here to catch.
   expect(measured.wrapperTransform).toBe("matrix(1, 0, 0, 1, 543, 0)");
-  expect(measured.wrapperShift).toBeGreaterThan(500);
+  expect(measured.wrapperOverflow).toBe("clip");
+  // The card is wider than the wrapper, so a `fixed` button left inside that subtree is clipped
+  // away by it - which is what happened on the page.
+  expect(measured.parent).toContain("wd-wl-floating-layer");
+  expect(measured.probes).toEqual(["button", "button", "button", "button"]);
   expect(measured.cornerWhileMarked.x).toBeCloseTo(
     measured.mediaEdge.right - 8,
     0

@@ -640,25 +640,31 @@ on the card itself (marked `wd-wl-anchor`) — *not* on the thumbnail link, whic
 surface outside it, and *not* inside the overlay, which is `pointer-events: none` until it plays and carries no `z-index`
 for a button inside it to beat.
 
-**Placement (rev 11):** bottom-right of the video box, **36 px above its bottom edge** — clear of the duration badge, and the
-**same offset while the site's inline preview plays**. The overlay takes the pointer while it plays, so the card stops being
-hovered exactly then; the card whose *video box* holds the pointer is marked on `pointermove` (rAF-coalesced, plus scroll and
-resize), and that mark is what keeps the button up. While marked, the button is placed `position: fixed` against the viewport
-at `z-index: 1`: the site's overlay is a fixed element at `z-index: auto`, so one is enough to put the button above it —
-visible *and* clickable — and the site's own layers start at 2020, so nothing of theirs ends up underneath a card. The video
-box is measured from the card's thumbnail-ish children, skipping any candidate too small to be the video.
+**Placement (rev 11, moved out of the card in rev 12):** bottom-right of the video box, **36 px above its bottom edge** — clear
+of the duration badge, and the **same offset while the site's inline preview plays**. The overlay takes the pointer while it
+plays, so the card stops being hovered exactly then; the card whose *video box* holds the pointer is marked on `pointermove`
+(rAF-coalesced, plus scroll and resize), and that mark is what keeps the button up. While marked, the button is moved into a
+`div` under `<body>` (`wd-wl-floating-layer`) and placed `position: fixed` at `z-index: 1` against the viewport: the site's
+overlay is a fixed element at `z-index: auto`, so one is enough to put the button above it — visible *and* clickable — and the
+site's own layers start at 2020, so nothing of theirs ends up underneath a card. The video box is measured from the card's
+thumbnail-ish children, skipping any candidate too small to be the video. A card maps to its button in a `WeakMap`, because a
+floating button is not findable from its card by query.
 
 **What must not be moved (rev 11):** the card. Rev 10 raised the marked card to `z-index: 1` instead, which puts the card
 above the overlay as well — the preview then starts, plays and is painted underneath the still picture, which reads as "the
 preview is broken". Only the button may leave the card's stacking context.
 
-**`fixed` is not always the viewport (rev 12):** the home feed's "Explore more topics" row wraps its cards in a
-horizontally scrolled element carrying an *identity* `transform` (`matrix(1, 0, 0, 1, 0, 0)`), and any transform makes that
-element the containing block for `position: fixed` descendants. The button was therefore drawn 256 px to the right of its
-own video — which the user reported as "the videos in that row do not get the button". `alignButton` now *measures* where
-a `fixed` 0,0 lands (zero the insets, read the rect, restore them) and subtracts it, rather than testing a hand-written
-list of the properties that create a containing block. The renderer tests now load `style.css` and compare screen
-rectangles, because the previous placement test read back the inline values it had just written and never actually made
+**`fixed` is not always the viewport, and its subtree can clip (rev 12):** the home feed's "Explore more topics" row
+(and the site's shelves generally) wraps its cards in a horizontally scrolled element carrying an *identity* `transform`
+(`matrix(1, 0, 0, 1, 0, 0)`) **and** `overflow: clip`. Any transform makes that element the containing block for
+`position: fixed` descendants, so the button was drawn 256 px to the right of its own video — and because that element was
+also its clipper, the parts that fell outside the wrapper's box were cut away: half a clock while the pointer was on the
+card, and nothing at all once the preview replaced the thumbnail and the video box moved. Two changes, in that order:
+`alignButton` *measures* where a `fixed` 0,0 lands (zero the insets, read the rect, restore them) instead of testing a
+hand-written list of the properties that create a containing block; and while marked the button is moved to a layer under
+`<body>`, so no ancestor of the card is its containing block or its clipper any more. The renderer tests load `style.css`
+and compare screen rectangles — and probe *inside the circle*, since a round button is not hit at the corners of its
+bounding box — because the previous placement test read back the inline values it had just written and never actually made
 the button `fixed`.
 
 **Why the preview's own state is not read (rev 11):** the overlay is one shared element (`ytd-video-preview`) the site moves

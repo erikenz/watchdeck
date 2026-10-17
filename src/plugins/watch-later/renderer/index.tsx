@@ -17,6 +17,7 @@ import {
   cardOf,
   cardUnderPoint,
   createSaveButton,
+  FLOATING_LAYER_CLASS,
   HOST_CLASS,
   isThumbnailHost,
   MEDIA_HOVER_CLASS,
@@ -59,6 +60,8 @@ export const renderer = {
   reportedSessionIndex: null as number | null,
   toolbarHost: null as HTMLElement | null,
   filter: null as Set<string> | null,
+  /** Cards to their button. A floating button lives outside its card, so a query cannot find it. */
+  buttons: new WeakMap<Element, HTMLButtonElement>(),
   rowEntries: new Map<string, WatchLaterEntry>(),
   context: null as RendererContext<WatchLaterPluginConfig> | null,
   videoDataListener: null as ((event: Event) => void) | null,
@@ -259,6 +262,9 @@ export const renderer = {
     for (const button of document.querySelectorAll(`.${BUTTON_CLASS}`)) {
       button.remove();
     }
+    for (const layer of document.querySelectorAll(`.${FLOATING_LAYER_CLASS}`)) {
+      layer.remove();
+    }
     for (const host of document.querySelectorAll(`.${HOST_CLASS}`)) {
       host.classList.remove(HOST_CLASS);
     }
@@ -383,9 +389,9 @@ export const renderer = {
       if (!videoId || card.closest(`.${HOST_CLASS}`)) {
         continue;
       }
-      const existing = card.querySelector<HTMLButtonElement>(
-        `.${BUTTON_CLASS}`
-      );
+      const existing =
+        this.buttons.get(card) ??
+        card.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
       if (existing) {
         // The card may have swapped its thumbnail for the inline preview since last scan.
         alignButton(existing, card);
@@ -399,6 +405,7 @@ export const renderer = {
       const button = createSaveButton(videoId, (button_) => {
         this.toggle(button_).catch(() => undefined);
       });
+      this.buttons.set(card, button);
       card.append(button);
       alignButton(button, card);
       // Paint it now: an unpainted button has no state, and a button with no state is an
@@ -441,7 +448,10 @@ export const renderer = {
       return;
     }
 
-    const button = card.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
+    const button =
+      this.buttons.get(card) ??
+      card.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
+
     if (button) {
       alignButton(button, card);
     }

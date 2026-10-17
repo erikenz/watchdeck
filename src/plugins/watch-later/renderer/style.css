@@ -29,18 +29,24 @@
    site's inline preview plays over it, because that overlay takes the pointer and the card stops
    being hovered exactly then. The button keeps one position in every state. */
 .wd-wl-anchor:hover .wd-wl-save,
-.wd-wl-anchor.wd-wl-media-hover .wd-wl-save,
 .wd-wl-save:focus-visible {
   opacity: 1;
 }
 
-/* While the card is marked the button is placed against the viewport (`alignButton` writes
-   `left`/`top`), which puts it above the site's inline preview without raising the card: the
-   preview is a fixed overlay at `z-index: auto`, and one is enough to sit above it while the
-   site's own layers start at 2020. Raising the card instead hid the preview behind it. */
-.wd-wl-anchor.wd-wl-media-hover .wd-wl-save {
+/* While the card is marked the button floats: it lives in a layer under `<body>` (see
+   `floatingLayer`), placed against the viewport so it sits above the site's inline preview
+   without raising the card. The preview is a fixed overlay at `z-index: auto`, and one is enough,
+   while the site's own layers start at 2020. Raising the card instead hid the preview behind it. */
+/* The layer is an empty div under `<body>`: it has no size of its own, so it cannot intercept
+   anything, and the button inside it is placed `fixed` against the viewport. */
+.wd-wl-floating-layer {
+  position: static;
+}
+
+.wd-wl-save.wd-wl-floating {
   position: fixed;
   z-index: 1;
+  opacity: 1;
 }
 
 /* A saved video says so without being hovered: that is the point of the button. */

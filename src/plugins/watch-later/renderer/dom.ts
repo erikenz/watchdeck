@@ -146,9 +146,61 @@ export const cardUnderPoint = (x: number, y: number): Element | null => {
 };
 
 /**
- * The button is 36 px square; it sits clear of the site's duration badge.
+ * The button that floats above a card's video box lives here while it does.
+ *
+ * A `position: fixed` box is clipped by whichever ancestor is its containing block, and the site's
+ * shelves make their scrolling wrapper one - an identity `transform` *and* `overflow: clip`. A
+ * button placed against the card's video box was therefore clipped by that wrapper: half of it
+ * cut off while the pointer sat on the card, and gone once the preview replaced the thumbnail and
+ * the video box moved. A child of `<body>` is outside every one of those subtrees, so `fixed`
+ * means the viewport and no `overflow` of theirs applies.
  */
+export const FLOATING_LAYER_CLASS = "wd-wl-floating-layer";
+
+/** Marks the button itself, because while floating it is no longer inside its card. */
+export const FLOATING_BUTTON_CLASS = "wd-wl-floating";
+
+const floatingLayer = (): HTMLElement => {
+  const placed = document.querySelector<HTMLElement>(
+    `.${FLOATING_LAYER_CLASS}`
+  );
+
+  if (placed) {
+    return placed;
+  }
+
+  const layer = document.createElement("div");
+  layer.className = FLOATING_LAYER_CLASS;
+  document.body.append(layer);
+  return layer;
+};
+
 export const BUTTON_SIZE = 36;
+
+/**
+ * Keeps the button in the subtree where it can actually be seen: its card normally, the floating
+ * layer while the card's own subtree would clip it.
+ */
+const keepButtonVisible = (
+  button: HTMLButtonElement,
+  host: Element,
+  floating: boolean
+) => {
+  if (floating) {
+    const layer = floatingLayer();
+
+    if (button.parentElement !== layer) {
+      button.classList.add(FLOATING_BUTTON_CLASS);
+      layer.append(button);
+    }
+    return;
+  }
+
+  if (button.parentElement !== host) {
+    button.classList.remove(FLOATING_BUTTON_CLASS);
+    host.append(button);
+  }
+};
 
 /**
  * Where a `position: fixed` box's 0,0 lands on screen.
@@ -195,8 +247,10 @@ export const alignButton = (button: HTMLButtonElement, host: Element) => {
   }
 
   const { box } = media;
+  const floating = host.classList.contains(MEDIA_HOVER_CLASS);
+  keepButtonVisible(button, host, floating);
 
-  if (host.classList.contains(MEDIA_HOVER_CLASS)) {
+  if (floating) {
     const origin = fixedOrigin(button);
     button.style.left = `${Math.round(box.right - origin.x) - 8 - BUTTON_SIZE}px`;
     button.style.top = `${Math.round(box.bottom - origin.y) - BUTTON_LIFT - BUTTON_SIZE}px`;

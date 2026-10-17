@@ -672,6 +672,14 @@ between cards; put away, its container is `display: none` and it reports a 0×0 
 Rev 9 read those attributes to decide the button's visibility, which made the button vanish in exactly the state it was
 needed. The mark follows the pointer instead: the same card in every state, whatever the site paints over it.
 
+**Leaving the page is not leaving an element (rev 12):** the mark is cleared when the pointer leaves, and the obvious event
+for that is `pointerleave` on `document` - which does not bubble, so it only works with `capture`, and in the capture phase
+it fires for *every* element the pointer leaves: the thumbnail, the card, the preview's own `<video>`. Each of those cleared
+the last pointer position, so a fast hover → unhover → hover ended with the pending frame unmarking the card that the pointer
+was sitting on; the button came back only on the next twitch of the pointer. It listens for `pointerout` (which bubbles)
+with `relatedTarget === null` instead, and a plain `pointermove` still clears the mark when the pointer leaves a card for the
+background.
+
 **Size (rev 9):** 36×36 translucent dark circle with a 22 px glyph, matching YouTube's own overlay buttons.
 
 **States:** not-saved (**outline clock**, the site's own Watch Later glyph) / saved (**the same clock, filled**) / pending

@@ -67,7 +67,7 @@ export const renderer = {
   videoDataListener: null as ((event: Event) => void) | null,
   timeUpdateListener: null as ((event: Event) => void) | null,
   pointerMoveListener: null as ((event: PointerEvent) => void) | null,
-  pointerGoneListener: null as (() => void) | null,
+  pointerGoneListener: null as ((event: PointerEvent) => void) | null,
   scrollListener: null as (() => void) | null,
   markedCard: null as Element | null,
 
@@ -87,7 +87,16 @@ export const renderer = {
       passive: true,
     });
     this.pointerGoneListener = this.onPointerGone.bind(this);
-    document.addEventListener("pointerleave", this.pointerGoneListener, true);
+    // `pointerout` bubbles, and `relatedTarget === null` means the pointer left the page rather
+    // than an element inside it. `pointerleave` was the obvious event and the wrong one: it does
+    // not bubble, so listening for it on `document` only works with `capture`, and in the capture
+    // phase it fires for *every* element the pointer leaves - the thumbnail, the card, the
+    // preview's own `<video>`. Each of those cleared the last pointer position, so a move that
+    // landed on a card right after a fast hover in/out/in left the button hidden until the pointer
+    // twitched again.
+    document.addEventListener("pointerout", this.pointerGoneListener, {
+      passive: true,
+    });
     this.scrollListener = this.queuePointerMark.bind(this);
     document.addEventListener("scroll", this.scrollListener, {
       capture: true,
@@ -234,11 +243,7 @@ export const renderer = {
       this.pointerMoveListener = null;
     }
     if (this.pointerGoneListener) {
-      document.removeEventListener(
-        "pointerleave",
-        this.pointerGoneListener,
-        true
-      );
+      document.removeEventListener("pointerout", this.pointerGoneListener);
       this.pointerGoneListener = null;
     }
     if (this.scrollListener) {
@@ -477,7 +482,11 @@ export const renderer = {
   },
 
   /** The pointer left the page: nothing is under it any more. */
-  onPointerGone() {
+  onPointerGone(event: PointerEvent) {
+    if (event.relatedTarget !== null) {
+      return;
+    }
+
     this.lastPointer = { x: -1, y: -1 };
     this.markCard(null);
   },

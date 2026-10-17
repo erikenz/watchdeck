@@ -332,9 +332,23 @@ release into `userData/sponsorblock-extension-wd1/`, patched with the shim, load
   fine (they are tree-shaken); calls at module scope are not. The smoke test caught it, which is why that test asks
   the page whether `wd-trans` came up.
 
-**Shipping Option A still needs** (not part of the spike): the first-use "download SponsorBlock from its official
-release" consent step; falling back to the native client automatically when no extension can be loaded; and a note in
-the about dialog (GPL-3.0, separate program, settings reachable only through SponsorBlock's in-player UI).
+**Shipping Option A (rev 13: done).** The consent step is in front of the download: enabling the plugin asks first, names
+the release and its SHA-256 check, credits SponsorBlock and links its release page, and a decline leaves the plugin off
+with nothing written to disk. A download that cannot be installed is reported with its reason (offline, hash mismatch,
+archive, or Electron refusing the load) instead of falling back to the native client - the built-in client is a mode the
+user can choose, not a safety net. The about dialog carries the credit, the GPL-3.0 note and the links.
+
+Two things the consent work settled, both measured:
+
+- **The plugin's own menu carries the way in while the release is not installed.** The ask waits for the window (a modal
+  over the desktop at login is what "start hidden in the tray" exists to avoid), and `ready-to-show` needs a paint - so a
+  window that never paints (started in the background, or a session without a compositor) would otherwise leave the plugin
+  enabled, inert and silent. The menu item says what it will do ("Download and install SponsorBlock", or "Install
+  SponsorBlock again" after a failure), and an app that means to show its window asks after ten seconds regardless.
+- **A plugin module may not import `@/menu` statically.** `menu.ts` awaits `config.plugins.isEnabled` at module scope,
+  which reaches every plugin module through `allPlugins()`; the cycle leaves the main process stuck before its first log
+  line - no window, no output, nothing to grep. The menu refresh after a decline is a deferred `await import("@/menu")`
+  for that reason.
 
 ### 5.2 Disable autoplay
 
@@ -619,7 +633,9 @@ can prefer one. Values are computed at query time, so changing a threshold re-fi
 
 ### R2 — SponsorBlock. See §5.1 for the revised approach and the spike result (rev 12): the official extension release is
 loaded at runtime with a `chrome.storage.sync → storage.local` shim, and that is the shipping path (full feature
-coverage, upstream-maintained). The native client stays as the fallback. **The release is pinned by tag and SHA-256**
+coverage, upstream-maintained). **There is no automatic fallback (rev 13):** the release is loaded or nothing runs, and a
+failure is reported to the user with the reason. The native client stays as a mode the user can pick by hand. **The release
+is pinned by tag and SHA-256**
 (rev 12): third-party code runs in the app's page, so `latest` - whatever upstream published that morning, including a
 release from a compromised maintainer account - is not what this app installs; a download whose hash is not the one in the
 source is refused before a file is written, and bumping the pin is a reviewed code change. Acceptance: skipping works and
@@ -787,7 +803,7 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 | **P0 — Reset** (small) | git re-init (in your checkout, §11), debrand (R8) **including the update feed**, delete plugin inventory (R5), Ultracite via `ultracite init` + rewired scripts (§5.3), `.npmrc`, version sweep to stable, README + plugin authoring guide, CI that runs `ultracite check` + `typecheck` + build | app boots to `www.youtube.com`, `pnpm dev` works, `ultracite check` passes, and the R8 grep gate finds upstream names only in the attribution section |
 | **P1 — YouTube base** | **Done (rev 11).** The player bridge (`video-info` / `video-controls` in main and in the page, replacing `song-info`/`song-controls`), a Playback menu as the app's own UI, the autoplay plugin reworked around the site's own toggle plus a user-intent rule, a gestures plugin (right-drag volume/seek, shift+right-drag speed, right+wheel volume, with a readout), and a smoke test that asserts the site and the app's page half | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green — all four verified live (MPRIS-driven controls, a cold load paused at 0.4 s, gesture values measured, and the launch test's page assertion green in CI) |
 | **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), and the app's own way to act on the video in front of you: the **`w` shortcut** (rev 12) | R1/R4 acceptance criteria; all delivered. "OS-level entry points" was resolved to the in-app shortcut: a global shortcut was rejected as useless and the tray icon as unwanted (§R4) |
-| **P3 — SponsorBlock** | **spike done (rev 12): it passed.** Ship the official release (runtime download + shim) with a first-use consent step and the native client as fallback; the remaining work is that consent dialog, the automatic fallback, and the about-dialog note | R2 acceptance criteria (§5.1 for the one that had to be revised) |
+| **P3 — SponsorBlock** | **Done (rev 13).** The spike passed (rev 12); the shipping surface landed with it: the official release downloaded at runtime behind a first-use consent step, a failure reported with its reason instead of a fallback, and the about-dialog credit | R2 acceptance criteria (§5.1 for the one that had to be revised) |
 | **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
 
 Order rationale: P0 shrinks the codebase before Ultracite runs over it and before any release identity exists; P1 gives a

@@ -98,7 +98,7 @@ test("offline, an installed copy is used and left in place", async () => {
   const network = offline();
 
   try {
-    await expect(ensureInstalled(dir, spec)).resolves.toBe(true);
+    await expect(ensureInstalled(dir, spec)).resolves.toEqual({ ok: true });
     expect(network.calls()).toBeGreaterThan(0);
     expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
       "v1.0.0"
@@ -113,7 +113,10 @@ test("offline with nothing installed installs nothing and says so", async () => 
   const network = offline();
 
   try {
-    await expect(ensureInstalled(dir, spec)).resolves.toBe(false);
+    await expect(ensureInstalled(dir, spec)).resolves.toEqual({
+      failure: "download",
+      ok: false,
+    });
     expect(isInstalled(extensionDir(dir, spec))).toBe(false);
   } finally {
     network.restore();
@@ -191,7 +194,7 @@ test("a published release is downloaded when the versions differ", async () => {
     )) as typeof fetch;
 
   try {
-    await expect(ensureInstalled(dir, spec)).resolves.toBe(true);
+    await expect(ensureInstalled(dir, spec)).resolves.toEqual({ ok: true });
     const installed = extensionDir(dir, spec);
     expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
       "v9.9.9"
@@ -219,7 +222,10 @@ test("a release that does not match the pinned hash is refused", async () => {
   try {
     // Nothing is written on a mismatch: not the extension, not the version file.
     const wrongHash = { ...spec, sha256: "0".repeat(64) };
-    await expect(ensureInstalled(dir, wrongHash)).resolves.toBe(false);
+    await expect(ensureInstalled(dir, wrongHash)).resolves.toEqual({
+      failure: "hash",
+      ok: false,
+    });
     expect(isInstalled(extensionDir(dir, spec))).toBe(false);
 
     // And the same bytes install once the hash is the one the app trusts.
@@ -227,7 +233,9 @@ test("a release that does not match the pinned hash is refused", async () => {
       ...spec,
       sha256: createHash("sha256").update(zip).digest("hex"),
     };
-    await expect(ensureInstalled(dir, rightHash)).resolves.toBe(true);
+    await expect(ensureInstalled(dir, rightHash)).resolves.toEqual({
+      ok: true,
+    });
     expect(isInstalled(extensionDir(dir, spec))).toBe(true);
   } finally {
     globalThis.fetch = original;

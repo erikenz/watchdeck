@@ -14,7 +14,10 @@
  * Nothing here may run at module scope: a plugin's `index.ts` is shared by every bundle, the page
  * included (see the loader's own note).
  */
-import type { WebExtensionSpec } from "@/extensions/web-extension";
+import type {
+  ExtensionLoadResult,
+  WebExtensionSpec,
+} from "@/extensions/web-extension";
 import { loadInto, unloadFrom } from "@/extensions/web-extension";
 
 const SHIM = `(() => {
@@ -62,11 +65,11 @@ export const sponsorBlockExtension: WebExtensionSpec = {
   userAgent: "Watchdeck",
 };
 
-/** Puts the pinned official release into a session; answers the extension's id, or null. */
+/** Puts the pinned official release into a session; answers the id, or why it could not. */
 export const mountSponsorBlockExtension = async (
   session: Electron.Session,
   userDataDir: string
-): Promise<string | null> =>
+): Promise<ExtensionLoadResult> =>
   await loadInto(session, userDataDir, sponsorBlockExtension);
 
 /** Answers whether it was actually removed, so the caller knows a page reload is due. */

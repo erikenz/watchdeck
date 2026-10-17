@@ -1,30 +1,43 @@
+import { shell } from "electron";
+
 import { t } from "@/i18n";
 import type { GetPlayerResponse } from "@/types/get-player-response";
 import { createPlugin, LoggerPrefix } from "@/utils";
 
 import {
-  mountSponsorBlockExtension,
-  sponsorBlockExtension,
-  unmountSponsorBlockExtension,
-} from "./extension";
+  ensureExtensionLoaded,
+  isExtensionLoaded,
+  unloadExtension,
+} from "./install";
+import { SPONSOR_BLOCK_REPOSITORY } from "./links";
 import { sortSegments } from "./segments";
 import type { Segment, SkipSegment } from "./types";
 
 /**
  * SponsorBlock (docs/PRD.md §5.1, R2).
  *
- * Two ways to get it, and the config says which: the official extension release loaded at
- * runtime (`mode: "extension"`, the shipping path once the spike passed) or our own client
- * against the public API (`mode: "native"`, kept as the fallback). Only one of them may run -
- * two skippers would seek over each other.
+ * Two ways to get it, and the config says which: the official extension release loaded at runtime
+ * (`mode: "extension"`, the shipping path once the spike passed) or our own client against the
+ * public API (`mode: "native"`). Only one of them may run - two skippers would seek over each
+ * other.
  *
- * Both can be switched at runtime, without a restart. What a switch cannot do is reach a page
+ * The extension is downloaded, never bundled: it is GPL-3.0 code, this app is MIT, and the user
+ * has to agree to the download before it happens (see `./install.ts`, which owns that flow). There
+ * is no automatic fallback to the built-in client: if the release cannot be installed, the user is
+ * told why and nothing skips.
+ *
+ * Both modes can be switched at runtime, without a restart. What a switch cannot do is reach a page
  * that is already loaded: content scripts arrive with a navigation, and taking the extension
  * away leaves what it already injected running. So a change of state reloads the page (see
  * `reloadIfOnYoutube`) rather than pretending the toggle did nothing.
  */
 export interface SponsorBlockPluginConfig {
   enabled: boolean;
+  /**
+   * The user's agreement to download the official release. Nothing is fetched without it, and
+   * declining leaves the plugin off.
+   */
+  consentGiven: boolean;
   /** `extension` loads the official release; `native` is our own client. */
   mode: "extension" | "native";
   apiURL: string;
@@ -39,7 +52,6 @@ export interface SponsorBlockPluginConfig {
 }
 
 let currentSegments: Segment[] = [];
-let loadedExtensionId: string | null = null;
 /** The two bundles (main, renderer) each keep their own copy of this module. */
 let backendMode: SponsorBlockPluginConfig["mode"] | null = null;
 let rendererMode: SponsorBlockPluginConfig["mode"] | null = null;
@@ -135,24 +147,6 @@ const fetchSegments = async (
   }
 };
 
-/**
- * Reloads the page so a change of extension state is actually in effect - and only when there
- * is a page to reload. Neither startup (the site is still loading, or has not been asked for
- * yet) nor a mid-load page is touched: what those need is not a reload, it is the navigation
- * they are already making.
- */
-const reloadIfOnYoutube = (win: Electron.BrowserWindow) => {
-  const isLoading = win.webContents.isLoading();
-  const url = win.webContents.getURL();
-
-  if (win.isDestroyed() || isLoading || !url.includes("youtube.com")) {
-    return;
-  }
-
-  win.webContents.reload();
-  log("SponsorBlock: reloaded the page for the new setting");
-};
-
 export default createPlugin<
   unknown,
   unknown,
@@ -192,25 +186,11 @@ export default createPlugin<
         // gets and then drops the imports nothing else references - a module-level helper would
         // keep the extension loader in the page's module graph, where its `node:*` imports throw
         // the moment the module is evaluated.
-        const userDataDir = window.webContents.session.getStoragePath();
-        const id = userDataDir
-          ? await mountSponsorBlockExtension(
-              window.webContents.session,
-              userDataDir
-            )
-          : null;
-
-        if (id) {
-          loadedExtensionId = id;
-          log(
-            `SponsorBlock: extension loaded (${id}, ${sponsorBlockExtension.pinnedTag})`
-          );
-          reloadIfOnYoutube(window);
-        } else {
-          logError(
-            "SponsorBlock: no extension on disk and none could be downloaded"
-          );
-        }
+        void ensureExtensionLoaded({
+          consentGiven: pluginConfig.consentGiven,
+          stillWanted: () => pluginConfig?.mode === "extension",
+          window,
+        });
       }
     },
     onConfigChange(newConfig) {
@@ -222,51 +202,22 @@ export default createPlugin<
         return;
       }
 
-      // Only reached while the plugin is enabled - switching it off goes through `stop`.
-      if (newConfig.mode === "extension" && !loadedExtensionId) {
-        const userDataDir = win.webContents.session.getStoragePath();
-
-        void mountSponsorBlockExtension(
-          win.webContents.session,
-          userDataDir ?? ""
-        ).then((id) => {
-          if (id) {
-            loadedExtensionId = id;
-            log(
-              `SponsorBlock: extension loaded (${id}, ${sponsorBlockExtension.pinnedTag})`
-            );
-            reloadIfOnYoutube(win);
-          } else {
-            logError(
-              "SponsorBlock: no extension on disk and none could be downloaded"
-            );
-          }
+      // Only reached while the plugin is enabled - switching it off goes through `stop`. Both
+      // calls do nothing when there is nothing to do: the install is skipped while one is
+      // loaded, and the unload while none is.
+      if (newConfig.mode === "extension") {
+        void ensureExtensionLoaded({
+          consentGiven: newConfig.consentGiven,
+          stillWanted: () => pluginConfig?.mode === "extension",
+          window: win,
         });
         return;
       }
 
-      if (newConfig.mode !== "extension" && loadedExtensionId) {
-        const id = loadedExtensionId;
-        loadedExtensionId = null;
-
-        if (unmountSponsorBlockExtension(win.webContents.session, id)) {
-          log(`SponsorBlock: extension unloaded (${id})`);
-          reloadIfOnYoutube(win);
-        }
-      }
+      unloadExtension(win);
     },
     stop({ window }) {
-      if (!loadedExtensionId) {
-        return;
-      }
-
-      const id = loadedExtensionId;
-      loadedExtensionId = null;
-
-      if (unmountSponsorBlockExtension(window.webContents.session, id)) {
-        log(`SponsorBlock: extension unloaded (${id})`);
-        reloadIfOnYoutube(window);
-      }
+      unloadExtension(window);
     },
   },
   config: {
@@ -279,11 +230,12 @@ export default createPlugin<
       "selfpromo",
       "music_offtopic",
     ],
+    consentGiven: false,
     enabled: false,
     mode: "extension",
   },
   description: () => t("plugins.sponsorblock.description"),
-  menu: async ({ getConfig, setConfig }) => {
+  menu: async ({ getConfig, setConfig, window }) => {
     const config = await getConfig();
 
     return [
@@ -302,6 +254,33 @@ export default createPlugin<
         },
         label: t("plugins.sponsorblock.menu.mode-native"),
         type: "radio" as const,
+      },
+      // Shown while there is nothing to skip with: the release has not been installed yet (the
+      // first run, a download that failed, or an app that started hidden and has not asked). The
+      // state is otherwise invisible, which is how a plugin ends up looking broken.
+      ...(config.mode === "extension" && !isExtensionLoaded()
+        ? [
+            { type: "separator" as const },
+            {
+              click() {
+                void ensureExtensionLoaded({
+                  consentGiven: config.consentGiven,
+                  stillWanted: () => pluginConfig?.mode === "extension",
+                  window,
+                });
+              },
+              label: config.consentGiven
+                ? t("plugins.sponsorblock.menu.install-again")
+                : t("plugins.sponsorblock.menu.install"),
+            },
+          ]
+        : []),
+      { type: "separator" as const },
+      {
+        click() {
+          void shell.openExternal(SPONSOR_BLOCK_REPOSITORY);
+        },
+        label: t("plugins.sponsorblock.menu.about"),
       },
     ];
   },
@@ -336,6 +315,6 @@ export default createPlugin<
     },
   },
   // Enabling and disabling both work on the session at runtime; the page is reloaded instead
-  // (see `reloadIfOnYoutube`).
+  // (see `./install.ts`).
   restartNeeded: false,
 });

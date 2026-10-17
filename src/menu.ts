@@ -11,6 +11,7 @@ import { APPLICATION_NAME, setLanguage, t } from "@/i18n";
 import packageJson from "../package.json";
 import * as config from "./config";
 import { getAllMenuTemplate, loadAllMenuPlugins } from "./loader/menu";
+import { SPONSOR_BLOCK_REPOSITORY } from "./plugins/sponsorblock/links";
 import { restart } from "./providers/app-controls";
 import promptOptions from "./providers/prompt-options";
 import { START_PAGES } from "./providers/start-pages";
@@ -20,6 +21,36 @@ export type MenuTemplate = Electron.MenuItemConstructorOptions[];
 
 /** How far the Playback menu's seek items move, in seconds. */
 const SEEK_STEP_SECONDS = 10;
+
+/** The project's own page, derived from `package.json` so the two cannot drift apart. */
+const PROJECT_URL = `https://github.com/${packageJson.repository}`;
+
+/**
+ * Our own about box. Electron's `role: "about"` panel shows the version and nothing else, and this
+ * app owes credits that belong in front of the user: the MIT portions it was built from, and
+ * SponsorBlock - GPL-3.0, never bundled, and downloaded only after the user agrees to it.
+ */
+const showAboutDialog = async (win: Electron.BrowserWindow) => {
+  const { response } = await dialog.showMessageBox(win, {
+    buttons: [
+      t("main.dialog.about.buttons.project-page"),
+      t("main.dialog.about.buttons.sponsorblock"),
+      t("main.dialog.about.buttons.close"),
+    ],
+    cancelId: 2,
+    defaultId: 2,
+    detail: t("main.dialog.about.detail"),
+    message: t("main.dialog.about.message", { version: app.getVersion() }),
+    title: t("main.dialog.about.title"),
+    type: "info",
+  });
+
+  if (response === 0) {
+    void shell.openExternal(PROJECT_URL);
+  } else if (response === 1) {
+    void shell.openExternal(SPONSOR_BLOCK_REPOSITORY);
+  }
+};
 
 // True only if in-app-menu was loaded on launch
 const inAppMenuActive = await config.plugins.isEnabled("in-app-menu");
@@ -669,7 +700,12 @@ export const mainMenuTemplate = async (
     },
     {
       label: t("main.menu.about"),
-      submenu: [{ role: "about" }],
+      submenu: [
+        {
+          click: () => showAboutDialog(win),
+          label: t("main.menu.about-watchdeck"),
+        },
+      ],
     },
   ];
 };

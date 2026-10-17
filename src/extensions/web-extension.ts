@@ -67,6 +67,24 @@ export interface WebExtensionSpec {
   userAgent?: string;
 }
 
+/**
+ * Why an install did not finish. The loader logs the reason; a caller with a user in front of it
+ * can name it instead of reporting "it did not work", which is the difference between "try again"
+ * and "the bytes are not the ones this app trusts".
+ */
+export type InstallFailure = "download" | "hash" | "unpack";
+
+export type InstallResult =
+  | { ok: true }
+  | { failure: InstallFailure; ok: false };
+
+/** An install that also had to be loaded into a session. */
+export type ExtensionFailure = InstallFailure | "load";
+
+export type ExtensionLoadResult =
+  | { id: string; ok: true }
+  | { failure: ExtensionFailure; ok: false };
+
 /** A manifest as far as script patching needs to read one. */
 interface ExtensionManifest {
   background?: { scripts?: string[]; service_worker?: string };
@@ -171,22 +189,28 @@ const downloadAndExtract = async (
   dir: string,
   spec: WebExtensionSpec,
   release: { digest?: string; url: string; version: string }
-): Promise<boolean> => {
+): Promise<InstallResult> => {
+  let bytes: Uint8Array;
+
   try {
     const response = await fetch(release.url, {
       headers: { "User-Agent": spec.userAgent ?? DEFAULT_USER_AGENT },
     });
 
     if (!response.ok) {
-      return false;
+      return { failure: "download", ok: false };
     }
 
-    const bytes = new Uint8Array(await response.arrayBuffer());
+    bytes = new Uint8Array(await response.arrayBuffer());
+  } catch {
+    return { failure: "download", ok: false };
+  }
 
-    if (!verifyAsset(bytes, spec, release.digest)) {
-      return false;
-    }
+  if (!verifyAsset(bytes, spec, release.digest)) {
+    return { failure: "hash", ok: false };
+  }
 
+  try {
     const files = readZip(bytes);
     const root = path.resolve(dir);
     rmSync(root, { force: true, recursive: true });
@@ -204,9 +228,9 @@ const downloadAndExtract = async (
 
     writeFileSync(path.join(root, VERSION_FILE), release.version, "utf-8");
 
-    return isInstalled(root);
+    return isInstalled(root) ? { ok: true } : { failure: "unpack", ok: false };
   } catch {
-    return false;
+    return { failure: "unpack", ok: false };
   }
 };
 
@@ -353,7 +377,7 @@ const removeStaleInstalls = (userDataDir: string, spec: WebExtensionSpec) => {
 export const ensureInstalled = async (
   userDataDir: string,
   spec: WebExtensionSpec
-): Promise<boolean> => {
+): Promise<InstallResult> => {
   removeStaleInstalls(userDataDir, spec);
 
   const dir = extensionDir(userDataDir, spec);
@@ -365,7 +389,7 @@ export const ensureInstalled = async (
     readInstalledVersion(dir) === spec.pinnedTag
   ) {
     patchInstalledExtension(dir, spec);
-    return true;
+    return { ok: true };
   }
 
   const release = await fetchRelease(spec);
@@ -373,12 +397,12 @@ export const ensureInstalled = async (
   if (!release) {
     // No network, or GitHub is having a day: an installed copy still works
     patchInstalledExtension(dir, spec);
-    return installed;
+    return installed ? { ok: true } : { failure: "download", ok: false };
   }
 
   if (installed && readInstalledVersion(dir) === release.version) {
     patchInstalledExtension(dir, spec);
-    return true;
+    return { ok: true };
   }
 
   const extracted = await downloadAndExtract(dir, spec, release);
@@ -392,11 +416,11 @@ export const loadInto = async (
   session: Electron.Session,
   userDataDir: string,
   spec: WebExtensionSpec
-): Promise<string | null> => {
+): Promise<ExtensionLoadResult> => {
   const available = await ensureInstalled(userDataDir, spec);
 
-  if (!available) {
-    return null;
+  if (!available.ok) {
+    return available;
   }
 
   try {
@@ -408,9 +432,9 @@ export const loadInto = async (
       { allowFileAccess: false }
     );
 
-    return extension.id;
+    return { id: extension.id, ok: true };
   } catch {
-    return null;
+    return { failure: "load", ok: false };
   }
 };
 

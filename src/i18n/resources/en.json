@@ -76,6 +76,16 @@
         "detail": "A new version is available and can be downloaded at {{downloadLink}}",
         "message": "A new version is available",
         "title": "Update Available"
+      },
+      "about": {
+        "title": "About Watchdeck",
+        "message": "Watchdeck {{version}}",
+        "detail": "An unofficial desktop client for YouTube, built around plugins. Not affiliated with, authorized by, or connected with Google LLC or YouTube.\n\nMIT licensed, © 2026 erikenz. It was built on portions of other MIT-licensed work, which the NOTICE file in the repository credits.\n\nSponsorBlock is a separate program by Ajay Ramachandran and its contributors, licensed GPL-3.0. When its plugin is enabled, Watchdeck downloads the official release from github.com/ajayyy/SponsorBlock, checks it against the hash this app trusts, and runs it in the page. Nothing of it is bundled with Watchdeck.",
+        "buttons": {
+          "project-page": "Watchdeck on GitHub",
+          "sponsorblock": "SponsorBlock on GitHub",
+          "close": "Close"
+        }
       }
     },
     "menu": {
@@ -204,7 +214,8 @@
           "volume-down": "Volume down",
           "volume-up": "Volume up"
         }
-      }
+      },
+      "about-watchdeck": "About Watchdeck"
     },
     "tray": {
       "next": "Next",
@@ -641,7 +652,32 @@
       "name": "SponsorBlock",
       "menu": {
         "mode-extension": "Use the official SponsorBlock extension (downloaded at runtime)",
-        "mode-native": "Use the built-in client (fallback)"
+        "mode-native": "Use the built-in client (fallback)",
+        "about": "SponsorBlock on GitHub",
+        "install": "Download and install SponsorBlock",
+        "install-again": "Install SponsorBlock again"
+      },
+      "consent": {
+        "title": "Enable SponsorBlock?",
+        "message": "SponsorBlock is not part of Watchdeck - it is downloaded from its own release page.",
+        "detail": "Watchdeck will download release {{tag}} from {{url}} and compare it with the SHA-256 hash this app ships with. Nothing is installed if the two do not match.\n\nSponsorBlock is a separate program by Ajay Ramachandran and its contributors, licensed GPL-3.0. Its own settings page cannot be opened from this app, so the options in this menu are the ones that are reachable.",
+        "buttons": {
+          "download": "Download and enable",
+          "release-page": "Open the release page",
+          "decline": "Not now"
+        }
+      },
+      "failed": {
+        "title": "SponsorBlock could not be installed",
+        "message": "Release {{tag}} from {{url}} is not installed, so nothing will be skipped. The plugin stays on: try again from this menu, or the next time the app starts.",
+        "download": "The release could not be downloaded. Check this machine's network connection, then try again.",
+        "hash": "The downloaded file does not match the SHA-256 hash this app trusts, so nothing was written to disk. This should be reported rather than worked around.",
+        "unpack": "The downloaded archive could not be unpacked - the download was most likely truncated. Try again.",
+        "load": "The release is on disk, but Electron refused to load it into this session. The app's log has the details.",
+        "buttons": {
+          "retry": "Try again",
+          "close": "Close"
+        }
       }
     },
     "taskbar-mediacontrol": {

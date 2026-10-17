@@ -1,3 +1,5 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
 
@@ -12,10 +14,17 @@ import { test, expect, _electron as electron } from "@playwright/test";
  */
 const appPath = path.resolve(import.meta.dirname, "..");
 
+/**
+ * Every launch gets its own `userData` directory. Two reasons, both learned the hard way: the
+ * app refuses a second instance while one holds the lock on the real one, which showed up as a
+ * window that never loaded a URL; and a test has no business writing to the config, the Watch
+ * Later database or an extension's storage that belongs to whoever runs it.
+ */
 const launchApp = () =>
   electron.launch({
     args: [
       appPath,
+      `--user-data-dir=${mkdtempSync(path.join(tmpdir(), "watchdeck-smoke-"))}`,
       "--no-sandbox",
       "--disable-gpu",
       "--whitelisted-ips=",

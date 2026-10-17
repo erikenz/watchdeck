@@ -1,3 +1,14 @@
+import { t } from "@/i18n";
+import type { GetPlayerResponse } from "@/types/get-player-response";
+import { createPlugin, LoggerPrefix } from "@/utils";
+
+import {
+  mountSponsorBlockExtension,
+  unmountSponsorBlockExtension,
+} from "./extension";
+import { sortSegments } from "./segments";
+import type { Segment, SkipSegment } from "./types";
+
 /**
  * SponsorBlock (docs/PRD.md §5.1, R2).
  *
@@ -11,15 +22,6 @@
  * away leaves what it already injected running. So a change of state reloads the page (see
  * `reloadIfOnYoutube`) rather than pretending the toggle did nothing.
  */
-import { app } from "electron";
-import { t } from "@/i18n";
-import type { GetPlayerResponse } from "@/types/get-player-response";
-import { createPlugin, LoggerPrefix } from "@/utils";
-
-import { ensureExtension, getExtensionDir } from "./extension";
-import { sortSegments } from "./segments";
-import type { Segment, SkipSegment } from "./types";
-
 export interface SponsorBlockPluginConfig {
   enabled: boolean;
   /** `extension` loads the official release; `native` is our own client. */
@@ -135,67 +137,6 @@ const fetchSegments = async (
 };
 
 /**
- * Loads the official release into this window's session. The download happens here, on the
- * user's machine, which is what keeps SponsorBlock's GPL-3.0 code out of this repository.
- *
- * The extension module is imported the ordinary way: the plugin loader strips the backend out of
- * the bundles a page gets, and what is left of this function goes with it. What must not happen
- * is anything *running* at this module's top level that only the main process can run - that
- * stays in every bundle, and the page has no `require`. The smoke test caught exactly that
- * (twice, from two different changes) by asking the page whether its half came up.
- *
- * Answers whether anything is loaded once it is done.
- */
-const loadOfficialExtension = async (
-  win: Electron.BrowserWindow,
-  options: { autoUpdate: boolean }
-): Promise<boolean> => {
-  if (loadedExtensionId) {
-    return true;
-  }
-
-  const userDataDir = app.getPath("userData");
-  const available = await ensureExtension(userDataDir, options);
-
-  if (!available) {
-    logError("SponsorBlock: no extension on disk and none could be downloaded");
-    return false;
-  }
-
-  try {
-    const extension = await win.webContents.session.extensions.loadExtension(
-      getExtensionDir(userDataDir),
-      { allowFileAccess: true }
-    );
-    loadedExtensionId = extension.id;
-    log(`SponsorBlock: extension loaded (${extension.id})`);
-    return true;
-  } catch (error) {
-    logError("SponsorBlock: loading the extension failed", error);
-    return false;
-  }
-};
-
-/** Answers whether something was actually loaded, so the caller knows a page reload is due. */
-const unloadOfficialExtension = (win: Electron.BrowserWindow): boolean => {
-  if (!loadedExtensionId) {
-    return false;
-  }
-
-  const id = loadedExtensionId;
-  loadedExtensionId = null;
-
-  try {
-    win.webContents.session.extensions.removeExtension(id);
-    log(`SponsorBlock: extension unloaded (${id})`);
-  } catch (error) {
-    logError("SponsorBlock: unloading the extension failed", error);
-  }
-
-  return true;
-};
-
-/**
  * Reloads the page so a change of extension state is actually in effect - and only when there
  * is a page to reload. Neither startup (the site is still loading, or has not been asked for
  * yet) nor a mid-load page is touched: what those need is not a reload, it is the navigation
@@ -248,12 +189,27 @@ export default createPlugin<
       }
 
       if (backendMode === "extension") {
-        const loaded = await loadOfficialExtension(window, {
-          autoUpdate: pluginConfig.autoUpdate,
-        });
+        // Inline on purpose. The plugin transform strips this context out of the bundles a page
+        // gets and then drops the imports nothing else references - a module-level helper would
+        // keep the extension loader in the page's module graph, where its `node:*` imports throw
+        // the moment the module is evaluated.
+        const userDataDir = window.webContents.session.getStoragePath();
+        const id = userDataDir
+          ? await mountSponsorBlockExtension(
+              window.webContents.session,
+              userDataDir,
+              { autoUpdate: pluginConfig.autoUpdate }
+            )
+          : null;
 
-        if (loaded) {
+        if (id) {
+          loadedExtensionId = id;
+          log(`SponsorBlock: extension loaded (${id})`);
           reloadIfOnYoutube(window);
+        } else {
+          logError(
+            "SponsorBlock: no extension on disk and none could be downloaded"
+          );
         }
       }
     },
@@ -268,22 +224,46 @@ export default createPlugin<
 
       // Only reached while the plugin is enabled - switching it off goes through `stop`.
       if (newConfig.mode === "extension" && !loadedExtensionId) {
-        void loadOfficialExtension(win, {
-          autoUpdate: newConfig.autoUpdate,
-        }).then((loaded) => {
-          if (loaded) {
+        const userDataDir = win.webContents.session.getStoragePath();
+
+        void mountSponsorBlockExtension(
+          win.webContents.session,
+          userDataDir ?? "",
+          { autoUpdate: newConfig.autoUpdate }
+        ).then((id) => {
+          if (id) {
+            loadedExtensionId = id;
+            log(`SponsorBlock: extension loaded (${id})`);
             reloadIfOnYoutube(win);
+          } else {
+            logError(
+              "SponsorBlock: no extension on disk and none could be downloaded"
+            );
           }
         });
         return;
       }
 
-      if (newConfig.mode !== "extension" && unloadOfficialExtension(win)) {
-        reloadIfOnYoutube(win);
+      if (newConfig.mode !== "extension" && loadedExtensionId) {
+        const id = loadedExtensionId;
+        loadedExtensionId = null;
+
+        if (unmountSponsorBlockExtension(win.webContents.session, id)) {
+          log(`SponsorBlock: extension unloaded (${id})`);
+          reloadIfOnYoutube(win);
+        }
       }
     },
     stop({ window }) {
-      if (unloadOfficialExtension(window)) {
+      if (!loadedExtensionId) {
+        return;
+      }
+
+      const id = loadedExtensionId;
+      loadedExtensionId = null;
+
+      if (unmountSponsorBlockExtension(window.webContents.session, id)) {
+        log(`SponsorBlock: extension unloaded (${id})`);
         reloadIfOnYoutube(window);
       }
     },

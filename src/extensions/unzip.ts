@@ -1,11 +1,12 @@
 /**
  * A zip reader, small enough to own.
  *
- * SponsorBlock publishes itself as a zip and the app needs exactly that one archive at runtime.
- * The obvious dependency for it (fflate) declares `require` at module scope in its ESM entry, which
- * rolldown then doubles with its own shim - `Identifier 'require' has already been declared` takes
- * the whole main process down. Reading the central directory ourselves and inflating the entries
- * with `node:zlib` is the smaller answer and one fewer thing in the main bundle.
+ * Web extension releases are published as zips and the app needs exactly that one archive at
+ * runtime. The obvious dependency for it (fflate) declares `require` at module scope in its ESM
+ * entry, which rolldown then doubles with its own shim - `Identifier 'require' has already been
+ * declared` takes the whole main process down. Reading the central directory ourselves and
+ * inflating the entries with `node:zlib` is the smaller answer and one fewer thing in the main
+ * bundle.
  */
 import { inflateRawSync } from "node:zlib";
 

@@ -235,18 +235,23 @@ let startupSyncPending = false;
 /** Follows the identity the session is acting as, whichever one the site switched to. */
 const adoptSessionIndex = async (index: number) => {
   if (!Number.isFinite(index)) {
+    log(`session index report was not a number (${String(index)})`);
     return;
   }
   state.sessionIndex = index;
 
   const account = state.accounts.find((entry) => entry.index === index);
+  log(
+    `session index ${index} reported; acting as ${account?.handle ?? account?.name ?? "nobody yet"}`
+  );
+
   if (account && state.activeAccountId !== account.id) {
-    log(
-      `session is acting as ${account.handle ?? account.name} (authuser ${index})`
-    );
     await switchAccount(account.id);
     // A half-synced list belongs to the account it was synced for.
     state.store.clearCursor(account.id);
+    // Everything the page is showing was drawn against the other account's list, buttons
+    // included - and the two lists have nothing to do with each other.
+    broadcast();
   }
 
   flushStartupSync("session-index");
@@ -303,9 +308,9 @@ export const onMainLoad = async ({
       state.config!
     )
   );
-  ipc.on("watchdeck:watch-later-session-index", (index: number) => {
-    void adoptSessionIndex(index);
-  });
+  ipc.handle("watchdeck:watch-later-session-index", (index: number) =>
+    adoptSessionIndex(index)
+  );
 
   ipc.handle("watchdeck:watch-later-sync", async () => {
     await runSync({ reason: "manual" });

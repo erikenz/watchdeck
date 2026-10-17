@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import { Project, ts, VariableDeclarationKind } from "ts-morph";
 import type {
+  ImportDeclaration,
   ObjectLiteralExpression,
   Node,
   ObjectLiteralElementLike,
@@ -22,6 +23,25 @@ const globalProject = new Project({
   skipLoadingLibFiles: true,
   skipFileDependencyResolution: true,
 });
+
+// Helper to extract the local names an import declaration binds
+const importedNames = (declaration: ImportDeclaration): string[] => {
+  const names: string[] = [];
+  const defaultImport = declaration.getDefaultImport();
+  const namespaceImport = declaration.getNamespaceImport();
+
+  if (defaultImport) {
+    names.push(defaultImport.getText());
+  }
+  if (namespaceImport) {
+    names.push(namespaceImport.getText());
+  }
+  for (const named of declaration.getNamedImports()) {
+    names.push((named.getAliasNode() ?? named.getNameNode()).getText());
+  }
+
+  return names;
+};
 
 // Helper to extract a property’s name from its node
 const getPropertyName = (prop: Node): string | null => {
@@ -161,6 +181,39 @@ export default function (
         for (const ctx of stubContexts) {
           if (stubMap.has(ctx)) {
             stubMap.get(ctx)?.remove();
+          }
+        }
+
+        // The page bundle runs in a page, where a `node:*` or `electron` import cannot work: the
+        // contexts that use them are the ones just removed, so their imports go too. A built
+        // bundle drops the code by tree-shaking and never notices, but the dev server replaces
+        // `node:*` with a proxy that throws *on access*, so an import that merely sits in the
+        // module graph kills the whole injected script at evaluation - and nothing of ours has
+        // run yet, which makes it look like the plugin is simply absent.
+        for (const declaration of src.getImportDeclarations()) {
+          const names = importedNames(declaration);
+
+          if (names.length === 0) {
+            continue;
+          }
+
+          const used = names.some((name) =>
+            src
+              .getDescendantsOfKind(ts.SyntaxKind.Identifier)
+              .some(
+                (node) =>
+                  node.getText() === name &&
+                  !node
+                    .getAncestors()
+                    .some(
+                      (ancestor) =>
+                        ancestor.getKind() === ts.SyntaxKind.ImportDeclaration
+                    )
+              )
+          );
+
+          if (!used) {
+            declaration.remove();
           }
         }
 

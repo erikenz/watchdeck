@@ -1,5 +1,5 @@
 /**
- * `ensureExtension` has to work with and without a network, and the two have to end in the same
+ * The shared loader has to work with and without a network, and both have to end in the same
  * place: the installed copy loaded. Written against a temp directory, never the real userData.
  */
 import {
@@ -15,11 +15,17 @@ import { crc32 } from "node:zlib";
 
 import { expect, test } from "@playwright/test";
 
-import {
-  ensureExtension,
-  getExtensionDir,
-  isExtensionInstalled,
-} from "../extension";
+import { ensureInstalled, extensionDir, isInstalled } from "../web-extension";
+import type { WebExtensionSpec } from "../web-extension";
+
+const spec: WebExtensionSpec = {
+  assetName: "ChromeExtension.zip",
+  installName: "test-extension",
+  releaseUrl: "https://api.github.com/repos/owner/repo/releases/latest",
+  shim: "globalThis.__watchdeckTestShim = true;",
+  shimVersion: 2,
+  userAgent: "WatchdeckTest",
+};
 
 const RELEASE = {
   assets: [
@@ -38,14 +44,14 @@ const extensionFiles: Record<string, string> = {
     background: { service_worker: "./js/background.js" },
     content_scripts: [{ js: ["./js/content.js"] }],
     manifest_version: 3,
-    name: "SponsorBlock",
+    name: "Test extension",
     version: "1.0.0",
   }),
 };
 
 /** A userData directory holding the extension the way an installed one looks. */
 const installCopy = (userDataDir: string, version = "v1.0.0") => {
-  const dir = getExtensionDir(userDataDir);
+  const dir = extensionDir(userDataDir, spec);
 
   for (const [relative, contents] of Object.entries(extensionFiles)) {
     const file = path.join(dir, relative);
@@ -58,7 +64,7 @@ const installCopy = (userDataDir: string, version = "v1.0.0") => {
   return dir;
 };
 
-const userDataDir = () => mkdtempSync(path.join(tmpdir(), "watchdeck-sb-"));
+const userDataDir = () => mkdtempSync(path.join(tmpdir(), "watchdeck-ext-"));
 
 /** No network at all: what `fetch` does when the machine is offline. */
 const offline = () => {
@@ -78,17 +84,24 @@ const offline = () => {
   };
 };
 
+test("the install directory carries the shim version", () => {
+  expect(path.basename(extensionDir("/tmp", spec))).toBe("test-extension-wd2");
+  expect(
+    path.basename(extensionDir("/tmp", { ...spec, shimVersion: undefined }))
+  ).toBe("test-extension-wd1");
+});
+
 test("offline, an installed copy is used and left in place", async () => {
   const dir = userDataDir();
-  const extensionDir = installCopy(dir, "v1.0.0");
+  const installed = installCopy(dir, "v1.0.0");
   const network = offline();
 
   try {
-    await expect(ensureExtension(dir, { autoUpdate: true })).resolves.toBe(
-      true
-    );
+    await expect(
+      ensureInstalled(dir, spec, { autoUpdate: true })
+    ).resolves.toBe(true);
     expect(network.calls()).toBeGreaterThan(0);
-    expect(readFileSync(path.join(extensionDir, "version.txt"), "utf-8")).toBe(
+    expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
       "v1.0.0"
     );
   } finally {
@@ -101,10 +114,10 @@ test("offline with nothing installed installs nothing and says so", async () => 
   const network = offline();
 
   try {
-    await expect(ensureExtension(dir, { autoUpdate: true })).resolves.toBe(
-      false
-    );
-    expect(isExtensionInstalled(getExtensionDir(dir))).toBe(false);
+    await expect(
+      ensureInstalled(dir, spec, { autoUpdate: true })
+    ).resolves.toBe(false);
+    expect(isInstalled(extensionDir(dir, spec))).toBe(false);
   } finally {
     network.restore();
   }
@@ -112,29 +125,28 @@ test("offline with nothing installed installs nothing and says so", async () => 
 
 test("an installed copy is patched, once, without the network", async () => {
   const dir = userDataDir();
-  const extensionDir = installCopy(dir);
+  const installed = installCopy(dir);
   const network = offline();
 
   try {
-    await ensureExtension(dir, { autoUpdate: false });
+    await ensureInstalled(dir, spec, { autoUpdate: false });
     // autoUpdate off: the release check is not even attempted
     expect(network.calls()).toBe(0);
 
-    const patched = [
-      readFileSync(path.join(extensionDir, "js/background.js"), "utf-8"),
-      readFileSync(path.join(extensionDir, "js/content.js"), "utf-8"),
-    ];
-
-    for (const source of patched) {
-      expect(source.startsWith("/* WATCHDECK_SHIM_START")).toBe(true);
+    for (const source of [
+      readFileSync(path.join(installed, "js/background.js"), "utf-8"),
+      readFileSync(path.join(installed, "js/content.js"), "utf-8"),
+    ]) {
+      expect(source.startsWith("/* WATCHDECK_SHIM_START v2 */")).toBe(true);
+      expect(source).toContain(spec.shim);
       expect(source).toContain("WATCHDECK_SHIM_END */");
     }
 
-    await ensureExtension(dir, { autoUpdate: false });
+    await ensureInstalled(dir, spec, { autoUpdate: false });
 
-    // A second pass must not stack a second shim - the scripts would declare it twice
+    // A second pass must not stack a second shim - the script would declare it twice
     for (const file of ["js/background.js", "js/content.js"]) {
-      const source = readFileSync(path.join(extensionDir, file), "utf-8");
+      const source = readFileSync(path.join(installed, file), "utf-8");
       expect(source.split("WATCHDECK_SHIM_START")).toHaveLength(2);
     }
   } finally {
@@ -142,18 +154,26 @@ test("an installed copy is patched, once, without the network", async () => {
   }
 });
 
-test("a copy left by an older shim version is removed", async () => {
+test("an install left by an older shim version is removed", async () => {
   const dir = userDataDir();
-  const stale = path.join(dir, "sponsorblock-extension");
-  mkdirSync(stale, { recursive: true });
-  writeFileSync(path.join(stale, "manifest.json"), "{}");
+  const stale = path.join(dir, "test-extension-wd1");
+  const namedLegacy = path.join(dir, "old-extension-name");
+  for (const gone of [stale, namedLegacy]) {
+    mkdirSync(gone, { recursive: true });
+    writeFileSync(path.join(gone, "manifest.json"), "{}");
+  }
   installCopy(dir);
   const network = offline();
 
   try {
-    await ensureExtension(dir, { autoUpdate: false });
+    await ensureInstalled(
+      dir,
+      { ...spec, legacyNames: ["old-extension-name"] },
+      { autoUpdate: false }
+    );
     expect(existsSync(stale)).toBe(false);
-    expect(isExtensionInstalled(getExtensionDir(dir))).toBe(true);
+    expect(existsSync(namedLegacy)).toBe(false);
+    expect(isInstalled(extensionDir(dir, spec))).toBe(true);
   } finally {
     network.restore();
   }
@@ -163,7 +183,7 @@ test("a published release is downloaded when the versions differ", async () => {
   const dir = userDataDir();
   installCopy(dir, "v1.0.0");
   const original = globalThis.fetch;
-  const zip = zipStore({ "manifest.json": '{"name":"SponsorBlock"}' });
+  const zip = zipStore({ "manifest.json": '{"name":"Test extension"}' });
 
   globalThis.fetch = ((url: string) =>
     Promise.resolve(
@@ -173,15 +193,16 @@ test("a published release is downloaded when the versions differ", async () => {
     )) as typeof fetch;
 
   try {
-    await expect(ensureExtension(dir, { autoUpdate: true })).resolves.toBe(
-      true
+    await expect(
+      ensureInstalled(dir, spec, { autoUpdate: true })
+    ).resolves.toBe(true);
+    const installed = extensionDir(dir, spec);
+    expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
+      "v9.9.9"
     );
     expect(
-      readFileSync(path.join(getExtensionDir(dir), "version.txt"), "utf-8")
-    ).toBe("v9.9.9");
-    expect(
-      readFileSync(path.join(getExtensionDir(dir), "manifest.json"), "utf-8")
-    ).toContain("SponsorBlock");
+      readFileSync(path.join(installed, "manifest.json"), "utf-8")
+    ).toContain("Test extension");
   } finally {
     globalThis.fetch = original;
   }

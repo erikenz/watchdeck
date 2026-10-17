@@ -56,6 +56,7 @@ export const renderer = {
   lastPointer: { x: -1, y: -1 },
   lastProgressSentAt: 0,
   sessionIndexAttempts: 0,
+  reportedSessionIndex: null as number | null,
   toolbarHost: null as HTMLElement | null,
   filter: null as Set<string> | null,
   rowEntries: new Map<string, WatchLaterEntry>(),
@@ -212,6 +213,9 @@ export const renderer = {
   /** The site is a single-page app: the toolbar and the row state follow navigation. */
   onNavigate() {
     if (this.context) {
+      // The site's own account switcher is a navigation, and the Watch Later list is per
+      // account: whoever the page is acting as now is who the buttons must ask about.
+      this.reportSessionIndex(this.context);
       this.mountToolbar(this.context);
       this.applyRows();
     }
@@ -297,9 +301,13 @@ export const renderer = {
   },
 
   /**
-   * Tells the backend which account the page is acting as - with two identities under one
-   * login this is the only signal that says which Watch Later to sync. `ytcfg` is the
-   * page's own global and is not there yet when the renderer starts, so this waits for it.
+   * Tells the backend which account the page is acting as - with two identities under one login
+   * this is the only signal that says which Watch Later the buttons ask about. Two things are
+   * not there yet when the renderer starts: `ytcfg` is the page's own global, and the backend's
+   * handler belongs to a plugin that loads in parallel with the page (~1.7 s of account
+   * probing). A fire-and-forget send was therefore lost, and the app acted as the first account
+   * in the list while the page was signed in as the second - which is why videos that are in
+   * Watch Later showed up as unsaved. The call is acknowledged and retried instead.
    */
   reportSessionIndex(context: RendererContext<WatchLaterPluginConfig>) {
     const ytcfg = (
@@ -307,14 +315,34 @@ export const renderer = {
     ).ytcfg;
     const index = Number(ytcfg?.get("SESSION_INDEX") ?? Number.NaN);
 
-    if (Number.isFinite(index)) {
-      context.ipc.send("watchdeck:watch-later-session-index", index);
+    if (!Number.isFinite(index)) {
+      this.scheduleSessionIndexReport(context);
       return;
     }
-    if (this.sessionIndexAttempts < 40) {
-      this.sessionIndexAttempts += 1;
-      setTimeout(() => this.reportSessionIndex(context), 500);
+
+    // Once per value: the backend reconnects and repairs on every report, and every navigation
+    // reports again - mostly with the same number.
+    if (index === this.reportedSessionIndex) {
+      return;
     }
+
+    context.ipc
+      .invoke("watchdeck:watch-later-session-index", index)
+      .then(() => {
+        this.reportedSessionIndex = index;
+        this.sessionIndexAttempts = 0;
+      })
+      .catch(() => this.scheduleSessionIndexReport(context));
+  },
+
+  /** Waits for the page's config or the backend, then reports; gives up after ~20 s. */
+  scheduleSessionIndexReport(context: RendererContext<WatchLaterPluginConfig>) {
+    if (this.sessionIndexAttempts >= 40) {
+      return;
+    }
+
+    this.sessionIndexAttempts += 1;
+    setTimeout(() => this.reportSessionIndex(context), 500);
   },
 
   queueScan() {

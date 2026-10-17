@@ -203,7 +203,13 @@ const runSync = async (options: {
     log(`sync ${options.reason}: ${result.status}`, result.items, "items");
     if (result.status !== "error") {
       await state.sync.enrich(session, accountId);
-      await state.sync.replayOutbox(session, accountId);
+      const replayed = await state.sync.replayOutbox(session, accountId);
+
+      if (replayed.replayed > 0 || replayed.pending > 0) {
+        log(
+          `outbox: applied ${replayed.replayed} queued change(s), ${replayed.pending} still waiting`
+        );
+      }
     }
   } catch (error) {
     log("sync failed", error);

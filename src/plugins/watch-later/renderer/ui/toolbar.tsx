@@ -85,6 +85,16 @@ const Toolbar = (props: ToolbarProps) => {
     if (running) {
       return running;
     }
+    // A walk that failed leaves the mirror where it was, and the count on its own reads as if the
+    // list had really shrunk. "empty page" is the site answering with nothing - a rate limit, an
+    // expired read - and it is worth naming instead of showing a number nobody can trust.
+    const lastError = state()?.lastSync?.error;
+    if (lastError === "empty page") {
+      return t("plugins.watch-later.status.empty-page");
+    }
+    if (lastError) {
+      return t("plugins.watch-later.status.last-error", { error: lastError });
+    }
     const mirrored = state()?.totalEntries ?? 0;
     const total = state()?.expectedTotal;
     return total && total > mirrored

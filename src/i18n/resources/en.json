@@ -711,7 +711,9 @@
         "reconciling": "Reconciling…"
       },
       "status": {
+        "empty-page": "YouTube returned an empty list - sync again",
         "failed": "Could not read the local index",
+        "last-error": "Last sync failed: {{error}}",
         "mirrored": "{{count}} mirrored",
         "mirrored-of": "{{items}} of {{total}} mirrored"
       }

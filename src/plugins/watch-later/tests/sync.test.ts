@@ -544,3 +544,119 @@ test("a failed add is queued in the outbox for the next sync", async () => {
   expect(db.listOutbox("alpha")[0].kind).toBe("add");
   db.close();
 });
+
+/** A transfer that records what was asked of it, for the retry tests. */
+const recordingTransport = (
+  overrides: Partial<WatchLaterTransport> = {}
+): WatchLaterTransport & { removed: string[]; added: string[] } => {
+  const removed: string[] = [];
+  const added: string[] = [];
+
+  return {
+    added,
+    addVideo: (videoId) => {
+      added.push(videoId);
+      return Promise.resolve();
+    },
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+    removeVideo: (setVideoId) => {
+      removed.push(setVideoId);
+      return Promise.resolve();
+    },
+    videoDetails: () => Promise.resolve({}),
+    removed,
+    ...overrides,
+  };
+};
+
+/**
+ * The queued row exists because the `setVideoId` was unknown; the walk that reads it is what
+ * makes the change possible, and `replayOutbox` after that walk is where it is applied.
+ */
+test("a queued removal is applied once a walk has read its id", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+
+  // In the list as far as the app knows, but without the id a removal needs - and the list this
+  // session can read right now does not carry it yet either.
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
+  const blind = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+  });
+  await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
+    "set-video-id-unknown"
+  );
+  expect(db.listOutbox("alpha")).toHaveLength(1);
+
+  // The next walk reads the entry, `set-9` included, and the replay after it removes it.
+  const walk = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(10))),
+  });
+  expect((await sync.pull(walk, { accountId: "alpha" })).status).toBe("ok");
+  expect(await sync.replayOutbox(walk, "alpha")).toEqual({
+    pending: 0,
+    replayed: 1,
+  });
+  expect(walk.removed).toEqual(["set-9"]);
+  // The walk wrote the ten videos it read; the queued removal is the one that is gone.
+  expect(db.membershipIds("alpha")).not.toContain("vid00000009");
+  expect(db.membershipIds("alpha")).toContain("vid00000008");
+  expect(db.listOutbox("alpha")).toHaveLength(0);
+  db.close();
+});
+
+test("a queued removal of a video that is already gone is dropped", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
+  const blind = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+  });
+  await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
+    "set-video-id-unknown"
+  );
+
+  // The user removed it from the site's own menu in the meantime: the mirror says so, and there
+  // is nothing left to ask YouTube for.
+  db.removeEntry("alpha", "vid00000009");
+  const walk = recordingTransport();
+
+  expect(await sync.replayOutbox(walk, "alpha")).toEqual({
+    pending: 0,
+    replayed: 1,
+  });
+  expect(walk.removed).toEqual([]);
+  expect(db.listOutbox("alpha")).toHaveLength(0);
+  db.close();
+});
+
+test("a replay that fails keeps its one row, with an attempt counted", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
+  const blind = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+  });
+  await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
+    "set-video-id-unknown"
+  );
+
+  const walk = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(10))),
+    removeVideo: () => Promise.reject(new Error("offline")),
+  });
+  expect((await sync.pull(walk, { accountId: "alpha" })).status).toBe("ok");
+  expect(await sync.replayOutbox(walk, "alpha")).toEqual({
+    pending: 1,
+    replayed: 0,
+  });
+
+  // The replay must not queue the change it was replaying: one stuck removal used to leave one
+  // more row per walk, which is how six rows for one video turned up.
+  const queued = db.listOutbox("alpha");
+  expect(queued).toHaveLength(1);
+  expect(queued[0].attempts).toBe(1);
+  db.close();
+});

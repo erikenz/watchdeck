@@ -301,7 +301,8 @@ export class WatchLaterSync {
   async add(
     transport: WatchLaterTransport,
     accountId: string,
-    videoId: string
+    videoId: string,
+    options: { queue?: boolean } = {}
   ): Promise<void> {
     const existing = this.#sink.entryFor(accountId, videoId);
     if (existing && existing.removed_at === null) {
@@ -312,7 +313,10 @@ export class WatchLaterSync {
       await transport.addVideo(videoId);
       this.#sink.upsertEntry({ accountId, videoId });
     } catch (error) {
-      this.#sink.enqueueOutbox({ accountId, kind: "add", videoId });
+      // A retry of a queued change keeps its own row: enqueueing again would duplicate it
+      if (options.queue !== false) {
+        this.#sink.enqueueOutbox({ accountId, kind: "add", videoId });
+      }
       throw error;
     }
   }
@@ -320,17 +324,27 @@ export class WatchLaterSync {
   async remove(
     transport: WatchLaterTransport,
     accountId: string,
-    videoId: string
+    videoId: string,
+    options: { queue?: boolean } = {}
   ): Promise<void> {
+    // Already gone from the mirror: a removal that ran, or a walk that found it missing, got
+    // there first - and asking again could only fail. That is how a queued removal used to sit in
+    // the outbox for ever after the user removed the video from the site's own menu.
+    if (this.#sink.entryFor(accountId, videoId)?.removed_at) {
+      return;
+    }
+
     const setVideoId = await this.#resolveSetVideoId(
       transport,
       accountId,
       videoId
     );
     if (!setVideoId) {
-      // InnerTube removes by the per-entry id, so without it the removal has to wait
-      // for the next sync to learn it.
-      this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
+      // InnerTube removes by the per-entry id, so without it the removal has to wait for the
+      // walk that reads it - and `replayOutbox` after that walk is where it is applied.
+      if (options.queue !== false) {
+        this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
+      }
       throw new Error("set-video-id-unknown");
     }
     try {
@@ -338,7 +352,9 @@ export class WatchLaterSync {
       await transport.removeVideo(setVideoId);
       this.#sink.removeEntry(accountId, videoId);
     } catch (error) {
-      this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
+      if (options.queue !== false) {
+        this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
+      }
       throw error;
     }
   }
@@ -385,10 +401,17 @@ export class WatchLaterSync {
 
     for (const entry of entries) {
       try {
+        // `queue: false`: the change is already queued, and a replay that queued itself again
+        // would leave one more row per walk for a change that keeps failing - which is exactly
+        // how one stuck removal turned into six.
         if (entry.kind === "add") {
-          await this.add(transport, accountId, entry.video_id);
+          await this.add(transport, accountId, entry.video_id, {
+            queue: false,
+          });
         } else if (entry.kind === "remove") {
-          await this.remove(transport, accountId, entry.video_id);
+          await this.remove(transport, accountId, entry.video_id, {
+            queue: false,
+          });
         }
         this.#sink.dropOutbox(entry.id);
         replayed += 1;

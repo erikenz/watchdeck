@@ -264,29 +264,41 @@ test("the button sits on the video box, at one offset in both states", async ({
     );
 
     dom.alignButton(button, card);
+    const mediaRect = video.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
     const placed = { bottom: button.style.bottom, right: button.style.right };
     const realigns = await countMutations(() => {
       for (let index = 0; index < 5; index += 1) {
         dom.alignButton(button, card);
       }
     });
+    // What those two values mean on screen: the button's top-left corner.
+    const cornerWhileHovered = {
+      x: cardRect.right - Number.parseFloat(placed.right) - 36,
+      y: cardRect.bottom - Number.parseFloat(placed.bottom) - 36,
+    };
+
     card.classList.add(dom.MEDIA_HOVER_CLASS);
     dom.alignButton(button, card);
-    const whileCovered = {
-      bottom: button.style.bottom,
-      right: button.style.right,
-    };
+    const whileMarked = { left: button.style.left, top: button.style.top };
 
     const picked = dom.mediaBoxOf(card);
     return {
       changed,
+      cornerWhileHovered,
+      cornerWhileMarked: {
+        x: Number.parseFloat(whileMarked.left),
+        y: Number.parseFloat(whileMarked.top),
+      },
       first,
+      mediaEdge: { right: mediaRect.right, bottom: mediaRect.bottom },
       pickedBox: picked ? [picked.box.width, picked.box.height] : null,
       pickedIsVideo: picked?.element === video,
       placed,
       realigns,
       repaints,
-      whileCovered,
+      whileMarkedClearedAbsolute:
+        button.style.right === "" && button.style.bottom === "",
     };
   });
 
@@ -295,9 +307,27 @@ test("the button sits on the video box, at one offset in both states", async ({
   expect(measured.first).toBeGreaterThan(0);
   expect(measured.repaints).toBe(0);
   expect(measured.changed).toBeGreaterThan(0);
-  // 36 px above the video's bottom edge, and the same offset while the preview covers the card.
+  // 36 px above the video's bottom edge and 8 px inside its right edge, hovered...
   expect(measured.placed).toEqual({ bottom: "92px", right: "8px" });
-  expect(measured.whileCovered).toEqual(measured.placed);
+  // ...and the same corner while the card is marked, where the button is placed against the
+  // viewport instead so it can sit above the site's preview overlay without raising the card.
+  expect(measured.whileMarkedClearedAbsolute).toBe(true);
+  expect(measured.cornerWhileMarked.x).toBeCloseTo(
+    measured.cornerWhileHovered.x,
+    0
+  );
+  expect(measured.cornerWhileMarked.y).toBeCloseTo(
+    measured.cornerWhileHovered.y,
+    0
+  );
+  expect(measured.cornerWhileMarked.x).toBeCloseTo(
+    measured.mediaEdge.right - 8 - 36,
+    0
+  );
+  expect(measured.cornerWhileMarked.y).toBeCloseTo(
+    measured.mediaEdge.bottom - 36 - 36,
+    0
+  );
   expect(measured.realigns).toBe(0);
   // The avatar is skipped: aligning to it parks the button in the metadata row.
   expect(measured.pickedIsVideo).toBe(true);

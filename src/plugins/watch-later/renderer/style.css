@@ -34,10 +34,12 @@
   opacity: 1;
 }
 
-/* Raising the marked card is what keeps that button clickable: the inline preview is a fixed
-   overlay at `z-index: auto`, so a card at 1 paints above it - and the site's own layers start at
-   2020 (masthead), so nothing of theirs ends up underneath a card. */
-.wd-wl-anchor.wd-wl-media-hover {
+/* While the card is marked the button is placed against the viewport (`alignButton` writes
+   `left`/`top`), which puts it above the site's inline preview without raising the card: the
+   preview is a fixed overlay at `z-index: auto`, and one is enough to sit above it while the
+   site's own layers start at 2020. Raising the card instead hid the preview behind it. */
+.wd-wl-anchor.wd-wl-media-hover .wd-wl-save {
+  position: fixed;
   z-index: 1;
 }
 

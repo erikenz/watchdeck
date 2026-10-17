@@ -146,19 +146,41 @@ export const cardUnderPoint = (x: number, y: number): Element | null => {
 };
 
 /**
- * Puts the button in the bottom-right corner of the video itself, above what the site puts there
- * (the duration badge on a thumbnail, the timestamp on its inline preview). The offset does not
- * change with what is playing: a control that moves when the preview starts is worse than one
- * that sits a little closer to the site's own chrome.
+ * The button is 36 px square; it sits clear of the site's duration badge.
+ */
+export const BUTTON_SIZE = 36;
+
+/**
+ * Places the button at the bottom-right of the video box.
+ *
+ * While the card is marked - the pointer is on its video box - the button is placed `fixed` in the
+ * viewport instead. The site's inline preview is a fixed overlay that paints over the card, so a
+ * button inside the card ends up underneath it; making the *card* win instead would put the card
+ * over the preview and hide the very thing the user is looking at (which is what happened first
+ * time round). A fixed button lives in the page's top layer on its own: above that overlay, below
+ * the site's own layers (masthead 2020), and the card keeps painting exactly where it was.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
   const media = mediaBoxOf(host);
   if (!media) {
     return;
   }
+
+  const { box } = media;
+
+  if (host.classList.contains(MEDIA_HOVER_CLASS)) {
+    button.style.left = `${Math.round(box.right) - 8 - BUTTON_SIZE}px`;
+    button.style.top = `${Math.round(box.bottom) - BUTTON_LIFT - BUTTON_SIZE}px`;
+    button.style.right = "";
+    button.style.bottom = "";
+    return;
+  }
+
   const hostRect = host.getBoundingClientRect();
-  button.style.right = `${Math.max(4, Math.round(hostRect.right - media.box.right) + 8)}px`;
-  button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - media.box.bottom) + BUTTON_LIFT)}px`;
+  button.style.left = "";
+  button.style.top = "";
+  button.style.right = `${Math.max(4, Math.round(hostRect.right - box.right) + 8)}px`;
+  button.style.bottom = `${Math.max(4, Math.round(hostRect.bottom - box.bottom) + BUTTON_LIFT)}px`;
 };
 
 const ICONS: Record<string, string> = {

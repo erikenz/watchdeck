@@ -396,13 +396,27 @@ export const renderer = {
    * above that overlay, so the button stays visible *and* clickable.
    */
   markCard(card: Element | null) {
-    if (card === this.markedCard) {
+    if (card !== this.markedCard) {
+      const previous = this.markedCard;
+      this.markedCard?.classList.remove(MEDIA_HOVER_CLASS);
+      this.markedCard = card;
+      card?.classList.add(MEDIA_HOVER_CLASS);
+      this.alignCardButton(previous);
+    }
+
+    // While marked, the button is placed against the viewport, so its coordinates follow the page
+    this.alignCardButton(card);
+  },
+
+  alignCardButton(card: Element | null) {
+    if (!card) {
       return;
     }
 
-    this.markedCard?.classList.remove(MEDIA_HOVER_CLASS);
-    this.markedCard = card;
-    card?.classList.add(MEDIA_HOVER_CLASS);
+    const button = card.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`);
+    if (button) {
+      alignButton(button, card);
+    }
   },
 
   /** Geometry changes without a structure change (scrolling, the overlay moving): coalesce it. */

@@ -22,6 +22,7 @@ interface DomApi {
   ) => HTMLButtonElement;
   cardUnderPoint: (x: number, y: number) => Element | null;
   BUTTON_CLASS: string;
+  isToggleShortcut: (event: KeyboardEvent) => boolean;
   FLOATING_LAYER_CLASS: string;
   mediaBoxOf: (card: Element) => { box: DOMRect; element: Element } | undefined;
   MEDIA_HOVER_CLASS: string;
@@ -426,6 +427,47 @@ test("the button stays visible inside a transformed, clipping shelf", async ({
     measured.cornerWhileHovered.y,
     0
   );
+});
+
+test("the shortcut takes `w` on a card and leaves typing alone", async ({
+  page,
+}) => {
+  await openFixture(page);
+
+  const decided = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    document.body.innerHTML = `
+      <div id="card" class="wd-wl-anchor"><input id="search" type="search"><div id="edit" contenteditable="true"></div></div>`;
+    const input = document.querySelector("#search") as HTMLElement;
+    const edit = document.querySelector("#edit") as HTMLElement;
+    const card = document.querySelector("#card") as HTMLElement;
+    const press = (target: EventTarget, init: KeyboardEventInit) => {
+      const event = new KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "w",
+        ...init,
+      });
+      Object.defineProperty(event, "target", { value: target });
+      return dom.isToggleShortcut(event);
+    };
+
+    return {
+      onCard: press(card, {}),
+      capital: press(card, { shiftKey: true }),
+      inInput: press(input, {}),
+      inContentEditable: press(edit, {}),
+      otherKey: press(card, { key: "k" }),
+      withCtrl: press(card, { ctrlKey: true }),
+    };
+  });
+
+  expect(decided.onCard).toBe(true);
+  // Everything else is somebody else's keypress.
+  expect(decided.capital).toBe(true); // Shift is fine: `key` is "w" only when it is typed lower-case
+  expect(decided.inInput).toBe(false);
+  expect(decided.inContentEditable).toBe(false);
+  expect(decided.otherKey).toBe(false);
+  expect(decided.withCtrl).toBe(false);
 });
 
 test("the card under the pointer is the one whose video box holds it", async ({

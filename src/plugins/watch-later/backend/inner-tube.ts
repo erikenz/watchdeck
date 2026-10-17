@@ -56,6 +56,19 @@ export const removeVideoPayload = (setVideoId: string) => ({
   playlistId: WATCH_LATER_PLAYLIST_ID,
 });
 
+/**
+ * The removal that does not need the per-entry id. `ACTION_REMOVE_VIDEO` keys on the
+ * `setVideoId` the list carries, which an entry added from the app does not have until a walk
+ * reads it - and a walk of a long list may never reach it. YouTube's own menu removes a video
+ * from Watch Later without knowing that id either, and this is what it sends.
+ */
+export const removeVideoByIdPayload = (videoId: string) => ({
+  actions: [
+    { action: "ACTION_REMOVE_VIDEO_BY_VIDEO_ID", removedVideoId: videoId },
+  ],
+  playlistId: WATCH_LATER_PLAYLIST_ID,
+});
+
 export const playerPayload = (videoId: string) => ({ videoId });
 
 // --- generic walkers over raw JSON (no `any`, no deep child paths) ----------

@@ -13,6 +13,7 @@ import {
   parseWatchLaterPage,
   playerPayload,
   probeAccounts,
+  removeVideoByIdPayload,
   removeVideoPayload,
 } from "./inner-tube";
 import type {
@@ -157,6 +158,20 @@ export class WatchLaterSession {
     const response = await this.#yt.actions.execute(
       "/browse/edit_playlist",
       removeVideoPayload(setVideoId)
+    );
+    const result = parseMutationResponse(
+      Number(response.status_code ?? 200),
+      response.data
+    );
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+  }
+
+  async removeVideoById(videoId: string): Promise<void> {
+    const response = await this.#yt.actions.execute(
+      "/browse/edit_playlist",
+      removeVideoByIdPayload(videoId)
     );
     const result = parseMutationResponse(
       Number(response.status_code ?? 200),

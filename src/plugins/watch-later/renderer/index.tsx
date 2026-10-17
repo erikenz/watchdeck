@@ -21,6 +21,7 @@ import {
   HOST_CLASS,
   isThumbnailHost,
   MEDIA_HOVER_CLASS,
+  isToggleShortcut,
   paintButton,
   THUMBNAIL_HOST_SELECTOR,
   videoIdFromHost,
@@ -69,6 +70,7 @@ export const renderer = {
   pointerMoveListener: null as ((event: PointerEvent) => void) | null,
   pointerGoneListener: null as ((event: PointerEvent) => void) | null,
   scrollListener: null as (() => void) | null,
+  shortcutListener: null as ((event: KeyboardEvent) => void) | null,
   markedCard: null as Element | null,
 
   async start(context: RendererContext<WatchLaterPluginConfig>) {
@@ -107,6 +109,8 @@ export const renderer = {
       childList: true,
       subtree: true,
     });
+    this.shortcutListener = this.onShortcut.bind(this);
+    document.addEventListener("keydown", this.shortcutListener);
     this.queueScan();
 
     context.ipc.on(
@@ -249,6 +253,10 @@ export const renderer = {
     if (this.scrollListener) {
       document.removeEventListener("scroll", this.scrollListener, true);
       this.scrollListener = null;
+    }
+    if (this.shortcutListener) {
+      document.removeEventListener("keydown", this.shortcutListener);
+      this.shortcutListener = null;
     }
     this.markCard(null);
     this.toolbarHost?.remove();
@@ -479,6 +487,28 @@ export const renderer = {
   onPointerMove(event: PointerEvent) {
     this.lastPointer = { x: event.clientX, y: event.clientY };
     this.queuePointerMark();
+  },
+
+  /**
+   * `w` toggles the video the pointer is on - the same card the button floats over. It is the one
+   * keyboard path into Watch Later, and it exists because the pointer is already there: the button
+   * only appears on the hovered card, so a shortcut that acts on "the video you are looking at"
+   * needs no selection model of its own.
+   */
+  onShortcut(event: KeyboardEvent) {
+    if (!isToggleShortcut(event)) {
+      return;
+    }
+
+    const card = this.markedCard;
+    const button = card
+      ? (this.buttons.get(card) ??
+        card.querySelector<HTMLButtonElement>(`.${BUTTON_CLASS}`))
+      : null;
+
+    if (button) {
+      void this.toggle(button);
+    }
   },
 
   /** The pointer left the page: nothing is under it any more. */

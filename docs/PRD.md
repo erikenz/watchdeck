@@ -966,6 +966,14 @@ conversation. The research behind it happened in one Delta thread, which was clo
   watch progress = `max(local high-water mark, YouTube resume %)` (§4.3); autoplay by a one-shot capturing `play` listener
   (§5.2); SQLite through `node:sqlite` (§5.4); git reset done with no remote (§11); **Watch Later enhanced in the page, no
   Library window and no account picker** (§R1, Q3); **the hover button as shipped in §R4** (Q4).
+- **Dev server vs build, for the next session (rev 12).** They share one database: the app sets
+  `userData` to `$XDG_CONFIG_HOME/watchdeck` (`src/app-identity.ts`) however it is started, so
+  restarting the dev server does not reset state and a build needs no migration. What differs is
+  what happens *around* a run: `pnpm dev` restarts Electron whenever a main-process file changes
+  (which drops in-flight IPC, so a mutation can look half-applied) and can leave the page on a
+  half-built module graph. Use the dev server for UI/DOM work; use `pnpm build && node_modules/.bin/electron .`
+  for anything stateful. `pnpm test` runs the build configuration for that reason, and each launch
+  gets its own `XDG_CONFIG_HOME` so a test never touches the real database.
 - **Still open:** nothing. §13's Q6 was answered by the shipped gesture set (rev 11).
 - **Next step:** **P3 — SponsorBlock** (§8): the bounded spike from §5.1 — load the official release at runtime with the
   `chrome.storage.sync → storage.local` shim, and check the service worker, the in-player button and skipping, config

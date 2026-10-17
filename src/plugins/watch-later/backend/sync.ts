@@ -9,6 +9,8 @@ export interface WatchLaterTransport {
   fetchPage(continuation?: string): Promise<WatchLaterPage>;
   addVideo(videoId: string): Promise<void>;
   removeVideo(setVideoId: string): Promise<void>;
+  /** Removes by video id, for entries whose per-entry id is not known yet. */
+  removeVideoById(videoId: string): Promise<void>;
   videoDetails(videoId: string): Promise<VideoDetails>;
 }
 
@@ -330,23 +332,66 @@ export class WatchLaterSync {
     // Already gone from the mirror: a removal that ran, or a walk that found it missing, got
     // there first - and asking again could only fail. That is how a queued removal used to sit in
     // the outbox for ever after the user removed the video from the site's own menu.
-    if (this.#sink.entryFor(accountId, videoId)?.removed_at) {
+    const existing = this.#sink.entryFor(accountId, videoId);
+
+    if (existing?.removed_at) {
       return;
     }
 
-    const setVideoId = await this.#resolveSetVideoId(
-      transport,
-      accountId,
-      videoId
-    );
-    if (!setVideoId) {
-      // InnerTube removes by the per-entry id, so without it the removal has to wait for the
-      // walk that reads it - and `replayOutbox` after that walk is where it is applied.
-      if (options.queue !== false) {
-        this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
-      }
-      throw new Error("set-video-id-unknown");
+    // The per-entry id is the precise way, and the only one that works on an entry this app did
+    // not add.
+    if (existing?.set_video_id) {
+      await this.#removeBySetVideoId(
+        transport,
+        accountId,
+        videoId,
+        existing.set_video_id,
+        options
+      );
+      return;
     }
+
+    // An entry added from the app has no `setVideoId` until a walk reads the page carrying it,
+    // and that page may be far down a long list - which is the case this used to fail: the
+    // removal gave up and waited for a walk that might never reach it. The site's own menu sends
+    // a removal that needs no per-entry id; ask for that first, then fall back.
+    try {
+      await this.#limiter.wait();
+      await transport.removeVideoById(videoId);
+      this.#sink.removeEntry(accountId, videoId);
+      return;
+    } catch {
+      const setVideoId = await this.#resolveSetVideoId(
+        transport,
+        accountId,
+        videoId
+      );
+
+      if (setVideoId) {
+        await this.#removeBySetVideoId(
+          transport,
+          accountId,
+          videoId,
+          setVideoId,
+          options
+        );
+        return;
+      }
+    }
+
+    if (options.queue !== false) {
+      this.#sink.enqueueOutbox({ accountId, kind: "remove", videoId });
+    }
+    throw new Error("set-video-id-unknown");
+  }
+
+  async #removeBySetVideoId(
+    transport: WatchLaterTransport,
+    accountId: string,
+    videoId: string,
+    setVideoId: string,
+    options: { queue?: boolean }
+  ): Promise<void> {
     try {
       await this.#limiter.wait();
       await transport.removeVideo(setVideoId);

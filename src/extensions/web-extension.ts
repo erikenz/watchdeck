@@ -337,7 +337,10 @@ export const loadInto = async (
   try {
     const extension = await session.extensions.loadExtension(
       extensionDir(userDataDir, spec),
-      { allowFileAccess: true }
+      // No `allowFileAccess`: the extension is third-party code the app downloaded, and
+      // `file://` access would hand it the user's disk. Nothing it does needs that - its own
+      // resources are served from `chrome-extension://`.
+      { allowFileAccess: false }
     );
 
     return extension.id;

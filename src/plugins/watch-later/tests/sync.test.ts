@@ -267,6 +267,7 @@ test("paging walks to the end, captures progress and soft-deletes what is gone",
       return Promise.resolve(parseWatchLaterPage(pages[continuation ?? ""]));
     },
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: (): Promise<VideoDetails> => Promise.resolve({}),
   };
 
@@ -307,6 +308,7 @@ test("an interrupted walk resumes from the stored cursor", async () => {
         )
       ),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -357,6 +359,7 @@ test("a walk resumed from the middle does not declare the pages before it gone",
         parseWatchLaterPage(continuation ? secondPage : legacyPage(2, "page-2"))
       ),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -392,6 +395,7 @@ test("a one-page top-up leaves the interrupted walk's cursor alone", async () =>
     fetchPage: () =>
       Promise.resolve(parseWatchLaterPage(legacyPage(1, "page-2"))),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -439,6 +443,7 @@ test("an empty page while the site still counts items is a failed read, not an e
         })
       ),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -478,6 +483,7 @@ test("a list the site itself calls empty does clear the mirror", async () => {
         })
       ),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -503,6 +509,7 @@ test("remove resolves the entry id the list carries, and queues when it cannot",
       removed.push(setVideoId);
       return Promise.resolve();
     },
+    removeVideoById: () => Promise.reject(new Error("refused")),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -518,7 +525,8 @@ test("remove resolves the entry id the list carries, and queues when it cannot",
   expect(removed).toEqual(["set-0"]);
   expect(db.membershipIds("alpha")).toEqual([]);
 
-  // Without the setVideoId the removal waits for a sync instead of guessing.
+  // Without the setVideoId, and with the by-id removal refused, the removal waits for a sync
+  // instead of guessing.
   db.upsertEntry({ accountId: "alpha", videoId: "unknown0001" });
   await expect(sync.remove(transport, "alpha", "unknown0001")).rejects.toThrow(
     "set-video-id-unknown"
@@ -533,6 +541,7 @@ test("a failed add is queued in the outbox for the next sync", async () => {
     addVideo: () => Promise.reject(new Error("offline")),
     fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
     removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
     videoDetails: () => Promise.resolve({}),
   };
 
@@ -545,29 +554,89 @@ test("a failed add is queued in the outbox for the next sync", async () => {
   db.close();
 });
 
-/** A transfer that records what was asked of it, for the retry tests. */
+/** A transfer that records what was asked of it, for the mutation tests. */
 const recordingTransport = (
   overrides: Partial<WatchLaterTransport> = {}
-): WatchLaterTransport & { removed: string[]; added: string[] } => {
-  const removed: string[] = [];
+): WatchLaterTransport & {
+  added: string[];
+  removed: string[];
+  removedById: string[];
+  counters: { pagesRead: number };
+} => {
   const added: string[] = [];
+  const removed: string[] = [];
+  const removedById: string[] = [];
+  const counters = { pagesRead: 0 };
 
-  return {
-    added,
+  const base: WatchLaterTransport = {
     addVideo: (videoId) => {
       added.push(videoId);
       return Promise.resolve();
     },
-    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+    fetchPage: () => {
+      counters.pagesRead += 1;
+      return Promise.resolve(parseWatchLaterPage(legacyPage(0)));
+    },
     removeVideo: (setVideoId) => {
       removed.push(setVideoId);
       return Promise.resolve();
     },
+    removeVideoById: (videoId) => {
+      removedById.push(videoId);
+      return Promise.resolve();
+    },
     videoDetails: () => Promise.resolve({}),
-    removed,
-    ...overrides,
   };
+
+  return { ...base, ...overrides, added, counters, removed, removedById };
 };
+
+/** A transport that refuses the by-id removal, so a test can reach the walk-and-queue path. */
+const withoutByVideoIdRemoval = () =>
+  recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+    removeVideoById: () => Promise.reject(new Error("refused")),
+  });
+
+/**
+ * The case that used to fail: an entry this app added has no per-entry id until a walk reads the
+ * page carrying it, and that page may be far down a long list. One request, and no walk at all.
+ */
+test("a removal of an entry with no setVideoId asks by video id, without walking", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const transport = recordingTransport();
+  const sync = new WatchLaterSync(db, config);
+
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
+  await sync.remove(transport, "alpha", "vid00000009");
+
+  expect(transport.removedById).toEqual(["vid00000009"]);
+  expect(transport.removed).toEqual([]);
+  expect(transport.counters.pagesRead).toBe(0);
+  expect(db.membershipIds("alpha")).toEqual([]);
+  expect(db.listOutbox("alpha")).toHaveLength(0);
+  db.close();
+});
+
+test("a removal falls back to the walk when the by-id action is refused", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+
+  db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
+  const transport = recordingTransport({
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(10))),
+    removeVideoById: () => Promise.reject(new Error("refused")),
+  });
+
+  // The by-id action is refused, so the walk has to find `set-9` - and it does: the entry is
+  // removed through the precise call, with nothing queued.
+  await sync.remove(transport, "alpha", "vid00000009");
+
+  expect(transport.removed).toEqual(["set-9"]);
+  expect(db.membershipIds("alpha")).toEqual([]);
+  expect(db.listOutbox("alpha")).toHaveLength(0);
+  db.close();
+});
 
 /**
  * The queued row exists because the `setVideoId` was unknown; the walk that reads it is what
@@ -580,9 +649,7 @@ test("a queued removal is applied once a walk has read its id", async () => {
   // In the list as far as the app knows, but without the id a removal needs - and the list this
   // session can read right now does not carry it yet either.
   db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
-  const blind = recordingTransport({
-    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
-  });
+  const blind = withoutByVideoIdRemoval();
   await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
     "set-video-id-unknown"
   );
@@ -610,9 +677,7 @@ test("a queued removal of a video that is already gone is dropped", async () => 
   const sync = new WatchLaterSync(db, config);
 
   db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
-  const blind = recordingTransport({
-    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
-  });
+  const blind = withoutByVideoIdRemoval();
   await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
     "set-video-id-unknown"
   );
@@ -636,9 +701,7 @@ test("a replay that fails keeps its one row, with an attempt counted", async () 
   const sync = new WatchLaterSync(db, config);
 
   db.upsertEntry({ accountId: "alpha", videoId: "vid00000009" });
-  const blind = recordingTransport({
-    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
-  });
+  const blind = withoutByVideoIdRemoval();
   await expect(sync.remove(blind, "alpha", "vid00000009")).rejects.toThrow(
     "set-video-id-unknown"
   );

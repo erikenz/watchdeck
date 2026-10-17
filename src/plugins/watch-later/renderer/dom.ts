@@ -332,5 +332,38 @@ export const createSaveButton = (
   return button;
 };
 
+/**
+ * The key that toggles the video under the pointer, and the cases where it must be left alone.
+ *
+ * "The hovered video" is the marked card - the same thing the floating button belongs to - so the
+ * shortcut and the button can never disagree about which video they mean. Ctrl, Cmd and Alt are
+ * refused (Ctrl+W closes a window, and the site's own shortcuts live in that space); a keypress
+ * that belongs to a text field, a contenteditable or the site's search box is the user typing.
+ */
+export const TOGGLE_SHORTCUT_KEY = "w";
+
+export const isToggleShortcut = (event: KeyboardEvent): boolean => {
+  if (event.key.toLowerCase() !== TOGGLE_SHORTCUT_KEY) {
+    return false;
+  }
+  if (event.altKey || event.ctrlKey || event.metaKey) {
+    return false;
+  }
+
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return !(
+    target.isContentEditable ||
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
+    target.closest("[contenteditable=''], [contenteditable='true']") !== null
+  );
+};
+
 export const isThumbnailHost = (element: Element): boolean =>
   element.matches(THUMBNAIL_HOST_SELECTOR);

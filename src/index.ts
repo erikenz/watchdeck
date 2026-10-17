@@ -609,6 +609,30 @@ app.once("browser-window-created", (_event, win) => {
     event.preventDefault();
   });
 
+  /**
+   * A popup would be a second window carrying this app's preload - and so its IPC bridge - into a
+   * page the app does not control. Links that want a window go to the browser instead, and only
+   * `http(s)` is handed over: a page can name any scheme it likes.
+   */
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:/u.test(url)) {
+      void shell.openExternal(url);
+    }
+
+    return { action: "deny" };
+  });
+
+  /**
+   * The window shows the site, the app's own error page, and nothing else. A page-initiated
+   * navigation to `file://` (or any other scheme) would put a document of the page's choosing in
+   * front of the preload's bridge.
+   */
+  win.webContents.on("will-navigate", (event, url) => {
+    if (!/^https?:/u.test(url)) {
+      event.preventDefault();
+    }
+  });
+
   // Every page sets its own title, and the site's is "YouTube" - not this app's name.
   // Keep the window titled after the app, unless a custom title is configured; the
   // config is re-read here so a change from the menu takes effect on the next

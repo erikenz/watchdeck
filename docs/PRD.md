@@ -1,6 +1,6 @@
 # PRD — YouTube desktop wrapper (working title: **Watchdeck**)
 
-**Status:** approved in outline — **P0 (repo reset) in progress**; P1–P4 not started.
+**Status:** approved in outline — **P1 done**; P2–P4 in progress; P3's SponsorBlock path decided by the spike (§5.1).
 **Revision 4** — P0 work has begun: the project folder is renamed and the repository is published, the music-only plugin
 inventory is deleted, and the §R8 debrand gate passes. Decisions and open questions are unchanged; §8 and §15 list what
 is left in P0.
@@ -21,6 +21,13 @@ instead of skipping it. R4's placement is now pointer-driven and the button, not
 inline preview — rev 10 raised the card and hid the preview behind it, which is recorded in R4 because it is the kind of
 mistake that gets made twice. **Q6 is answered** (§13), so no question in this document is open any more. What P1 knowingly
 left behind lives in `TODO.md`, not here.
+**Revision 12** — **the SponsorBlock spike passed**, so §5.1's Option A (the official extension release, downloaded at
+runtime and patched with a shim) is the shipping path: service worker, in-player skipping, config across restarts,
+enable/disable without a restart, and a cold start with no network were each verified live, and the numbers are in §5.1.
+Two things the spike measured are worth more than the verdict: SponsorBlock's own settings page and popup are
+unreachable in Electron (so the user gets its defaults), and a plugin's `index.ts` is shared by every bundle, where a
+module-scope call that only belongs to the main process can kill the injected page half — the smoke test is what
+caught it, and §5.1 records how.
 **Previously** (rev 3) — the name is decided (**Watchdeck**), the git reset is done, and §15 was added as the handoff note for the next thread.
 **Previously** (rev 2) — incorporates erikenz's review comments (progress from YouTube's own resume indicator, Ultracite via `ultracite init`, debrand directive, naming criteria) and a read-only review of the `~/Projects/watchdeck` prototype.
 **Origin thread:** [Research YouTube wrapper requirements](delta://thread/ksQQtJ1g3qomQKOnuQmLwMFfRJLOAATRZpIBxBC_dFj9xJZPkJI4nq3kXvYt) — see §15.
@@ -62,7 +69,7 @@ plugins for YouTube.
 | D5 | Watch Later sync | Main process, `youtubei.js` + session cookies (same pattern as the inherited downloader); mutations may go page-side via `window.ytcfg` if account handling requires it | no (impl detail, §4.2) |
 | D6 | Watch Later UI | **In-page, in v1** (rev 9): a toolbar above the page's own sort control, filters that hide the page's own rows, per-row context lines. No separate Library window. | no (Q3 answered) |
 | D7 | Hover "add to Watch Later" button | Hosted on the **card** (the inline preview lives outside the thumbnail link), bottom-right **above** the duration badge, one offset in every state, always visible once saved, clock glyph filled/outline for state, skipped on the Watch Later page itself | no (Q4 answered) |
-| D8 | SponsorBlock | Load the **official extension release at runtime** with a small compat shim (**revised** — see §5.1); native client only as fallback | **yes — Q7** |
+| D8 | SponsorBlock | Load the **official extension release at runtime** with a small compat shim (**revised** — see §5.1); native client only as fallback. The spike passed on all five criteria, so this is the shipping path | no (spike passed — §5.1) |
 | D9 | Disable autoplay | One-shot capturing `play` listener → `video.pause()`, armed on `yt-navigate-finish`/`popstate`; plus click YouTube's toggle to enforce off (`aria-checked` flip verified — `setAutonavState()` is a **no-op**). Since rev 11: a navigation the user asked for (a click on a link or thumbnail, or one of the app's own playback commands) is not blocked | no (shipped) |
 | D10b | Watch progress source | `max(local high-water mark, YouTube's own resume %)` — the resume % is available per item as `thumbnailOverlays[].thumbnailOverlayResumePlaybackRenderer.percentDurationWatched` (**revised** — see §4.3) | no (evidence-backed) |
 | D10 | Gestures | Own pointer-state tracking + wheel/pointer movement; right-drag = volume, right-drag horizontal = seek, shift+right-drag = speed, right+wheel = volume (shipped in P1 with a readout) | no (Q6 answered) |
@@ -296,6 +303,38 @@ If (a)–(e) pass → Option A ships as the default with an explicit "download S
 consent step, and Option B stays untouched. If they fail → Option B, implemented as specified in revision 1
 (`{api}/api/skipSegments/{sha256HashPrefix[4]}`, `actionType` handling, per-category toggles incl. `music_offtopic`,
 segment cache in SQLite, optional `userID` for later voting).
+
+**Spike result (rev 12): all five pass, Option A is the default.** SponsorBlock 6.1.7, downloaded from its GitHub
+release into `userData/sponsorblock-extension-wd1/`, patched with the shim, loaded with
+`session.extensions.loadExtension`:
+
+| | Evidence |
+|---|---|
+| (a) background runs | `session.serviceWorkers.getAllRunning()` lists `chrome-extension://…/js/background.js` |
+| (b) skipping works | on a video with a sponsor segment `[83.449, 106.491]`: playback at 80.0 s was at **108.9 s** six seconds later; a video with an intro segment `[0, 2.769]` starts playback at 3.7 s. SB's own notice and icons render (the icons come from a per-session dynamic extension id and load fine) |
+| (c) config survives a restart | `categorySelections: [{name: intro, option: 2}]` written through the extension's own `chrome.storage.sync` (aliased to `local` by the shim) was still there after a full restart, and the intro was skipped on the cold run |
+| (d) enable/disable without a restart | toggling the plugin removes/loads the extension on the live session (`extension unloaded` → SW target gone → no skipping, no leftover DOM; enable → loaded to the SW target → skipping resumes). Both directions reload the page, which is what makes the change reach the page |
+| (e) cold start offline | with the release check failing (`ECONNREFUSED`), the installed copy still loads and the plugin starts in 25 ms; with nothing installed, it logs `no extension on disk and none could be downloaded` and the app is unaffected |
+
+**What the spike settled, besides the verdict:**
+
+- **SponsorBlock's own settings UI cannot be reached from Electron**, and this is now measured, not assumed:
+  `chrome-extension://<id>/options/options.html` fails with `ERR_FILE_NOT_FOUND`, and registering the
+  `chrome-extension` scheme ourselves to work around it aborts the app (SIGTRAP). So the extension's options page and
+  toolbar popup are both unavailable, and the in-player notice has no settings entry — with Option A the user gets
+  SponsorBlock's defaults. Everything the app itself configures is ours (`mode`, `autoUpdate`, plugin on/off); the
+  extension's own storage does respond to writes (proved in (c)), so a small settings surface of our own is possible
+  later, at the cost of tracking its config schema. Recorded as a known limitation, not a bug to fix.
+- **A plugin's `index.ts` is shared by every bundle, so nothing main-process-only may run at its module scope.**
+  `import is from "electron-is"` reached from page-reachable code, and a `z.object(...)` call at the top of a module
+  only the main process uses, both pulled CommonJS wrappers into the injected page bundle, where `require` does not
+  exist — the whole page half died silently. Static imports that are only *referenced* from a stripped context are
+  fine (they are tree-shaken); calls at module scope are not. The smoke test caught it, which is why that test asks
+  the page whether `wd-trans` came up.
+
+**Shipping Option A still needs** (not part of the spike): the first-use "download SponsorBlock from its official
+release" consent step; falling back to the native client automatically when no extension can be loaded; and a note in
+the about dialog (GPL-3.0, separate program, settings reachable only through SponsorBlock's in-player UI).
 
 ### 5.2 Disable autoplay
 
@@ -578,12 +617,13 @@ can prefer one. Values are computed at query time, so changing a threshold re-fi
 - A list whose videos were watched on another device (YouTube resume % present, no local history) is classified as
   continue-watching/watched accordingly, and the row shows which source the number came from.
 
-### R2 — SponsorBlock. See §5.1 for the revised approach: P3 opens with a bounded spike that tries to load the official
-extension release with a `chrome.storage.sync → storage.local` shim; on success that is the shipping path (full feature
-coverage, upstream-maintained), otherwise the native client is implemented. Acceptance for either path: skipping works and
-respects `actionType` (`skip` vs `mute` vs `full` vs `poi`), per-category settings are controllable from our menu, segment
-data is not re-fetched on every view (extension cache, or our SQLite cache in the native path), and enabling/disabling
-the plugin cleanly loads/unloads the extension (or unregisters our listeners) without a restart.
+### R2 — SponsorBlock. See §5.1 for the revised approach and the spike result (rev 12): the official extension release is
+loaded at runtime with a `chrome.storage.sync → storage.local` shim, and that is the shipping path (full feature
+coverage, upstream-maintained). The native client stays as the fallback. Acceptance: skipping works and respects
+`actionType` (`skip` vs `mute` vs `full` vs `poi`), segment data is not re-fetched on every view (the extension's own
+cache), and enabling/disabling takes effect without a restart — all verified in the spike. **Per-category settings are
+not controllable from our menu on this path**: SponsorBlock's options page and popup cannot be opened in Electron
+(measured — §5.1), so its categories are its defaults; that criterion now applies to the native path only.
 
 ### R3 — Disable autoplay: see §5.2. Acceptance: (a) opening any watch URL leaves autoplay off, and it stays off after a
   restart; (b) with "stop auto-advance" on, an auto-loaded video is paused within ~1 s; (c) manually choosing a video (click
@@ -714,7 +754,7 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 | **P0 — Reset** (small) | git re-init (in your checkout, §11), debrand (R8) **including the update feed**, delete plugin inventory (R5), Ultracite via `ultracite init` + rewired scripts (§5.3), `.npmrc`, version sweep to stable, README + plugin authoring guide, CI that runs `ultracite check` + `typecheck` + build | app boots to `www.youtube.com`, `pnpm dev` works, `ultracite check` passes, and the R8 grep gate finds upstream names only in the attribution section |
 | **P1 — YouTube base** | **Done (rev 11).** The player bridge (`video-info` / `video-controls` in main and in the page, replacing `song-info`/`song-controls`), a Playback menu as the app's own UI, the autoplay plugin reworked around the site's own toggle plus a user-intent rule, a gestures plugin (right-drag volume/seek, shift+right-drag speed, right+wheel volume, with a readout), and a smoke test that asserts the site and the app's page half | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green — all four verified live (MPRIS-driven controls, a cold load paused at 0.4 s, gesture values measured, and the launch test's page assertion green in CI) |
 | **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), OS-level entry points | R1/R4 acceptance criteria; all delivered except the OS-level entry points |
-| **P3 — SponsorBlock** | spike: load the official release with the storage.sync shim (verify SW, player UI, config persistence, offline behaviour); ship that if it passes, else the native client (skip/mute/full/poi, categories, cache, menu) | R2 acceptance criteria |
+| **P3 — SponsorBlock** | **spike done (rev 12): it passed.** Ship the official release (runtime download + shim) with a first-use consent step and the native client as fallback; the remaining work is that consent dialog, the automatic fallback, and the about-dialog note | R2 acceptance criteria (§5.1 for the one that had to be revised) |
 | **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
 
 Order rationale: P0 shrinks the codebase before Ultracite runs over it and before any release identity exists; P1 gives a
@@ -821,7 +861,8 @@ review already settled it; "open" means I need an answer — a single "yes to th
   `watchdeck` is unpublished, and the name describes the domain rather than a feature. The prototype folder was renamed to
   `watchdeck-old`; the GitHub repo name still has to be freed (§11).
 - **Q7 SponsorBlock** → §5.1 revised: load the official release at runtime with a compat shim as the primary path, spike
-  first; native client as the fallback.
+  first; native client as the fallback. **Answered by the spike (rev 12): all five criteria pass, Option A is the default;
+  SponsorBlock's own settings UI is unreachable in Electron, which is the price of the path.**
 - **Q8 Ultracite** → setup via `ultracite init` exactly as you instructed (§5.3).
 - **Q8b** → drop the inherited custom lint config in favour of Ultracite's presets + oxfmt formatting (implied by the above).
 - **Q8c** → pre-release toolchain pins go; stable equivalents exist (§5.5).

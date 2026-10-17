@@ -41,24 +41,33 @@ const SHIM = `(() => {
   }
 })();`;
 
-/** `wd1` is the shim version, and part of the installed directory's name on purpose. */
+/**
+ * `wd1` is the shim version, and part of the installed directory's name on purpose.
+ *
+ * **The release is pinned on purpose too.** Third-party code runs inside this app's page, and
+ * `latest` would hand it whatever upstream published that morning - including a release from a
+ * compromised maintainer account, or one that broke the shim. Bumping `pinnedTag` and `sha256` is
+ * a code change, reviewed like any other: download the asset from the release page, run
+ * `sha256sum` on it, and compare it with the `digest` the GitHub API reports for that asset.
+ */
 export const sponsorBlockExtension: WebExtensionSpec = {
   assetName: "ChromeExtension.zip",
   installName: "sponsorblock-extension",
+  pinnedTag: "6.1.7",
   releaseUrl:
     "https://api.github.com/repos/ajayyy/SponsorBlock/releases/latest",
+  sha256: "7c8e3dc8b5e560b480ae8efdf28f4f1101fce0cc32434562a336a89e4962eda3",
   shim: SHIM,
   shimVersion: 1,
   userAgent: "Watchdeck",
 };
 
-/** Puts the official release into a session; answers the extension's id, or null. */
+/** Puts the pinned official release into a session; answers the extension's id, or null. */
 export const mountSponsorBlockExtension = async (
   session: Electron.Session,
-  userDataDir: string,
-  options: { autoUpdate: boolean }
+  userDataDir: string
 ): Promise<string | null> =>
-  await loadInto(session, userDataDir, sponsorBlockExtension, options);
+  await loadInto(session, userDataDir, sponsorBlockExtension);
 
 /** Answers whether it was actually removed, so the caller knows a page reload is due. */
 export const unmountSponsorBlockExtension = (

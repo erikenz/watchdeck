@@ -4,6 +4,7 @@ import { createPlugin, LoggerPrefix } from "@/utils";
 
 import {
   mountSponsorBlockExtension,
+  sponsorBlockExtension,
   unmountSponsorBlockExtension,
 } from "./extension";
 import { sortSegments } from "./segments";
@@ -26,8 +27,6 @@ export interface SponsorBlockPluginConfig {
   enabled: boolean;
   /** `extension` loads the official release; `native` is our own client. */
   mode: "extension" | "native";
-  /** Fetch a newer extension release when one is published. */
-  autoUpdate: boolean;
   apiURL: string;
   categories: (
     | "sponsor"
@@ -197,14 +196,15 @@ export default createPlugin<
         const id = userDataDir
           ? await mountSponsorBlockExtension(
               window.webContents.session,
-              userDataDir,
-              { autoUpdate: pluginConfig.autoUpdate }
+              userDataDir
             )
           : null;
 
         if (id) {
           loadedExtensionId = id;
-          log(`SponsorBlock: extension loaded (${id})`);
+          log(
+            `SponsorBlock: extension loaded (${id}, ${sponsorBlockExtension.pinnedTag})`
+          );
           reloadIfOnYoutube(window);
         } else {
           logError(
@@ -228,12 +228,13 @@ export default createPlugin<
 
         void mountSponsorBlockExtension(
           win.webContents.session,
-          userDataDir ?? "",
-          { autoUpdate: newConfig.autoUpdate }
+          userDataDir ?? ""
         ).then((id) => {
           if (id) {
             loadedExtensionId = id;
-            log(`SponsorBlock: extension loaded (${id})`);
+            log(
+              `SponsorBlock: extension loaded (${id}, ${sponsorBlockExtension.pinnedTag})`
+            );
             reloadIfOnYoutube(win);
           } else {
             logError(
@@ -270,7 +271,6 @@ export default createPlugin<
   },
   config: {
     apiURL: "https://sponsor.ajay.app",
-    autoUpdate: true,
     categories: [
       "sponsor",
       "intro",
@@ -302,15 +302,6 @@ export default createPlugin<
         },
         label: t("plugins.sponsorblock.menu.mode-native"),
         type: "radio" as const,
-      },
-      { type: "separator" as const },
-      {
-        checked: config.autoUpdate,
-        click(item: Electron.MenuItem) {
-          void setConfig({ autoUpdate: item.checked });
-        },
-        label: t("plugins.sponsorblock.menu.auto-update"),
-        type: "checkbox" as const,
       },
     ];
   },

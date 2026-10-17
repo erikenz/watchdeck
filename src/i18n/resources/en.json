@@ -644,7 +644,6 @@
       "description": "Automatically Skips non-music parts like intro/outro or parts of music videos where the song isn't playing",
       "name": "SponsorBlock",
       "menu": {
-        "auto-update": "Download a newer extension release when one is published",
         "mode-extension": "Use the official SponsorBlock extension (downloaded at runtime)",
         "mode-native": "Use the built-in client (fallback)"
       }

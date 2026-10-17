@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 /**
  * The shared loader has to work with and without a network, and both have to end in the same
  * place: the installed copy loaded. Written against a temp directory, never the real userData.
@@ -97,9 +98,7 @@ test("offline, an installed copy is used and left in place", async () => {
   const network = offline();
 
   try {
-    await expect(
-      ensureInstalled(dir, spec, { autoUpdate: true })
-    ).resolves.toBe(true);
+    await expect(ensureInstalled(dir, spec)).resolves.toBe(true);
     expect(network.calls()).toBeGreaterThan(0);
     expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
       "v1.0.0"
@@ -114,23 +113,23 @@ test("offline with nothing installed installs nothing and says so", async () => 
   const network = offline();
 
   try {
-    await expect(
-      ensureInstalled(dir, spec, { autoUpdate: true })
-    ).resolves.toBe(false);
+    await expect(ensureInstalled(dir, spec)).resolves.toBe(false);
     expect(isInstalled(extensionDir(dir, spec))).toBe(false);
   } finally {
     network.restore();
   }
 });
 
-test("an installed copy is patched, once, without the network", async () => {
+test("an installed copy of the pinned version is patched, once, without the network", async () => {
   const dir = userDataDir();
-  const installed = installCopy(dir);
+  // The copy on disk *is* the pinned release, so there is nothing to check up on.
+  const installed = installCopy(dir, "v2.0.0");
+  const pinned = { ...spec, pinnedTag: "v2.0.0" };
   const network = offline();
 
   try {
-    await ensureInstalled(dir, spec, { autoUpdate: false });
-    // autoUpdate off: the release check is not even attempted
+    await ensureInstalled(dir, pinned);
+    // The pinned version is already installed: the network is not even asked
     expect(network.calls()).toBe(0);
 
     for (const source of [
@@ -142,7 +141,7 @@ test("an installed copy is patched, once, without the network", async () => {
       expect(source).toContain("WATCHDECK_SHIM_END */");
     }
 
-    await ensureInstalled(dir, spec, { autoUpdate: false });
+    await ensureInstalled(dir, pinned);
 
     // A second pass must not stack a second shim - the script would declare it twice
     for (const file of ["js/background.js", "js/content.js"]) {
@@ -166,11 +165,10 @@ test("an install left by an older shim version is removed", async () => {
   const network = offline();
 
   try {
-    await ensureInstalled(
-      dir,
-      { ...spec, legacyNames: ["old-extension-name"] },
-      { autoUpdate: false }
-    );
+    await ensureInstalled(dir, {
+      ...spec,
+      legacyNames: ["old-extension-name"],
+    });
     expect(existsSync(stale)).toBe(false);
     expect(existsSync(namedLegacy)).toBe(false);
     expect(isInstalled(extensionDir(dir, spec))).toBe(true);
@@ -193,9 +191,7 @@ test("a published release is downloaded when the versions differ", async () => {
     )) as typeof fetch;
 
   try {
-    await expect(
-      ensureInstalled(dir, spec, { autoUpdate: true })
-    ).resolves.toBe(true);
+    await expect(ensureInstalled(dir, spec)).resolves.toBe(true);
     const installed = extensionDir(dir, spec);
     expect(readFileSync(path.join(installed, "version.txt"), "utf-8")).toBe(
       "v9.9.9"
@@ -203,6 +199,36 @@ test("a published release is downloaded when the versions differ", async () => {
     expect(
       readFileSync(path.join(installed, "manifest.json"), "utf-8")
     ).toContain("Test extension");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("a release that does not match the pinned hash is refused", async () => {
+  const dir = userDataDir();
+  const original = globalThis.fetch;
+  const zip = zipStore({ "manifest.json": '{"name":"Test extension"}' });
+
+  globalThis.fetch = ((url: string) =>
+    Promise.resolve(
+      String(url).includes("api.github.com")
+        ? Response.json(RELEASE)
+        : new Response(new Uint8Array(zip), { status: 200 })
+    )) as typeof fetch;
+
+  try {
+    // Nothing is written on a mismatch: not the extension, not the version file.
+    const wrongHash = { ...spec, sha256: "0".repeat(64) };
+    await expect(ensureInstalled(dir, wrongHash)).resolves.toBe(false);
+    expect(isInstalled(extensionDir(dir, spec))).toBe(false);
+
+    // And the same bytes install once the hash is the one the app trusts.
+    const rightHash = {
+      ...spec,
+      sha256: createHash("sha256").update(zip).digest("hex"),
+    };
+    await expect(ensureInstalled(dir, rightHash)).resolves.toBe(true);
+    expect(isInstalled(extensionDir(dir, spec))).toBe(true);
   } finally {
     globalThis.fetch = original;
   }

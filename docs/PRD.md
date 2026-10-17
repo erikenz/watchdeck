@@ -619,7 +619,11 @@ can prefer one. Values are computed at query time, so changing a threshold re-fi
 
 ### R2 — SponsorBlock. See §5.1 for the revised approach and the spike result (rev 12): the official extension release is
 loaded at runtime with a `chrome.storage.sync → storage.local` shim, and that is the shipping path (full feature
-coverage, upstream-maintained). The native client stays as the fallback. Acceptance: skipping works and respects
+coverage, upstream-maintained). The native client stays as the fallback. **The release is pinned by tag and SHA-256**
+(rev 12): third-party code runs in the app's page, so `latest` - whatever upstream published that morning, including a
+release from a compromised maintainer account - is not what this app installs; a download whose hash is not the one in the
+source is refused before a file is written, and bumping the pin is a reviewed code change. Acceptance: skipping works and
+respects
 `actionType` (`skip` vs `mute` vs `full` vs `poi`), segment data is not re-fetched on every view (the extension's own
 cache), and enabling/disabling takes effect without a restart — all verified in the spike. **Per-category settings are
 not controllable from our menu on this path**: SponsorBlock's options page and popup cannot be opened in Electron
@@ -686,6 +690,12 @@ background.
 (spinner) / error (red circle). Tooltip and `aria-label` localized (`Save to Watch Later` / `Remove from Watch Later`) with
 `aria-pressed`; keyboard focusable; a click never navigates (`preventDefault` + `stopPropagation` on `mousedown`,
 `pointerdown`, `auxclick` and `click`). A saved video's button is visible without hovering; an unsaved one appears on hover
+
+**The `w` shortcut (rev 12):** the app's own way to act on the video in front of you without aiming at a 36 px button. It
+toggles the **marked** card - the same card the button floats over - so the shortcut and the button cannot disagree about
+which video they mean, and no selection model is needed. Ctrl/Cmd/Alt are refused, and a keypress that belongs to a text
+field, a `contenteditable` or the site's search box is left alone. A global shortcut was considered and rejected by the
+owner (useless for this), as was a tray item (unwanted); this is what "OS-level entry points" in §8 resolved to.
 (and while the preview covers that card). On the Watch Later page itself the buttons are **not** added — every row there is
 already in the list.
 
@@ -776,7 +786,7 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 |-------|---------|---------------|
 | **P0 — Reset** (small) | git re-init (in your checkout, §11), debrand (R8) **including the update feed**, delete plugin inventory (R5), Ultracite via `ultracite init` + rewired scripts (§5.3), `.npmrc`, version sweep to stable, README + plugin authoring guide, CI that runs `ultracite check` + `typecheck` + build | app boots to `www.youtube.com`, `pnpm dev` works, `ultracite check` passes, and the R8 grep gate finds upstream names only in the attribution section |
 | **P1 — YouTube base** | **Done (rev 11).** The player bridge (`video-info` / `video-controls` in main and in the page, replacing `song-info`/`song-controls`), a Playback menu as the app's own UI, the autoplay plugin reworked around the site's own toggle plus a user-intent rule, a gestures plugin (right-drag volume/seek, shift+right-drag speed, right+wheel volume, with a readout), and a smoke test that asserts the site and the app's page half | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green — all four verified live (MPRIS-driven controls, a cold load paused at 0.4 s, gesture values measured, and the launch test's page assertion green in CI) |
-| **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), OS-level entry points | R1/R4 acceptance criteria; all delivered except the OS-level entry points |
+| **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), and the app's own way to act on the video in front of you: the **`w` shortcut** (rev 12) | R1/R4 acceptance criteria; all delivered. "OS-level entry points" was resolved to the in-app shortcut: a global shortcut was rejected as useless and the tray icon as unwanted (§R4) |
 | **P3 — SponsorBlock** | **spike done (rev 12): it passed.** Ship the official release (runtime download + shim) with a first-use consent step and the native client as fallback; the remaining work is that consent dialog, the automatic fallback, and the about-dialog note | R2 acceptance criteria (§5.1 for the one that had to be revised) |
 | **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
 

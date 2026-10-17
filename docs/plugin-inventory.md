@@ -22,6 +22,17 @@ This is the survey the owner asked for: for each one, what it does, whether it i
 | **equalizer** | 106 L | Equalizer | **Optional.** Needs the same audio-graph opt-in; on a video site it is a niche want. |
 | **ambient-mode** | 456 L | Blurred backdrop from the video | **Optional.** Pure look, no player coupling; cheap to port if you like the effect. |
 
+## Kept at the owner's request (port candidates, not deletes)
+
+These three were on the delete list and the owner asked for them to stay. What each one is, and what
+porting it means:
+
+| Plugin | Size | What it actually does | What porting it means |
+|---|---|---|---|
+| **do-not-track** | 493 L | A real tracker/ad blocker: `@ghostery/adblocker-electron` in the main process, selectable blocklists (`InPlayer` and friends), optional extra uBlock-style filter lists, cached engine, plus page-side injectors. Not music-specific at all. | Check that the default lists cover youtube.com's ad/tracker hosts and decide what the music-era injectors are for; the engine itself is surface-agnostic. Off by default. |
+| **custom-output-device** | 141 L | A menu that picks which audio output the player uses, remembered in config. | Cheaper than it looks: it currently routes the *audio graph* (which P1 removed), but `HTMLMediaElement.setSinkId()` does the same job on the page's `<video>` with no graph at all. Off by default. |
+| **performance-improvement** | 175 L | Injects two vendored MIT scripts by CY Fung - `cpu-tamer` (by animation frame and by DOM mutation) and `rm3` - written to tame YouTube **Music**'s DOM churn. | Decide which half is worth keeping: `rm3` is music-specific, while a CPU tamer for youtube.com's feed is plausible. Note its default config says `enabled: true` yet it does not load - worth understanding before porting it. |
+
 ## Delete (music-era, or YouTube already has it)
 
 | Plugin | Size | Why it goes |
@@ -34,8 +45,9 @@ This is the survey the owner asked for: for each one, what it does, whether it i
 | visualizer | 552 L | Music-player visualizer. |
 | in-app-menu | 1555 L | A DOM menu bar; the app has a native menu. |
 | navigation | 80 L | Music-era navigation tweaks. |
-| performance-improvement | 175 L | Injects two YouTube-Music-specific scripts (`rm3`, `cpu-tamer`). Note: its default config says `enabled: true` yet it does not load — worth a look before deleting. |
-| do-not-track | 493 L | A tracker blocker aimed at music.youtube.com; on youtube.com the site *is* the tracker, so it is a different (and much larger) feature. |
+| do-not-track | — | *Kept at the owner's request - see below.* |
+| custom-output-device | — | *Kept at the owner's request - see below.* |
+| performance-improvement | — | *Kept at the owner's request - see below.* |
 | picture-in-picture | 553 L | The site's own PiP, plus a menu item. |
 | taskbar-mediacontrol | 107 L | Windows-only; the Linux equivalent is MPRIS (above). |
 | touchbar | 103 L | macOS-only, and this app is Linux-first. |
@@ -56,9 +68,9 @@ app do X?" — today it is "there is a plugin for that, but it does not work her
 ## Order I would do it in
 
 1. Delete the music-era list above in one commit (nothing imports it except `plugins/utils`).
-2. Re-measure the lint deviation list with the entry points gone.
-3. Port `shortcuts` (MPRIS + media keys) and `discord` — both are small and land in the app's own
+2. Re-measure the lint deviation list with those entry points gone.
+3. Port `shortcuts` (MPRIS + media keys) and `discord` - both are small and land in the app's own
    surface rather than in the page.
 4. `downloader` gets its own phase: it is the one that needs real work, and the one you named.
-5. Decide the optional three (`equalizer`, `ambient-mode`, `notifications`) and the audio-graph
-   question that `skip-silences` depends on.
+5. Decide the optional three (`equalizer`, `ambient-mode`, `notifications`), the three kept at your
+   request, and the audio-graph question that `skip-silences` depends on.

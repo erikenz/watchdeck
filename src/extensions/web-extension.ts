@@ -17,6 +17,7 @@
  *    its pre-bundled copy reads `__dirname`, which does not exist in a page - the injected script
  *    died before it defined anything, in dev only, which is the sort of thing that costs a day.
  */
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -33,6 +34,7 @@ import { readZip } from "./unzip";
 
 const VERSION_FILE = "version.txt";
 const DEFAULT_USER_AGENT = "Watchdeck";
+const LOG_PREFIX = "[Watchdeck]";
 
 /** What a plugin has to say about the extension it wants loaded. */
 export interface WebExtensionSpec {
@@ -42,6 +44,15 @@ export interface WebExtensionSpec {
   legacyNames?: string[];
   /** The GitHub release API endpoint for the extension's releases. */
   releaseUrl: string;
+  /**
+   * The release tag this app trusts, instead of "whatever is latest". Third-party code runs inside
+   * the app, and a release published later - by a compromised maintainer account, or one that
+   * simply broke something - would otherwise arrive on its own. Bumping this (and the hash) is a
+   * code change, reviewed like any other.
+   */
+  pinnedTag?: string;
+  /** SHA-256 of the release asset, hex. A download that does not match is refused. */
+  sha256?: string;
   /** The asset inside a release holding the browser build. */
   assetName: string;
   /** Prepended to every script the manifest lists. Its markers are added for you. */
@@ -88,11 +99,14 @@ const readInstalledVersion = (dir: string): string | null => {
   }
 };
 
-const fetchLatestRelease = async (
+const fetchRelease = async (
   spec: WebExtensionSpec
-): Promise<{ url: string; version: string } | null> => {
+): Promise<{ digest?: string; url: string; version: string } | null> => {
   try {
-    const response = await fetch(spec.releaseUrl, {
+    const endpoint = spec.pinnedTag
+      ? `${spec.releaseUrl.replace(/\/latest$/u, "")}/tags/${spec.pinnedTag}`
+      : spec.releaseUrl;
+    const response = await fetch(endpoint, {
       headers: {
         Accept: "application/vnd.github+json",
         "User-Agent": spec.userAgent ?? DEFAULT_USER_AGENT,
@@ -106,7 +120,11 @@ const fetchLatestRelease = async (
     const parsed = z
       .object({
         assets: z.array(
-          z.object({ browser_download_url: z.string(), name: z.string() })
+          z.object({
+            browser_download_url: z.string(),
+            digest: z.string().nullish(),
+            name: z.string(),
+          })
         ),
         tag_name: z.string(),
       })
@@ -121,7 +139,11 @@ const fetchLatestRelease = async (
     );
 
     return asset
-      ? { url: asset.browser_download_url, version: parsed.data.tag_name }
+      ? {
+          digest: asset.digest ?? undefined,
+          url: asset.browser_download_url,
+          version: parsed.data.tag_name,
+        }
       : null;
   } catch {
     return null;
@@ -148,11 +170,10 @@ const stripShim = (source: string): string => {
 const downloadAndExtract = async (
   dir: string,
   spec: WebExtensionSpec,
-  url: string,
-  version: string
+  release: { digest?: string; url: string; version: string }
 ): Promise<boolean> => {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(release.url, {
       headers: { "User-Agent": spec.userAgent ?? DEFAULT_USER_AGENT },
     });
 
@@ -160,7 +181,13 @@ const downloadAndExtract = async (
       return false;
     }
 
-    const files = readZip(new Uint8Array(await response.arrayBuffer()));
+    const bytes = new Uint8Array(await response.arrayBuffer());
+
+    if (!verifyAsset(bytes, spec, release.digest)) {
+      return false;
+    }
+
+    const files = readZip(bytes);
     const root = path.resolve(dir);
     rmSync(root, { force: true, recursive: true });
     mkdirSync(root, { recursive: true });
@@ -175,12 +202,50 @@ const downloadAndExtract = async (
       }
     }
 
-    writeFileSync(path.join(root, VERSION_FILE), version, "utf-8");
+    writeFileSync(path.join(root, VERSION_FILE), release.version, "utf-8");
 
     return isInstalled(root);
   } catch {
     return false;
   }
+};
+
+/**
+ * The bytes are the extension's code, and nothing else checks them: refuse anything whose SHA-256
+ * is not the one the app ships with, and refuse it before a single file is written. GitHub's own
+ * `digest` field is compared too when the API offers one - it is computed on their side, so a
+ * disagreement means the bytes changed in transit.
+ */
+const verifyAsset = (
+  bytes: Uint8Array,
+  spec: WebExtensionSpec,
+  digest?: string
+): boolean => {
+  const expected = spec.sha256?.toLowerCase();
+
+  if (!expected) {
+    return true;
+  }
+
+  const actual = createHash("sha256").update(bytes).digest("hex");
+
+  if (actual !== expected) {
+    console.error(
+      `${LOG_PREFIX} the ${spec.installName} release does not match the hash this app trusts ` +
+        `(expected ${expected}, got ${actual}); refusing to install it`
+    );
+    return false;
+  }
+
+  if (digest && digest.toLowerCase() !== `sha256:${expected}`) {
+    console.error(
+      `${LOG_PREFIX} the release API reports a different hash than this app trusts ` +
+        `(${digest}); refusing to install it`
+    );
+    return false;
+  }
+
+  return true;
 };
 
 /** The scripts the manifest loads, which are the ones that need the shim. */
@@ -281,41 +346,42 @@ const removeStaleInstalls = (userDataDir: string, spec: WebExtensionSpec) => {
 /**
  * Makes sure a usable extension is on disk and patched, without needing the network when one is
  * already there - a cold start offline has to keep working (docs/PRD.md §5.1).
+ *
+ * With a pinned tag there is nothing to check up on: the copy on disk is either the pinned version
+ * or it is replaced by it, and a newer release upstream changes nothing until the pin moves.
  */
 export const ensureInstalled = async (
   userDataDir: string,
-  spec: WebExtensionSpec,
-  options: { autoUpdate: boolean }
+  spec: WebExtensionSpec
 ): Promise<boolean> => {
   removeStaleInstalls(userDataDir, spec);
 
   const dir = extensionDir(userDataDir, spec);
   const installed = isInstalled(dir);
 
-  if (installed && !options.autoUpdate) {
+  if (
+    installed &&
+    spec.pinnedTag &&
+    readInstalledVersion(dir) === spec.pinnedTag
+  ) {
     patchInstalledExtension(dir, spec);
     return true;
   }
 
-  const latest = await fetchLatestRelease(spec);
+  const release = await fetchRelease(spec);
 
-  if (!latest) {
+  if (!release) {
     // No network, or GitHub is having a day: an installed copy still works
     patchInstalledExtension(dir, spec);
     return installed;
   }
 
-  if (installed && readInstalledVersion(dir) === latest.version) {
+  if (installed && readInstalledVersion(dir) === release.version) {
     patchInstalledExtension(dir, spec);
     return true;
   }
 
-  const extracted = await downloadAndExtract(
-    dir,
-    spec,
-    latest.url,
-    latest.version
-  );
+  const extracted = await downloadAndExtract(dir, spec, release);
   patchInstalledExtension(dir, spec);
 
   return extracted;
@@ -325,10 +391,9 @@ export const ensureInstalled = async (
 export const loadInto = async (
   session: Electron.Session,
   userDataDir: string,
-  spec: WebExtensionSpec,
-  options: { autoUpdate: boolean }
+  spec: WebExtensionSpec
 ): Promise<string | null> => {
-  const available = await ensureInstalled(userDataDir, spec, options);
+  const available = await ensureInstalled(userDataDir, spec);
 
   if (!available) {
     return null;

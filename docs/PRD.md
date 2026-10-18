@@ -824,7 +824,7 @@ Verification for the gate (runs in CI too): `grep -rniE 'pear-desktop|peard:|ytm
 | **P1 — YouTube base** | **Done (rev 11).** The player bridge (`video-info` / `video-controls` in main and in the page, replacing `song-info`/`song-controls`), a Playback menu as the app's own UI, the autoplay plugin reworked around the site's own toggle plus a user-intent rule, a gestures plugin (right-drag volume/seek, shift+right-drag speed, right+wheel volume, with a readout), and a smoke test that asserts the site and the app's page half | play/pause/seek/volume via the app's own UI works; autoplay stays off; gestures work; smoke test green — all four verified live (MPRIS-driven controls, a cold load paused at 0.4 s, gesture values measured, and the launch test's page assertion green in CI) |
 | **P2 — Watch Later** | DB layer + migrations, sync service, metadata enrichment, quick-add hover button, **in-page** enhancement of `/playlist?list=WL` (toolbar, filters, row context — rev 9 replaced the planned Library window), and the app's own way to act on the video in front of you: the **`w` shortcut** (rev 12) | R1/R4 acceptance criteria; all delivered. "OS-level entry points" was resolved to the in-app shortcut: a global shortcut was rejected as useless and the tray icon as unwanted (§R4) |
 | **P3 — SponsorBlock** | **Done (rev 13).** The spike passed (rev 12); the shipping surface landed with it: the official release downloaded at runtime behind a first-use consent step, a failure reported with its reason instead of a fallback, and the about-dialog credit | R2 acceptance criteria (§5.1 for the one that had to be revised) |
-| **P4 — Polish / optional** | in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray/MPRIS integration, packaging (deb/rpm/AppImage/dmg/nsis) | release build installs and runs on your Linux machine |
+| **P4 — Polish / optional** | **AppImage and MPRIS landed (rev 13).** `pnpm dist:linux:appimage` builds `pack/Watchdeck-<version>.AppImage` — verified on the owner's machine: it launches with no install step, loads the site, runs the page half, exposes MPRIS, and its desktop entry carries `StartupWMClass=watchdeck`, which is the class the window sets. MPRIS comes from the ported `shortcuts` plugin (§R5). Left: in-page takeover of `/playlist?list=WL`, SB voting + chapter highlights, saved filter presets, tray, deb/rpm/dmg/nsis | release build installs and runs on your Linux machine — the AppImage **runs from `pack/` and installs nothing**, so "installs" is still open |
 
 Order rationale: P0 shrinks the codebase before Ultracite runs over it and before any release identity exists; P1 gives a
 usable player; P2 is the requested core feature; P3 is independent and can be parallelised after P1.
@@ -888,8 +888,12 @@ them.
   skeleton) and `.youtube-client-git-backup-pear-desktop/` (above).
 - Keep the upstream MIT attribution (`license`, `NOTICE`), this repository's own copyright line, and the
   `tools/identity-gate.sh` check when publishing.
-- CI runs the checks only; releases are manual (`workflow_dispatch`), and four workflows sit parked as `.yml.disabled`
-  (dependency-review, pr-build-artifacts, winget-cla, winget-submission) with their reasons in the files — see §8.
+- **Releases are still cut by hand, and none has been cut.** The AppImage builds locally
+  (`pnpm dist:linux:appimage`) and is verified; publishing it (a GitHub release, or the parked
+  packaging workflows in `.github/workflows/*.yml.disabled`) is not wired up yet. The `pack/`
+  directory is gitignored, so the artifact is not in the tree.
+- CI runs the checks only; four workflows sit parked as `.yml.disabled` (dependency-review,
+  pr-build-artifacts, winget-cla, winget-submission) with their reasons in the files — see §8.
 
 ## 12. Name recommendations (revised for your criteria)
 

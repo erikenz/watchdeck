@@ -31,6 +31,14 @@ These four are held at the version the current code is written against. Each one
 - [ ] `solid-floating-ui` 0.3.1 (1.0 replaces `useFloating(anchor, floating, options)` with a single options object) — in-app-menu panels.
 - [ ] `electron-vite` 6.0.0-beta.1: 6.0.0 stable fails to load the project tsconfig ("Failed to load tsconfig .../@electron-toolkit/tsconfig/tsconfig.node.json: Tsconfig not found"), which breaks every build. Retry the bump when upstream fixes it; `tsconfig.json` no longer extends anything in node_modules, so the toolkit package is not needed for that any more.
 
+## Packaging
+
+- [x] ~~**An AppImage**~~ — **done (rev 13).** `pnpm dist:linux:appimage` builds `pack/Watchdeck-0.1.0.AppImage` (131 MB) and it was verified on this machine: the window's class is `watchdeck` (matching the desktop entry's `StartupWMClass`), the site loads, the page half runs (`customElements.get("wd-trans")` answers), plugins load, and `--remote-debugging-port` works from inside the AppImage. The artifact is gitignored; nothing is installed by it.
+
+- [ ] **The AppImage's desktop entry passes `--no-sandbox`, and that is electron-builder's default, not a decision.** It is there because the bundled `chrome-sandbox` helper cannot be setuid inside a squashfs mount. `AppRun` already probes `unshare -Ur true` and adds the flag itself when user namespaces are unavailable, so on a machine like this one the app _can_ run sandboxed when started from a terminal — but a launcher's click always passes the flag. Dropping it means overriding the generated `Exec`, which electron-builder does not expose cleanly; worth revisiting together with the sandbox refactor in §3.3.
+
+- [ ] **Releases are manual and none has been cut.** Publishing means a GitHub release with the AppImage attached (and re-enabling the parked workflows for the other platforms, which need signing identities). Decide whether the AppImage is the only artifact for now.
+
 ## Diagnostics
 
 - [ ] **The shortcuts plugin's two settings have no test that clicks the prompt.** The native keybind prompt (`custom-electron-prompt`) cannot be driven from a harness, so what is covered is the decision it feeds: `mappingFromPrompt` is unit-tested (`src/plugins/shortcuts/tests/shortcuts.test.ts`), and the rest was checked live while the port landed — registration from config, the release of the old accelerators on a config change (with another plugin's shortcut left alone), a local chord pausing a playing video, and MPRIS answering `playerctl`. Re-running that check means rebuilding the throwaway scripts; the recipe is in the commit that ported the plugin.

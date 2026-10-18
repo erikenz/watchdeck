@@ -210,10 +210,11 @@ export default createPlugin({
 1. Clone the repo
 2. Follow [this guide](https://pnpm.io/installation) to install `pnpm`
 3. Run `pnpm install --frozen-lockfile` to install dependencies
-4. Run `pnpm build:OS`
+4. Run one of the packaging scripts below
 
+- `pnpm dist:linux:appimage` - Linux, **AppImage only** (the artifact this project uses; lands in `pack/`)
 - `pnpm dist:win` - Windows
-- `pnpm dist:linux` - Linux (amd64)
+- `pnpm dist:linux` - Linux, every target (AppImage, flatpak, deb, rpm, snap, freebsd, tar.gz)
 - `pnpm dist:linux:deb-arm64` - Linux (arm64 for Debian)
 - `pnpm dist:linux:rpm-arm64` - Linux (arm64 for Fedora)
 - `pnpm dist:mac` - macOS (amd64)
@@ -221,6 +222,12 @@ export default createPlugin({
 
 Builds the app for macOS, Linux, and Windows,
 using [electron-builder](https://github.com/electron-userland/electron-builder).
+
+The AppImage is self-contained: it runs on a machine with no `pnpm`, no Node and no install step
+(`chmod +x` if the download lost its bit, then run it). Its desktop entry carries
+`StartupWMClass=watchdeck`, which is the class the window sets, so launchers and panels associate
+the running window with the app; the `Exec` line passes `--no-sandbox`, which is electron-builder's
+AppImage default (the bundled `chrome-sandbox` helper cannot be setuid inside a squashfs mount).
 
 ### Building in devcontainer
 

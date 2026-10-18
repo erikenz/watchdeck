@@ -7,74 +7,101 @@ import type { MenuTemplate } from "@/menu";
 import promptOptions from "@/providers/prompt-options";
 import type { MenuContext } from "@/types/contexts";
 
-import type { ShortcutsPluginConfig } from "./index";
+import type { ShortcutMappingType, ShortcutsPluginConfig } from "./index";
+import { mappingFromPrompt } from "./shortcuts";
+
+/**
+ * Asks for one set of keybinds and answers the mapping the answers produce - or `null` when the
+ * prompt was cancelled, which must leave the config alone.
+ *
+ * All three actions are always asked for together, so clearing one (the prompt's own way of
+ * unbinding) arrives as an empty accelerator instead of silently keeping the old one. The inherited
+ * version built the new mapping and then saved the old one, which is why no keybind ever stuck.
+ */
+const promptMapping = async (
+  win: BrowserWindow,
+  title: string,
+  label: string,
+  current: ShortcutMappingType
+): Promise<ShortcutMappingType | null> => {
+  const kb = (
+    label_: string,
+    value: string,
+    default_?: string
+  ): KeybindOptions => ({
+    default: default_ || undefined,
+    label: label_,
+    value,
+  });
+
+  const output = await prompt(
+    {
+      height: 270,
+      keybindOptions: [
+        kb(
+          t("plugins.shortcuts.prompt.keybind.keybind-options.previous"),
+          "previous",
+          current.previous
+        ),
+        kb(
+          t("plugins.shortcuts.prompt.keybind.keybind-options.play-pause"),
+          "playPause",
+          current.playPause
+        ),
+        kb(
+          t("plugins.shortcuts.prompt.keybind.keybind-options.next"),
+          "next",
+          current.next
+        ),
+      ],
+      label,
+      title,
+      type: "keybind",
+      ...promptOptions(),
+    },
+    win
+  );
+
+  return output ? mappingFromPrompt(output, current) : null;
+};
 
 export const onMenu = async ({
-  window,
   getConfig,
   setConfig,
+  window,
 }: MenuContext<ShortcutsPluginConfig>): Promise<MenuTemplate> => {
   const config = await getConfig();
 
-  /**
-   * Helper function for keybind prompt
-   */
-  const kb = (
-    label_: string,
-    value_: string,
-    default_?: string
-  ): KeybindOptions => ({ default: default_, label: label_, value: value_ });
-
-  async function promptKeybind(
-    config: ShortcutsPluginConfig,
-    win: BrowserWindow
-  ) {
-    const output = await prompt(
-      {
-        height: 270,
-        keybindOptions: [
-          // If default=undefined then no default is used
-          kb(
-            t("plugins.shortcuts.prompt.keybind.keybind-options.previous"),
-            "previous",
-            config.global?.previous
-          ),
-          kb(
-            t("plugins.shortcuts.prompt.keybind.keybind-options.play-pause"),
-            "playPause",
-            config.global?.playPause
-          ),
-          kb(
-            t("plugins.shortcuts.prompt.keybind.keybind-options.next"),
-            "next",
-            config.global?.next
-          ),
-        ],
-        label: t("plugins.shortcuts.prompt.keybind.label"),
-        title: t("plugins.shortcuts.prompt.keybind.title"),
-        type: "keybind",
-        ...promptOptions(),
-      },
-      win
-    );
-
-    if (output) {
-      const newConfig = { ...config };
-
-      for (const { value, accelerator } of output) {
-        newConfig.global[value as keyof ShortcutsPluginConfig["global"]] =
-          accelerator;
-      }
-
-      setConfig(config);
-    }
-    // Else -> pressed cancel
-  }
-
   return [
     {
-      click: async () => promptKeybind(config, window),
-      label: t("plugins.shortcuts.menu.set-keybinds"),
+      click: async () => {
+        const mapping = await promptMapping(
+          window,
+          t("plugins.shortcuts.prompt.global.title"),
+          t("plugins.shortcuts.prompt.global.label"),
+          config.global
+        );
+
+        if (mapping) {
+          setConfig({ global: mapping });
+        }
+      },
+      label: t("plugins.shortcuts.menu.set-global-keybinds"),
+    },
+    {
+      click: async () => {
+        const mapping = await promptMapping(
+          window,
+          t("plugins.shortcuts.prompt.local.title"),
+          t("plugins.shortcuts.prompt.local.label"),
+          config.local
+        );
+
+        if (mapping) {
+          setConfig({ local: mapping });
+        }
+      },
+      label: t("plugins.shortcuts.menu.set-local-keybinds"),
     },
     {
       checked: config.overrideMediaKeys,

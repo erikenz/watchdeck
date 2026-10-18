@@ -1,7 +1,7 @@
 import { t } from "@/i18n";
 import { createPlugin } from "@/utils";
 
-import { onMainLoad } from "./main";
+import { onConfigChange, onMainLoad, onMainStop } from "./main";
 import { onMenu } from "./menu";
 
 export interface ShortcutMappingType {
@@ -16,8 +16,20 @@ export interface ShortcutsPluginConfig {
   local: ShortcutMappingType;
 }
 
+/**
+ * Playback shortcuts, and MPRIS on Linux (docs/PRD.md §R5).
+ *
+ * Two sets of keybinds, because they answer different questions: **global** ones are registered with
+ * the desktop and work from any application, **local** ones only while this window has focus. Both
+ * are configured from the plugin's menu, and both take effect at once - nothing here needs a
+ * restart.
+ */
 export default createPlugin({
-  backend: onMainLoad,
+  backend: {
+    onConfigChange,
+    start: onMainLoad,
+    stop: onMainStop,
+  },
   config: {
     enabled: false,
     overrideMediaKeys: false,
@@ -35,5 +47,5 @@ export default createPlugin({
   description: () => t("plugins.shortcuts.description"),
   menu: onMenu,
   name: () => t("plugins.shortcuts.name"),
-  restartNeeded: true,
+  restartNeeded: false,
 });

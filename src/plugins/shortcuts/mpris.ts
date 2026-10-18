@@ -15,6 +15,21 @@ import { registerCallback, VideoInfoEvent } from "@/providers/video-info";
 import type { VideoInfo } from "@/types/video-info";
 import { LoggerPrefix } from "@/utils";
 
+import { isTrackFor, trackIdFor } from "./shortcuts";
+
+/**
+ * MPRIS: what the desktop's media keys, lock screen and player widgets talk to (docs/PRD.md §R5).
+ *
+ * Two details that are not obvious from the API:
+ *
+ * 1. **The bus name is the on-disk identity, not the display name.** MPRIS clients - `playerctl`
+ *    above all - address a player as `org.mpris.MediaPlayer2.<name>`, and a desktop matches it
+ *    against `watchdeck.desktop`; the inherited code announced `Watchdeck`, which is why
+ *    `playerctl --player=watchdeck` found nothing.
+ * 2. **There is no teardown in the library.** Once registered, the bus name lives until the app
+ *    exits: `@jellybrick/mpris-service` keeps its connection private, so disabling the plugin
+ *    stops the metadata updates but not the name.
+ */
 class YTPlayer extends MprisPlayer {
   /**
    * @type {number} The current position in microseconds
@@ -54,17 +69,20 @@ class YTPlayer extends MprisPlayer {
 function setupMPRIS() {
   const instance = new YTPlayer({
     identity: APPLICATION_NAME,
-    name: "Watchdeck",
+    name: "watchdeck",
     supportedInterfaces: ["player"],
     supportedMimeTypes: ["audio/mpeg"],
   });
 
   instance.canRaise = true;
   instance.canQuit = false;
-  // There is no queue to ask about: the site decides what "next" means (its own
-  // playlist, or the recommendation it is already showing)
+  // There is no queue to ask about: the site decides what "next" means (its own playlist, or the
+  // recommendation it is already showing)
   instance.canGoNext = true;
   instance.canGoPrevious = true;
+  // Absolute and relative seeks both work, and `SetPosition` is refused without this (measured:
+  // `playerctl position 60` moves the video to 61 s, `position 15+` moves it 15 s on).
+  instance.canSeek = true;
   instance.supportedUriSchemes = ["http", "https"];
   instance.desktopEntry = "watchdeck";
   return instance;
@@ -77,25 +95,34 @@ export function registerMPRIS(win: BrowserWindow) {
     const secToMicro = (n: number) => Math.round(Number(n) * 1e6);
     const microToSec = (n: number) => Math.round(Number(n) / 1e6);
 
-    const correctId = (videoId: string) => videoId.replace(/-/g, "_MINUS_");
-
     const player = setupMPRIS();
 
     const seekTo = (event: Position) => {
-      if (
-        currentSongInfo?.videoId &&
-        event.trackId.endsWith(correctId(currentSongInfo.videoId))
-      ) {
-        win.webContents.send(
-          "watchdeck:seek-to",
-          microToSec(event.position ?? 0)
+      const videoId = currentSongInfo?.videoId;
+
+      // `SetPosition` carries the track id the client read from our metadata; a seek aimed at
+      // another track (a stale client, or a video that has since changed) is not ours to serve.
+      if (!videoId || !isTrackFor(event.trackId, videoId)) {
+        console.debug(
+          LoggerPrefix,
+          "MPRIS: ignoring a seek for another track",
+          event.trackId
         );
-        player.setPosition(event.position ?? 0);
+        return;
       }
+
+      win.webContents.send(
+        "watchdeck:seek-to",
+        microToSec(event.position ?? 0)
+      );
+      player.setPosition(event.position ?? 0);
+      player.seeked(event.position ?? 0);
     };
+
     const seekBy = (offset: number) => {
       win.webContents.send("watchdeck:seek-by", microToSec(offset));
       player.setPosition(player.getPosition() + offset);
+      player.seeked(player.getPosition());
     };
 
     player.on("raise", () => {
@@ -181,7 +208,7 @@ export function registerMPRIS(win: BrowserWindow) {
           "xesam:url": songInfo.url,
           "xesam:artist": [songInfo.channel],
           "mpris:trackid": player.objectPath(
-            `Track/${correctId(songInfo.videoId)}`
+            `Track/${trackIdFor(songInfo.videoId)}`
           ),
         };
         currentSongInfo = songInfo;

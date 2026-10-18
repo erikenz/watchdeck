@@ -1,94 +1,133 @@
+/**
+ * Registering the plugin's shortcuts, and taking them back again (docs/PRD.md §R5).
+ *
+ * Two things this file is careful about, both learned from the inherited version:
+ *
+ * 1. **It only unregisters its own.** `globalShortcut.unregisterAll()` would also drop the volume
+ *    keys another plugin registered, so every accelerator this plugin registers is remembered and
+ *    taken back by name.
+ * 2. **A shortcut the desktop already owns is reported.** `globalShortcut.register` answers
+ *    `false` (or throws on a malformed accelerator) and the inherited code ignored both, which is
+ *    how a keybind ends up silently doing nothing.
+ */
 import { globalShortcut } from "electron";
 import type { BrowserWindow } from "electron";
 import is from "electron-is";
-import { register as registerElectronLocalShortcut } from "electron-localshortcut";
+import {
+  register as registerInWindow,
+  unregister as unregisterInWindow,
+} from "electron-localshortcut";
 
 import { getVideoControls } from "@/providers/video-controls";
 import type { BackendContext } from "@/types/contexts";
+import { LoggerPrefix } from "@/utils";
 
-import type { ShortcutMappingType, ShortcutsPluginConfig } from "./index";
+import type { ShortcutsPluginConfig } from "./index";
 import { registerMPRIS } from "./mpris";
+import { shortcutsToRegister } from "./shortcuts";
 
-function _registerGlobalShortcut(
-  webContents: Electron.WebContents,
-  shortcut: string,
-  action: (webContents: Electron.WebContents) => void
-) {
-  globalShortcut.register(shortcut, () => {
-    action(webContents);
-  });
-}
+/** The media keys, for the `overrideMediaKeys` switch. */
+const MEDIA_KEYS = {
+  next: "MediaNextTrack",
+  playPause: "MediaPlayPause",
+  previous: "MediaPreviousTrack",
+} as const;
 
-function _registerLocalShortcut(
+/** What this plugin registered, so a config change takes back its own and nobody else's. */
+const ownGlobal = new Set<string>();
+const ownLocal = new Set<string>();
+
+let pluginWindow: BrowserWindow | null = null;
+
+const warn = (...message: unknown[]) => console.warn(LoggerPrefix, ...message);
+
+const registerGlobal = (accelerator: string, run: () => void) => {
+  try {
+    if (globalShortcut.register(accelerator, run)) {
+      ownGlobal.add(accelerator);
+      return;
+    }
+
+    warn(`shortcuts: ${accelerator} is taken by another application`);
+  } catch (error) {
+    warn(`shortcuts: ${accelerator} is not a usable accelerator`, error);
+  }
+};
+
+const registerLocally = (
   win: BrowserWindow,
-  shortcut: string,
-  action: (webContents: Electron.WebContents) => void
-) {
-  registerElectronLocalShortcut(win, shortcut, () => {
-    action(win.webContents);
-  });
-}
+  accelerator: string,
+  run: () => void
+) => {
+  try {
+    registerInWindow(win, accelerator, run);
+    ownLocal.add(accelerator);
+  } catch (error) {
+    warn(`shortcuts: ${accelerator} is not a usable accelerator`, error);
+  }
+};
+
+const releaseAll = (win: BrowserWindow) => {
+  for (const accelerator of ownGlobal) {
+    globalShortcut.unregister(accelerator);
+  }
+
+  ownGlobal.clear();
+
+  for (const accelerator of ownLocal) {
+    unregisterInWindow(win, accelerator);
+  }
+
+  ownLocal.clear();
+};
+
+/** Registers what a config asks for, after taking back whatever the last one asked for. */
+const apply = (config: ShortcutsPluginConfig, win: BrowserWindow) => {
+  releaseAll(win);
+
+  const controls = getVideoControls(win);
+
+  if (config.overrideMediaKeys) {
+    registerGlobal(MEDIA_KEYS.playPause, controls.playPause);
+    registerGlobal(MEDIA_KEYS.next, controls.next);
+    registerGlobal(MEDIA_KEYS.previous, controls.previous);
+  }
+
+  for (const { accelerator, action } of shortcutsToRegister(config.global)) {
+    registerGlobal(accelerator, controls[action]);
+  }
+
+  for (const { accelerator, action } of shortcutsToRegister(config.local)) {
+    registerLocally(win, accelerator, controls[action]);
+  }
+};
 
 export const onMainLoad = async ({
   getConfig,
   window,
 }: BackendContext<ShortcutsPluginConfig>) => {
-  const config = await getConfig();
+  pluginWindow = window;
+  apply(await getConfig(), window);
 
-  const videoControls = getVideoControls(window);
-  const { playPause, next, previous } = videoControls;
-
-  if (config.overrideMediaKeys) {
-    _registerGlobalShortcut(window.webContents, "MediaPlayPause", playPause);
-    _registerGlobalShortcut(window.webContents, "MediaNextTrack", next);
-    _registerGlobalShortcut(window.webContents, "MediaPreviousTrack", previous);
-  }
-
+  // Once per window: MPRIS is the app's media keys on Linux, and the desktop keeps the bus name for
+  // as long as the app runs (the library has no teardown, see `./mpris.ts`).
   if (is.linux()) {
     registerMPRIS(window);
   }
+};
 
-  const { global, local } = config;
-  const shortcutOptions = { global, local };
-
-  for (const optionType in shortcutOptions) {
-    registerAllShortcuts(
-      shortcutOptions[optionType as "global" | "local"],
-      optionType
-    );
+/** A keybind change takes effect at once - nothing here needs a restart. */
+export const onConfigChange = (config: ShortcutsPluginConfig) => {
+  if (!pluginWindow || pluginWindow.isDestroyed()) {
+    return;
   }
 
-  function registerAllShortcuts(container: ShortcutMappingType, type: string) {
-    for (const _action in container) {
-      // HACK: _action is detected as string, but it's actually a key of ShortcutMappingType
-      const action = _action as keyof ShortcutMappingType;
+  apply(config, pluginWindow);
+};
 
-      if (!container[action]) {
-        continue; // Action accelerator is empty
-      }
-
-      console.debug(
-        `Registering ${type} shortcut`,
-        container[action],
-        ":",
-        action
-      );
-      const actionCallback: () => void = videoControls[action];
-      if (typeof actionCallback !== "function") {
-        console.warn("Invalid action", action);
-        continue;
-      }
-
-      if (type === "global") {
-        _registerGlobalShortcut(
-          window.webContents,
-          container[action],
-          actionCallback
-        );
-      } else {
-        // Type === "local"
-        _registerLocalShortcut(window, local[action], actionCallback);
-      }
-    }
-  }
+export const onMainStop = ({
+  window,
+}: BackendContext<ShortcutsPluginConfig>) => {
+  releaseAll(window);
+  pluginWindow = null;
 };

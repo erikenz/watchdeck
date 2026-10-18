@@ -75,6 +75,18 @@ export const loadTrackerBlockerEngine = async (
       cachingOptions
     );
     if (session) {
+      // Scriptlets (`##+js(...)` in the filter lists) are third-party JavaScript, injected into the
+      // page by this library. Measured on youtube.com: one of them recurses - three
+      // `RangeError: Maximum call stack size exceeded` per page load, an `apply` trap inside uBO's
+      // `proxyApplyFn` helper - and there is no engine flag that turns them off
+      // (`loadPreprocessors` gates `#if` directives, not scriptlets; the Electron wrapper asks for
+      // injection rules on every first cosmetic pass). So the request is answered without them.
+      // What is left is what this app actually wants: requests blocked, and CSS hiding, neither of
+      // which runs code from a third-party list inside the page.
+      const cosmetics = blocker.getCosmeticsFilters.bind(blocker);
+      blocker.getCosmeticsFilters = (options) =>
+        cosmetics({ ...options, getInjectionRules: false });
+
       blocker.enableBlockingInSession(session);
     }
     console.log(

@@ -280,6 +280,27 @@ const ICONS: Record<string, string> = {
 
 export type ButtonState = "saved" | "unsaved" | "pending" | "error";
 
+/**
+ * Which of the button's states wins.
+ *
+ * A change the server refused is shown over everything else: a button that quietly returns to "not
+ * saved" reads as "nothing happened" - which is how a save that never landed went unnoticed. A
+ * change still in flight is shown over what the last known state was.
+ */
+export const buttonStateOf = (flags: {
+  refused: boolean;
+  pending: boolean;
+  saved: boolean;
+}): ButtonState => {
+  if (flags.refused) {
+    return "error";
+  }
+  if (flags.pending) {
+    return "pending";
+  }
+  return flags.saved ? "saved" : "unsaved";
+};
+
 /** What each button was last painted with, so a repaint that changes nothing can be skipped. */
 const painted = new WeakMap<
   HTMLButtonElement,

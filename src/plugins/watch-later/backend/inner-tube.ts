@@ -470,18 +470,76 @@ export const parseVideoDetails = (data: unknown): VideoDetails => {
   };
 };
 
-/** `edit_playlist` answers with an empty body on success, an error object when not. */
+/** The site's own word for "this edit was applied"; anything else is a refusal. */
+const MUTATION_SUCCEEDED = "STATUS_SUCCEEDED";
+
+/** Why the server did not apply an edit, or `undefined` when it did. */
+const mutationRefusal = (
+  statusCode: number,
+  data: unknown
+): string | undefined => {
+  const error = child(data, "error");
+  if (error !== undefined) {
+    const parts = [child(error, "code"), child(error, "message")].filter(
+      (part): part is number | string =>
+        typeof part === "number" || typeof part === "string"
+    );
+    return parts.length > 0 ? parts.join(": ") : "request failed";
+  }
+
+  const status = child(data, "status");
+  if (status === MUTATION_SUCCEEDED) {
+    return undefined;
+  }
+  if (status !== undefined) {
+    return typeof status === "string" ? status : "request failed";
+  }
+
+  return statusCode >= 200 && statusCode < 300
+    ? undefined
+    : `request failed with ${statusCode}`;
+};
+
+/**
+ * Whether `edit_playlist` applied the change.
+ *
+ * The answer is a 2xx either way, and a refused write carries no `error` object at all: it is
+ * `{"status": "STATUS_FAILED"}` - which is what every write gets once the session's cookies have
+ * gone stale. Reading `error` alone is how a refused save was recorded as saved: the button flipped
+ * at once, the video was never added, and nothing was queued to try again.
+ */
 export const parseMutationResponse = (
   statusCode: number,
   data: unknown
 ): { ok: boolean; error?: string } => {
-  const code = child(child(data, "error"), "code");
-  if (statusCode >= 200 && statusCode < 300 && typeof code !== "string") {
-    return { ok: true };
+  const refusal = mutationRefusal(statusCode, data);
+  return refusal === undefined ? { ok: true } : { error: refusal, ok: false };
+};
+
+/**
+ * Whether the server answered as if no session were attached at all.
+ *
+ * A stale cookie is not refused with an error status: YouTube serves the signed-out answer and says
+ * so only in its own tracking flags (`logged_in=0` in `responseContext`), which is what makes a
+ * stale session read as an empty list ("empty page") rather than as a failure. An answer without
+ * the flag is taken at face value - the flag is the one thing that can tell.
+ */
+export const answeredSignedOut = (data: unknown): boolean => {
+  const services = children(
+    child(data, "responseContext"),
+    "serviceTrackingParams"
+  );
+
+  for (const service of services) {
+    if (child(service, "service") !== "GFEEDBACK") {
+      continue;
+    }
+    for (const param of children(service, "params")) {
+      if (child(param, "key") === "logged_in") {
+        return child(param, "value") === "0";
+      }
+    }
   }
-  return {
-    error:
-      typeof code === "string" ? code : `request failed with ${statusCode}`,
-    ok: false,
-  };
+
+  return false;
 };

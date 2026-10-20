@@ -97,21 +97,39 @@ const broadcast = () => {
   );
 };
 
+/**
+ * The cookies the page is keeping fresh, or `undefined` when the jar holds no session.
+ *
+ * YouTube rotates the signed-in session's binding cookies while the app runs, and the page follows
+ * those rotations in its own jar. A session built from one snapshot therefore goes stale on its own
+ * - which is why the session is handed this reader and allowed to build itself again when YouTube
+ * says it is signed out (see `WatchLaterSession`).
+ */
+const currentCookies = async (): Promise<string | undefined> => {
+  if (!state.window) {
+    return undefined;
+  }
+  const cookies = await readSessionCookies(state.window);
+  return looksSignedIn(cookies) ? cookies : undefined;
+};
+
 const connect = async () => {
   if (!state.window) {
     return;
   }
 
-  const cookies = await readSessionCookies(state.window);
-  state.needsAuth = !looksSignedIn(cookies);
+  const cookies = await currentCookies();
+  state.needsAuth = cookies === undefined;
 
-  if (state.needsAuth) {
+  if (!cookies) {
     log("no signed-in session yet; waiting for one");
     return;
   }
 
   try {
-    state.session = await WatchLaterSession.create(cookies, 0);
+    state.session = await WatchLaterSession.create(cookies, 0, {
+      renewCookies: currentCookies,
+    });
     const accounts = await state.session.listAccounts();
     for (const account of accounts) {
       state.store.upsertAccount(account);

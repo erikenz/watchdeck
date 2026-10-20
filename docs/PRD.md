@@ -232,6 +232,20 @@ Consequences for the design:
    (`session.cookies.get`) + PO-token generation (`bgutils-js`) in the main process. We reuse that pattern.
 4. Caveat: multi-account sessions need `X-Goog-AuthUser` / `SESSION_INDEX`; `youtubei.js`'s `account_index` is known to be
    unreliable (upstream issue #735). Design assumption: **the active (first) account of the browser session** — see Q12.
+5. **A 2xx is not a success.** `edit_playlist` answers `200` whether it applied the change or refused it: an applied write
+   carries `{"status": "STATUS_SUCCEEDED"}`, a refused one `{"status": "STATUS_FAILED"}` with **no `error` object at
+   all** — the refusal shows up only as a "Sign in to add this video to a playlist." popup inside the action. Verified
+   against a live session on 2026-10-19: the same write answered `STATUS_SUCCEEDED` from a healthy session and
+   `STATUS_FAILED` from a stale one. Reading `error` alone is what made a refused save look saved (see §7 R1, and
+   `parseMutationResponse`).
+6. **A stale cookie is answered as signed out, not refused.** The signed-in session's binding cookies
+   (`__Secure-1PSIDTS` / `__Secure-3PSIDTS`, and the `PSIDCC` set) are rotated by the page while it runs — rotations
+   observed 15–16 minutes apart — and a request carrying an older value gets the signed-out answer instead of an
+   error: `"logged_in": "0"` in `responseContext.serviceTrackingParams`, a `browse` with no `contents` at all, and
+   `STATUS_FAILED` for writes. A client that reads the cookie jar once, as this app did for a whole run, therefore
+   goes stale on its own — in the observed run the first refused request came 9 minutes after the app read the jar,
+   and every request after it was answered signed out while the page kept working. `WatchLaterSession` now reads the
+   jar again and retries once when it sees that flag.
 
 ### 4.3 Where the watched/continue-watching numbers come from (revised)
 

@@ -16,6 +16,11 @@ import { build } from "vite";
  */
 interface DomApi {
   alignButton: (button: HTMLButtonElement, host: Element) => void;
+  buttonStateOf: (flags: {
+    refused: boolean;
+    pending: boolean;
+    saved: boolean;
+  }) => string;
   createSaveButton: (
     videoId: string,
     onToggle: (button: HTMLButtonElement) => void
@@ -468,6 +473,47 @@ test("the shortcut takes `w` on a card and leaves typing alone", async ({
   expect(decided.inContentEditable).toBe(false);
   expect(decided.otherKey).toBe(false);
   expect(decided.withCtrl).toBe(false);
+});
+
+test("a refusal outranks everything else on the button", async ({ page }) => {
+  await openFixture(page);
+
+  const states = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    return {
+      pending: dom.buttonStateOf({
+        pending: true,
+        refused: false,
+        saved: false,
+      }),
+      refused: dom.buttonStateOf({
+        pending: false,
+        refused: true,
+        saved: true,
+      }),
+      refusedWhilePending: dom.buttonStateOf({
+        pending: true,
+        refused: true,
+        saved: false,
+      }),
+      saved: dom.buttonStateOf({ pending: false, refused: false, saved: true }),
+      unsaved: dom.buttonStateOf({
+        pending: false,
+        refused: false,
+        saved: false,
+      }),
+    };
+  });
+
+  // A change the server refused has to be visible: a button that goes back to "not saved" on its own
+  // reads as "nothing happened", which is how a save that never landed was missed.
+  expect(states).toEqual({
+    pending: "pending",
+    refused: "error",
+    refusedWhilePending: "error",
+    saved: "saved",
+    unsaved: "unsaved",
+  });
 });
 
 test("the card under the pointer is the one whose video box holds it", async ({

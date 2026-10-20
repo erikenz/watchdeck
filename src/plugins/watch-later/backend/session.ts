@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import type { Types } from "youtubei.js";
 import { Innertube } from "youtubei.js";
 
 import { SITE_ORIGIN } from "../site";
@@ -6,6 +7,7 @@ import type { WatchLaterAccount } from "../types";
 import {
   accountsListPayload,
   addVideoPayload,
+  answeredSignedOut,
   browsePayload,
   parseIdentity,
   parseMutationResponse,
@@ -38,6 +40,40 @@ export const readSessionCookies = async (
 export const looksSignedIn = (cookieString: string): boolean =>
   AUTH_COOKIES.some((name) => cookieString.includes(`${name}=`));
 
+export interface WatchLaterSessionOptions {
+  /**
+   * The page's cookies, as they are now. YouTube rotates the session's binding cookies while the
+   * app runs, so a session built from a snapshot goes stale and is answered as signed out - which
+   * this is the way out of: read the jar again and retry. `undefined` means the jar holds no
+   * session any more and there is nothing to retry with.
+   */
+  renewCookies?: () => Promise<string | undefined>;
+  /** The network. The library's own fetch when not given; tests hand in their own. */
+  fetch?: Types.FetchFunction;
+}
+
+/**
+ * One construction path, for the first session and for a renewal alike.
+ *
+ * Nothing here needs the network. This plugin only ever calls `actions.execute`: never the
+ * library's player, and never the InnerTube config, so a session can be built locally - which is
+ * what makes replacing a stale one cheap enough to do on the spot. The player costs a request for
+ * `iframe_api` and the config another; neither is asked for.
+ */
+const buildClient = (
+  cookie: string,
+  visitorData: string | undefined,
+  fetchImpl: Types.FetchFunction | undefined
+): Promise<Innertube> =>
+  Innertube.create({
+    cookie,
+    fetch: fetchImpl,
+    generate_session_locally: true,
+    retrieve_innertube_config: false,
+    retrieve_player: false,
+    visitor_data: visitorData,
+  });
+
 /**
  * Wraps one signed-in session. Account switching is a session-level concern in
  * InnerTube: `session.account_index` decides which of the signed-in accounts
@@ -45,24 +81,31 @@ export const looksSignedIn = (cookieString: string): boolean =>
  * setting it and telling the caller which account is now active.
  */
 export class WatchLaterSession {
-  readonly #yt: Innertube;
+  #yt: Innertube;
   #accountIndex: number;
   #accounts: WatchLaterAccount[] = [];
+  readonly #options: WatchLaterSessionOptions;
 
-  private constructor(yt: Innertube, accountIndex: number) {
+  private constructor(
+    yt: Innertube,
+    accountIndex: number,
+    options: WatchLaterSessionOptions
+  ) {
     this.#yt = yt;
     this.#accountIndex = accountIndex;
+    this.#options = options;
   }
 
   static async create(
     cookieString: string,
-    accountIndex = 0
+    accountIndex = 0,
+    options: WatchLaterSessionOptions = {}
   ): Promise<WatchLaterSession> {
-    const yt = await Innertube.create({
-      cookie: cookieString,
-      generate_session_locally: true,
-    });
-    const session = new WatchLaterSession(yt, accountIndex);
+    const session = new WatchLaterSession(
+      await buildClient(cookieString, undefined, options.fetch),
+      accountIndex,
+      options
+    );
     session.setAccountIndex(accountIndex);
     return session;
   }
@@ -133,7 +176,7 @@ export class WatchLaterSession {
   }
 
   async fetchPage(continuation?: string): Promise<WatchLaterPage> {
-    const response = await this.#yt.actions.execute(
+    const response = await this.#request(
       "/browse",
       browsePayload(continuation)
     );
@@ -141,38 +184,25 @@ export class WatchLaterSession {
   }
 
   async addVideo(videoId: string): Promise<void> {
-    const response = await this.#yt.actions.execute(
-      "/browse/edit_playlist",
-      addVideoPayload(videoId)
-    );
-    const result = parseMutationResponse(
-      Number(response.status_code ?? 200),
-      response.data
-    );
-    if (!result.ok) {
-      throw new Error(result.error);
-    }
+    await this.#mutate(addVideoPayload(videoId));
   }
 
   async removeVideo(setVideoId: string): Promise<void> {
-    const response = await this.#yt.actions.execute(
-      "/browse/edit_playlist",
-      removeVideoPayload(setVideoId)
-    );
-    const result = parseMutationResponse(
-      Number(response.status_code ?? 200),
-      response.data
-    );
-    if (!result.ok) {
-      throw new Error(result.error);
-    }
+    await this.#mutate(removeVideoPayload(setVideoId));
   }
 
   async removeVideoById(videoId: string): Promise<void> {
-    const response = await this.#yt.actions.execute(
-      "/browse/edit_playlist",
-      removeVideoByIdPayload(videoId)
-    );
+    await this.#mutate(removeVideoByIdPayload(videoId));
+  }
+
+  async videoDetails(videoId: string): Promise<VideoDetails> {
+    const response = await this.#request("/player", playerPayload(videoId));
+    return parseVideoDetails(response.data);
+  }
+
+  /** `edit_playlist` reports its own refusals in the body, whatever the status code said. */
+  async #mutate(payload: Record<string, unknown>): Promise<void> {
+    const response = await this.#request("/browse/edit_playlist", payload);
     const result = parseMutationResponse(
       Number(response.status_code ?? 200),
       response.data
@@ -182,11 +212,40 @@ export class WatchLaterSession {
     }
   }
 
-  async videoDetails(videoId: string): Promise<VideoDetails> {
-    const response = await this.#yt.actions.execute(
-      "/player",
-      playerPayload(videoId)
-    );
-    return parseVideoDetails(response.data);
+  /**
+   * One request, retried once when the server answers as if no session were attached.
+   *
+   * A session built from an old cookie snapshot is not refused loudly: for a write the answer is
+   * `{"status": "STATUS_FAILED"}` and for a page it is the empty list the sync reads as "empty
+   * page". Reading the jar again is what clears it, and retrying here is where a dry snapshot stops
+   * costing the user anything.
+   */
+  async #request(path: string, payload: Record<string, unknown>) {
+    const response = await this.#yt.actions.execute(path, payload);
+    if (!answeredSignedOut(response.data) || !(await this.#renew())) {
+      return response;
+    }
+    return this.#yt.actions.execute(path, payload);
+  }
+
+  /** Rebuilds the client on the page's current cookies; false when there is nothing to renew. */
+  async #renew(): Promise<boolean> {
+    const renew = this.#options.renewCookies;
+    if (!renew) {
+      return false;
+    }
+    try {
+      const cookies = await renew();
+      if (!cookies) {
+        return false;
+      }
+      // The visitor is kept: a renewal is a refresh of the cookies, not a new client showing up.
+      const visitorData = this.#yt.session.context.client.visitorData;
+      this.#yt = await buildClient(cookies, visitorData, this.#options.fetch);
+      this.setAccountIndex(this.#accountIndex);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

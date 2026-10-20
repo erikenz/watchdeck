@@ -14,6 +14,7 @@ import type {
 import {
   alignButton,
   BUTTON_CLASS,
+  buttonStateOf,
   cardOf,
   cardUnderPoint,
   createSaveButton,
@@ -26,7 +27,6 @@ import {
   THUMBNAIL_HOST_SELECTOR,
   videoIdFromHost,
 } from "./dom";
-import type { ButtonState } from "./dom";
 import type { WatchLaterBridge } from "./ui/bridge";
 import {
   applyRowVisibility,
@@ -44,6 +44,9 @@ import Toolbar from "./ui/toolbar";
 /** How often the local high-water mark is reported while something plays. */
 const PROGRESS_INTERVAL_MS = 5000;
 
+/** How long a change the server refused stays visible on the button. */
+const REFUSAL_HOLD_MS = 1200;
+
 type Ipc = RendererContext<WatchLaterPluginConfig>["ipc"];
 
 export const renderer = {
@@ -53,6 +56,12 @@ export const renderer = {
   membership: new Set<string>(),
   observer: null as MutationObserver | null,
   pending: new Set<string>(),
+  /**
+   * Videos whose change the server refused. Held apart from `pending` and painted over the rest, so
+   * a failure is visible: a button that goes back to "not saved" on its own reads as "nothing
+   * happened", which is how a save that never landed was missed.
+   */
+  refused: new Set<string>(),
   scanQueued: false,
   pointerMarkQueued: false,
   lastPointer: { x: -1, y: -1 },
@@ -532,12 +541,11 @@ export const renderer = {
       remove: t("plugins.watch-later.button.remove"),
       save: t("plugins.watch-later.button.save"),
     };
-    let state: ButtonState = "unsaved";
-    if (this.pending.has(videoId)) {
-      state = "pending";
-    } else if (this.membership.has(videoId)) {
-      state = "saved";
-    }
+    const state = buttonStateOf({
+      pending: this.pending.has(videoId),
+      refused: this.refused.has(videoId),
+      saved: this.membership.has(videoId),
+    });
     paintButton(button, state, labels);
   },
 
@@ -557,6 +565,8 @@ export const renderer = {
 
     const wasSaved = this.membership.has(videoId);
     this.pending.add(videoId);
+    // A new attempt is this click, not the last one's failure.
+    this.refused.delete(videoId);
     // Optimistic: the click has to feel instant, and it is reverted on failure.
     if (wasSaved) {
       this.membership.delete(videoId);
@@ -585,8 +595,13 @@ export const renderer = {
       } else {
         this.membership.delete(videoId);
       }
-      button.dataset.state = "error";
-      setTimeout(() => this.repaint(), 1200);
+      // Held in `refused`, not written onto the button: the `finally` below repaints from these sets,
+      // and a state set here would be gone before it was ever seen - which is what hid every refusal.
+      this.refused.add(videoId);
+      setTimeout(() => {
+        this.refused.delete(videoId);
+        this.repaint();
+      }, REFUSAL_HOLD_MS);
     } finally {
       this.pending.delete(videoId);
       this.repaint();

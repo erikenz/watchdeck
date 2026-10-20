@@ -30,6 +30,10 @@ The refused-write bug that prompted the search is fixed (the session re-reads th
 
 - [ ] **Nothing in the UI says "signed out".** `WatchLaterState.needsAuth` is set by the backend and reaches the renderer, but no surface reads it: with no usable session the buttons simply stay unsaved and an add answers `not-signed-in`. That is the state the app ran in for sixteen minutes on 2026-10-19 while the page looked signed in — the one line the toolbar was missing. (`docs/PRD.md` §4.2 now records what a stale cookie looks like from the API side.)
 
+## Cookies: unencrypted on a desktop Chromium does not recognise
+
+- [ ] **The app's session cookies are stored in the clear, and nothing in it says so.** Measured with the app's own Electron binary on this machine (CachyOS, `XDG_CURRENT_DESKTOP=Hyprland`): `Hyprland` → `safeStorage.isEncryptionAvailable() false` and `getSelectedStorageBackend() basic_text`, which is Electron's name for "write the cookie in the clear" — and `~/.config/watchdeck/Cookies` shows exactly that (empty `encrypted_value`, plaintext `value`), while the `chromium` and `vivaldi` jars on the same machine are `v10`-encrypted (263 and 1267 rows) because those wrappers read their `*-flags.conf`. `GNOME` → `gnome_libsecret`, `KDE` → `kwallet` (nothing listening here, so unusable), and `--password-store=gnome-libsecret` under Hyprland → `gnome_libsecret`: the keyring was never the problem (gnome-keyring-daemon has been up since 2026-10-18 and every collection is unlocked). Worth doing: a startup line naming the backend, and a setting that passes `--password-store=` for desktops Chromium's detection does not know — note that the switch has to be appended before Chromium's first cookie access, and that the app cannot know which keyring a machine has.
+
 ## Dependencies pinned behind an API change
 
 These four are held at the version the current code is written against. Each one belongs to a plugin that P1/P2 rebuilds, so the migration is deliberately not done yet — the entry goes away with the rewrite:

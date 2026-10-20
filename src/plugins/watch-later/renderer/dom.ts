@@ -310,9 +310,16 @@ const painted = new WeakMap<
 export const paintButton = (
   button: HTMLButtonElement,
   state: ButtonState,
-  labels: { save: string; remove: string }
+  labels: { failed: string; remove: string; save: string }
 ) => {
-  const label = state === "saved" ? labels.remove : labels.save;
+  let label = labels.save;
+  if (state === "saved") {
+    label = labels.remove;
+  } else if (state === "error") {
+    // A refusal has to be readable, not just red: the button is the only place that knows which
+    // video it was for, and "Save to Watch Later" on a button that just failed says nothing.
+    label = labels.failed;
+  }
   const last = painted.get(button);
   // Painting runs for every card on every scan. Rewriting the icon replaces the SVG, which is a
   // child-list mutation, which is what tells this plugin to scan again - so a paint that would

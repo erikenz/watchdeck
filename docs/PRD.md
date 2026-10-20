@@ -236,8 +236,13 @@ Consequences for the design:
    carries `{"status": "STATUS_SUCCEEDED"}`, a refused one `{"status": "STATUS_FAILED"}` with **no `error` object at
    all** — the refusal shows up only as a "Sign in to add this video to a playlist." popup inside the action. Verified
    against a live session on 2026-10-19: the same write answered `STATUS_SUCCEEDED` from a healthy session and
-   `STATUS_FAILED` from a stale one. Reading `error` alone is what made a refused save look saved (see §7 R1, and
+   `STATUS_FAILED` from a stale one. Reading `error` alone is what made a refused save look saved (see §R4 and
    `parseMutationResponse`).
+7. **The answer is not the last word: the list is.** A write that was answered `STATUS_SUCCEEDED` has been seen not
+   to appear in the list, and a page read can come back signed out (note 6) — so a save is only recorded once the
+   list itself carries the video: `WatchLaterSync.add` follows the write with one read of the first page, which is
+   also where a freshly added entry's `setVideoId` and position come from. A write the list does not show is a
+   failure the user is told about (and is queued for the next walk), never a silent "saved".
 6. **A stale cookie is answered as signed out, not refused.** The signed-in session's binding cookies
    (`__Secure-1PSIDTS` / `__Secure-3PSIDTS`, and the `PSIDCC` set) are rotated by the page while it runs — rotations
    observed 15–16 minutes apart — and a request carrying an older value gets the signed-out answer instead of an
@@ -716,8 +721,11 @@ background.
 
 **Size (rev 9):** 36×36 translucent dark circle with a 22 px glyph, matching YouTube's own overlay buttons.
 
-**States:** not-saved (**outline clock**, the site's own Watch Later glyph) / saved (**the same clock, filled**) / pending
-(spinner) / error (red circle). Tooltip and `aria-label` localized (`Save to Watch Later` / `Remove from Watch Later`) with
+**States (rev 14):** not-saved (**outline clock**, the site's own Watch Later glyph) / saved (**the same clock, filled**) / pending
+(spinner) / error (**red circle**, tooltip *"Could not save to Watch Later - try again"*). A refusal outranks the other
+states (`buttonStateOf`) and is held for 1.2 s — the button is painted from the mirror, so writing the state onto the
+element lasted only until the next repaint. **"Saved" is claimed only once the list itself confirms the write**
+(§4.2 note 7): a refused write answers 200, which is what the button used to believe. Tooltip and `aria-label` localized (`Save to Watch Later` / `Remove from Watch Later`) with
 `aria-pressed`; keyboard focusable; a click never navigates (`preventDefault` + `stopPropagation` on `mousedown`,
 `pointerdown`, `auxclick` and `click`). A saved video's button is visible without hovering; an unsaved one appears on hover
 

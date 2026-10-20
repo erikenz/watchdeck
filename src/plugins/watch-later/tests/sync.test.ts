@@ -554,6 +554,81 @@ test("a failed add is queued in the outbox for the next sync", async () => {
   db.close();
 });
 
+test("an add is only recorded once the list carries the video", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+  const added: string[] = [];
+  const transport: WatchLaterTransport = {
+    addVideo: (videoId: string) => {
+      added.push(videoId);
+      return Promise.resolve();
+    },
+    // The list itself, an instant after the write: a video that was just added is at the top of it.
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(1))),
+    removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  await sync.add(transport, "alpha", "vid00000000");
+
+  expect(added).toEqual(["vid00000000"]);
+  expect(db.membershipIds("alpha")).toEqual(["vid00000000"]);
+  // Reading the page is also where the entry's own id comes from: no walk is needed to learn it.
+  expect(db.entryFor("alpha", "vid00000000")?.set_video_id).toBe("set-0");
+  db.close();
+});
+
+test("an add the list does not show is a failure, not a save", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+  const transport: WatchLaterTransport = {
+    // Answered as applied. A write can be accepted and not appear, and a page read can come back
+    // signed out - neither is something the app may call "saved".
+    addVideo: () => Promise.resolve(),
+    fetchPage: () => Promise.resolve(parseWatchLaterPage(legacyPage(0))),
+    removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  await expect(sync.add(transport, "alpha", "vid00000000")).rejects.toThrow(
+    "not in the list after the write"
+  );
+  expect(db.membershipIds("alpha")).toEqual([]);
+  // Queued, so the next walk that can read the list applies it.
+  expect(db.listOutbox("alpha")).toHaveLength(1);
+  db.close();
+});
+
+test("an add that failed is applied by a later replay, once the list carries it", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const sync = new WatchLaterSync(db, config);
+  let showsIt = false;
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: () =>
+      Promise.resolve(parseWatchLaterPage(legacyPage(showsIt ? 1 : 0))),
+    removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
+    videoDetails: () => Promise.resolve({}),
+  };
+
+  await expect(sync.add(transport, "alpha", "vid00000000")).rejects.toThrow();
+  expect(db.listOutbox("alpha")).toHaveLength(1);
+
+  // The list catches up (the write landed late, the session was renewed, whatever it was) and the
+  // replay after the next walk is what makes the entry saved.
+  showsIt = true;
+  expect(await sync.replayOutbox(transport, "alpha")).toEqual({
+    pending: 0,
+    replayed: 1,
+  });
+  expect(db.membershipIds("alpha")).toEqual(["vid00000000"]);
+  expect(db.listOutbox("alpha")).toHaveLength(0);
+  db.close();
+});
+
 /** A transfer that records what was asked of it, for the mutation tests. */
 const recordingTransport = (
   overrides: Partial<WatchLaterTransport> = {}

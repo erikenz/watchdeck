@@ -220,7 +220,13 @@ const runSync = async (options: {
     });
     log(`sync ${options.reason}: ${result.status}`, result.items, "items");
     if (result.status !== "error") {
-      await state.sync.enrich(session, accountId);
+      // Enrichment is one request per video, and a walk that stopped at its page limit is a peek -
+      // the retry after a failed write, the entry-id repair - not a metadata sync: the backlog it
+      // works through is thousands of entries long, so the 25 requests it spent per save went
+      // nowhere. The list's own fields (title, channel, duration) arrive with the page either way.
+      if (result.completed) {
+        await state.sync.enrich(session, accountId);
+      }
       const replayed = await state.sync.replayOutbox(session, accountId);
 
       if (replayed.replayed > 0 || replayed.pending > 0) {
@@ -350,14 +356,16 @@ export const onMainLoad = async ({
         noteMutation(videoId);
         await state.sync.add(state.session, state.activeAccountId, videoId);
         broadcast();
-        // One page is enough to learn the entry id and position we do not know yet.
+        return { ok: true };
+      } catch (error) {
+        // A write that did not land gets one retry, and the retry is the walk that replays the
+        // outbox. A write that did land needs no follow-up: `add` has already read the top of the
+        // list and recorded what it found there.
         setTimeout(() => {
           runSync({ maxPages: 1, reason: "reconcile", resume: false }).catch(
             () => undefined
           );
         }, 15_000);
-        return { ok: true };
-      } catch (error) {
         return {
           error: error instanceof Error ? error.message : String(error),
           ok: false,

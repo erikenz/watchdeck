@@ -537,14 +537,22 @@ export const renderer = {
 
   paint(button: HTMLButtonElement) {
     const videoId = button.dataset.videoId ?? "";
+    const saved = this.membership.has(videoId);
     const labels = {
+      // What the button says after a refusal. The state has been reverted by then, so it is the
+      // video's own saved/unsaved standing that says which of the two actions failed.
+      failed: t(
+        saved
+          ? "plugins.watch-later.button.remove-failed"
+          : "plugins.watch-later.button.save-failed"
+      ),
       remove: t("plugins.watch-later.button.remove"),
       save: t("plugins.watch-later.button.save"),
     };
     const state = buttonStateOf({
       pending: this.pending.has(videoId),
       refused: this.refused.has(videoId),
-      saved: this.membership.has(videoId),
+      saved,
     });
     paintButton(button, state, labels);
   },

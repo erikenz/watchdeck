@@ -622,7 +622,9 @@
     "watch-later": {
       "button": {
         "remove": "Remove from Watch Later",
-        "save": "Save to Watch Later"
+        "remove-failed": "Could not remove from Watch Later - try again",
+        "save": "Save to Watch Later",
+        "save-failed": "Could not save to Watch Later - try again"
       },
       "description": "Mirrors your Watch Later list into a local database: search, filter and group it by how much you have watched",
       "filter": {

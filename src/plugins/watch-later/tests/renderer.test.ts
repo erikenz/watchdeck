@@ -34,7 +34,7 @@ interface DomApi {
   paintButton: (
     button: HTMLButtonElement,
     state: string,
-    labels: { remove: string; save: string }
+    labels: { failed: string; remove: string; save: string }
   ) => void;
 }
 
@@ -250,7 +250,7 @@ test("the button sits on the video box, at one offset in both states", async ({
       </div>`;
     const card = document.querySelector("#card") as Element;
     const video = document.querySelector("#video") as Element;
-    const labels = { remove: "Remove", save: "Save" };
+    const labels = { failed: "Could not save", remove: "Remove", save: "Save" };
     const button = dom.createSaveButton("vid00000000", () => undefined);
     card.append(button);
 
@@ -473,6 +473,47 @@ test("the shortcut takes `w` on a card and leaves typing alone", async ({
   expect(decided.inContentEditable).toBe(false);
   expect(decided.otherKey).toBe(false);
   expect(decided.withCtrl).toBe(false);
+});
+
+test("a refused change is painted as a failure, and says so on the button", async ({
+  page,
+}) => {
+  await openFixture(page);
+
+  const painted = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    const button = dom.createSaveButton("vid00000000", () => undefined);
+    document.body.append(button);
+    const labels = {
+      failed: "Could not save to Watch Later - try again",
+      remove: "Remove from Watch Later",
+      save: "Save to Watch Later",
+    };
+
+    dom.paintButton(button, "error", labels);
+    const refused = {
+      aria: button.getAttribute("aria-label"),
+      state: button.dataset.state,
+      title: button.title,
+    };
+    dom.paintButton(button, "unsaved", labels);
+
+    return {
+      afterRepaint: button.title,
+      pressed: button.getAttribute("aria-pressed"),
+      refused,
+    };
+  });
+
+  // A refusal has to be readable, not just red: "Save to Watch Later" on a button that just failed
+  // says nothing about what happened.
+  expect(painted.refused).toEqual({
+    aria: "Could not save to Watch Later - try again",
+    state: "error",
+    title: "Could not save to Watch Later - try again",
+  });
+  expect(painted.afterRepaint).toBe("Save to Watch Later");
+  expect(painted.pressed).toBe("false");
 });
 
 test("a refusal outranks everything else on the button", async ({ page }) => {

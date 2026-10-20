@@ -177,34 +177,10 @@ export class WatchLaterSync {
         pages += 1;
         totalItems ??= page.totalItems;
 
-        for (const item of page.items) {
-          seen.add(item.videoId);
-          items += 1;
-          this.#sink.upsertVideo({
-            channelId: item.channelId,
-            channelTitle: item.channelTitle,
-            durationSeconds: item.durationSeconds,
-            isLive: item.isLive,
-            thumbnailUrl: item.thumbnailUrl,
-            title: item.title || item.videoId,
-            videoId: item.videoId,
-          });
-          this.#sink.upsertEntry({
-            accountId,
-            position: items - 1,
-            setVideoId: item.setVideoId,
-            videoId: item.videoId,
-          });
-          if (
-            item.ytPercentWatched !== undefined ||
-            item.watchedBadge === true
-          ) {
-            this.#sink.setYouTubeProgress(accountId, item.videoId, {
-              percent: item.ytPercentWatched ?? 0,
-              watchedBadge: item.watchedBadge,
-            });
-          }
+        for (const videoId of this.#absorbPage(accountId, page, items)) {
+          seen.add(videoId);
         }
+        items += page.items.length;
 
         continuation = page.continuation;
         // The cursor exists to continue a walk. A top-up that deliberately starts from page one
@@ -300,6 +276,59 @@ export class WatchLaterSync {
     return done;
   }
 
+  /**
+   * Takes one page of the list into the mirror, and answers with the video ids it carried.
+   *
+   * The positions are the list's own order, counted on from `offset` so that a walk's second page
+   * continues where its first stopped.
+   */
+  #absorbPage(
+    accountId: string,
+    page: WatchLaterPage,
+    offset: number
+  ): Set<string> {
+    const seen = new Set<string>();
+    let position = offset;
+
+    for (const item of page.items) {
+      seen.add(item.videoId);
+      this.#sink.upsertVideo({
+        channelId: item.channelId,
+        channelTitle: item.channelTitle,
+        durationSeconds: item.durationSeconds,
+        isLive: item.isLive,
+        thumbnailUrl: item.thumbnailUrl,
+        title: item.title || item.videoId,
+        videoId: item.videoId,
+      });
+      this.#sink.upsertEntry({
+        accountId,
+        position,
+        setVideoId: item.setVideoId,
+        videoId: item.videoId,
+      });
+      if (item.ytPercentWatched !== undefined || item.watchedBadge === true) {
+        this.#sink.setYouTubeProgress(accountId, item.videoId, {
+          percent: item.ytPercentWatched ?? 0,
+          watchedBadge: item.watchedBadge,
+        });
+      }
+      position += 1;
+    }
+
+    return seen;
+  }
+
+  /**
+   * Adds a video, and only records it as saved once the list itself says so.
+   *
+   * `edit_playlist` is not the last word on its own write. A session YouTube has stopped accepting
+   * answers a 200 `{"status": "STATUS_FAILED"}` with no `error` object at all, and a write has been
+   * seen to be answered `STATUS_SUCCEEDED` without the video ever appearing. What cannot lie about a
+   * video that was just added is the list, which puts it at the top: one read of the first page
+   * follows the write, and the entry is recorded - with the `setVideoId` and position that page
+   * carries - only if the video is on it.
+   */
   async add(
     transport: WatchLaterTransport,
     accountId: string,
@@ -313,7 +342,9 @@ export class WatchLaterSync {
     try {
       await this.#limiter.wait();
       await transport.addVideo(videoId);
-      this.#sink.upsertEntry({ accountId, videoId });
+      if (!(await this.#confirmAdded(transport, accountId, videoId))) {
+        throw new Error("not in the list after the write");
+      }
     } catch (error) {
       // A retry of a queued change keeps its own row: enqueueing again would duplicate it
       if (options.queue !== false) {
@@ -321,6 +352,17 @@ export class WatchLaterSync {
       }
       throw error;
     }
+  }
+
+  /** Whether the top of the list carries the video that was just added. */
+  async #confirmAdded(
+    transport: WatchLaterTransport,
+    accountId: string,
+    videoId: string
+  ): Promise<boolean> {
+    await this.#limiter.wait();
+    const page = await transport.fetchPage();
+    return this.#absorbPage(accountId, page, 0).has(videoId);
   }
 
   async remove(

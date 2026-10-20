@@ -45,11 +45,15 @@ These four are held at the version the current code is written against. Each one
 
 ## Packaging
 
-- [x] ~~**An AppImage**~~ — **done (rev 13).** `pnpm dist:linux:appimage` builds `pack/Watchdeck-0.1.0.AppImage` (131 MB) and it was verified on this machine: the window's class is `watchdeck` (matching the desktop entry's `StartupWMClass`), the site loads, the page half runs (`customElements.get("wd-trans")` answers), plugins load, and `--remote-debugging-port` works from inside the AppImage. The artifact is gitignored; nothing is installed by it.
+- [x] ~~**An AppImage**~~ — **done (rev 13).** `pnpm dist:linux:appimage` builds `pack/Watchdeck.AppImage` (131 MB) and it was verified on this machine: the window's class is `watchdeck` (matching the desktop entry's `StartupWMClass`), the site loads, the page half runs (`customElements.get("wd-trans")` answers), plugins load, and `--remote-debugging-port` works from inside the AppImage. The artifact is gitignored; nothing is installed by it.
 
 - [ ] **The AppImage's desktop entry passes `--no-sandbox`, and that is electron-builder's default, not a decision.** It is there because the bundled `chrome-sandbox` helper cannot be setuid inside a squashfs mount. `AppRun` already probes `unshare -Ur true` and adds the flag itself when user namespaces are unavailable, so on a machine like this one the app _can_ run sandboxed when started from a terminal — but a launcher's click always passes the flag. Dropping it means overriding the generated `Exec`, which electron-builder does not expose cleanly; worth revisiting together with the sandbox refactor in §3.3.
 
 - [ ] **Releases are manual and none has been cut.** Publishing means a GitHub release with the AppImage attached (and re-enabling the parked workflows for the other platforms, which need signing identities). Decide whether the AppImage is the only artifact for now.
+
+## Version, and how a build is identified
+
+- [ ] **Nothing but the version number says which build is which.** The About menu item and its dialog show `app.getVersion()` (`package.json` → the packaged copy), and the AppImage's file name deliberately carries no version — so a fix that does not bump the version is indistinguishable from the build it replaces, which is exactly how a fixed AppImage sat in `pack/` while the old one was tested. Bumping the version with every user-facing fix is the cheap half; a commit/build marker in the About dialog (the git sha or the build date, injected at build time) is the half that would not depend on remembering. On a release, `pnpm changelog` (now the pinned `auto-changelog` instead of `pnpm dlx`) writes `changelog.md`, which the workflow commits.
 
 ## Diagnostics
 

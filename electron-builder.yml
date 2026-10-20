@@ -77,6 +77,9 @@ linux:
         - arm64
         - armv7l
 appImage:
+  # No version in the file name, on purpose: the About menu is what says which build this is, and a
+  # name that changes every build is one more thing to keep in step.
+  artifactName: "Watchdeck.AppImage"
   description: "Unofficial \u0059\u006f\u0075\u0054\u0075\u0062\u0065 desktop client (Watchdeck)"
   category: AudioVideo
 flatpak:

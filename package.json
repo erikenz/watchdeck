@@ -1,6 +1,6 @@
 {
   "name": "watchdeck",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unofficial YouTube desktop client, built around a plugin system",
   "license": "MIT",
   "author": {
@@ -34,7 +34,7 @@
     "lint": "ultracite check",
     "format": "ultracite fix",
     "format:check": "ultracite check",
-    "changelog": "pnpm dlx auto-changelog",
+    "changelog": "auto-changelog",
     "release:linux": "pnpm clean && pnpm build && pnpm electron-builder --linux -p always -c.snap.publish=github",
     "release:mac": "pnpm clean && pnpm build && pnpm electron-builder --mac -p always",
     "release:win": "pnpm clean && pnpm build && pnpm electron-builder --win -p always",
@@ -90,6 +90,7 @@
     "@types/semver": "7.8.0",
     "@types/trusted-types": "2.0.7",
     "@types/ws": "8.18.2",
+    "auto-changelog": "2.7.0",
     "bufferutil": "4.1.0",
     "builtin-modules": "5.4.0",
     "cross-env": "10.1.0",
@@ -114,9 +115,11 @@
     "ws": "8.22.0"
   },
   "auto-changelog": {
+    "commitLimit": false,
     "hideCredit": true,
     "output": "changelog.md",
     "package": true,
+    "sortCommits": "date-desc",
     "unreleased": true
   },
   "engines": {

@@ -693,7 +693,11 @@ export const mainMenuTemplate = async (
       submenu: [
         {
           click: () => showAboutDialog(win),
-          label: t("main.menu.about-watchdeck"),
+          // The version belongs where it can be read without opening anything: the answer to
+          // "which build am I running" is the one thing this menu is asked for.
+          label: t("main.menu.about-watchdeck", {
+            version: app.getVersion(),
+          }),
         },
       ],
     },

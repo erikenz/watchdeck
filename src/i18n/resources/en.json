@@ -215,7 +215,7 @@
           "volume-up": "Volume up"
         }
       },
-      "about-watchdeck": "About Watchdeck"
+      "about-watchdeck": "About Watchdeck {{version}}"
     },
     "tray": {
       "next": "Next",

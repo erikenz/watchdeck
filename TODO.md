@@ -30,6 +30,13 @@ The refused-write bug that prompted the search is fixed (the session re-reads th
 
 - [ ] **Nothing in the UI says "signed out".** `WatchLaterState.needsAuth` is set by the backend and reaches the renderer, but no surface reads it: with no usable session the buttons simply stay unsaved and an add answers `not-signed-in`. That is the state the app ran in for sixteen minutes on 2026-10-19 while the page looked signed in — the one line the toolbar was missing. (`docs/PRD.md` §4.2 now records what a stale cookie looks like from the API side.)
 
+- [ ] **The mirror's raw responses are most of the database, and nothing reads them.** `video.raw_json` is written by
+  `WatchLaterDb.saveDetails` for every enriched video (`src/plugins/watch-later/backend/db.ts`) and no code reads the
+  column — `grep -rn raw_json src/` finds the schema and the write, nothing else. Measured in the app's own profile on
+  2026-10-21: 1,706 of 3,536 videos carry one, 109 MB of the file's 125 MB (~64 KB each), against 2.4 MB of
+  descriptions and 0.3 MB of tags. Enrichment is off by default now, so it no longer grows, but the file stays that
+  size. Decide: stop writing the column, or drop it and `VACUUM` (the reclaim is the whole 109 MB).
+
 - [ ] **The list's own count is not a count a walk can reach.** The Watch Later page says "3,636 videos" and the response's `totalItems` agrees, but the paginated walk ends after 36 pages with 3,528 rows and no continuation — measured twice on 2026-10-21, once through the app's own sync and once with a standalone client on the same cookies. So `3528 of 3636 mirrored` in the toolbar is where this API stops, not a walk that stopped early. Either say that in the status line, or stop showing the site's count as a target nobody can hit.
 
 ## Cookies: unencrypted on a desktop Chromium does not recognise

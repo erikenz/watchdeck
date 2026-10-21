@@ -24,11 +24,13 @@ Ultracite's presets are on and the deviation list is deliberately temporary. Two
 
 ## Watch Later (found while chasing a save that never landed)
 
-The refused-write bug that prompted the search is fixed (the session re-reads the cookie jar and retries once, and `edit_playlist`'s `STATUS_FAILED` is a failure). These two were found on the way and are not fixed:
+The refused-write bug that prompted the search is fixed (the session re-reads the cookie jar and retries once, and `edit_playlist`'s `STATUS_FAILED` is a failure), and so is the one that replaced it (the request had to carry the site's own cookies; see `docs/research/youtube-session-cookies.md`). What follows was found on the way and is not fixed:
 
 - [ ] **A full walk can sweep away a save that happened during that walk.** `runSync` hands the walk `new Set(mutatedDuringWalk)` — a copy taken _before_ the walk starts — while the walk decides what is missing at the _end_. A video the user saves while the walk is running is in neither the seen set nor the protected set, so `softRemoveMissing` marks it removed: the server has it, the mirror says it does not, and the button offers to save what is already saved. Seen in the app's own database on 2026-10-17: three app-added entries all carry the same removal timestamp (17:01:12.954 — one sweep), and one of them was added again by hand two days later. Handing the walk the live set instead of a copy looks like the fix; the test that pins it is "an add during a walk survives its sweep".
 
 - [ ] **Nothing in the UI says "signed out".** `WatchLaterState.needsAuth` is set by the backend and reaches the renderer, but no surface reads it: with no usable session the buttons simply stay unsaved and an add answers `not-signed-in`. That is the state the app ran in for sixteen minutes on 2026-10-19 while the page looked signed in — the one line the toolbar was missing. (`docs/PRD.md` §4.2 now records what a stale cookie looks like from the API side.)
+
+- [ ] **The list's own count is not a count a walk can reach.** The Watch Later page says "3,636 videos" and the response's `totalItems` agrees, but the paginated walk ends after 36 pages with 3,528 rows and no continuation — measured twice on 2026-10-21, once through the app's own sync and once with a standalone client on the same cookies. So `3528 of 3636 mirrored` in the toolbar is where this API stops, not a walk that stopped early. Either say that in the status line, or stop showing the site's count as a target nobody can hit.
 
 ## Cookies: unencrypted on a desktop Chromium does not recognise
 

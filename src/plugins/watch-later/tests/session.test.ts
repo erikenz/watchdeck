@@ -4,7 +4,7 @@ import type { Types } from "youtubei.js";
 import {
   WatchLaterSession,
   looksSignedIn,
-  mergeCookies,
+  siteCookieString,
 } from "../backend/session";
 import {
   appliedEditAnswer,
@@ -35,35 +35,46 @@ const answeringFetch = (answers: unknown[]) => {
   return { fetch, sent };
 };
 
-// The bug this is about: YouTube answers a stale snapshot as signed out - not with a failure - so
-// the write was recorded as saved and the page walk read as empty. Reading the jar again is what
-// clears it.
-test("the session cookie string merges both origins, the site's copy winning", () => {
-  const merged = mergeCookies(
-    [
-      { name: "SAPISID", value: "account" },
-      { name: "SID", value: "account" },
-      { name: "VISITOR_INFO1_LIVE", value: "account" },
-    ],
-    [
-      { name: "__Secure-1PSIDTS", value: "site" },
-      { name: "SAPISID", value: "site" },
-    ]
-  );
-
-  // Both origins contribute what they have; the site's copy of a name is the one the page is using,
-  // so it wins.
-  expect(merged.split("; ")).toEqual([
-    "SAPISID=site",
-    "SID=account",
-    "VISITOR_INFO1_LIVE=account",
-    "__Secure-1PSIDTS=site",
+// What the site actually holds, measured on 2026-10-21: the `youtube.com` set carries
+// `__Secure-3PSID` and `__Secure-3PAPISID` but no plain `SAPISID` - and `SAPISID` is the name
+// youtubei.js hashes into the `SAPISIDHASH` header. Without one the header is not sent at all and
+// every request is answered as signed out, which is what the app was getting.
+test("the site's __Secure-3PAPISID answers for the SAPISID the client hashes", () => {
+  const string = siteCookieString([
+    { name: "__Secure-3PSID", value: "site" },
+    { name: "__Secure-3PAPISID", value: "site-ap" },
+    { name: "LOGIN_INFO", value: "site" },
   ]);
-  expect(looksSignedIn(merged)).toBe(true);
-  // What the app read before this fix: `youtube.com` alone, where SID and SAPISID had been deleted -
-  // which is why a renewal found nothing to renew from and every request stayed signed out.
+
+  expect(string.split("; ")).toEqual([
+    "__Secure-3PSID=site",
+    "__Secure-3PAPISID=site-ap",
+    "LOGIN_INFO=site",
+    "SAPISID=site-ap",
+  ]);
+  expect(looksSignedIn(string)).toBe(true);
+});
+
+// The alias is a fallback, not a replacement: a site that still sets the cookie it is named after
+// is the one the page itself is using.
+test("a SAPISID the site sets itself is left alone", () => {
+  const string = siteCookieString([
+    { name: "SAPISID", value: "own" },
+    { name: "__Secure-3PAPISID", value: "site-ap" },
+  ]);
+
+  expect(string).toContain("SAPISID=own");
+  expect(string).not.toContain("SAPISID=site-ap");
+});
+
+// The `.google.com` copies are not a substitute for the site's own: they are a second,
+// differently-rotated copy of the same session, and one of them alongside the site's set is what
+// turned a signed-in answer back into `loggedOut`.
+test("a jar with no account cookie of its own reads as signed out", () => {
   expect(
-    looksSignedIn(mergeCookies([{ name: "VISITOR_INFO1_LIVE", value: "v" }]))
+    looksSignedIn(
+      siteCookieString([{ name: "VISITOR_INFO1_LIVE", value: "v" }])
+    )
   ).toBe(false);
 });
 

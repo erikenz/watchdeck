@@ -29,52 +29,52 @@ export { SITE_ORIGIN };
 const AUTH_COOKIES = ["SAPISID", "SID"];
 
 /**
- * Where the account's own cookies live. The site is `youtube.com`, but the cookies that authenticate
- * the session - `SID`, `SAPISID`, `HSID`, `SSID`, `__Secure-1PSID` - are `google.com` ones, and the
- * rotating binding tokens (`__Secure-1PSIDTS`, `__Secure-3PSIDCC`) are `youtube.com` ones.
- */
-const ACCOUNT_ORIGIN = "https://www.google.com";
-
-/**
- * One cookie string out of several lists of cookies, later lists winning a name clash.
+ * The site's own cookies, as one string, with the one alias the client needs.
  *
- * Kept pure so the merge is testable: the two origins do not hold the same set, and where they
- * overlap the site's own copy is the fresher one.
+ * `youtubei.js` signs each request with `SAPISIDHASH`, and it builds that hash from the cookie
+ * named `SAPISID` - no cookie by that name, no `Authorization` header, and the request is
+ * answered as signed out. The site has stopped setting a plain `SAPISID` on `youtube.com` (it
+ * still sets one on `.google.com`), but the account's `__Secure-3PAPISID` *is* on `youtube.com`,
+ * and that is the secret the site's own script hashes. So it answers for `SAPISID` here, and a
+ * real `SAPISID` still wins when the site has one.
+ *
+ * Kept pure so this is testable without a window.
  */
-export const mergeCookies = (
-  ...lists: { name: string; value: string }[][]
+export const siteCookieString = (
+  cookies: { name: string; value: string }[]
 ): string => {
   const byName = new Map<string, string>();
-  for (const list of lists) {
-    for (const cookie of list) {
-      byName.set(cookie.name, cookie.value);
-    }
+  for (const cookie of cookies) {
+    byName.set(cookie.name, cookie.value);
+  }
+  const siteApisid = byName.get("__Secure-3PAPISID");
+  if (!byName.has("SAPISID") && siteApisid) {
+    byName.set("SAPISID", siteApisid);
   }
   return [...byName].map(([name, value]) => `${name}=${value}`).join("; ");
 };
 
 /**
- * The signed-in session, as one cookie string.
+ * The signed-in session, as one cookie string: the site's cookies, and only the site's.
  *
- * Both origins are read, and the site's cookies win a name clash. Reading `youtube.com` alone was a
- * real failure, measured on 2026-10-21: the `youtube.com` copies of `SID` and `SAPISID` had been
- * deleted (the site makes and clears host-only copies) while `.google.com` still carried them, so
- * the app's cookie string had no `SAPISID` at all - no `SAPISIDHASH` header goes with it, every
- * request is answered as signed out, and a renewal finds nothing to renew from. Measured the same
- * day, against the live account: `youtube.com` alone answers `logged_in=0` with an empty list,
- * `google.com` alone the same (no binding tokens), and the two merged answer `logged_in=1` with the
- * real list.
+ * Measured against the live account on 2026-10-21, one request per row:
+ *
+ * - the `youtube.com` set alone carries no `SAPISID`, so no `SAPISIDHASH` goes with it and the
+ *   answer is `loggedOut` with an empty list - which is what the app was getting;
+ * - the same set with `SAPISID` = the site's `__Secure-3PAPISID` answers signed in, with the real
+ *   list (101 items on the first page);
+ * - adding `.google.com`'s cookies to that working string breaks it again. One at a time: the
+ *   `.google.com` copies of `__Secure-1PSID` and of `__Secure-3PSIDTS` each turn the answer back
+ *   into `loggedOut`, and the whole `google.com` set does the same.
+ *
+ * The `google.com` cookies are a second, differently-rotated copy of the same session, and this
+ * request is not going to `google.com`. The page sends only the site's own cookies, so this does
+ * too.
  */
-export const readSessionCookies = async (
-  win: BrowserWindow
-): Promise<string> => {
-  const session = win.webContents.session;
-  const [account, site] = await Promise.all([
-    session.cookies.get({ url: ACCOUNT_ORIGIN }),
-    session.cookies.get({ url: SITE_ORIGIN }),
-  ]);
-  return mergeCookies(account, site);
-};
+export const readSessionCookies = async (win: BrowserWindow): Promise<string> =>
+  siteCookieString(
+    await win.webContents.session.cookies.get({ url: SITE_ORIGIN })
+  );
 
 export const looksSignedIn = (cookieString: string): boolean =>
   AUTH_COOKIES.some((name) => cookieString.includes(`${name}=`));

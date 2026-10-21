@@ -251,6 +251,15 @@ Consequences for the design:
    goes stale on its own — in the observed run the first refused request came 9 minutes after the app read the jar,
    and every request after it was answered signed out while the page kept working. `WatchLaterSession` now reads the
    jar again and retries once when it sees that flag.
+8. **Which cookies the request carries decides this, not just how fresh they are.** Measured on
+   2026-10-21 against the live account: the `youtube.com` cookie set on its own is answered
+   `loggedOut` (it has no `SAPISID`, which is the name `youtubei.js` hashes into `SAPISIDHASH`, so
+   no `Authorization` header goes with the request at all), the same set with `SAPISID` = the site's
+   `__Secure-3PAPISID` is answered signed in, and adding `.google.com`'s `__Secure-1PSID` — or a
+   `__Secure-3PSIDTS` that disagrees with the site's — turns the signed-in answer back into
+   `loggedOut`. So the session string is the **site's** cookies with that one alias, and the two
+   origins are not merged. The measurements and a re-measurement recipe are in
+   [`docs/research/youtube-session-cookies.md`](research/youtube-session-cookies.md).
 
 ### 4.3 Where the watched/continue-watching numbers come from (revised)
 

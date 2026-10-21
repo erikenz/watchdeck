@@ -321,6 +321,20 @@ test("the button sits on the video box, at one offset in both states", async ({
 
     card.classList.add(dom.MEDIA_HOVER_CLASS);
     dom.alignButton(button, card);
+    // Marked - the pointer is on the video box - and the site's preview is *not* playing: the button
+    // stays in its card, so it scrolls with the card instead of trailing it by a frame (which is what
+    // the owner saw as flicker).
+    const markedInCard = {
+      floating: button.classList.contains("wd-wl-floating"),
+      parent: button.parentElement === card,
+    };
+
+    // The preview plays over the card: only then does the button float, so it stays above it.
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<ytd-video-preview style="position:fixed;left:0;top:0;width:527px;height:296px"></ytd-video-preview>'
+    );
+    dom.alignButton(button, card);
     const marked = button.getBoundingClientRect();
     const whileMarked = { left: button.style.left, top: button.style.top };
 
@@ -330,6 +344,7 @@ test("the button sits on the video box, at one offset in both states", async ({
       cornerWhileHovered: { x: hovered.right, y: hovered.bottom },
       cornerWhileMarked: { x: marked.right, y: marked.bottom },
       first,
+      markedInCard,
       mediaEdge: { right: mediaRect.right, bottom: mediaRect.bottom },
       pickedBox: picked ? [picked.box.width, picked.box.height] : null,
       pickedIsVideo: picked?.element === video,
@@ -347,6 +362,8 @@ test("the button sits on the video box, at one offset in both states", async ({
   expect(measured.first).toBeGreaterThan(0);
   expect(measured.repaints).toBe(0);
   expect(measured.changed).toBeGreaterThan(0);
+  // Marked without a preview: the button is still the card's own child.
+  expect(measured.markedInCard).toEqual({ floating: false, parent: true });
   // 36 px above the video's bottom edge and 8 px inside its right edge, hovered...
   expect(measured.placed).toEqual({ bottom: "92px", right: "8px" });
   expect(measured.cornerWhileHovered.x).toBeCloseTo(
@@ -403,6 +420,12 @@ test("the button stays visible inside a transformed, clipping shelf", async ({
     const hovered = button.getBoundingClientRect();
 
     card.classList.add(dom.MEDIA_HOVER_CLASS);
+    // The float exists for the preview: it paints over the card, and this wrapper would clip a button
+    // that stayed inside it.
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<ytd-video-preview style="position:fixed;left:0;top:0;width:527px;height:296px"></ytd-video-preview>'
+    );
     dom.alignButton(button, card);
     const marked = button.getBoundingClientRect();
     const media = video.getBoundingClientRect();
@@ -471,8 +494,13 @@ test("a button whose card is gone comes back to the card, not the floating layer
     const button = dom.createSaveButton("vid00000000", () => undefined);
     card.append(button);
 
-    // The pointer is on the card's video box, so the button floats.
+    // The pointer is on the card's video box and the site's preview is playing over it, so the
+    // button floats above the card.
     card.classList.add(dom.MEDIA_HOVER_CLASS);
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<ytd-video-preview style="position:fixed;left:0;top:0;width:320px;height:180px"></ytd-video-preview>'
+    );
     dom.alignButton(button, card);
     const floated = {
       floating: button.classList.contains("wd-wl-floating"),

@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import type { Types } from "youtubei.js";
 
-import { WatchLaterSession } from "../backend/session";
+import {
+  WatchLaterSession,
+  looksSignedIn,
+  mergeCookies,
+} from "../backend/session";
 import {
   appliedEditAnswer,
   pageWithOneItemAnswer,
@@ -34,6 +38,35 @@ const answeringFetch = (answers: unknown[]) => {
 // The bug this is about: YouTube answers a stale snapshot as signed out - not with a failure - so
 // the write was recorded as saved and the page walk read as empty. Reading the jar again is what
 // clears it.
+test("the session cookie string merges both origins, the site's copy winning", () => {
+  const merged = mergeCookies(
+    [
+      { name: "SAPISID", value: "account" },
+      { name: "SID", value: "account" },
+      { name: "VISITOR_INFO1_LIVE", value: "account" },
+    ],
+    [
+      { name: "__Secure-1PSIDTS", value: "site" },
+      { name: "SAPISID", value: "site" },
+    ]
+  );
+
+  // Both origins contribute what they have; the site's copy of a name is the one the page is using,
+  // so it wins.
+  expect(merged.split("; ")).toEqual([
+    "SAPISID=site",
+    "SID=account",
+    "VISITOR_INFO1_LIVE=account",
+    "__Secure-1PSIDTS=site",
+  ]);
+  expect(looksSignedIn(merged)).toBe(true);
+  // What the app read before this fix: `youtube.com` alone, where SID and SAPISID had been deleted -
+  // which is why a renewal found nothing to renew from and every request stayed signed out.
+  expect(
+    looksSignedIn(mergeCookies([{ name: "VISITOR_INFO1_LIVE", value: "v" }]))
+  ).toBe(false);
+});
+
 test("a write answered as signed out is retried on the page's fresh cookies", async () => {
   const { fetch, sent } = answeringFetch([
     refusedEditAnswer(),

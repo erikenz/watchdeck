@@ -233,21 +233,37 @@ const fixedOrigin = (button: HTMLButtonElement): { x: number; y: number } => {
 };
 
 /**
+ * The site's inline preview: one shared element it moves over the hovered card while it plays.
+ * Put away, its container is `display: none` and reports a 0×0 box; it is given geometry only while
+ * it plays (docs/PRD.md §R4).
+ */
+const PREVIEW_SELECTOR = "ytd-video-preview";
+
+const isPreviewPlaying = (): boolean => {
+  const preview = document.querySelector(PREVIEW_SELECTOR);
+  return preview !== null && preview.getBoundingClientRect().width > 0;
+};
+
+/**
  * Places the button at the bottom-right of the video box.
  *
- * While the card is marked - the pointer is on its video box - the button is placed `fixed` in the
- * viewport instead. The site's inline preview is a fixed overlay that paints over the card, so a
- * button inside the card ends up underneath it; making the *card* win instead would put the card
- * over the preview and hide the very thing the user is looking at (which is what happened first
- * time round). A fixed button lives in the page's top layer on its own: above that overlay, below
- * the site's own layers (masthead 2020), and the card keeps painting exactly where it was.
+ * It lives **in its card** unless the site's preview is actually playing over it. A `fixed` button is
+ * positioned from a measurement taken after the scroll has already been applied, so while the pointer
+ * sits on a card and the page scrolls it trails the card by a frame - which reads as flicker. In the
+ * card it scrolls with the card, exactly like the site's own overlay buttons.
+ *
+ * While the preview plays the button is moved to the floating layer and placed `fixed` against the
+ * viewport: that overlay paints over the card, so a button inside the card ends up underneath it, and
+ * raising the *card* instead hides the preview behind the still picture (docs/PRD.md §R4). The card
+ * keeps painting exactly where it was either way.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
   // Which subtree the button belongs in does not depend on being able to measure the video box.
   // This used to run after the measurement, so a card that had been removed from the page (or was
   // not laid out yet) left its button in the floating layer - under `<body>`, above everything, on
   // every page, for the rest of the session.
-  const floating = host.classList.contains(MEDIA_HOVER_CLASS);
+  const floating =
+    host.classList.contains(MEDIA_HOVER_CLASS) && isPreviewPlaying();
   keepButtonVisible(button, host, floating);
 
   const media = mediaBoxOf(host);

@@ -29,6 +29,7 @@
    site's inline preview plays over it, because that overlay takes the pointer and the card stops
    being hovered exactly then. The button keeps one position in every state. */
 .wd-wl-anchor:hover .wd-wl-save,
+.wd-wl-media-hover .wd-wl-save,
 .wd-wl-save:focus-visible {
   opacity: 1;
 }

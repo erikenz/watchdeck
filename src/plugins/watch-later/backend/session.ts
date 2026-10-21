@@ -28,13 +28,52 @@ export { SITE_ORIGIN };
 
 const AUTH_COOKIES = ["SAPISID", "SID"];
 
+/**
+ * Where the account's own cookies live. The site is `youtube.com`, but the cookies that authenticate
+ * the session - `SID`, `SAPISID`, `HSID`, `SSID`, `__Secure-1PSID` - are `google.com` ones, and the
+ * rotating binding tokens (`__Secure-1PSIDTS`, `__Secure-3PSIDCC`) are `youtube.com` ones.
+ */
+const ACCOUNT_ORIGIN = "https://www.google.com";
+
+/**
+ * One cookie string out of several lists of cookies, later lists winning a name clash.
+ *
+ * Kept pure so the merge is testable: the two origins do not hold the same set, and where they
+ * overlap the site's own copy is the fresher one.
+ */
+export const mergeCookies = (
+  ...lists: { name: string; value: string }[][]
+): string => {
+  const byName = new Map<string, string>();
+  for (const list of lists) {
+    for (const cookie of list) {
+      byName.set(cookie.name, cookie.value);
+    }
+  }
+  return [...byName].map(([name, value]) => `${name}=${value}`).join("; ");
+};
+
+/**
+ * The signed-in session, as one cookie string.
+ *
+ * Both origins are read, and the site's cookies win a name clash. Reading `youtube.com` alone was a
+ * real failure, measured on 2026-10-21: the `youtube.com` copies of `SID` and `SAPISID` had been
+ * deleted (the site makes and clears host-only copies) while `.google.com` still carried them, so
+ * the app's cookie string had no `SAPISID` at all - no `SAPISIDHASH` header goes with it, every
+ * request is answered as signed out, and a renewal finds nothing to renew from. Measured the same
+ * day, against the live account: `youtube.com` alone answers `logged_in=0` with an empty list,
+ * `google.com` alone the same (no binding tokens), and the two merged answer `logged_in=1` with the
+ * real list.
+ */
 export const readSessionCookies = async (
   win: BrowserWindow
 ): Promise<string> => {
-  const cookies = await win.webContents.session.cookies.get({
-    url: SITE_ORIGIN,
-  });
-  return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; ");
+  const session = win.webContents.session;
+  const [account, site] = await Promise.all([
+    session.cookies.get({ url: ACCOUNT_ORIGIN }),
+    session.cookies.get({ url: SITE_ORIGIN }),
+  ]);
+  return mergeCookies(account, site);
 };
 
 export const looksSignedIn = (cookieString: string): boolean =>

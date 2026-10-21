@@ -1,4 +1,7 @@
-import { classifyProgress } from "@/plugins/utils/common/watch-thresholds";
+import {
+  classifyProgress,
+  withThresholdDefaults,
+} from "@/plugins/utils/common/watch-thresholds";
 import {
   CARD_SELECTOR,
   durationOf,
@@ -26,12 +29,16 @@ let thresholds: WatchThresholds | null = null;
  *
  * They are the same numbers the Watch Later plugin buckets its list with, and they live with the
  * app rather than in a plugin so that this one works while that one is disabled. The page is handed
- * the config (`window.mainConfig`), so a read is a lookup and no IPC of its own is needed.
+ * the config (`window.mainConfig`), so a read is a lookup and no IPC of its own is needed - and the
+ * stored value goes through `withThresholdDefaults`, because a config file written before these
+ * keys existed holds an `options` object without them (measured live: `{}`, which would have made
+ * every card "unwatched").
  */
-const readThresholds = (): WatchThresholds => ({
-  inProgress: window.mainConfig.get("options.inProgress"),
-  watched: window.mainConfig.get("options.watched"),
-});
+const readThresholds = (): WatchThresholds =>
+  withThresholdDefaults({
+    inProgress: window.mainConfig.get("options.inProgress"),
+    watched: window.mainConfig.get("options.watched"),
+  });
 
 /**
  * Whether the card counts as viewed.

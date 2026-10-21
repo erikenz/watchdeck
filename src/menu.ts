@@ -278,7 +278,11 @@ export const mainMenuTemplate = async (
         {
           label: t("main.menu.options.submenu.watched.label"),
           submenu: WATCHED_PERCENT_LEVELS.map((percent) => ({
-            checked: config.get("options.watched.percent") === percent,
+            // The stored config may not carry these keys yet (an `options` object from an older
+            // file), so the check mark shows the value that is actually in effect.
+            checked:
+              (config.get("options.watched.percent") ??
+                config.defaultConfig.options.watched.percent) === percent,
             click() {
               config.setMenuOption("options.watched.percent", percent);
             },
@@ -289,7 +293,10 @@ export const mainMenuTemplate = async (
         {
           label: t("main.menu.options.submenu.continue-from.label"),
           submenu: CONTINUE_PERCENT_LEVELS.map((percent) => ({
-            checked: config.get("options.inProgress.min.percent") === percent,
+            checked:
+              (config.get("options.inProgress.min.percent") ??
+                config.defaultConfig.options.inProgress.min.percent) ===
+              percent,
             click() {
               config.setMenuOption("options.inProgress.min.percent", percent);
             },

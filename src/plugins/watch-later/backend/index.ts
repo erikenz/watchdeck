@@ -4,6 +4,7 @@ import { app } from "electron";
 
 import { get as getOption, watch as watchOptions } from "@/config";
 import { t } from "@/i18n";
+import { withThresholdDefaults } from "@/plugins/utils/common/watch-thresholds";
 import type { BackendContext } from "@/types/contexts";
 import type { WatchThresholds } from "@/types/watch-thresholds";
 import { LoggerPrefix } from "@/utils";
@@ -70,11 +71,17 @@ const state: BackendState = {
   window: null,
 };
 
-/** The shared watched / continue-watching thresholds, as the app options hold them now. */
-const readThresholds = (): WatchThresholds => ({
-  inProgress: getOption("options.inProgress"),
-  watched: getOption("options.watched"),
-});
+/**
+ * The shared watched / continue-watching thresholds, as the app options hold them now.
+ *
+ * The store's value goes through `withThresholdDefaults`: a config file written before these keys
+ * existed holds an `options` object without them, and the store returns that object unchanged.
+ */
+const readThresholds = (): WatchThresholds =>
+  withThresholdDefaults({
+    inProgress: getOption("options.inProgress"),
+    watched: getOption("options.watched"),
+  });
 
 const log = (...args: unknown[]) =>
   console.log(LoggerPrefix, "[watch-later]", ...args);

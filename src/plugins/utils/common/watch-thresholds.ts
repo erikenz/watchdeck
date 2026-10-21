@@ -1,4 +1,31 @@
+import { defaultConfig } from "@/config/defaults";
 import type { WatchThresholds } from "@/types/watch-thresholds";
+
+/**
+ * The thresholds as the app should read them: the shipped defaults, with whatever the config holds
+ * on top.
+ *
+ * A config file written before these keys existed has an `options` object without them, and the
+ * store hands that object back as it is - defaults are not merged into a stored object - so the
+ * defaults have to be applied by the reader. Measured live: `options.watched` came back as `{}` in
+ * the page, which made every card "unwatched". The merge also keeps a *partial* object working (a
+ * user who set only `percent`).
+ */
+export const withThresholdDefaults = (
+  stored?: Partial<WatchThresholds> | null
+): WatchThresholds => ({
+  inProgress: {
+    max: {
+      ...defaultConfig.options.inProgress.max,
+      ...stored?.inProgress?.max,
+    },
+    min: {
+      ...defaultConfig.options.inProgress.min,
+      ...stored?.inProgress?.min,
+    },
+  },
+  watched: { ...defaultConfig.options.watched, ...stored?.watched },
+});
 
 /**
  * The one place the watched / continue-watching thresholds are applied.

@@ -86,13 +86,13 @@ test("the site's percentage decides, with the app's thresholds", async ({
   const seen = await page.evaluate(
     ({ config, cards }) => {
       const { __dim: dim } = window as unknown as { __dim: DimApi };
-      // The preload's bridge, as the page sees it: reads are lookups, `watch` hands back a way to
-      // stop listening.
+      // The preload's bridge, as the page sees it: a stored config written before the thresholds
+      // existed hands back an `options` object *without* them - measured live as `{}` - so the
+      // plugin has to apply the shipped defaults itself. `watch` hands back a way to stop
+      // listening.
       (window as unknown as { mainConfig: unknown }).mainConfig = {
         get: (key: string) =>
-          key === "options.watched"
-            ? { percent: 90 }
-            : { max: { percent: 90 }, min: { percent: 5 } },
+          key === "options.watched" ? {} : { min: { percent: 5 } },
         watch: () => () => undefined,
       };
       document.body.innerHTML = cards;

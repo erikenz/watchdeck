@@ -2,8 +2,12 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### 0.1.5
+#### 0.1.6
 
+- Watch Later: a signed-out app says so, on the button and in the toolbar [`0761cae`](https://github.com/erikenz/watchdeck/commit/0761cae7096c2e5c6bb83c02992cff9058be617a)
+- Research: the extension's request layer confirms the cookie rule [`6e63cfc`](https://github.com/erikenz/watchdeck/commit/6e63cfc93f3cb4ce9c51af2ad3533d31bbd5d2b6)
+- TODO: the mirror keeps 109 MB of raw responses nothing reads [`44d1d64`](https://github.com/erikenz/watchdeck/commit/44d1d646aebbebabc6885ddd2a93e2cdc33fa1db)
+- Version 0.1.5, changelog regenerated [`714726d`](https://github.com/erikenz/watchdeck/commit/714726d5ba07050c2ff276dc45af8e94be4c4f9c)
 - The session sends the site's cookies, and the alias that was missing [`85d54df`](https://github.com/erikenz/watchdeck/commit/85d54df4f28b82db556b905b34bc65b11adee8e9)
 - Version 0.1.4, changelog regenerated [`f45bae9`](https://github.com/erikenz/watchdeck/commit/f45bae986749d1257201792522533ddebb20f29a)
 - The session's cookies live on two origins, and the button stays in its card [`e8d883e`](https://github.com/erikenz/watchdeck/commit/e8d883edb732de10269aa70d64adefde22b5d56b)

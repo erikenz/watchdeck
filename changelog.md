@@ -2,8 +2,10 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### 0.1.3
+#### 0.1.4
 
+- The session's cookies live on two origins, and the button stays in its card [`e8d883e`](https://github.com/erikenz/watchdeck/commit/e8d883edb732de10269aa70d64adefde22b5d56b)
+- Changelog: 0.1.3, including the fix found by running the build [`f53c3e0`](https://github.com/erikenz/watchdeck/commit/f53c3e090fd4002ff08dc7e6fdd0e47a43c6f058)
 - A stored config predates the thresholds, so the readers apply the defaults [`6ba1bfe`](https://github.com/erikenz/watchdeck/commit/6ba1bfea1ec40879b0b91860c6854650a6efb2e3)
 - Debloat, shared watched thresholds, and a button that stays on its card [`1c04deb`](https://github.com/erikenz/watchdeck/commit/1c04deb57cd209189bd38156d41ac8b4c4db5c94)
 - Dimming, a freeze fixed, and a button that no longer floats away [`ca0a433`](https://github.com/erikenz/watchdeck/commit/ca0a4338bfe05bf94b323c4beceb6d0830e37996)

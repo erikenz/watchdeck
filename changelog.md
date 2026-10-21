@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### 0.1.3
 
+- A stored config predates the thresholds, so the readers apply the defaults [`6ba1bfe`](https://github.com/erikenz/watchdeck/commit/6ba1bfea1ec40879b0b91860c6854650a6efb2e3)
+- Debloat, shared watched thresholds, and a button that stays on its card [`1c04deb`](https://github.com/erikenz/watchdeck/commit/1c04deb57cd209189bd38156d41ac8b4c4db5c94)
 - Dimming, a freeze fixed, and a button that no longer floats away [`ca0a433`](https://github.com/erikenz/watchdeck/commit/ca0a4338bfe05bf94b323c4beceb6d0830e37996)
 - Version 0.1.1, and a build you can tell apart [`9a29df8`](https://github.com/erikenz/watchdeck/commit/9a29df8fe403fc78520c809055bfcb5cf589c13c)
 - Watch Later: "saved" now means the list says so [`ae9c4b3`](https://github.com/erikenz/watchdeck/commit/ae9c4b331e617ac6dec4e7fa3e161ed192735796)

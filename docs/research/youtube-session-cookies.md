@@ -68,8 +68,13 @@ client's `/browse/edit_playlist` with `ACTION_ADD_VIDEO` answers `STATUS_SUCCEED
 
 ## Related
 
-* The reference extension this app was measured against has the same failure mode in its issue
-  tracker: [youtube-watch-later#201](https://github.com/dnwjn/youtube-watch-later/issues/201),
-  "SAPISID cookie not found" - its request helper reads a SAPISID-family cookie out of the page and
-  has nothing to read when the site stops setting one
+* An independent implementation reaches the same rule from the other side: the
+  [youtube-watch-later](https://github.com/dnwjn/youtube-watch-later) extension asks Chrome for `SAPISID` on
+  `https://www.youtube.com` (so it can never be handed the `.google.com` copy) and hashes
+  `cookies.sapisid ?? cookies.sapisid3p`, with a source comment saying the plain cookie is no longer set and
+  that a `SAPISID3PHASH` alone does not authorize a mutation. See
+  [`watch-later-button.md`](./watch-later-button.md), finding 7.
+* That extension's issue tracker carries the same failure mode under a different name:
+  [youtube-watch-later#201](https://github.com/dnwjn/youtube-watch-later/issues/201), "SAPISID cookie not
+  found" — thrown when all three APISID cookies are missing for `youtube.com`
   (see [`watch-later-button.md`](./watch-later-button.md), finding 5).

@@ -60,6 +60,39 @@ No remove path, `ACTION_REMOVE_VIDEO`, retry loop, exponential backoff, or expli
 * The extension supports “always” or “hover” visibility and per-location placement/opacity settings, according to its README ([`README.md`, lines 35–78](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/README.md#L35-L78)). The source's preview-hover state is specifically used to make hover-only behavior workable while YouTube moves the preview outside the thumbnail.
 * The selectors are centralized and include both older `ytd-*` elements and newer view-model hosts. The source comment notes a newer class-name replacement, which is a concrete reminder that selector churn is expected ([`src/contents/button.tsx`, lines 60–80](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/contents/button.tsx#L60-L80)).
 
+### 7. How it authenticates the request (and what it confirms about this app)
+
+The extension's write path is one `POST` per action, and everything the request needs is read from the page or
+the cookie jar at call time:
+
+* **It only ever sees the site's own cookies.** `chrome.cookies.get({ url: 'https://www.youtube.com', name })`
+is asked for `SAPISID`, `__Secure-1PAPISID` and `__Secure-3PAPISID` ([`src/background/messages/visitor-cookie.ts`, lines 9–23](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/background/messages/visitor-cookie.ts#L9-L23)).
+A `.google.com` cookie is not sent to `youtube.com`, so that query cannot return it — the extension never has
+the `google.com` copies in hand, whatever the jar holds. That is the same conclusion this app reached by
+measurement, by a different route
+([`docs/research/youtube-session-cookies.md`](./youtube-session-cookies.md)).
+* **The `__Secure-3PAPISID` fallback is written out in a comment** ([`src/helpers/api.ts`, lines 41–53](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/helpers/api.ts#L41-L53)):
+`cookies.sapisid ?? cookies.sapisid3p` builds `SAPISIDHASH`, with “Some browsers/accounts no longer set the
+plain SAPISID cookie. YouTube accepts __Secure-3PAPISID's value as a SAPISIDHASH fallback in that case (a
+SAPISID3PHASH alone is not enough to authorize mutating requests).” It sends `SAPISIDHASH`,
+`SAPISID1PHASH` and `SAPISID3PHASH` together, each from its own cookie. This is the alias this app now
+applies, arrived at independently — and the “3PHASH alone is not enough” half is what the app measured as
+`loggedOut` with an empty list.
+* **The client is the page's, not a hard-coded one.** `SESSION_INDEX` → `X-Goog-Authuser`,
+`DELEGATED_SESSION_ID` → `X-Goog-PageId`, `VISITOR_DATA` → `X-Goog-Visitor-Id`, `INNERTUBE_CLIENT_VERSION` →
+both `context.client.clientVersion` and `X-Youtube-Client-Version`, plus `X-Origin`,
+`X-Youtube-Client-Name: 1` and `X-Youtube-Bootstrap-Logged-In: true`
+([`src/contents/yt.ts`, lines 18–26](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/contents/yt.ts#L18-L26),
+[`src/helpers/api.ts`, lines 85–100](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/helpers/api.ts#L85-L100)).
+* **`LOGGED_IN` from `ytcfg` is a pre-flight.** The button's render guard is
+`enabled && (isInNotification || !isWatchLaterItem)` ([`src/contents/button.tsx`, line 499](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/contents/button.tsx#L499)),
+and `enabled` is set from `ytData.loggedIn` on every navigation
+([line 216](https://github.com/dnwjn/youtube-watch-later/blob/37093c7ffa94ab1485909f7877b271df795f071d/src/contents/button.tsx#L216)).
+On a signed-out page there is no button at all — it does not offer a save it knows will fail. It is still not
+a *label*: nothing on screen says “signed out”.
+* The failure mode of its issue tracker follows from the same code: `'SAPISID cookie not found'` is thrown when
+all three APISID cookies are missing for `youtube.com`, which is what the fallback exists to survive.
+
 ## What this app should take from it
 
 Watchdeck should keep the button owned by its **card renderer**, not inject it into YouTube's mute/CC/settings overlay and not attach it to the thumbnail link that YouTube can replace during an inline preview. That matches the app's own decision record: use a card anchor, and when the preview covers the card, move only the button into a page-level floating layer ([`docs/PRD.md`, lines 671–694](../PRD.md#L671-L694)).
@@ -73,6 +106,23 @@ The practical recommendation is:
 5. Preserve keyboard focus, `aria-label`/pressed state, click propagation guards, and a pending/error visual state. Keep selector/DOM integration in one renderer module, and use targeted mutation/scroll/resize observation rather than a whole-page scan on every mutation.
 
 The main thing **not** to copy is the extension's in-memory “added” set as membership truth and its direct browser-cookie/SAPISID plumbing. In a desktop client those concerns belong behind the renderer's IPC boundary and the app's account-aware database/sync service; the renderer should receive a state snapshot and mutation result rather than read browser cookies or own the network authorization flow.
+
+Three things in finding 7 are worth more than they cost, though none is done yet:
+
+* **Do not offer a save that cannot work.** The app's open TODO item “nothing in the UI says signed out” is the
+  half of this the extension gets right by accident: it reads `LOGGED_IN` off the page before deciding whether to
+  draw a button. The app already reads `SESSION_INDEX` from the same `ytcfg` global in the renderer
+  (`src/plugins/watch-later/renderer/index.tsx`), so the signed-in flag is one more read — and it would let the
+  toolbar say why the buttons do nothing instead of leaving the user to guess.
+* **`X-Goog-PageId` for a delegated (brand) session.** The app's session never sends it: `youtubei.js` sets the
+  header only when `session.context.user.onBehalfOfUser` is set, which nothing here sets, and the app has no
+  equivalent of `DELEGATED_SESSION_ID`. A brand account is therefore acted on as the personal one, or refused.
+  Not urgent (the PRD's assumption is the first account of the session), but it is the difference between “works
+  for the accounts I have” and “works for the accounts YouTube lets people have”.
+* **Send the page's client version and visitor data rather than a synthesized pair.** The extension takes
+  `INNERTUBE_CLIENT_VERSION` and `VISITOR_DATA` off the page, where this app lets the library invent both. A
+  client version baked into a dependency goes stale without anything failing until YouTube stops accepting it;
+  the page's copy cannot.
 
 ## Sources
 

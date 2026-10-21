@@ -649,7 +649,8 @@
         "remove": "Remove from Watch Later",
         "remove-failed": "Could not remove from Watch Later - try again",
         "save": "Save to Watch Later",
-        "save-failed": "Could not save to Watch Later - try again"
+        "save-failed": "Could not save to Watch Later - try again",
+        "signed-out": "Not signed in to YouTube - sign in to use Watch Later"
       },
       "description": "Mirrors your Watch Later list into a local database: search, filter and group it by how much you have watched",
       "filter": {
@@ -704,7 +705,8 @@
         "failed": "Could not read the local index",
         "last-error": "Last sync failed: {{error}}",
         "mirrored": "{{count}} mirrored",
-        "mirrored-of": "{{items}} of {{total}} mirrored"
+        "mirrored-of": "{{items}} of {{total}} mirrored",
+        "signed-out": "Not signed in to YouTube - sign in to read or save Watch Later"
       }
     },
     "gestures": {

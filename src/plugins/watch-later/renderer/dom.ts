@@ -333,10 +333,25 @@ const painted = new WeakMap<
 export const paintButton = (
   button: HTMLButtonElement,
   state: ButtonState,
-  labels: { failed: string; remove: string; save: string }
+  labels: {
+    failed: string;
+    remove: string;
+    save: string;
+    /**
+     * Why the button cannot act, when the app has no session. Given, the button is disabled and
+     * this is what it says instead of its action.
+     *
+     * Not a `ButtonState`: being signed out is not a fact about the video, and the icon keeps
+     * saying what it knows about the video (the mirror is local, and it is still true).
+     */
+    signedOut?: string;
+  }
 ) => {
+  const blocked = labels.signedOut !== undefined;
   let label = labels.save;
-  if (state === "saved") {
+  if (blocked) {
+    label = labels.signedOut ?? label;
+  } else if (state === "saved") {
     label = labels.remove;
   } else if (state === "error") {
     // A refusal has to be readable, not just red: the button is the only place that knows which
@@ -352,6 +367,7 @@ export const paintButton = (
   }
   painted.set(button, { label, state });
   button.dataset.state = state;
+  button.disabled = blocked;
   button.innerHTML =
     ICONS[state === "error" ? "unsaved" : state] ?? ICONS.unsaved;
   button.setAttribute("aria-label", label);

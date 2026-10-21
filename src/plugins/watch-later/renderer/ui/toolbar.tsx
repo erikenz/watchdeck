@@ -79,6 +79,12 @@ const Toolbar = (props: ToolbarProps) => {
   };
 
   const statusText = () => {
+    // Nothing else on this line matters while there is no session: the count is what the mirror
+    // holds, the filters work, and none of it can be refreshed or changed until the user signs in.
+    // Said here rather than left to each button's refusal, which is how it was found.
+    if (state()?.needsAuth) {
+      return t("plugins.watch-later.status.signed-out");
+    }
     if (failure()) {
       return t("plugins.watch-later.status.failed");
     }
@@ -219,7 +225,11 @@ const Toolbar = (props: ToolbarProps) => {
       <div class="wd-wl-toolbar-right">
         <button
           class="wd-wl-chip wd-wl-sync"
-          disabled={busy() || (state()?.syncing ?? false)}
+          disabled={
+            busy() ||
+            (state()?.syncing ?? false) ||
+            (state()?.needsAuth ?? false)
+          }
           onClick={() => runSync().catch(() => undefined)}
           type="button"
         >

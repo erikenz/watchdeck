@@ -30,6 +30,7 @@ interface DomApi {
   BUTTON_CLASS: string;
   isToggleShortcut: (event: KeyboardEvent) => boolean;
   FLOATING_LAYER_CLASS: string;
+  HOST_CLASS: string;
   mediaBoxOf: (card: Element) => { box: DOMRect; element: Element } | undefined;
   MEDIA_HOVER_CLASS: string;
   paintButton: (
@@ -524,6 +525,65 @@ test("a button whose card is gone comes back to the card, not the floating layer
   expect(seen.floated).toEqual({ floating: true, inLayer: true });
   expect(seen.backInCard).toBe(true);
   expect(seen.stillFloating).toBe(false);
+});
+
+test("a button with no session says so, and cannot be pressed", async ({
+  page,
+}) => {
+  await openFixture(page);
+
+  const seen = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    const labels = { failed: "failed", remove: "remove", save: "save" };
+    const blockedLabels = { ...labels, signedOut: "not signed in" };
+    const button = dom.createSaveButton("vid00000000", () => undefined);
+
+    dom.paintButton(button, "unsaved", labels);
+    const enabled = { disabled: button.disabled, label: button.title };
+
+    dom.paintButton(button, "saved", labels);
+    const saved = {
+      disabled: button.disabled,
+      icon: button.innerHTML,
+      label: button.title,
+      pressed: button.getAttribute("aria-pressed"),
+    };
+
+    // The session goes away: the icon keeps saying what the mirror knows about the video, and
+    // the label says why the press would do nothing.
+    dom.paintButton(button, "saved", blockedLabels);
+    const blocked = {
+      disabled: button.disabled,
+      icon: button.innerHTML,
+      label: button.title,
+      state: button.dataset.state,
+    };
+
+    // Signing in again gives the button its action back.
+    dom.paintButton(button, "saved", labels);
+
+    return {
+      blocked,
+      enabled,
+      restored: { disabled: button.disabled, label: button.title },
+      saved,
+    };
+  });
+
+  expect(seen.enabled).toEqual({ disabled: false, label: "save" });
+  expect(seen.saved).toMatchObject({
+    disabled: false,
+    label: "remove",
+    pressed: "true",
+  });
+  // The icon is the video's own standing, and being signed out does not change it.
+  expect(seen.blocked).toMatchObject({
+    disabled: true,
+    icon: seen.saved.icon,
+    label: "not signed in",
+    state: "saved",
+  });
+  expect(seen.restored).toEqual({ disabled: false, label: "remove" });
 });
 
 test("the shortcut takes `w` on a card and leaves typing alone", async ({

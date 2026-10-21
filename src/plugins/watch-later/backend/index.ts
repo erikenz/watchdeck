@@ -34,6 +34,11 @@ interface BackendState {
   needsAuth: boolean;
   /** `SESSION_INDEX` the page reports, i.e. the account the user is browsing as. */
   sessionIndex: number | null;
+  /**
+   * `LOGGED_IN` the page reports. The page is where the user signs in and out, so it is the first
+   * place a lost session is visible - before any request has to be refused to find out.
+   */
+  pageSignedIn: boolean;
   /** The reason the running walk was started with, and what the site says the list holds. */
   syncReason: string | null;
   expectedTotal: number | null;
@@ -58,6 +63,7 @@ const state: BackendState = {
   config: null,
   expectedTotal: null,
   needsAuth: false,
+  pageSignedIn: true,
   repairedEntryIds: false,
   session: null,
   sessionIndex: null,
@@ -286,10 +292,49 @@ const scheduleInterval = () => {
 
 let startupSyncPending = false;
 
-/** Follows the identity the session is acting as, whichever one the site switched to. */
-const adoptSessionIndex = async (index: number) => {
+/**
+ * Follows the identity the session is acting as, and whether the page is signed in at all.
+ *
+ * Both facts come off the page's own `ytcfg`, and they are not the same fact: a signed-out page
+ * publishes `LOGGED_IN: false` and no `SESSION_INDEX` at all (measured), so a report that needed an
+ * index could never say "signed out". A page that reports no session has none to act with:
+ * the session built earlier is dropped, the state says `needsAuth`, and the renderer takes its
+ * buttons back and the toolbar says why - instead of every click discovering it one refusal at a
+ * time. Signing in again reports itself the same way, and that is what builds the session back.
+ */
+const adoptSessionReport = async (report: {
+  index: number | null;
+  loggedIn: boolean;
+}) => {
+  const signedIn = report?.loggedIn;
+  if (signedIn !== state.pageSignedIn) {
+    state.pageSignedIn = signedIn;
+    log(
+      signedIn
+        ? "the page reports a signed-in session"
+        : "the page reports no signed-in session"
+    );
+  }
+
+  if (!signedIn) {
+    // A session built from the jar is no more use than the jar itself once the page says nobody
+    // is signed in, and keeping it would let a click look like it had a chance.
+    state.session = null;
+    state.needsAuth = true;
+    broadcast();
+    return;
+  }
+
+  if (!state.session) {
+    // The way back: the cookies arrived with the sign-in the page just reported.
+    await connect();
+    broadcast();
+  }
+
+  // The account is a separate fact, and only a signed-in page has one to report.
+  const index = Number(report?.index);
   if (!Number.isFinite(index)) {
-    log(`session index report was not a number (${String(index)})`);
+    log(`session index report was not a number (${String(report?.index)})`);
     return;
   }
   state.sessionIndex = index;
@@ -368,8 +413,10 @@ export const onMainLoad = async ({
       state.thresholds
     )
   );
-  ipc.handle("watchdeck:watch-later-session-index", (index: number) =>
-    adoptSessionIndex(index)
+  ipc.handle(
+    "watchdeck:watch-later-session-index",
+    (report: { index: number | null; loggedIn: boolean }) =>
+      adoptSessionReport(report)
   );
 
   ipc.handle("watchdeck:watch-later-sync", async () => {

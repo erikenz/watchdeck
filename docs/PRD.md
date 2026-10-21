@@ -260,6 +260,16 @@ Consequences for the design:
    `loggedOut`. So the session string is the **site's** cookies with that one alias, and the two
    origins are not merged. The measurements and a re-measurement recipe are in
    [`docs/research/youtube-session-cookies.md`](research/youtube-session-cookies.md).
+9. **The page knows whether anyone is signed in, and says so before a request does.** `ytcfg.LOGGED_IN`
+   is the same global `SESSION_INDEX` comes from, and the renderer reports both together
+   (`{ index, loggedIn }`). They are separate facts, not one: a signed-out page publishes
+   `LOGGED_IN: false` and **no** `SESSION_INDEX` at all (measured 2026-10-21), which is why a report
+   that required an index could never say "signed out". The backend applies them to `needsAuth`
+   before any request has to be refused, and the renderer paints every hover button **disabled**
+   with the reason instead of letting each click end in a refusal the user has to interpret. The
+   reference extension reads the same flag and does not render its button at all; this app keeps
+   the button and labels it, because on a card page the button is the only surface that can
+   explain itself (`docs/research/watch-later-button.md`, finding 7).
 
 ### 4.3 Where the watched/continue-watching numbers come from (revised)
 

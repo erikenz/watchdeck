@@ -111,9 +111,11 @@ Three things in finding 7 are worth more than they cost, though none is done yet
 
 * **Do not offer a save that cannot work.** The app's open TODO item “nothing in the UI says signed out” is the
   half of this the extension gets right by accident: it reads `LOGGED_IN` off the page before deciding whether to
-  draw a button. The app already reads `SESSION_INDEX` from the same `ytcfg` global in the renderer
-  (`src/plugins/watch-later/renderer/index.tsx`), so the signed-in flag is one more read — and it would let the
-  toolbar say why the buttons do nothing instead of leaving the user to guess.
+  draw a button. **Built in 0.1.6** — the renderer reports `LOGGED_IN` next to `SESSION_INDEX`, the backend turns
+  it into `needsAuth`, and every hover button is painted disabled with the reason (see PRD §4.2 note 9). One
+  deliberate difference: this app keeps the button and labels it rather than removing it. On a card page the
+  button is the only surface that can explain itself — a missing button explains nothing, and a signed-out Watch
+  Later page has no list for the toolbar to sit above, so the toolbar's own line is not a surface the user sees.
 * **`X-Goog-PageId` for a delegated (brand) session.** The app's session never sends it: `youtubei.js` sets the
   header only when `session.context.user.onBehalfOfUser` is set, which nothing here sets, and the app has no
   equivalent of `DELEGATED_SESSION_ID`. A brand account is therefore acted on as the personal one, or refused.

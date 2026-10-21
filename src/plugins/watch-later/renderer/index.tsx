@@ -75,6 +75,7 @@ export const renderer = {
   lastProgressSentAt: 0,
   sessionIndexAttempts: 0,
   reportedSessionIndex: null as number | null,
+  reportedLoggedIn: null as boolean | null,
   toolbarHost: null as HTMLElement | null,
   filter: null as Set<string> | null,
   /** Cards to their button. A floating button lives outside its card, so a query cannot find it. */
@@ -88,11 +89,21 @@ export const renderer = {
   scrollListener: null as (() => void) | null,
   shortcutListener: null as ((event: KeyboardEvent) => void) | null,
   markedCard: null as Element | null,
+  /**
+   * Whether the app has no usable YouTube session, as the backend last reported it.
+   *
+   * Read off the page's own `ytcfg.LOGGED_IN` by the renderer and carried back through the
+   * backend's state, so a signed-out app knows it before any request has to fail to find out. The
+   * buttons stay where they are and say why they will not act, instead of every click ending in a
+   * refusal the user has to interpret.
+   */
+  signedOut: false,
 
   async start(context: RendererContext<WatchLaterPluginConfig>) {
     this.ipc = context.ipc;
     this.context = context;
     this.config = await context.getConfig();
+    this.signedOut = await this.readSignedOut();
 
     await this.hydrate();
     this.reportSessionIndex(context);
@@ -134,8 +145,14 @@ export const renderer = {
     context.ipc.on(
       "watchdeck:watch-later-changed",
       (state: WatchLaterState) => {
+        // The session can go away while the app runs (signing out in the window, an expired
+        // session): every button says so the moment the state says so, and goes back to its
+        // action when the session comes back.
+        if (state.needsAuth !== this.signedOut) {
+          this.signedOut = state.needsAuth;
+          this.repaint();
+        }
         void this.hydrate();
-        void state;
       }
     );
 
@@ -379,35 +396,76 @@ export const renderer = {
   },
 
   /**
-   * Tells the backend which account the page is acting as - with two identities under one login
-   * this is the only signal that says which Watch Later the buttons ask about. Two things are
-   * not there yet when the renderer starts: `ytcfg` is the page's own global, and the backend's
-   * handler belongs to a plugin that loads in parallel with the page (~1.7 s of account
-   * probing). A fire-and-forget send was therefore lost, and the app acted as the first account
-   * in the list while the page was signed in as the second - which is why videos that are in
-   * Watch Later showed up as unsaved. The call is acknowledged and retried instead.
+   * Whether the app has a usable session, as the backend knows it right now.
+   *
+   * Asked once at start so the first scan already knows: creating a button and withdrawing it
+   * again a moment later is a flicker, and on a signed-out app it would be a button that was never
+   * going to work.
+   */
+  async readSignedOut(): Promise<boolean> {
+    if (!this.ipc) {
+      return false;
+    }
+    try {
+      const state = (await this.ipc.invoke(
+        "watchdeck:watch-later-state"
+      )) as WatchLaterState;
+      return state.needsAuth;
+    } catch {
+      // No answer yet: offer the buttons. A session that is missing says so through the state
+      // broadcast as soon as the backend has one.
+      return false;
+    }
+  },
+
+  /**
+   * Tells the backend which account the page is acting as, and whether it is signed in at all.
+   *
+   * With two identities under one login the index is the only signal that says which Watch Later
+   * the buttons ask about. `LOGGED_IN` is the only signal that says there is no Watch Later to ask
+   * about, and it arrives *before* any request has to be refused to find out. The two are reported
+   * together but are not the same fact: a signed-out page publishes no `SESSION_INDEX` at all
+   * (measured), so a report that needed one could never say "signed out".
+   *
+   * Two things are not there yet when the renderer starts: `ytcfg` is the page's own global, and
+   * the backend's handler belongs to a plugin that loads in parallel with the page (~1.7 s of
+   * account probing). A fire-and-forget send was therefore lost, and the app acted as the first
+   * account in the list while the page was signed in as the second - which is why videos that are
+   * in Watch Later showed up as unsaved. The call is acknowledged and retried instead.
    */
   reportSessionIndex(context: RendererContext<WatchLaterPluginConfig>) {
     const ytcfg = (
       window as unknown as { ytcfg?: { get: (key: string) => unknown } }
     ).ytcfg;
-    const index = Number(ytcfg?.get("SESSION_INDEX") ?? Number.NaN);
 
-    if (!Number.isFinite(index)) {
+    // The page publishes its config late, and a page that never does is a page this plugin has
+    // nothing to say about.
+    if (!ytcfg) {
       this.scheduleSessionIndexReport(context);
       return;
     }
 
+    const index = Number(ytcfg.get("SESSION_INDEX") ?? Number.NaN);
+    const loggedIn = ytcfg.get("LOGGED_IN") === true;
+    const report = {
+      index: Number.isFinite(index) ? index : null,
+      loggedIn,
+    };
+
     // Once per value: the backend reconnects and repairs on every report, and every navigation
-    // reports again - mostly with the same number.
-    if (index === this.reportedSessionIndex) {
+    // reports again - mostly with the same number and the same session.
+    if (
+      report.index === this.reportedSessionIndex &&
+      loggedIn === this.reportedLoggedIn
+    ) {
       return;
     }
 
     context.ipc
-      .invoke("watchdeck:watch-later-session-index", index)
+      .invoke("watchdeck:watch-later-session-index", report)
       .then(() => {
-        this.reportedSessionIndex = index;
+        this.reportedSessionIndex = report.index;
+        this.reportedLoggedIn = loggedIn;
         this.sessionIndexAttempts = 0;
       })
       .catch(() => this.scheduleSessionIndexReport(context));
@@ -568,6 +626,11 @@ export const renderer = {
       return;
     }
 
+    // The button is disabled while there is no session, and the key stands for the button.
+    if (this.signedOut) {
+      return;
+    }
+
     const card = this.markedCard;
     const button = card
       ? (this.buttons.get(card) ??
@@ -607,6 +670,12 @@ export const renderer = {
       ),
       remove: t("plugins.watch-later.button.remove"),
       save: t("plugins.watch-later.button.save"),
+      // Nothing on a card page says why a button does nothing: the toolbar is on the Watch Later
+      // page, and a signed-out Watch Later page has no list for it to sit above. So the button
+      // says it - disabled, because a press is a promise this app cannot keep without a session.
+      signedOut: this.signedOut
+        ? t("plugins.watch-later.button.signed-out")
+        : undefined,
     };
     const state = buttonStateOf({
       pending: this.pending.has(videoId),

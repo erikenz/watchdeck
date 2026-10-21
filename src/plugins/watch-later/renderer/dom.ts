@@ -116,11 +116,23 @@ export const mediaBoxOf = (
 export const MEDIA_HOVER_CLASS = "wd-wl-media-hover";
 
 /**
- * The card whose video box contains the point. Only our own cards are considered: they are the
- * only ones that can carry a button, and this runs on every pointer move.
+ * The card whose video box contains the point.
+ *
+ * A hit test rather than a measurement per card: this runs on every pointer move and every scroll
+ * frame, and measuring *every* card on the page - each `getBoundingClientRect` invalidated by the
+ * scroll that just happened - is what made the floating button lag behind its card while the page
+ * scrolled, then snap back when the scrolling stopped. `elementsFromPoint` returns everything at
+ * the point, including the cards *under* the site's inline preview overlay, which is the case the
+ * measurement was there for. The video box still decides: a hit in the card's metadata row is not a
+ * hit on the video.
  */
 export const cardUnderPoint = (x: number, y: number): Element | null => {
-  for (const card of document.querySelectorAll(`.${HOST_CLASS}`)) {
+  for (const element of document.elementsFromPoint(x, y)) {
+    const card = element.closest(`.${HOST_CLASS}`);
+    if (!card) {
+      continue;
+    }
+
     const media = mediaBoxOf(card);
     if (!media) {
       continue;

@@ -19,8 +19,20 @@ import { getVideoControls } from "./providers/video-controls";
 
 export type MenuTemplate = Electron.MenuItemConstructorOptions[];
 
-/** How far the Playback menu's seek items move, in seconds. */
+/** How far the Options menu's seek items move, in seconds. */
 const SEEK_STEP_SECONDS = 10;
+
+/**
+ * The watched / continue-watching thresholds the Options menu offers.
+ *
+ * They are app options rather than a plugin's config because two plugins ask the question - Watch
+ * Later buckets its list with them, the dimming plugin decides from them whether a card has been
+ * viewed - and a plugin that is disabled cannot own a setting another one needs. The units a menu
+ * cannot express (a threshold in minutes, "the last n minutes count as watched") stay in the
+ * config file, which is where these came from.
+ */
+const WATCHED_PERCENT_LEVELS = [80, 90, 95] as const;
+const CONTINUE_PERCENT_LEVELS = [2, 5, 10] as const;
 
 /** The project's own page, derived from `package.json` so the two cannot drift apart. */
 const PROJECT_URL = `https://github.com/${packageJson.repository}`;
@@ -262,6 +274,28 @@ export const mainMenuTemplate = async (
             });
             return subMenuArray;
           })(),
+        },
+        {
+          label: t("main.menu.options.submenu.watched.label"),
+          submenu: WATCHED_PERCENT_LEVELS.map((percent) => ({
+            checked: config.get("options.watched.percent") === percent,
+            click() {
+              config.setMenuOption("options.watched.percent", percent);
+            },
+            label: `${percent}%`,
+            type: "radio" as const,
+          })),
+        },
+        {
+          label: t("main.menu.options.submenu.continue-from.label"),
+          submenu: CONTINUE_PERCENT_LEVELS.map((percent) => ({
+            checked: config.get("options.inProgress.min.percent") === percent,
+            click() {
+              config.setMenuOption("options.inProgress.min.percent", percent);
+            },
+            label: `${percent}%`,
+            type: "radio" as const,
+          })),
         },
         {
           label: t("main.menu.options.submenu.visual-tweaks.label"),

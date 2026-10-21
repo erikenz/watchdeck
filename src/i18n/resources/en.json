@@ -141,6 +141,12 @@
               "to-help-translate": "Want to help translate? Click here"
             }
           },
+          "continue-from": {
+            "label": "Continue watching from"
+          },
+          "watched": {
+            "label": "Watched at"
+          },
           "resume-on-start": "Resume last song when app starts",
           "single-instance-lock": "Single Instance Lock",
           "start-at-login": "Start at login",
@@ -347,6 +353,13 @@
           "title": "Select Output Device"
         }
       }
+    },
+    "debloat": {
+      "description": "Take the parts of the site you do not want out of the page",
+      "menu": {
+        "shorts-shelf": "Hide the Shorts shelf"
+      },
+      "name": "Debloat"
     },
     "disable-autoplay": {
       "description": "Keep a video from starting by itself, and the site's autoplay toggle off",

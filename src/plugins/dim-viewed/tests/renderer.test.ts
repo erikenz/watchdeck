@@ -1,8 +1,11 @@
 /**
  * The dimming lives in the page's DOM, out of reach of the node tests: these run the real
  * `renderer.ts` against markup shaped like the site's, in a plain browser - the same fixture shape
- * the watch-later renderer tests use. What they pin is the rule: the site's own marks decide which
- * cards fade, a card that loses its mark fades back in, and disabling the plugin leaves nothing.
+ * the watch-later renderer tests use.
+ *
+ * What they pin is the rule the owner asked for: the site's own percentage is put through the same
+ * thresholds the Watch Later plugin buckets its list with (the app's options, stubbed here the way
+ * the preload exposes them), and only cards that count as viewed fade.
  */
 import path from "node:path";
 
@@ -16,6 +19,27 @@ interface DimApi {
   stop: () => void;
   VIEWED_CLASS: string;
 }
+
+const CONFIG = { enabled: true, opacity: 0.45 };
+
+/**
+ * One card per case, in the markup the live site serves (measured on the history page): the bar's
+ * segment carries the watched percentage as a width. `extra` adds the badge, or a bar with no
+ * width at all.
+ */
+const CARD = (id: string, width: string | null, extra = "") => `
+  <ytd-rich-item-renderer id="${id}">
+    ${
+      width === null
+        ? ""
+        : `<yt-thumbnail-overlay-progress-bar-view-model class="ytThumbnailOverlayProgressBarHost">
+             <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBar">
+               <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: ${width}"></div>
+             </div>
+           </yt-thumbnail-overlay-progress-bar-view-model>`
+    }
+    ${extra}
+  </ytd-rich-item-renderer>`;
 
 /** Bundles the plugin's renderer the way the app does, and hands back its IIFE. */
 const bundle = async (entry: string, name: string) => {
@@ -54,95 +78,125 @@ const openFixture = async (page: Page) => {
   await page.addScriptTag({ content: script });
 };
 
-const CONFIG = { enabled: true, opacity: 0.45 };
-
-test("the cards the site marks as viewed fade, and only those", async ({
+test("the site's percentage decides, with the app's thresholds", async ({
   page,
 }) => {
   await openFixture(page);
 
-  const seen = await page.evaluate((config) => {
-    const { __dim: dim } = window as unknown as { __dim: DimApi };
-    document.body.innerHTML = `
-      <ytd-rich-item-renderer id="watched">
-        <ytw-thumbnail-overlay-resume-playback-renderer>
-          <div class="ytThumbnailOverlayResumePlaybackRendererThumbnailOverlayResumePlaybackProgress" style="width: 42%"></div>
-        </ytw-thumbnail-overlay-resume-playback-renderer>
-      </ytd-rich-item-renderer>
-      <ytd-rich-item-renderer id="fresh"><yt-thumbnail-view-model></yt-thumbnail-view-model></ytd-rich-item-renderer>
-      <yt-lockup-view-model id="badge"><ytd-thumbnail-overlay-playback-status-renderer></ytd-thumbnail-overlay-playback-status-renderer></yt-lockup-view-model>`;
+  const seen = await page.evaluate(
+    ({ config, cards }) => {
+      const { __dim: dim } = window as unknown as { __dim: DimApi };
+      // The preload's bridge, as the page sees it: reads are lookups, `watch` hands back a way to
+      // stop listening.
+      (window as unknown as { mainConfig: unknown }).mainConfig = {
+        get: (key: string) =>
+          key === "options.watched"
+            ? { percent: 90 }
+            : { max: { percent: 90 }, min: { percent: 5 } },
+        watch: () => () => undefined,
+      };
+      document.body.innerHTML = cards;
 
-    dim.start(config);
+      dim.start(config);
 
-    return {
-      badge: document
-        .querySelector("#badge")
-        ?.classList.contains(dim.VIEWED_CLASS),
-      fresh: document
-        .querySelector("#fresh")
-        ?.classList.contains(dim.VIEWED_CLASS),
-      opacity: document.documentElement.style
-        .getPropertyValue("--wd-dv-opacity")
-        .trim(),
-      watched: document
-        .querySelector("#watched")
-        ?.classList.contains(dim.VIEWED_CLASS),
-    };
-  }, CONFIG);
+      const dimmed = (id: string) =>
+        document.querySelector(`#${id}`)?.classList.contains(dim.VIEWED_CLASS);
+      return {
+        barelyStarted: dimmed("barely"),
+        badge: dimmed("badge"),
+        fresh: dimmed("fresh"),
+        inProgress: dimmed("middle"),
+        opacity: document.documentElement.style
+          .getPropertyValue("--wd-dv-opacity")
+          .trim(),
+        unmeasurable: dimmed("nowidth"),
+        watched: dimmed("done"),
+      };
+    },
+    {
+      cards:
+        CARD("done", "95%") +
+        CARD("middle", "30%") +
+        CARD("barely", "1%") +
+        CARD("fresh", null) +
+        CARD("nowidth", "") +
+        CARD(
+          "badge",
+          null,
+          "<ytd-thumbnail-overlay-playback-status-renderer></ytd-thumbnail-overlay-playback-status-renderer>"
+        ),
+      config: CONFIG,
+    }
+  );
 
-  // A partially watched card (the resume bar) and a finished one (the watched badge) fade; a card
-  // the site has not marked does not. The level is the plugin's own setting, on the root element.
+  // 95% is watched and 30% is in progress (both above the 5% minimum), 1% is not, a card the site
+  // does not mark is not, a bar with no readable width counts as started, and the watched badge
+  // counts outright.
   expect(seen).toEqual({
+    barelyStarted: false,
     badge: true,
     fresh: false,
+    inProgress: true,
     opacity: "0.45",
+    unmeasurable: true,
     watched: true,
   });
 });
 
-test("a card that stops being marked fades back in, and stop leaves nothing", async ({
+test("a threshold change re-reads the cards, and stop leaves nothing", async ({
   page,
 }) => {
   await openFixture(page);
 
-  const seen = await page.evaluate(async (config) => {
-    const { __dim: dim } = window as unknown as { __dim: DimApi };
-    document.body.innerHTML = `
-      <ytd-video-renderer id="card"><ytw-thumbnail-overlay-resume-playback-renderer></ytw-thumbnail-overlay-resume-playback-renderer></ytd-video-renderer>`;
-    dim.start(config);
+  const seen = await page.evaluate(
+    ({ config, cards }) => {
+      const { __dim: dim } = window as unknown as { __dim: DimApi };
+      const thresholds = {
+        inProgress: { max: { percent: 90 }, min: { percent: 5 } },
+        watched: { percent: 90 },
+      };
+      const watchers: (() => void)[] = [];
+      (window as unknown as { mainConfig: unknown }).mainConfig = {
+        get: (key: string) =>
+          key === "options.watched"
+            ? thresholds.watched
+            : thresholds.inProgress,
+        watch: (listener: () => void) => {
+          watchers.push(listener);
+          return () => watchers.splice(watchers.indexOf(listener), 1);
+        },
+      };
+      document.body.innerHTML = cards;
+      dim.start(config);
 
-    const card = document.querySelector("#card") as Element;
-    const marked = card.classList.contains(dim.VIEWED_CLASS);
+      const card = document.querySelector("#middle") as Element;
+      const before = card.classList.contains(dim.VIEWED_CLASS);
 
-    // The site re-renders the item without its resume bar, and the next frame puts the card back.
-    card
-      .querySelector("ytw-thumbnail-overlay-resume-playback-renderer")
-      ?.remove();
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolve))
-    );
-    const afterRerender = card.classList.contains(dim.VIEWED_CLASS);
+      // The owner raises "continue watching from" to 50% in the Options menu: 30% is not viewed
+      // any more, and the answer is re-read without a reload.
+      thresholds.inProgress.min.percent = 50;
+      for (const watcher of watchers) {
+        watcher();
+      }
+      const after = card.classList.contains(dim.VIEWED_CLASS);
 
-    dim.applyConfig({ ...config, opacity: 0.25 });
-    const level = document.documentElement.style
-      .getPropertyValue("--wd-dv-opacity")
-      .trim();
+      dim.stop();
+      return {
+        after,
+        afterStop: card.classList.contains(dim.VIEWED_CLASS),
+        before,
+        listeners: watchers.length,
+        variable:
+          document.documentElement.style.getPropertyValue("--wd-dv-opacity"),
+      };
+    },
+    { cards: CARD("middle", "30%"), config: CONFIG }
+  );
 
-    dim.stop();
-    return {
-      afterRerender,
-      afterStop: card.classList.contains(dim.VIEWED_CLASS),
-      level,
-      marked,
-      variable:
-        document.documentElement.style.getPropertyValue("--wd-dv-opacity"),
-    };
-  }, CONFIG);
-
-  expect(seen.marked).toBe(true);
-  expect(seen.afterRerender).toBe(false);
-  // A new level lands without a reload, and disabling the plugin leaves no class and no variable.
-  expect(seen.level).toBe("0.25");
+  expect(seen.before).toBe(true);
+  expect(seen.after).toBe(false);
   expect(seen.afterStop).toBe(false);
   expect(seen.variable).toBe("");
+  // `stop` lets go of the options listener as well, so a disabled plugin is not still waking up.
+  expect(seen.listeners).toBe(0);
 });

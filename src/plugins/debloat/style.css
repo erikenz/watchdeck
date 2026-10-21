@@ -1,0 +1,5 @@
+/* A shelf the plugin was told to remove keeps its place in the page and loses its layout box
+   instead: nothing of the site's is deleted, so turning the plugin off puts it straight back. */
+.wd-db-hidden {
+  display: none;
+}

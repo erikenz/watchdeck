@@ -253,12 +253,15 @@ export const renderer = {
    */
   applyDims() {
     const dim = this.config?.dimSaved === true;
+    // Not on the Watch Later page itself: every row there is a saved video, so fading all of them
+    // says nothing and only makes the list harder to read.
+    const onOwnList = this.config?.enhancePage === true && isWatchLaterPage();
     for (const card of document.querySelectorAll(CARD_SELECTOR)) {
       const videoId = videoIdFromHost(card);
       const saved = videoId !== undefined && this.membership.has(videoId);
       // `toggle` with the state the class already has is not a DOM mutation, and this plugin scans
       // on mutations: a write that repeats itself would scan for ever.
-      card.classList.toggle(SAVED_CLASS, dim && saved);
+      card.classList.toggle(SAVED_CLASS, dim && !onOwnList && saved);
     }
   },
 

@@ -1,13 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+import { defaultConfig } from "../../../config/defaults";
 import { openNodeSqlite, WatchLaterStore } from "../backend/db";
 import { parseWatchLaterPage } from "../backend/inner-tube";
 import type { VideoDetails, WatchLaterPage } from "../backend/inner-tube";
 import { WatchLaterSync } from "../backend/sync";
 import type { WatchLaterTransport } from "../backend/sync";
-import { defaultConfig } from "../config";
+import { defaultConfig as pluginDefaults } from "../config";
 
-const config = { ...defaultConfig, requestsPerSecond: 0 };
+const config = { ...pluginDefaults, requestsPerSecond: 0 };
+
+/** The thresholds are app options; these tests use the shipped defaults. */
+const thresholds = {
+  inProgress: defaultConfig.options.inProgress,
+  watched: defaultConfig.options.watched,
+};
 
 /** Synthetic pages in the shape the site returns (trimmed to what we read). */
 const legacyPage = (items: number, continuation?: string) => ({
@@ -292,7 +299,7 @@ test("paging walks to the end, captures progress and soft-deletes what is gone",
   // ...but the row is still there for provenance.
   expect(db.entryFor("alpha", "stale000001")?.removed_at).not.toBeNull();
   // Progress from the same page walk needed no extra request.
-  const [first] = db.query({ accountId: "alpha" }, defaultConfig);
+  const [first] = db.query({ accountId: "alpha" }, thresholds);
   expect(first.bucket).toBe("in-progress");
   db.close();
 });

@@ -744,7 +744,7 @@ opens the video or the inline preview.
 
 ### R5 — Plugins: what happens to the 41 inherited ones
 
-**Where this landed (rev 13; 19 plugins as of rev 16).** `src/plugins` now holds **19 plugins**, and the plan below is the record of
+**Where this landed (rev 13; 21 plugins as of rev 17).** `src/plugins` now holds **21 plugins**, and the plan below is the record of
 how they were triaged rather than a to-do list:
 
 - P0 deleted the 15 music-only ones; P1/P2 reworked the providers underneath the rest.
@@ -1061,6 +1061,18 @@ conversation. The research behind it happened in one Delta thread, which was clo
   videos already in the list, deliberately less than the watched ones; and the stray save button that
   used to stay floating over every page when its card left the page while marked (`alignButton` puts a
   button back before it measures, and a mark whose card is gone is dropped in `scan`).
+- **Version 0.1.3 (rev 17).** The watched / continue-watching thresholds moved out of the Watch Later
+  plugin's config and into the app's own options (`options.watched`, `options.inProgress`, with the two
+  percentages in the Options menu), because two plugins ask that question now: Watch Later buckets its
+  list with them and `dim-viewed` decides from them whether a card has been viewed. A plugin that can be
+  disabled cannot own a setting another one needs; both read the same numbers through
+  `classifyProgress` (`plugins/utils/common/watch-thresholds.ts`). `dim-viewed` also reads the
+  percentage the site itself prints on a thumbnail - measured on the live history page:
+  `yt-thumbnail-overlay-progress-bar-view-model`, whose segment carries `width: 10%` - so a partially
+  watched card fades instead of only the ones the site badges. Also in this revision: **`debloat`** (off
+  by default, starting with the Shorts shelf), the Watch Later page no longer dims its own rows, and the
+  floating save button follows the scroll again - the card under the pointer is a hit test now, not a
+  measurement of every card on the page.
 - **Still open:** nothing. §13's Q6 was answered by the shipped gesture set (rev 11).
 - **Next step:** **P3 — SponsorBlock** (§8): the bounded spike from §5.1 — load the official release at runtime with the
   `chrome.storage.sync → storage.local` shim, and check the service worker, the in-player button and skipping, config

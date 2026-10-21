@@ -1,6 +1,6 @@
 {
   "name": "watchdeck",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Unofficial YouTube desktop client, built around a plugin system",
   "license": "MIT",
   "author": {

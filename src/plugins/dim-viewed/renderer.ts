@@ -1,4 +1,12 @@
-import { CARD_SELECTOR, isViewedCard } from "@/plugins/utils/renderer/cards";
+import { classifyProgress } from "@/plugins/utils/common/watch-thresholds";
+import {
+  CARD_SELECTOR,
+  durationOf,
+  hasWatchedBadge,
+  isViewedCard,
+  viewedPercent,
+} from "@/plugins/utils/renderer/cards";
+import type { WatchThresholds } from "@/types/watch-thresholds";
 
 import type { DimViewedPluginConfig } from "./index";
 
@@ -9,21 +17,62 @@ export const VIEWED_CLASS = "wd-dv-viewed";
 const OPACITY_VARIABLE = "--wd-dv-opacity";
 
 let observer: MutationObserver | null = null;
+let unwatch: (() => void) | null = null;
 let scanQueued = false;
+let thresholds: WatchThresholds | null = null;
 
 /**
- * Fades the cards the site itself marks as watched - and only those.
+ * The watched / continue-watching thresholds, read from the app's own options.
  *
- * The mark is the site's own resume bar or watched badge, read off the card: what the app believes
- * about a video and what the page shows are two different things, and this is decoration for the
- * page, so the page decides. A card the site stops marking (a re-render, a fresh item) is faded
- * back in, which is why this runs over every card rather than only over the new ones.
+ * They are the same numbers the Watch Later plugin buckets its list with, and they live with the
+ * app rather than in a plugin so that this one works while that one is disabled. The page is handed
+ * the config (`window.mainConfig`), so a read is a lookup and no IPC of its own is needed.
+ */
+const readThresholds = (): WatchThresholds => ({
+  inProgress: window.mainConfig.get("options.inProgress"),
+  watched: window.mainConfig.get("options.watched"),
+});
+
+/**
+ * Whether the card counts as viewed.
+ *
+ * The percentage is the site's own - the width of the bar it draws - put through the shared
+ * thresholds, so "viewed" means the same thing here and in the Watch Later list. A card the site
+ * marks but whose bar cannot be measured counts as started (the site only draws a bar when there is
+ * progress), and the watched badge counts outright.
+ */
+const isViewed = (card: Element): boolean => {
+  if (hasWatchedBadge(card)) {
+    return true;
+  }
+
+  const percent = viewedPercent(card);
+  if (percent === undefined) {
+    return isViewedCard(card);
+  }
+  if (!thresholds) {
+    return percent > 0;
+  }
+
+  return (
+    classifyProgress(
+      { durationSeconds: durationOf(card), ratio: percent / 100 },
+      thresholds
+    ) !== "unwatched"
+  );
+};
+
+/**
+ * Fades the cards that count as viewed, and only those.
+ *
+ * A card the site stops marking (a re-render, a fresh item) is faded back in, which is why this runs
+ * over every card rather than only over the new ones.
  */
 export const applyDims = () => {
   for (const card of document.querySelectorAll(CARD_SELECTOR)) {
     // `toggle` with the state it already has is not a DOM mutation, and this plugin's own observer
     // watches for those: a write that repeats itself would scan for ever.
-    card.classList.toggle(VIEWED_CLASS, isViewedCard(card));
+    card.classList.toggle(VIEWED_CLASS, isViewed(card));
   }
 };
 
@@ -43,12 +92,18 @@ const setOpacity = (opacity: number) => {
 };
 
 export const start = (config: DimViewedPluginConfig) => {
+  thresholds = readThresholds();
   setOpacity(config.opacity);
   applyDims();
   // The site is a single-page app that re-renders its feeds: a card's mark comes and goes with the
   // item, so the cards are re-read whenever the page changes, coalesced to one frame.
   observer = new MutationObserver(() => queueScan());
   observer.observe(document.body, { childList: true, subtree: true });
+  // A threshold changed in the Options menu re-reads the cards at once: the answer is a lookup.
+  unwatch = window.mainConfig.watch(() => {
+    thresholds = readThresholds();
+    applyDims();
+  });
 };
 
 export const applyConfig = (config: DimViewedPluginConfig) => {
@@ -58,6 +113,9 @@ export const applyConfig = (config: DimViewedPluginConfig) => {
 export const stop = () => {
   observer?.disconnect();
   observer = null;
+  unwatch?.();
+  unwatch = null;
+  thresholds = null;
   scanQueued = false;
   document.documentElement.style.removeProperty(OPACITY_VARIABLE);
   for (const card of document.querySelectorAll(`.${VIEWED_CLASS}`)) {

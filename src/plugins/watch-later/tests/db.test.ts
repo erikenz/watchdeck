@@ -4,8 +4,18 @@ import { join } from "node:path";
 
 import { expect, test } from "@playwright/test";
 
+import { defaultConfig } from "../../../config/defaults";
+import type { WatchThresholds } from "../../../types/watch-thresholds";
 import { openNodeSqlite, WatchLaterStore } from "../backend/db";
-import { defaultConfig } from "../config";
+
+/**
+ * The thresholds are app options now (`options.watched` / `options.inProgress`), shared with the
+ * plugins that ask the same question; these tests use the shipped defaults.
+ */
+const thresholds: WatchThresholds = {
+  inProgress: defaultConfig.options.inProgress,
+  watched: defaultConfig.options.watched,
+};
 
 const store = () => new WatchLaterStore(openNodeSqlite(":memory:"));
 
@@ -95,7 +105,7 @@ test("progress merges the local high-water mark with YouTube's percentage", () =
   });
   db.setYouTubeProgress("alpha", "watched0001", { percent: 95 });
 
-  const [entry] = db.query({ accountId: "alpha" }, defaultConfig);
+  const [entry] = db.query({ accountId: "alpha" }, thresholds);
   expect(entry.bucket).toBe("watched");
   expect(entry.ratio).toBeCloseTo(0.95);
   expect(entry.progressSource).toBe("both");
@@ -140,7 +150,7 @@ test("buckets follow the configured thresholds", () => {
 
   const buckets = new Map(
     db
-      .query({ accountId: "alpha" }, defaultConfig)
+      .query({ accountId: "alpha" }, thresholds)
       .map((entry) => [entry.videoId, entry.bucket])
   );
   for (const item of cases) {
@@ -148,7 +158,7 @@ test("buckets follow the configured thresholds", () => {
   }
 
   // Changing the threshold reclassifies without touching the data.
-  const strict = { ...defaultConfig, watched: { percent: 99 } };
+  const strict: WatchThresholds = { ...thresholds, watched: { percent: 99 } };
   const strictBuckets = new Map(
     db
       .query({ accountId: "alpha" }, strict)
@@ -176,16 +186,16 @@ test("search matches title, description and channel", () => {
 
   expect(
     db
-      .query({ accountId: "alpha", search: "rainy" }, defaultConfig)
+      .query({ accountId: "alpha", search: "rainy" }, thresholds)
       .map((e) => e.videoId)
   ).toEqual(["lofi0000001"]);
   expect(
     db
-      .query({ accountId: "alpha", search: "loops" }, defaultConfig)
+      .query({ accountId: "alpha", search: "loops" }, thresholds)
       .map((e) => e.videoId)
   ).toEqual(["lofi0000001"]);
   expect(
-    db.query({ accountId: "alpha", search: "nothing" }, defaultConfig)
+    db.query({ accountId: "alpha", search: "nothing" }, thresholds)
   ).toEqual([]);
   db.close();
 });

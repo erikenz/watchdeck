@@ -2,11 +2,13 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
+import { classifyProgress } from "@/plugins/utils/common/watch-thresholds";
+import type { WatchThresholds } from "@/types/watch-thresholds";
+
 import type {
   WatchLaterAccount,
   WatchLaterBucket,
   WatchLaterEntry,
-  WatchLaterPluginConfig,
   WatchLaterQuery,
 } from "../types";
 
@@ -182,9 +184,11 @@ interface EntryRow extends VideoRow {
 }
 
 /**
- * Classifies one entry into the three buckets the UI filters by. Kept pure so the
- * thresholds (and the merge rule for the two progress sources) are unit-testable:
- * `effective = max(local high-water mark / duration, YouTube's own resume %)`.
+ * Classifies one entry into the three buckets the UI filters by. Kept pure so the merge rule for
+ * the two progress sources is unit-testable: `effective = max(local high-water mark / duration,
+ * YouTube's own resume %)`. The thresholds themselves are shared - the app's options, applied by
+ * `classifyProgress` - because the dimming plugin asks the same question of the site's own
+ * percentage.
  */
 export const classifyEntry = (
   entry: {
@@ -193,7 +197,7 @@ export const classifyEntry = (
     ytWatchedBadge?: boolean | null;
     maxPositionSeconds?: number | null;
   },
-  config: Pick<WatchLaterPluginConfig, "watched" | "inProgress">
+  thresholds: WatchThresholds
 ): { bucket: WatchLaterBucket; ratio: number; watchedSeconds: number } => {
   const duration = entry.durationSeconds ?? 0;
   const localSeconds = entry.maxPositionSeconds ?? 0;
@@ -202,45 +206,13 @@ export const classifyEntry = (
     duration > 0 ? Math.max(localSeconds / duration, ytRatio) : ytRatio;
   const watchedSeconds = Math.max(localSeconds, ytRatio * duration);
 
-  const minutes = (value?: number) =>
-    value === undefined ? undefined : value * 60;
-  const ratioOf = (value?: number) =>
-    value === undefined ? undefined : value / 100;
+  // The site's own badge is the one signal that needs no threshold: YouTube only draws it on a
+  // video it counts as watched.
+  const bucket = entry.ytWatchedBadge
+    ? "watched"
+    : classifyProgress({ durationSeconds: duration, ratio }, thresholds);
 
-  const watchedPercent = ratioOf(config.watched.percent);
-  const watchedMinutes = minutes(config.watched.minutes);
-
-  // Watched: a threshold met, the site's own badge, or — when `max` is given in minutes —
-  // close enough to the end that only that many minutes are left.
-  const remainingSeconds = duration > 0 ? duration - watchedSeconds : undefined;
-  const maxRemaining = minutes(config.inProgress.max.minutes);
-  const watched =
-    entry.ytWatchedBadge === true ||
-    (watchedPercent !== undefined && ratio >= watchedPercent) ||
-    (watchedMinutes !== undefined && watchedSeconds >= watchedMinutes) ||
-    (maxRemaining !== undefined &&
-      remainingSeconds !== undefined &&
-      remainingSeconds <= maxRemaining);
-
-  if (watched) {
-    return { bucket: "watched", ratio, watchedSeconds };
-  }
-
-  const minPercent = ratioOf(config.inProgress.min.percent);
-  const minMinutes = minutes(config.inProgress.min.minutes);
-  const maxPercent = ratioOf(config.inProgress.max.percent);
-  // "Continue watching" reaches up to the watched threshold, so raising it cannot leave a
-  // band where a video counts as neither.
-  const ceiling = Math.max(maxPercent ?? 1, watchedPercent ?? 1);
-  const started =
-    (minPercent !== undefined && ratio >= minPercent) ||
-    (minMinutes !== undefined && watchedSeconds >= minMinutes);
-
-  if (started && ratio < ceiling) {
-    return { bucket: "in-progress", ratio, watchedSeconds };
-  }
-
-  return { bucket: "unwatched", ratio, watchedSeconds };
+  return { bucket, ratio, watchedSeconds };
 };
 
 export class WatchLaterStore {
@@ -686,7 +658,7 @@ export class WatchLaterStore {
 
   query(
     query: WatchLaterQuery,
-    config: WatchLaterPluginConfig
+    thresholds: WatchThresholds
   ): WatchLaterEntry[] {
     const accountId = query.accountId ?? "";
     const limit = query.limit ?? 200;
@@ -736,7 +708,7 @@ export class WatchLaterStore {
           ytPercentWatched: row.yt_percent_watched,
           ytWatchedBadge: row.yt_watched_badge === 1,
         },
-        config
+        thresholds
       );
 
       return {

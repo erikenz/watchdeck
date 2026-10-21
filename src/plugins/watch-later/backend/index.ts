@@ -2,8 +2,10 @@ import { join } from "node:path";
 
 import { app } from "electron";
 
+import { get as getOption, watch as watchOptions } from "@/config";
 import { t } from "@/i18n";
 import type { BackendContext } from "@/types/contexts";
+import type { WatchThresholds } from "@/types/watch-thresholds";
 import { LoggerPrefix } from "@/utils";
 
 import type {
@@ -39,6 +41,14 @@ interface BackendState {
   interval?: NodeJS.Timeout;
   window: BackendContext<WatchLaterPluginConfig>["window"] | null;
   config: WatchLaterPluginConfig | null;
+  /**
+   * What counts as watched, from the app's own options: the same thresholds the dimming plugin
+   * applies to the percentage the site prints on a thumbnail. A plugin cannot own a setting
+   * another plugin needs, and it must keep working while this one is disabled.
+   */
+  thresholds: WatchThresholds;
+  /** Stops listening for threshold changes when the plugin unloads. */
+  unwatch?: () => void;
 }
 
 const state: BackendState = {
@@ -56,8 +66,15 @@ const state: BackendState = {
   sync: null!,
   syncReason: null,
   syncing: false,
+  thresholds: { inProgress: { max: {}, min: {} }, watched: {} },
   window: null,
 };
+
+/** The shared watched / continue-watching thresholds, as the app options hold them now. */
+const readThresholds = (): WatchThresholds => ({
+  inProgress: getOption("options.inProgress"),
+  watched: getOption("options.watched"),
+});
 
 const log = (...args: unknown[]) =>
   console.log(LoggerPrefix, "[watch-later]", ...args);
@@ -320,6 +337,13 @@ export const onMainLoad = async ({
 }: BackendContext<WatchLaterPluginConfig>) => {
   state.window = window;
   state.config = await getConfig();
+  state.thresholds = readThresholds();
+  // The thresholds belong to the app, not to this plugin: a change re-buckets the mirror, and the
+  // toolbar hears about it through the same broadcast it already listens to.
+  state.unwatch = watchOptions(() => {
+    state.thresholds = readThresholds();
+    broadcast();
+  });
   state.store = new WatchLaterStore(
     openNodeSqlite(join(app.getPath("userData"), "watch-later.db"))
   );
@@ -334,8 +358,7 @@ export const onMainLoad = async ({
   ipc.handle("watchdeck:watch-later-query", (query: WatchLaterQuery) =>
     state.store.query(
       { ...query, accountId: state.activeAccountId ?? "" },
-      // set in onMainLoad, before this handler can be registered
-      state.config!
+      state.thresholds
     )
   );
   ipc.handle("watchdeck:watch-later-session-index", (index: number) =>
@@ -440,6 +463,8 @@ export const onConfigChange = async (config: WatchLaterPluginConfig) => {
 };
 
 export const onMainUnload = () => {
+  state.unwatch?.();
+  state.unwatch = undefined;
   if (state.interval) {
     clearInterval(state.interval);
     state.interval = undefined;

@@ -90,6 +90,6 @@ export const get = <Key extends Paths<typeof defaultConfig>>(key: Key) =>
 
 export const edit = async () => store.openInEditor();
 
-export const watch = (cb: Parameters<IStore["onDidAnyChange"]>[0]) => {
+export const watch = (cb: Parameters<IStore["onDidAnyChange"]>[0]) =>
+  // Returned so a caller that lives as long as a plugin can stop listening when it unloads.
   store.onDidAnyChange(cb);
-};

@@ -1,3 +1,5 @@
+import { secondsFromText } from "../common/watch-thresholds";
+
 /**
  * What a card is on this site, and how the site says "you have watched this".
  *
@@ -25,23 +27,86 @@ export const cardOf = (element: Element): Element | null =>
   element.closest(CARD_SELECTOR);
 
 /**
- * The site's own marks for a video that has been watched: the red resume bar (the classic
- * renderer and the newer view-model one, which is what the live site serves now) and the
- * "Watched" badge a finished video gets where the site renders one.
+ * The site's own marks for a video that has been watched.
  *
- * Measured on the live site (2026-10-19): a partially watched card carries
- * `ytw-thumbnail-overlay-resume-playback-renderer`, with an element whose class contains
- * `ResumePlaybackProgress` inside it. The older `ytd-` names are still listed - the site serves
- * both generations of markup per surface - and so is the playback-status overlay, which is the
- * one `inner-tube.ts` reads the watched badge out of.
+ * Measured on the live site (2026-10-21) on the history page, where every card is watched:
+ *
+ * ```html
+ * <yt-thumbnail-overlay-progress-bar-view-model class="ytThumbnailOverlayProgressBarHost">
+ *   <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBar">
+ *     <div class="ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment" style="width: 10%"></div>
+ *   </div>
+ * </yt-thumbnail-overlay-progress-bar-view-model>
+ * ```
+ *
+ * The segment's width is the watched percentage - which is what the shared thresholds are applied
+ * to. The older `resume-playback` families (both generations, measured on the home feed and named
+ * in docs/PRD.md §4.3) are still listed: the site serves whichever markup a surface was built
+ * with. The watched badge is the classic playback-status overlay, the one `inner-tube.ts` reads
+ * the "Watched" text out of - not the badge view-model, which is where the duration lives.
  */
-export const VIEWED_MARKER_SELECTOR = [
-  "ytd-thumbnail-overlay-resume-playback-renderer",
+export const PROGRESS_MARKER_SELECTOR = [
+  "yt-thumbnail-overlay-progress-bar-view-model",
   "ytw-thumbnail-overlay-resume-playback-renderer",
-  "ytd-thumbnail-overlay-playback-status-renderer",
+  "ytd-thumbnail-overlay-resume-playback-renderer",
   "[class*='ResumePlaybackProgress']",
 ].join(",");
 
+export const WATCHED_BADGE_SELECTOR =
+  "ytd-thumbnail-overlay-playback-status-renderer";
+
 /** Whether the site marks this card's video as watched, fully or partly. */
 export const isViewedCard = (card: Element): boolean =>
-  card.querySelector(VIEWED_MARKER_SELECTOR) !== null;
+  card.querySelector(
+    `${PROGRESS_MARKER_SELECTOR},${WATCHED_BADGE_SELECTOR}`
+  ) !== null;
+
+/** Whether the card carries the site's own "Watched" badge. */
+export const hasWatchedBadge = (card: Element): boolean =>
+  card.querySelector(WATCHED_BADGE_SELECTOR) !== null;
+
+/**
+ * How far through the video the site says the viewer is, 0-100, or `undefined` when it draws a bar
+ * without a readable width.
+ *
+ * The width is a percentage in the markup the site serves today (`style="width: 10%"`) and was a
+ * percentage in the classic `#progress` element too, so a value that parses as a number is a
+ * percentage; a bar whose width is not a number is treated as "some progress, amount unknown".
+ */
+export const viewedPercent = (card: Element): number | undefined => {
+  const candidates = card.querySelectorAll<HTMLElement>(
+    [
+      "[class*='WatchedProgressBarSegment']",
+      "[class*='ResumePlaybackProgress']",
+      "#progress",
+    ].join(",")
+  );
+
+  let percent: number | undefined;
+  for (const candidate of candidates) {
+    const parsed = Number.parseFloat(candidate.style.width);
+    if (Number.isFinite(parsed)) {
+      percent = parsed;
+    }
+  }
+  return percent;
+};
+
+/** The duration the card prints on its thumbnail (`24:07`, `1:02:33`), in seconds. */
+const DURATION_SELECTOR = [
+  "ytd-thumbnail-overlay-time-status-renderer",
+  "yt-thumbnail-badge-view-model",
+  ".ytThumbnailBottomOverlayViewModelBadgeContainer",
+].join(",");
+
+export const durationOf = (card: Element): number | undefined => {
+  let seconds: number | undefined;
+  for (const candidate of card.querySelectorAll(DURATION_SELECTOR)) {
+    // Badge containers carry "New" and "Live" too; only a duration parses.
+    const parsed = secondsFromText(candidate.textContent?.trim());
+    if (parsed !== undefined) {
+      seconds = parsed;
+    }
+  }
+  return seconds;
+};

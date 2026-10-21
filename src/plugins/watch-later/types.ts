@@ -30,6 +30,13 @@ export interface WatchLaterPluginConfig {
   showHoverButton: boolean;
   /** Add the toolbar and the enriched rows to the site's own Watch Later page. */
   enhancePage: boolean;
+  /** Fade the cards of videos that are already in Watch Later. */
+  dimSaved: boolean;
+  /**
+   * Opacity of a saved card, 0-1. Deliberately above the dim-viewed plugin's default: a video
+   * saved for later is faded less than one that has already been watched.
+   */
+  savedOpacity: number;
 }
 
 export interface WatchLaterAccount {

@@ -358,6 +358,18 @@
       },
       "name": "Disable Autoplay"
     },
+    "dim-viewed": {
+      "description": "Fade videos the site marks as watched, so a feed you have already been through is easier to scan",
+      "menu": {
+        "level": {
+          "medium": "Noticeably",
+          "slight": "Slightly",
+          "strong": "Strongly"
+        },
+        "opacity": "Dimming"
+      },
+      "name": "Dim Viewed Videos"
+    },
     "discord": {
       "backend": {
         "already-connected": "Attempted to connect with active connection",
@@ -634,6 +646,8 @@
         "watched": "Watched"
       },
       "menu": {
+        "dim-saved": "Fade videos already in Watch Later",
+        "dim-saved-opacity": "How much they fade",
         "enhance-page": "Enhance the Watch Later page",
         "enrich-metadata": "Fetch descriptions and tags",
         "hover-button": "Show the save button on thumbnails",
@@ -646,6 +660,11 @@
           "1h": "1 hour",
           "6h": "6 hours",
           "24h": "24 hours"
+        },
+        "level": {
+          "medium": "Noticeably",
+          "slight": "Slightly",
+          "strong": "Strongly"
         }
       },
       "name": "Watch Later",

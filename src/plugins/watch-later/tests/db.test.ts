@@ -1,9 +1,52 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { expect, test } from "@playwright/test";
 
 import { openNodeSqlite, WatchLaterStore } from "../backend/db";
 import { defaultConfig } from "../config";
 
 const store = () => new WatchLaterStore(openNodeSqlite(":memory:"));
+
+test("a file-backed database is opened in WAL", () => {
+  const directory = mkdtempSync(join(tmpdir(), "watchdeck-db-"));
+  const db = openNodeSqlite(join(directory, "mirror.db"));
+  try {
+    // The rollback journal commits (and fsyncs) every statement on its own, which is what made one
+    // page of the list - 200 rows and the search-index triggers - take 1.7 s of the main process.
+    expect(
+      db.get<{ journal_mode: string }>("PRAGMA journal_mode")?.journal_mode
+    ).toBe("wal");
+    expect(
+      db.get<{ synchronous: number }>("PRAGMA synchronous")?.synchronous
+    ).toBe(1);
+  } finally {
+    db.close();
+    rmSync(directory, { force: true, recursive: true });
+  }
+});
+
+test("a transaction is all-or-nothing", () => {
+  const db = store();
+  db.transaction(() => {
+    db.upsertVideo({ title: "One", videoId: "aaaaaaaaaaa" });
+    db.upsertEntry({ accountId: "alpha", videoId: "aaaaaaaaaaa" });
+  });
+  expect(db.membershipIds("alpha")).toEqual(["aaaaaaaaaaa"]);
+
+  expect(() =>
+    db.transaction(() => {
+      db.upsertVideo({ title: "Two", videoId: "bbbbbbbbbbb" });
+      throw new Error("boom");
+    })
+  ).toThrow("boom");
+  // Rolled back: the failed burst left no row behind, and the database still takes writes.
+  expect(db.entryFor("alpha", "bbbbbbbbbbb")).toBeUndefined();
+  db.upsertEntry({ accountId: "alpha", videoId: "ccccccccccc" });
+  expect(db.membershipIds("alpha")).toContain("ccccccccccc");
+  db.close();
+});
 
 test("entries are isolated per account", () => {
   const db = store();

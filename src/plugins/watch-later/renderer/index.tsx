@@ -1,6 +1,7 @@
 import { render } from "solid-js/web";
 
 import { t } from "@/i18n";
+import { CARD_SELECTOR } from "@/plugins/utils/renderer/cards";
 import type { RendererContext } from "@/types/contexts";
 import type { MusicPlayer } from "@/types/music-player";
 
@@ -47,6 +48,12 @@ const PROGRESS_INTERVAL_MS = 5000;
 /** How long a change the server refused stays visible on the button. */
 const REFUSAL_HOLD_MS = 1200;
 
+/** The class a card gets while its video is in Watch Later. */
+export const SAVED_CLASS = "wd-wl-dim";
+
+/** Where the configured opacity lands; the stylesheet reads it, so a change needs no reload. */
+const SAVED_OPACITY_VARIABLE = "--wd-wl-dim-opacity";
+
 type Ipc = RendererContext<WatchLaterPluginConfig>["ipc"];
 
 export const renderer = {
@@ -90,6 +97,8 @@ export const renderer = {
     await this.hydrate();
     this.reportSessionIndex(context);
     this.mountToolbar(context);
+    this.applyDimOpacity();
+    this.applyDims();
 
     this.resizeListener = this.onResize.bind(this);
     window.addEventListener("resize", this.resizeListener, { passive: true });
@@ -235,6 +244,37 @@ export const renderer = {
     }
   },
 
+  /**
+   * Fades the cards of videos that are already in Watch Later.
+   *
+   * Deliberately a lighter fade than the dim-viewed plugin's: a video saved for later is dimmed
+   * less than one already watched, and where a card is both, that plugin's rule wins (the
+   * stylesheet explains how).
+   */
+  applyDims() {
+    const dim = this.config?.dimSaved === true;
+    for (const card of document.querySelectorAll(CARD_SELECTOR)) {
+      const videoId = videoIdFromHost(card);
+      const saved = videoId !== undefined && this.membership.has(videoId);
+      // `toggle` with the state the class already has is not a DOM mutation, and this plugin scans
+      // on mutations: a write that repeats itself would scan for ever.
+      card.classList.toggle(SAVED_CLASS, dim && saved);
+    }
+  },
+
+  /** Hands the configured fade to the stylesheet. */
+  applyDimOpacity() {
+    const opacity = this.config?.savedOpacity;
+    if (opacity === undefined) {
+      document.documentElement.style.removeProperty(SAVED_OPACITY_VARIABLE);
+      return;
+    }
+    document.documentElement.style.setProperty(
+      SAVED_OPACITY_VARIABLE,
+      String(opacity)
+    );
+  },
+
   /** The site is a single-page app: the toolbar and the row state follow navigation. */
   onNavigate() {
     if (this.context) {
@@ -271,6 +311,10 @@ export const renderer = {
     this.toolbarHost?.remove();
     this.toolbarHost = null;
     this.filter = null;
+    for (const card of document.querySelectorAll(`.${SAVED_CLASS}`)) {
+      card.classList.remove(SAVED_CLASS);
+    }
+    document.documentElement.style.removeProperty(SAVED_OPACITY_VARIABLE);
     for (const row of document.querySelectorAll(ROW_SELECTOR)) {
       row.classList.remove("wd-wl-row-hidden");
       row.querySelector(".wd-wl-row-meta")?.remove();
@@ -305,6 +349,8 @@ export const renderer = {
 
   onConfigChange(config: WatchLaterPluginConfig) {
     this.config = config;
+    this.applyDimOpacity();
+    this.applyDims();
     this.repaint();
   },
 
@@ -322,6 +368,7 @@ export const renderer = {
       )) as string[];
       this.membership = new Set(ids);
       this.repaint();
+      this.applyDims();
     } catch {
       // Not signed in yet, or the backend is still starting: the buttons simply
       // stay in their unsaved state.
@@ -385,10 +432,19 @@ export const renderer = {
   },
 
   scan() {
+    // A card can leave the page while the mark is on it - the site re-renders a feed, the user
+    // navigates - and nothing else would notice: the mark is cleared by pointer movement, and a
+    // pointer that sits still does not move. Its button would then float over every page for the
+    // rest of the session (the bug the owner saw), so a mark whose card is gone is dropped here.
+    if (this.markedCard && !this.markedCard.isConnected) {
+      this.markCard(null);
+    }
+
     if (this.context) {
       this.mountToolbar(this.context);
     }
     this.applyRows();
+    this.applyDims();
 
     // On the Watch Later page every row is already saved, so a button per row is noise.
     if (

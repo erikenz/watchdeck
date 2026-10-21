@@ -16,6 +16,11 @@ export interface WatchLaterTransport {
 
 /** Minimal view of the store the sync writes to, so tests can pass a stub too. */
 export interface WatchLaterSink {
+  /**
+   * Runs a burst of writes - one page of the list - as one transaction. A store without one (a
+   * test stub) may simply call `write`.
+   */
+  transaction<T>(write: () => T): T;
   startSyncRun(accountId: string): number;
   finishSyncRun(
     id: number,
@@ -279,6 +284,9 @@ export class WatchLaterSync {
   /**
    * Takes one page of the list into the mirror, and answers with the video ids it carried.
    *
+   * One transaction for the whole page: a page is 200 rows and the search-index triggers on top of
+   * them, and committing each statement on its own is what made a finished save freeze the app.
+   *
    * The positions are the list's own order, counted on from `offset` so that a walk's second page
    * continues where its first stopped.
    */
@@ -287,36 +295,38 @@ export class WatchLaterSync {
     page: WatchLaterPage,
     offset: number
   ): Set<string> {
-    const seen = new Set<string>();
-    let position = offset;
+    return this.#sink.transaction(() => {
+      const seen = new Set<string>();
+      let position = offset;
 
-    for (const item of page.items) {
-      seen.add(item.videoId);
-      this.#sink.upsertVideo({
-        channelId: item.channelId,
-        channelTitle: item.channelTitle,
-        durationSeconds: item.durationSeconds,
-        isLive: item.isLive,
-        thumbnailUrl: item.thumbnailUrl,
-        title: item.title || item.videoId,
-        videoId: item.videoId,
-      });
-      this.#sink.upsertEntry({
-        accountId,
-        position,
-        setVideoId: item.setVideoId,
-        videoId: item.videoId,
-      });
-      if (item.ytPercentWatched !== undefined || item.watchedBadge === true) {
-        this.#sink.setYouTubeProgress(accountId, item.videoId, {
-          percent: item.ytPercentWatched ?? 0,
-          watchedBadge: item.watchedBadge,
+      for (const item of page.items) {
+        seen.add(item.videoId);
+        this.#sink.upsertVideo({
+          channelId: item.channelId,
+          channelTitle: item.channelTitle,
+          durationSeconds: item.durationSeconds,
+          isLive: item.isLive,
+          thumbnailUrl: item.thumbnailUrl,
+          title: item.title || item.videoId,
+          videoId: item.videoId,
         });
+        this.#sink.upsertEntry({
+          accountId,
+          position,
+          setVideoId: item.setVideoId,
+          videoId: item.videoId,
+        });
+        if (item.ytPercentWatched !== undefined || item.watchedBadge === true) {
+          this.#sink.setYouTubeProgress(accountId, item.videoId, {
+            percent: item.ytPercentWatched ?? 0,
+            watchedBadge: item.watchedBadge,
+          });
+        }
+        position += 1;
       }
-      position += 1;
-    }
 
-    return seen;
+      return seen;
+    });
   }
 
   /**

@@ -629,6 +629,46 @@ test("an add that failed is applied by a later replay, once the list carries it"
   db.close();
 });
 
+test("a page of the list is absorbed as one transaction", async () => {
+  const db = new WatchLaterStore(openNodeSqlite(":memory:"));
+  const pages: Record<string, unknown> = { "": legacyPage(100) };
+  const transport: WatchLaterTransport = {
+    addVideo: () => Promise.resolve(),
+    fetchPage: (continuation?: string) =>
+      Promise.resolve(parseWatchLaterPage(pages[continuation ?? ""])),
+    removeVideo: () => Promise.resolve(),
+    removeVideoById: () => Promise.resolve(),
+    videoDetails: (): Promise<VideoDetails> => Promise.resolve({}),
+  };
+
+  // A page is 200 rows plus the search-index triggers, and committing each statement on its own is
+  // what made a finished save freeze the app: 1.7 s for one page, measured.
+  let transactions = 0;
+  const counted = new Proxy(db, {
+    get(target, property) {
+      if (property === "transaction") {
+        return (write: () => unknown) => {
+          transactions += 1;
+          return target.transaction(write);
+        };
+      }
+      const value = Reflect.get(target, property) as unknown;
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+
+  const sync = new WatchLaterSync(counted, config);
+  const result = await sync.pull(transport, {
+    accountId: "alpha",
+    maxPages: 1,
+  });
+
+  expect(result.items).toBe(100);
+  expect(db.membershipIds("alpha")).toHaveLength(100);
+  expect(transactions).toBe(1);
+  db.close();
+});
+
 /** A transfer that records what was asked of it, for the mutation tests. */
 const recordingTransport = (
   overrides: Partial<WatchLaterTransport> = {}

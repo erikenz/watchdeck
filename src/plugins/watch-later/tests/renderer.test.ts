@@ -21,6 +21,7 @@ interface DomApi {
     pending: boolean;
     saved: boolean;
   }) => string;
+  videoIdFromHost: (host: Element) => string | undefined;
   createSaveButton: (
     videoId: string,
     onToggle: (button: HTMLButtonElement) => void
@@ -68,7 +69,15 @@ const bundle = async (entry: string, name: "__dom" | "__rows") => {
     },
     configFile: false,
     logLevel: "silent",
-    resolve: { alias: { "@/i18n": path.join(here, "fixture-i18n.ts") } },
+    resolve: {
+      // `@/i18n` first: the alias list is matched in order, and the fixture has to win over the
+      // app's own i18n. `@` then resolves the rest of the source tree (`@/plugins/utils/...`,
+      // which `dom.ts` shares with the dimming plugins).
+      alias: {
+        "@/i18n": path.join(here, "fixture-i18n.ts"),
+        "@": path.join(here, "../../.."),
+      },
+    },
   });
   const [output] = Array.isArray(result) ? result : [result];
   if (!("output" in output)) {
@@ -100,6 +109,21 @@ const openFixture = async (page: Page) => {
   await page.goto("about:blank");
   await page.addScriptTag({ content: domScript });
   await page.addScriptTag({ content: rowsScript });
+};
+
+/**
+ * The same fixture on the site's own origin: reading a video id off a card resolves the card's
+ * *relative* links against `location.origin`, which `about:blank` does not have.
+ */
+const openSiteFixture = async (page: Page) => {
+  await page.route("https://www.youtube.com/**", (route) =>
+    route.fulfill({
+      body: "<!doctype html><title>fixture</title>",
+      contentType: "text/html",
+    })
+  );
+  await page.goto("https://www.youtube.com/");
+  await page.addScriptTag({ content: domScript });
 };
 
 test("the toolbar goes above the sort control the page is really showing", async ({
@@ -434,6 +458,46 @@ test("the button stays visible inside a transformed, clipping shelf", async ({
   );
 });
 
+test("a button whose card is gone comes back to the card, not the floating layer", async ({
+  page,
+}) => {
+  await openFixture(page);
+
+  const seen = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    document.body.innerHTML = `
+      <div id="card"><yt-thumbnail-view-model id="video" style="position:absolute;left:0;top:0;width:320px;height:180px"></yt-thumbnail-view-model></div>`;
+    const card = document.querySelector("#card") as Element;
+    const button = dom.createSaveButton("vid00000000", () => undefined);
+    card.append(button);
+
+    // The pointer is on the card's video box, so the button floats.
+    card.classList.add(dom.MEDIA_HOVER_CLASS);
+    dom.alignButton(button, card);
+    const floated = {
+      floating: button.classList.contains("wd-wl-floating"),
+      inLayer: button.parentElement !== card,
+    };
+
+    // The site re-renders and the card leaves the page while the mark is still on it. Nothing can
+    // be measured on a detached card, and the button used to stay in the layer - under `<body>`,
+    // over everything, on every page, for the rest of the session.
+    card.remove();
+    card.classList.remove(dom.MEDIA_HOVER_CLASS);
+    dom.alignButton(button, card);
+
+    return {
+      backInCard: button.parentElement === card,
+      floated,
+      stillFloating: button.classList.contains("wd-wl-floating"),
+    };
+  });
+
+  expect(seen.floated).toEqual({ floating: true, inLayer: true });
+  expect(seen.backInCard).toBe(true);
+  expect(seen.stillFloating).toBe(false);
+});
+
 test("the shortcut takes `w` on a card and leaves typing alone", async ({
   page,
 }) => {
@@ -514,6 +578,34 @@ test("a refused change is painted as a failure, and says so on the button", asyn
   });
   expect(painted.afterRepaint).toBe("Save to Watch Later");
   expect(painted.pressed).toBe("false");
+});
+
+test("a card's video id is read off its own link", async ({ page }) => {
+  await openSiteFixture(page);
+
+  const read = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    document.body.innerHTML = `
+      <div id="watch"><a href="/watch?v=vid00000000&amp;list=WL"><yt-thumbnail></yt-thumbnail></a></div>
+      <div id="shorts"><a href="/shorts/shrt0000001"></a></div>
+      <div id="none"><a href="/feed/subscriptions"></a></div>`;
+    const none = document.querySelector("#none") as Element;
+    const shorts = document.querySelector("#shorts") as Element;
+    const watch = document.querySelector("#watch") as Element;
+    return {
+      none: dom.videoIdFromHost(none),
+      shorts: dom.videoIdFromHost(shorts),
+      watch: dom.videoIdFromHost(watch),
+    };
+  });
+
+  // The dimming plugins ask the same reader which video a card is, so what it answers for the two
+  // link shapes the site serves is part of their contract too.
+  expect(read).toEqual({
+    none: undefined,
+    shorts: "shrt0000001",
+    watch: "vid00000000",
+  });
 });
 
 test("a refusal outranks everything else on the button", async ({ page }) => {

@@ -2,8 +2,9 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### 0.1.1
+#### 0.1.2
 
+- Version 0.1.1, and a build you can tell apart [`9a29df8`](https://github.com/erikenz/watchdeck/commit/9a29df8fe403fc78520c809055bfcb5cf589c13c)
 - Watch Later: "saved" now means the list says so [`ae9c4b3`](https://github.com/erikenz/watchdeck/commit/ae9c4b331e617ac6dec4e7fa3e161ed192735796)
 - TODO: the cookies are stored in the clear, and why [`9705685`](https://github.com/erikenz/watchdeck/commit/9705685f9f2007c25df0a921c6f967177e15e72e)
 - Watch Later: a save YouTube refused is no longer recorded as saved [`cf72157`](https://github.com/erikenz/watchdeck/commit/cf72157aa137fe267330a37da3d1faad3febffde)

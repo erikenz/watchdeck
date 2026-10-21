@@ -6,6 +6,8 @@
  * sometimes both at once.
  */
 
+import { CARD_SELECTOR, cardOf } from "@/plugins/utils/renderer/cards";
+
 /** The thumbnail-ish parts a card is built from; the button walks up to the card itself. */
 export const THUMBNAIL_HOST_SELECTOR = [
   "ytd-thumbnail",
@@ -16,23 +18,11 @@ export const THUMBNAIL_HOST_SELECTOR = [
   "a.yt-lockup-view-model__content-image",
 ].join(",");
 
-/**
- * The card the button belongs to. It has to be the card, not the thumbnail inside it: the
- * site's inline preview replaces the thumbnail with a surface outside that link, so a button
- * anchored to the link only appears when the pointer is over the little that is left of it.
- */
-export const CARD_SELECTOR = [
-  "ytd-rich-item-renderer",
-  "ytd-video-renderer",
-  "ytd-grid-video-renderer",
-  "ytd-compact-video-renderer",
-  "ytd-playlist-video-renderer",
-  "ytd-playlist-panel-video-renderer",
-  "yt-lockup-view-model",
-].join(",");
-
-export const cardOf = (element: Element): Element | null =>
-  element.closest(CARD_SELECTOR);
+// The card itself is shared with the dimming plugins - see `plugins/utils/renderer/cards.ts`. The
+// button has to hang off the card and not the thumbnail inside it: the site's inline preview
+// replaces the thumbnail with a surface outside that link, so a button anchored to the link only
+// appears when the pointer is over the little of it that is left.
+export { CARD_SELECTOR, cardOf };
 
 export const BUTTON_CLASS = "wd-wl-save";
 export const HOST_CLASS = "wd-wl-anchor";
@@ -241,14 +231,19 @@ const fixedOrigin = (button: HTMLButtonElement): { x: number; y: number } => {
  * the site's own layers (masthead 2020), and the card keeps painting exactly where it was.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
+  // Which subtree the button belongs in does not depend on being able to measure the video box.
+  // This used to run after the measurement, so a card that had been removed from the page (or was
+  // not laid out yet) left its button in the floating layer - under `<body>`, above everything, on
+  // every page, for the rest of the session.
+  const floating = host.classList.contains(MEDIA_HOVER_CLASS);
+  keepButtonVisible(button, host, floating);
+
   const media = mediaBoxOf(host);
   if (!media) {
     return;
   }
 
   const { box } = media;
-  const floating = host.classList.contains(MEDIA_HOVER_CLASS);
-  keepButtonVisible(button, host, floating);
 
   if (floating) {
     const origin = fixedOrigin(button);

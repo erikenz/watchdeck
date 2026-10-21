@@ -1,0 +1,7 @@
+/* A card whose video the site marks as watched fades, so a feed you have already been through
+   reads as one. The level is the plugin's own setting, handed over as a variable; the fallback is
+   the default one. */
+.wd-dv-viewed {
+  opacity: var(--wd-dv-opacity, 0.45);
+  transition: opacity 120ms ease;
+}

@@ -49,6 +49,15 @@
   opacity: 1;
 }
 
+/* A card whose video is already in Watch Later fades a little, so the ones you have not saved yet
+   stand out. Wrapped in `:where()` on purpose: a card can be both saved and watched, the
+   dim-viewed plugin fades a watched one with a plain class, and `:where()` keeps this rule's
+   specificity at zero - so the watched fade wins whatever order the two plugins loaded in. */
+:where(.wd-wl-dim) {
+  opacity: var(--wd-wl-dim-opacity, 0.7);
+  transition: opacity 120ms ease;
+}
+
 /* A saved video says so without being hovered: that is the point of the button. */
 .wd-wl-save[data-state="saved"],
 .wd-wl-save[data-state="pending"],

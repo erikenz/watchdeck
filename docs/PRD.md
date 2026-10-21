@@ -744,7 +744,7 @@ opens the video or the inline preview.
 
 ### R5 — Plugins: what happens to the 41 inherited ones
 
-**Where this landed (rev 13).** `src/plugins` now holds **18 plugins**, and the plan below is the record of
+**Where this landed (rev 13; 19 plugins as of rev 16).** `src/plugins` now holds **19 plugins**, and the plan below is the record of
 how they were triaged rather than a to-do list:
 
 - P0 deleted the 15 music-only ones; P1/P2 reworked the providers underneath the rest.
@@ -1052,6 +1052,15 @@ conversation. The research behind it happened in one Delta thread, which was clo
   pinned `auto-changelog` (the script was a `pnpm dlx`, which R6's exact-version rule does not allow) and writes
   `changelog.md`, which the release workflow commits. The bump covers the two Watch Later fixes of rev 14 and this
   naming change; both bugs are written up in §4.2 notes 5–7 and §R4.
+- **Version 0.1.2 (rev 16).** Four things the owner asked for after using the app, and one of them is a
+  bug worth naming: a finished save froze the app for a moment, because a page of the mirror was written
+  statement by statement in the rollback journal (measured: 1.7 s for the 200 rows of one page, 10 ms once
+  the page is one transaction in WAL — `openNodeSqlite`, `WatchLaterStore.transaction`). The other three
+  are new surface: **`dim-viewed`**, a plugin that fades the cards the site itself marks as watched
+  (measured marks in `plugins/utils/renderer/cards.ts`); an option in Watch Later that fades the cards of
+  videos already in the list, deliberately less than the watched ones; and the stray save button that
+  used to stay floating over every page when its card left the page while marked (`alignButton` puts a
+  button back before it measures, and a mark whose card is gone is dropped in `scan`).
 - **Still open:** nothing. §13's Q6 was answered by the shipped gesture set (rev 11).
 - **Next step:** **P3 — SponsorBlock** (§8): the bounded spike from §5.1 — load the official release at runtime with the
   `chrome.storage.sync → storage.local` shim, and check the service worker, the in-player button and skipping, config

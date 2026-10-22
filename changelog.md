@@ -2,8 +2,10 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### 0.1.6
+#### 0.1.7
 
+- Dimming is for finished videos, and the button is placed in the document [`419b138`](https://github.com/erikenz/watchdeck/commit/419b138685384617b05d75fec834b54b9bcb82bb)
+- Version 0.1.6, changelog regenerated [`080e3f1`](https://github.com/erikenz/watchdeck/commit/080e3f1a9a75a533ae20c38c229557fb3abcdad7)
 - Watch Later: a signed-out app says so, on the button and in the toolbar [`0761cae`](https://github.com/erikenz/watchdeck/commit/0761cae7096c2e5c6bb83c02992cff9058be617a)
 - Research: the extension's request layer confirms the cookie rule [`6e63cfc`](https://github.com/erikenz/watchdeck/commit/6e63cfc93f3cb4ce9c51af2ad3533d31bbd5d2b6)
 - TODO: the mirror keeps 109 MB of raw responses nothing reads [`44d1d64`](https://github.com/erikenz/watchdeck/commit/44d1d646aebbebabc6885ddd2a93e2cdc33fa1db)

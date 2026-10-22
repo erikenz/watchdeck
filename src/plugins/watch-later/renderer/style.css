@@ -34,18 +34,24 @@
   opacity: 1;
 }
 
-/* While the card is marked the button floats: it lives in a layer under `<body>` (see
-   `floatingLayer`), placed against the viewport so it sits above the site's inline preview
-   without raising the card. The preview is a fixed overlay at `z-index: auto`, and one is enough,
-   while the site's own layers start at 2020. Raising the card instead hid the preview behind it. */
-/* The layer is an empty div under `<body>`: it has no size of its own, so it cannot intercept
-   anything, and the button inside it is placed `fixed` against the viewport. */
+/* While the card is marked *and the site's preview is playing over it* the button floats: it lives
+   in a layer under `<body>` (see `floatingLayer`), placed in document coordinates so it sits above
+   the preview without raising the card - and scrolls with the page the way the card does. The
+   preview is an overlay at `z-index: auto`, and one is enough, while the site's own layers start at
+   2020. Raising the card instead hid the preview behind it. */
+/* The layer is an empty div under `<body>` at the document's origin: it has no size of its own, so
+   it cannot intercept anything, and the button inside it is placed in the document's own
+   coordinates. */
 .wd-wl-floating-layer {
-  position: static;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
 }
 
 .wd-wl-save.wd-wl-floating {
-  position: fixed;
+  position: absolute;
   z-index: 1;
   opacity: 1;
 }

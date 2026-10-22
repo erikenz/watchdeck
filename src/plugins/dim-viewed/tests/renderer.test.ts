@@ -129,16 +129,17 @@ test("the site's percentage decides, with the app's thresholds", async ({
     }
   );
 
-  // 95% is watched and 30% is in progress (both above the 5% minimum), 1% is not, a card the site
-  // does not mark is not, a bar with no readable width counts as started, and the watched badge
-  // counts outright.
+  // 95% is past the 90% finished threshold and the badge is the site saying so outright; 30% is in
+  // progress, and started is not finished - a video the user is halfway through is not faded. 1% is
+  // not started, a card the site does not mark is not, and a bar with no readable width says
+  // "started", which is not finished either.
   expect(seen).toEqual({
     barelyStarted: false,
     badge: true,
     fresh: false,
-    inProgress: true,
+    inProgress: false,
     opacity: "0.45",
-    unmeasurable: true,
+    unmeasurable: false,
     watched: true,
   });
 });
@@ -169,12 +170,12 @@ test("a threshold change re-reads the cards, and stop leaves nothing", async ({
       document.body.innerHTML = cards;
       dim.start(config);
 
-      const card = document.querySelector("#middle") as Element;
+      const card = document.querySelector("#done") as Element;
       const before = card.classList.contains(dim.VIEWED_CLASS);
 
-      // The owner raises "continue watching from" to 50% in the Options menu: 30% is not viewed
-      // any more, and the answer is re-read without a reload.
-      thresholds.inProgress.min.percent = 50;
+      // The owner raises "watched at" to 99% in the Options menu: 95% is not finished any more,
+      // and the answer is re-read without a reload.
+      thresholds.watched.percent = 99;
       for (const watcher of watchers) {
         watcher();
       }
@@ -190,7 +191,7 @@ test("a threshold change re-reads the cards, and stop leaves nothing", async ({
           document.documentElement.style.getPropertyValue("--wd-dv-opacity"),
       };
     },
-    { cards: CARD("middle", "30%"), config: CONFIG }
+    { cards: CARD("done", "95%"), config: CONFIG }
   );
 
   expect(seen.before).toBe(true);

@@ -181,13 +181,17 @@ export const BUTTON_SIZE = 36;
 
 /**
  * Keeps the button in the subtree where it can actually be seen: its card normally, the floating
- * layer while the card's own subtree would clip it.
+ * layer while the card's own subtree would clip it. Returns the layer when it floated, so the
+ * caller can place the button against it.
+ *
+ * The layer is an empty div under `<body>` that the stylesheet places at the document's own origin,
+ * so a button inside it is positioned in document coordinates and scrolls with the page.
  */
 const keepButtonVisible = (
   button: HTMLButtonElement,
   host: Element,
   floating: boolean
-) => {
+): HTMLElement | null => {
   if (floating) {
     const layer = floatingLayer();
 
@@ -195,42 +199,32 @@ const keepButtonVisible = (
       button.classList.add(FLOATING_BUTTON_CLASS);
       layer.append(button);
     }
-    return;
+    return layer;
   }
 
   if (button.parentElement !== host) {
     button.classList.remove(FLOATING_BUTTON_CLASS);
     host.append(button);
   }
+  return null;
 };
 
 /**
- * Where a `position: fixed` box's 0,0 lands on screen.
+ * Where the floating layer's own 0,0 lands on screen.
  *
- * A fixed box is placed against the viewport - unless one of its ancestors has a `transform`,
- * `filter`, `perspective`, `contain` or `will-change`, in which case *that* ancestor becomes its
- * containing block instead. The site's horizontal shelves do exactly this: an identity
- * `matrix(1, 0, 0, 1, 0, 0)` on the scrolling wrapper, which is enough, and which moved the button
- * of a hovered shelf card onto the card next to it ("the button does not appear" - it was 256 px
- * to the right). Measured, not guessed: listing which ancestors count gets half a fix.
+ * The layer is an empty child of `<body>`, placed at the document's origin by the stylesheet, so a
+ * button inside it is positioned in the document's own coordinate space - which is the point: a box
+ * positioned there scrolls with the page exactly as the card does, with no per-frame work and no
+ * frame of lag. It used to be `position: fixed`, in viewport coordinates, and that is what the owner
+ * kept seeing: correct only until the page scrolled, at which point the button stayed where it was
+ * and had to be measured back onto its card - a 200 px jump per wheel tick, measured frame by frame
+ * on the live page.
+ *
+ * Read off the layer rather than the button: a measurement that writes to the element it measures is
+ * a DOM mutation, and this plugin's own observer watches for those.
  */
-const fixedOrigin = (button: HTMLButtonElement): { x: number; y: number } => {
-  const saved = {
-    bottom: button.style.bottom,
-    left: button.style.left,
-    right: button.style.right,
-    top: button.style.top,
-  };
-
-  button.style.left = "0px";
-  button.style.top = "0px";
-  button.style.right = "";
-  button.style.bottom = "";
-  const rect = button.getBoundingClientRect();
-
-  Object.assign(button.style, saved);
-  return { x: rect.left, y: rect.top };
-};
+const layerOrigin = (layer: HTMLElement): DOMRect =>
+  layer.getBoundingClientRect();
 
 /**
  * The site's inline preview: one shared element it moves over the hovered card while it plays.
@@ -239,23 +233,49 @@ const fixedOrigin = (button: HTMLButtonElement): { x: number; y: number } => {
  */
 const PREVIEW_SELECTOR = "ytd-video-preview";
 
-const isPreviewPlaying = (): boolean => {
+/**
+ * Whether that preview is playing *over this card*.
+ *
+ * The element is shared and the site moves it to whichever card the pointer is on, so "a preview
+ * exists" is a different question from "this card is covered" - and answering the first one
+ * floated a card's button while the preview was over another card, which moved the button between
+ * subtrees for no reason. The overlap is the thing that matters: it is what hides an in-card
+ * button. The card's own box is used rather than the video box's, because the card can always be
+ * measured and the video box cannot.
+ */
+const previewCovers = (card: Element): boolean => {
   const preview = document.querySelector(PREVIEW_SELECTOR);
-  return preview !== null && preview.getBoundingClientRect().width > 0;
+  if (!preview) {
+    return false;
+  }
+
+  const box = preview.getBoundingClientRect();
+  if (box.width <= 0 || box.height <= 0) {
+    return false;
+  }
+
+  const cardBox = card.getBoundingClientRect();
+  return (
+    box.left < cardBox.right &&
+    box.right > cardBox.left &&
+    box.top < cardBox.bottom &&
+    box.bottom > cardBox.top
+  );
 };
 
 /**
  * Places the button at the bottom-right of the video box.
  *
- * It lives **in its card** unless the site's preview is actually playing over it. A `fixed` button is
- * positioned from a measurement taken after the scroll has already been applied, so while the pointer
- * sits on a card and the page scrolls it trails the card by a frame - which reads as flicker. In the
- * card it scrolls with the card, exactly like the site's own overlay buttons.
+ * It lives **in its card** unless the site's preview is actually playing over it. A box pinned to the
+ * viewport is positioned from a measurement, so while the pointer sits on a card and the page scrolls
+ * it stays where it is and then jumps back onto the card - measured on the live page as a 200 px jump
+ * per wheel tick, which is what the owner saw as flicker. In the card, and in the document-positioned
+ * floating layer, it scrolls with the card instead, exactly like the site's own overlay buttons.
  *
- * While the preview plays the button is moved to the floating layer and placed `fixed` against the
- * viewport: that overlay paints over the card, so a button inside the card ends up underneath it, and
- * raising the *card* instead hides the preview behind the still picture (docs/PRD.md §R4). The card
- * keeps painting exactly where it was either way.
+ * While the preview plays over the card the button is moved to that layer and placed in **document**
+ * coordinates: the preview paints over the card, so a button inside the card ends up underneath it,
+ * and raising the *card* instead hides the preview behind the still picture (docs/PRD.md §R4). The
+ * card keeps painting exactly where it was either way.
  */
 export const alignButton = (button: HTMLButtonElement, host: Element) => {
   // Which subtree the button belongs in does not depend on being able to measure the video box.
@@ -263,8 +283,8 @@ export const alignButton = (button: HTMLButtonElement, host: Element) => {
   // not laid out yet) left its button in the floating layer - under `<body>`, above everything, on
   // every page, for the rest of the session.
   const floating =
-    host.classList.contains(MEDIA_HOVER_CLASS) && isPreviewPlaying();
-  keepButtonVisible(button, host, floating);
+    host.classList.contains(MEDIA_HOVER_CLASS) && previewCovers(host);
+  const layer = keepButtonVisible(button, host, floating);
 
   const media = mediaBoxOf(host);
   if (!media) {
@@ -273,10 +293,12 @@ export const alignButton = (button: HTMLButtonElement, host: Element) => {
 
   const { box } = media;
 
-  if (floating) {
-    const origin = fixedOrigin(button);
-    button.style.left = `${Math.round(box.right - origin.x) - 8 - BUTTON_SIZE}px`;
-    button.style.top = `${Math.round(box.bottom - origin.y) - BUTTON_LIFT - BUTTON_SIZE}px`;
+  if (floating && layer) {
+    // Both rects are viewport-relative, so their difference does not care where the page is
+    // scrolled - which is exactly why the button stays on its card now.
+    const origin = layerOrigin(layer);
+    button.style.left = `${Math.round(box.right - origin.left) - 8 - BUTTON_SIZE}px`;
+    button.style.top = `${Math.round(box.bottom - origin.top) - BUTTON_LIFT - BUTTON_SIZE}px`;
     button.style.right = "";
     button.style.bottom = "";
     return;

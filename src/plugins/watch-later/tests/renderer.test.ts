@@ -330,7 +330,8 @@ test("the button sits on the video box, at one offset in both states", async ({
       parent: button.parentElement === card,
     };
 
-    // The preview plays over the card: only then does the button float, so it stays above it.
+    // The preview plays over the card: only then does the button float, so it stays above it. The
+    // preview is placed where the site places it - over the card's own video box.
     document.body.insertAdjacentHTML(
       "beforeend",
       '<ytd-video-preview style="position:fixed;left:0;top:0;width:527px;height:296px"></ytd-video-preview>'
@@ -375,8 +376,9 @@ test("the button sits on the video box, at one offset in both states", async ({
     measured.mediaEdge.bottom - 36,
     0
   );
-  // ...and the same corner while the card is marked, where the button is placed `fixed` so it can
-  // sit above the site's preview overlay without raising the card.
+  // ...and the same corner while the card is marked, where the button is placed in the floating
+  // layer in document coordinates, so it can sit above the site's preview overlay without raising
+  // the card - and scroll with the card rather than being pinned to the viewport.
   expect(measured.whileMarkedClearedAbsolute).toBe(true);
   expect(measured.cornerWhileMarked.x).toBeCloseTo(
     measured.cornerWhileHovered.x,
@@ -422,10 +424,12 @@ test("the button stays visible inside a transformed, clipping shelf", async ({
 
     card.classList.add(dom.MEDIA_HOVER_CLASS);
     // The float exists for the preview: it paints over the card, and this wrapper would clip a button
-    // that stayed inside it.
+    // that stayed inside it. The preview is placed over the *card*, which is where the site puts it
+    // (it moves the one shared element onto whichever card the pointer is on), and the card here is
+    // inside a wrapper translated by 543 px.
     document.body.insertAdjacentHTML(
       "beforeend",
-      '<ytd-video-preview style="position:fixed;left:0;top:0;width:527px;height:296px"></ytd-video-preview>'
+      '<ytd-video-preview style="position:fixed;left:543px;top:0;width:527px;height:296px"></ytd-video-preview>'
     );
     dom.alignButton(button, card);
     const marked = button.getBoundingClientRect();
@@ -584,6 +588,74 @@ test("a button with no session says so, and cannot be pressed", async ({
     state: "saved",
   });
   expect(seen.restored).toEqual({ disabled: false, label: "remove" });
+});
+
+test("a floating button scrolls with its card instead of staying on screen", async ({
+  page,
+}) => {
+  await openFixture(page);
+  await page.addStyleTag({ content: pluginStyles });
+
+  const seen = await page.evaluate(() => {
+    const { __dom: dom } = window as unknown as { __dom: DomApi };
+    document.body.innerHTML = `
+      <div style="height:600px"></div>
+      <div id="card" class="wd-wl-anchor" style="position:relative;width:527px;height:352px">
+        <yt-thumbnail-view-model id="video" style="position:absolute;left:0;top:0;width:527px;height:296px"></yt-thumbnail-view-model>
+      </div>
+      <div style="height:1200px"></div>`;
+
+    const card = document.querySelector("#card") as Element;
+    const button = dom.createSaveButton("vid00000002", () => undefined);
+    card.append(button);
+    window.scrollTo(0, 0);
+
+    const gap = () => {
+      const b = button.getBoundingClientRect();
+      const c = card.getBoundingClientRect();
+      return { x: Math.round(b.left - c.left), y: Math.round(b.top - c.top) };
+    };
+
+    // The preview is over the card, so the button floats - and it is *not* re-aligned while the page
+    // scrolls, which is the whole point: nothing has to run for it to stay on its card.
+    card.classList.add(dom.MEDIA_HOVER_CLASS);
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<ytd-video-preview style="position:fixed;left:0;top:600px;width:527px;height:296px"></ytd-video-preview>'
+    );
+    dom.alignButton(button, card);
+    const floating = {
+      gap: gap(),
+      inLayer: button.parentElement?.className ?? "",
+      position: getComputedStyle(button).position,
+    };
+
+    window.scrollTo(0, 240);
+    const scrolled = { gap: gap(), scrollY: Math.round(window.scrollY) };
+
+    // The preview moves to a different card (the pointer did): this card's button belongs in the card
+    // again, and it is not moved to the layer for a preview that is playing somewhere else.
+    const preview = document.querySelector("ytd-video-preview") as HTMLElement;
+    preview.style.top = "-900px";
+    dom.alignButton(button, card);
+
+    return {
+      afterPreviewLeft: {
+        inCard: button.parentElement === card,
+        position: getComputedStyle(button).position,
+      },
+      floating,
+      scrolled,
+    };
+  });
+
+  expect(seen.floating.inLayer).toContain("wd-wl-floating-layer");
+  expect(seen.floating.position).toBe("absolute");
+  expect(seen.scrolled.scrollY).toBe(240);
+  // The same offset on screen before and after the scroll: a `fixed` button keeps its own screen
+  // position instead, which is the 200 px jump the owner saw.
+  expect(seen.scrolled.gap).toEqual(seen.floating.gap);
+  expect(seen.afterPreviewLeft).toEqual({ inCard: true, position: "absolute" });
 });
 
 test("the shortcut takes `w` on a card and leaves typing alone", async ({

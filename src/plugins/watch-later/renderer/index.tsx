@@ -446,7 +446,15 @@ export const renderer = {
     }
 
     const index = Number(ytcfg.get("SESSION_INDEX") ?? Number.NaN);
-    const loggedIn = ytcfg.get("LOGGED_IN") === true;
+    const loggedIn = ytcfg.get("LOGGED_IN");
+
+    // The page publishes its config in pieces, and a piece can exist before `LOGGED_IN` does.
+    // "Not yet" is not "signed out": reading it that way tore a working session down at start.
+    if (typeof loggedIn !== "boolean") {
+      this.scheduleSessionIndexReport(context);
+      return;
+    }
+
     const report = {
       index: Number.isFinite(index) ? index : null,
       loggedIn,

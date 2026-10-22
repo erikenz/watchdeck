@@ -317,8 +317,19 @@ const adoptSessionReport = async (report: {
   }
 
   if (!signedIn) {
-    // A session built from the jar is no more use than the jar itself once the page says nobody
-    // is signed in, and keeping it would let a click look like it had a chance.
+    // The page is one witness; the jar is the other, and the jar decides. At a cold start the page
+    // can report no session before the cookies have been read, and a working session must not be
+    // torn down over that (seen in the app's own log: "no signed-in session", then a signed-in one
+    // a moment later, with a rebuilt session behind it).
+    const cookies = await currentCookies();
+    if (cookies) {
+      log(
+        "the page reports no session, but the jar still holds one; keeping it"
+      );
+      return;
+    }
+    // A session built from the jar is no more use than the jar itself once nobody is signed in,
+    // and keeping it would let a click look like it had a chance.
     state.session = null;
     state.needsAuth = true;
     broadcast();

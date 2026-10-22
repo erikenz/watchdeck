@@ -6,7 +6,6 @@ import {
   CARD_SELECTOR,
   durationOf,
   hasWatchedBadge,
-  isViewedCard,
   viewedPercent,
 } from "@/plugins/utils/renderer/cards";
 import type { WatchThresholds } from "@/types/watch-thresholds";
@@ -41,12 +40,13 @@ const readThresholds = (): WatchThresholds =>
   });
 
 /**
- * Whether the card counts as viewed.
+ * Whether the card counts as *finished*.
  *
  * The percentage is the site's own - the width of the bar it draws - put through the shared
- * thresholds, so "viewed" means the same thing here and in the Watch Later list. A card the site
- * marks but whose bar cannot be measured counts as started (the site only draws a bar when there is
- * progress), and the watched badge counts outright.
+ * thresholds, so "finished" means the same thing here and in the Watch Later list's watched bucket.
+ * Started is not finished: a card in the continue-watching band is deliberately left alone, because
+ * fading a video the user is halfway through says the wrong thing about it. The site's own
+ * "Watched" badge counts outright; a bar with no readable width is "started", not "finished".
  */
 const isViewed = (card: Element): boolean => {
   if (hasWatchedBadge(card)) {
@@ -55,17 +55,18 @@ const isViewed = (card: Element): boolean => {
 
   const percent = viewedPercent(card);
   if (percent === undefined) {
-    return isViewedCard(card);
+    return false;
   }
   if (!thresholds) {
-    return percent > 0;
+    // No thresholds read yet: only a bar the site drew all the way across is finished.
+    return percent >= 100;
   }
 
   return (
     classifyProgress(
       { durationSeconds: durationOf(card), ratio: percent / 100 },
       thresholds
-    ) !== "unwatched"
+    ) === "watched"
   );
 };
 

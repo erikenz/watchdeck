@@ -698,15 +698,20 @@ on the card itself (marked `wd-wl-anchor`) — *not* on the thumbnail link, whic
 surface outside it, and *not* inside the overlay, which is `pointer-events: none` until it plays and carries no `z-index`
 for a button inside it to beat.
 
-**Placement (rev 11, moved out of the card in rev 12):** bottom-right of the video box, **36 px above its bottom edge** — clear
+**Placement (rev 11, moved out of the card in rev 12, document coordinates in rev 14):** bottom-right of the video box, **36 px above its bottom edge** — clear
 of the duration badge, and the **same offset while the site's inline preview plays**. The overlay takes the pointer while it
 plays, so the card stops being hovered exactly then; the card whose *video box* holds the pointer is marked on `pointermove`
-(rAF-coalesced, plus scroll and resize), and that mark is what keeps the button up. While marked, the button is moved into a
-`div` under `<body>` (`wd-wl-floating-layer`) and placed `position: fixed` at `z-index: 1` against the viewport: the site's
-overlay is a fixed element at `z-index: auto`, so one is enough to put the button above it — visible *and* clickable — and the
-site's own layers start at 2020, so nothing of theirs ends up underneath a card. The video box is measured from the card's
-thumbnail-ish children, skipping any candidate too small to be the video. A card maps to its button in a `WeakMap`, because a
-floating button is not findable from its card by query.
+(rAF-coalesced, plus scroll and resize), and that mark is what keeps the button up. While the preview is playing **over that
+card** — the shared `ytd-video-preview` element is moved onto whichever card the pointer is on, so "a preview exists" is not
+the same question as "this card is covered" — the button is moved into a `div` under `<body>` (`wd-wl-floating-layer`) and
+placed at `z-index: 1` in **document coordinates**: the site's overlay is a fixed element at `z-index: auto`, so one is enough
+to put the button above it — visible *and* clickable — and the site's own layers start at 2020, so nothing of theirs ends up
+underneath a card. It was `position: fixed` against the viewport through rev 13, and that is a placement the page has to keep
+re-measuring: a wheel tick moves the content, the fixed box stays where it was, and the button visibly jumps back onto its card
+— **measured frame by frame on the live page as a 200 px jump per tick, `maxGapJump: 200`, down to 0 once it is positioned in
+the document instead** (pinned by `a floating button scrolls with its card instead of staying on screen`). The video box is
+measured from the card's thumbnail-ish children, skipping any candidate too small to be the video. A card maps to its button in
+a `WeakMap`, because a floating button is not findable from its card by query.
 
 **What must not be moved (rev 11):** the card. Rev 10 raised the marked card to `z-index: 1` instead, which puts the card
 above the overlay as well — the preview then starts, plays and is painted underneath the still picture, which reads as "the
@@ -1080,6 +1085,18 @@ conversation. The research behind it happened in one Delta thread, which was clo
   videos already in the list, deliberately less than the watched ones; and the stray save button that
   used to stay floating over every page when its card left the page while marked (`alignButton` puts a
   button back before it measures, and a mark whose card is gone is dropped in `scan`).
+- **Version 0.1.7 (rev 18).** Two reports from the owner, both about a rule being one step too eager.
+  **Dimming is for *finished* videos.** Through 0.1.6 `dim-viewed` faded every card that was not
+  `unwatched` — the continue-watching band included — so a video watched 10% of the way was faded as if
+  it were done, and a card carrying a resume bar with no readable width faded too. It now fades only
+  what `classifyProgress` calls `watched` (or what the site's own "Watched" badge says outright);
+  started is not finished. Measured live on 209 cards: 0 in-progress cards faded, the only 2 faded
+  ones at 100%. **The floating button is placed in document coordinates.** A `position: fixed` box is
+  placed from a measurement in viewport coordinates, so every wheel tick moved the content out from
+  under it and it jumped back onto its card — measured frame by frame as `maxGapJump: 200` px per
+  tick, 0 after the change, with the button never leaving `absolute` (`docs/PRD.md` §R4). It also
+  floats only when the shared preview element actually covers *that* card. Both are pinned by tests
+  that fail when the old behaviour is restored.
 - **Version 0.1.3 (rev 17).** The watched / continue-watching thresholds moved out of the Watch Later
   plugin's config and into the app's own options (`options.watched`, `options.inProgress`, with the two
   percentages in the Options menu), because two plugins ask that question now: Watch Later buckets its
